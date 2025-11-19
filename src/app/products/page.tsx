@@ -1,0 +1,484 @@
+/** @format */
+
+"use client";
+import {
+  useState,
+  useMemo,
+  useEffect,
+  Suspense,
+  useRef,
+  useCallback,
+} from "react";
+import { useSearchParams } from "next/navigation";
+import { useDebouncedCallback } from "use-debounce";
+import Link from "next/link";
+import Image from "next/image";
+import {
+  PlusCircle,
+  Search,
+  GitBranch,
+  Edit,
+  Trash2,
+  Upload,
+  LayoutGrid,
+  List,
+  Tags,
+} from "lucide-react";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { useOrderStore } from "@/store/use-order-store";
+import { Product } from "@/lib/types";
+import { useSettingsStore } from "@/store/use-settings-store";
+import { ProductForm } from "./_components/product-form";
+import Loading from "../loading";
+import { cn } from "@/lib/utils";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { toast } from "@/hooks/use-toast";
+import { ProductImporterDialog } from "./_components/product-importer-dialog";
+import { PriceAuditDialog } from "@/components/price-audit-dialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import { useManufacturerStore } from "@/store/use-manufacturer-store";
+
+type AddProductData = Omit<Product, "id" | "imageUrl"> & { image?: File };
+
+interface ProductListItem extends Product {
+  depth: number;
+}
+
+function ProductsPageContent() {
+  const {
+    products,
+    addProduct,
+    updateProduct,
+    deleteProduct,
+    deleteAllProducts,
+    loading: productsLoading,
+    loadRemainingProducts,
+    searchProducts,
+  } = useOrderStore();
+  const { manufacturers, loading: manufacturersLoading } =
+    useManufacturerStore();
+  const { paginationLimit } = useSettingsStore();
+  const observerRef = useRef<IntersectionObserver | null>(null);
+  const loadMoreRef = useRef<HTMLDivElement>(null);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [hasLoadedAll, setHasLoadedAll] = useState(false);
+
+  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [isImporterOpen, setIsImporterOpen] = useState(false);
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [isSearching, setIsSearching] = useState(false);
+  const [visibleCount, setVisibleCount] = useState(paginationLimit);
+  const [isAlertOpen, setIsAlertOpen] = useState(false);
+  const [productToDelete, setProductToDelete] = useState<Product | null>(null);
+  const [isDeleteAllAlertOpen, setIsDeleteAllAlertOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState("category");
+
+  useEffect(() => {
+    setVisibleCount(paginationLimit);
+  }, [paginationLimit]);
+
+  // Infinite scroll for loading remaining products
+  const handleLoadMore = async () => {
+    if (isLoadingMore || hasLoadedAll || isSearching) return;
+
+    setIsLoadingMore(true);
+    const initialCount = products.length;
+    await loadRemainingProducts();
+    const newCount = useOrderStore.getState().products.length;
+
+    if (newCount === initialCount) {
+      setHasLoadedAll(true);
+    }
+    setIsLoadingMore(false);
+  };
+
+  useEffect(() => {
+    if (!loadMoreRef.current) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (
+          entries[0].isIntersecting &&
+          !isLoadingMore &&
+          !hasLoadedAll &&
+          !isSearching
+        ) {
+          handleLoadMore();
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    observer.observe(loadMoreRef.current);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, [isLoadingMore, hasLoadedAll, isSearching, products.length]);
+
+  const loading = productsLoading || manufacturersLoading;
+
+  const debouncedSearch = useDebouncedCallback(async (term: string) => {
+    if (!term.trim()) {
+      setIsSearching(false);
+      setIsLoadingMore(false);
+      await useOrderStore.getState().fetchInitialData();
+      return;
+    }
+    setIsLoadingMore(true);
+    setIsSearching(true);
+    await useOrderStore.getState().searchProducts(term);
+    setIsLoadingMore(false);
+  }, 500);
+
+  const handleSearch = (term: string) => {
+    setSearchTerm(term);
+    if (term.trim()) {
+      setIsLoadingMore(true);
+    }
+    debouncedSearch(term);
+  };
+
+  const filteredProducts = products;
+
+  const productsByCategory = useMemo(() => {
+    return filteredProducts.reduce((acc, product) => {
+      const category = product.category || "Uncategorized";
+      if (!acc[category]) {
+        acc[category] = [];
+      }
+      acc[category].push(product);
+      return acc;
+    }, {} as Record<string, Product[]>);
+  }, [filteredProducts]);
+
+  const productsByManufacturer = useMemo(() => {
+    const manufacturerMap = new Map(manufacturers.map((m) => [m.id, m.name]));
+    return filteredProducts.reduce((acc, product) => {
+      const manufacturerName = product.manufacturerId
+        ? manufacturerMap.get(product.manufacturerId) || "Unassigned"
+        : "Unassigned";
+      if (!acc[manufacturerName]) {
+        acc[manufacturerName] = [];
+      }
+      acc[manufacturerName].push(product);
+      return acc;
+    }, {} as Record<string, Product[]>);
+  }, [filteredProducts, manufacturers]);
+
+  const handleOpenForm = (product: Product | null) => {
+    setEditingProduct(product);
+    setIsFormOpen(true);
+  };
+
+  const handleDeleteClick = (product: Product) => {
+    setProductToDelete(product);
+    setIsAlertOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (productToDelete) {
+      await deleteProduct(productToDelete.id);
+      toast({
+        title: "Product Deleted",
+        description: `"${productToDelete.name}" has been removed.`,
+        variant: "destructive",
+      });
+    }
+    setIsAlertOpen(false);
+    setProductToDelete(null);
+  };
+
+  const handleDeleteAllConfirm = async () => {
+    await deleteAllProducts();
+    setIsDeleteAllAlertOpen(false);
+  };
+
+  const onSubmit = async (data: AddProductData) => {
+    if (editingProduct) {
+      await updateProduct(editingProduct.id, data);
+      toast({ title: "Product Updated" });
+    } else {
+      await addProduct(data);
+    }
+    setIsFormOpen(false);
+    setEditingProduct(null);
+  };
+
+  const renderProductList = (productsToRender: Product[]) => (
+    <div className='grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4'>
+      {productsToRender.map((product) => (
+        <Card
+          key={product.id}
+          className={cn(product.isVariant && "bg-muted/50 ml-4")}
+        >
+          <CardContent className='p-4 flex gap-4'>
+            <Image
+              src={product.imageUrl || "https://placehold.co/100x100.png"}
+              alt={product.name}
+              width={80}
+              height={80}
+              className='rounded-md object-cover'
+              data-ai-hint={product.hint}
+            />
+            <div className='flex-1 flex flex-col justify-between'>
+              <div>
+                <p className='font-semibold'>
+                  {product.name}{" "}
+                  {product.variantName && `- ${product.variantName}`}
+                </p>
+                <p className='text-sm text-muted-foreground'>
+                  $
+                  {typeof product.price === "number"
+                    ? product.price.toFixed(2)
+                    : "0.00"}
+                </p>
+                <p className='text-sm text-muted-foreground'>
+                  {product.stock} in stock
+                </p>
+              </div>
+              <div className='mt-2 flex items-center justify-end space-x-2'>
+                <Button variant='outline' size='sm' asChild>
+                  <Link href={`/products/${product.id}`}>View</Link>
+                </Button>
+
+                <Button
+                  variant='secondary'
+                  size='icon'
+                  className='h-9 w-9'
+                  onClick={() => handleOpenForm(product)}
+                >
+                  <Edit className='h-4 w-4' />
+                </Button>
+                <Button
+                  variant='destructive'
+                  size='icon'
+                  className='h-9 w-9'
+                  onClick={() => handleDeleteClick(product)}
+                >
+                  <Trash2 className='h-4 w-4' />
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      ))}
+    </div>
+  );
+
+  if (loading) return <Loading />;
+
+  return (
+    <>
+      <AlertDialog open={isAlertOpen} onOpenChange={setIsAlertOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the
+              product "{productToDelete?.name}".
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteConfirm}>
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog
+        open={isDeleteAllAlertOpen}
+        onOpenChange={setIsDeleteAllAlertOpen}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete All Products?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action is irreversible and will permanently delete all
+              products.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteAllConfirm}
+              className='bg-destructive text-destructive-foreground hover:bg-destructive/90'
+            >
+              Delete All
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <div className='flex flex-col gap-8'>
+        <div className='flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4'>
+          <div>
+            <h1 className='text-3xl font-bold'>Products</h1>
+            <p className='text-muted-foreground'>
+              Manage your product inventory.
+            </p>
+          </div>
+          <div className='flex items-center gap-2 w-full sm:w-auto'>
+            <Button
+              onClick={() => handleOpenForm(null)}
+              className='w-full sm:w-auto'
+            >
+              <PlusCircle className='h-4 w-4 mr-2' />
+              Add Product
+            </Button>
+            <Button
+              variant='outline'
+              onClick={() => setIsImporterOpen(true)}
+              className='w-full sm:w-auto'
+            >
+              <Upload className='h-4 w-4 mr-2' />
+              Import
+            </Button>
+            <Button variant='outline' asChild className='w-full sm:w-auto'>
+              <Link href='/products/manufacturers'>Manage Manufacturers</Link>
+            </Button>
+            <Button variant='outline' asChild className='w-full sm:w-auto'>
+              <Link href='/products/categories'>
+                <Tags className='h-4 w-4 mr-2' />
+                Manage Categories
+              </Link>
+            </Button>
+            <Button
+              variant='destructive'
+              onClick={() => setIsDeleteAllAlertOpen(true)}
+              className='w-full sm:w-auto'
+            >
+              <Trash2 className='h-4 w-4 mr-2' />
+              Delete All
+            </Button>
+          </div>
+        </div>
+        <ProductForm
+          isOpen={isFormOpen}
+          onOpenChange={setIsFormOpen}
+          onSubmit={onSubmit}
+          product={editingProduct}
+        />
+        <ProductImporterDialog
+          isOpen={isImporterOpen}
+          onOpenChange={setIsImporterOpen}
+        />
+
+        <div className='relative'>
+          <Search className='absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground' />
+          <Input
+            type='search'
+            placeholder='Search products...'
+            className='pl-8 pr-10'
+            value={searchTerm}
+            onChange={(e) => handleSearch(e.target.value)}
+          />
+          {isLoadingMore && isSearching && (
+            <div className='absolute right-2.5 top-2.5'>
+              <div className='h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent' />
+            </div>
+          )}
+        </div>
+
+        <Tabs value={activeTab} onValueChange={setActiveTab}>
+          <TabsList>
+            <TabsTrigger value='category'>By Category</TabsTrigger>
+            <TabsTrigger value='manufacturer'>By Manufacturer</TabsTrigger>
+          </TabsList>
+          <TabsContent value='category' className='mt-4'>
+            <Accordion
+              type='multiple'
+              defaultValue={Object.keys(productsByCategory)}
+            >
+              {Object.entries(productsByCategory).map(
+                ([category, products]) => (
+                  <AccordionItem value={category} key={category}>
+                    <AccordionTrigger className='text-lg font-medium'>
+                      {category} ({products.length})
+                    </AccordionTrigger>
+                    <AccordionContent className='p-4'>
+                      {renderProductList(products)}
+                    </AccordionContent>
+                  </AccordionItem>
+                )
+              )}
+            </Accordion>
+          </TabsContent>
+          <TabsContent value='manufacturer' className='mt-4'>
+            <Accordion
+              type='multiple'
+              defaultValue={Object.keys(productsByManufacturer)}
+            >
+              {Object.entries(productsByManufacturer).map(
+                ([manufacturer, products]) => (
+                  <AccordionItem value={manufacturer} key={manufacturer}>
+                    <AccordionTrigger className='text-lg font-medium'>
+                      {manufacturer} ({products.length})
+                    </AccordionTrigger>
+                    <AccordionContent className='p-4'>
+                      {renderProductList(products)}
+                    </AccordionContent>
+                  </AccordionItem>
+                )
+              )}
+            </Accordion>
+          </TabsContent>
+        </Tabs>
+
+        {!isSearching && (
+          <div ref={loadMoreRef} className='flex justify-center py-8'>
+            {isLoadingMore && (
+              <p className='text-muted-foreground'>Loading more products...</p>
+            )}
+            {!isLoadingMore && !hasLoadedAll && products.length >= 50 && (
+              <Button variant='outline' onClick={handleLoadMore}>
+                Load More Products
+              </Button>
+            )}
+            {hasLoadedAll && (
+              <p className='text-sm text-muted-foreground'>
+                All products loaded ({products.length} total)
+              </p>
+            )}
+          </div>
+        )}
+      </div>
+    </>
+  );
+}
+
+export default function ProductsPage() {
+  return (
+    <Suspense fallback={<Loading />}>
+      <ProductsPageContent />
+    </Suspense>
+  );
+}

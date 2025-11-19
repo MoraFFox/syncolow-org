@@ -1,0 +1,339 @@
+GET
+http://localhost:9002/analytics
+[HTTP/1.1 200 OK 370ms]
+
+XHRGET
+https://firestore.googleapis.com/google.firestore.v1.Firestore/Listen/channel?gsessionid=-6Ut9T9trGrEY1OSfpOYYK2bH8TP1AXJIwsx4miY2HU&VER=8&database=projects/synergyflow-pvqrj/databases/(default)&RID=rpc&SID=T8iPQRab8P5APamnZtPdYQ&AID=45575&CI=0&TYPE=xmlhttp&zx=w8b57rp0pacw&t=1
+[HTTP/2 200  nullms]
+
+GET
+http://localhost:9002/_next/static/chunks/firebase-orginal_src_app_globals_31e9131b.css
+[HTTP/1.1 200 OK 7ms]
+
+GET
+http://localhost:9002/_next/static/chunks/[turbopack]_browser_dev_hmr-client_hmr-client_ts_099275f4._.js
+[HTTP/1.1 200 OK 10ms]
+
+GET
+http://localhost:9002/_next/static/chunks/97dea_next_dist_compiled_react-dom_92424803._.js
+[HTTP/1.1 200 OK 488ms]
+
+GET
+http://localhost:9002/_next/static/chunks/97dea_next_dist_compiled_react-server-dom-turbopack_fd66e9bc._.js
+[HTTP/1.1 200 OK 488ms]
+
+GET
+http://localhost:9002/_next/static/chunks/97dea_next_dist_compiled_next-devtools_index_a78e6daf.js
+[HTTP/1.1 200 OK 272ms]
+
+GET
+http://localhost:9002/_next/static/chunks/97dea_next_dist_compiled_e793555b._.js
+[HTTP/1.1 200 OK 204ms]
+
+GET
+http://localhost:9002/_next/static/chunks/97dea_next_dist_client_ce563615._.js
+[HTTP/1.1 200 OK 734ms]
+
+GET
+http://localhost:9002/_next/static/chunks/97dea_next_dist_b5d32be2._.js
+[HTTP/1.1 200 OK 200ms]
+
+GET
+http://localhost:9002/_next/static/chunks/97dea_@swc_helpers_cjs_b4342a33._.js
+[HTTP/1.1 200 OK 195ms]
+
+GET
+http://localhost:9002/_next/static/chunks/firebase-orginal_a0ff3932._.js
+[HTTP/1.1 200 OK 195ms]
+
+GET
+http://localhost:9002/_next/static/chunks/turbopack-firebase-orginal_1df438e4._.js
+[HTTP/1.1 200 OK 237ms]
+
+GET
+http://localhost:9002/_next/static/chunks/97dea_next_dist_e8d2e20c._.js
+[HTTP/1.1 200 OK 348ms]
+
+GET
+http://localhost:9002/_next/static/chunks/firebase-orginal_src_app_favicon_ico_mjs_b3a5503f._.js
+[HTTP/1.1 200 OK 235ms]
+
+GET
+http://localhost:9002/_next/static/chunks/firebase-orginal_src_components_aa73e6bd._.js
+[HTTP/1.1 200 OK 829ms]
+
+GET
+http://localhost:9002/_next/static/chunks/firebase-orginal_src_2902c23a._.js
+[HTTP/1.1 200 OK 237ms]
+
+GET
+http://localhost:9002/_next/static/chunks/firebase-orginal_src_store_208195a7._.js
+[HTTP/1.1 200 OK 347ms]
+
+GET
+http://localhost:9002/_next/static/chunks/firebase-orginal_src_app_5c70d10a._.js
+[HTTP/1.1 200 OK 813ms]
+
+GET
+http://localhost:9002/_next/static/chunks/firebase-orginal_src_04de876c._.js
+[HTTP/1.1 200 OK 557ms]
+
+GET
+http://localhost:9002/_next/static/chunks/97dea_next_60f77ba3._.js
+[HTTP/1.1 200 OK 796ms]
+
+GET
+http://localhost:9002/_next/static/chunks/97dea_lucide-react_dist_esm_icons_index_a0c80c48.js
+[HTTP/1.1 200 OK 856ms]
+
+GET
+http://localhost:9002/_next/static/chunks/97dea_lucide-react_dist_esm_icons_c9f298be._.js
+[HTTP/1.1 200 OK 1805ms]
+
+GET
+http://localhost:9002/_next/static/chunks/97dea_lucide-react_dist_esm_lucide-react_88c7da99.js
+[HTTP/1.1 200 OK 1538ms]
+
+GET
+http://localhost:9002/_next/static/chunks/97dea_lucide-react_dist_esm_aadc553c._.js
+[HTTP/1.1 200 OK 821ms]
+
+GET
+http://localhost:9002/_next/static/chunks/97dea_@firebase_firestore_dist_index_esm2017_677030ca.js
+[HTTP/1.1 200 OK 1840ms]
+
+GET
+http://localhost:9002/_next/static/chunks/97dea_@firebase_storage_dist_index_esm2017_ae94e2b6.js
+[HTTP/1.1 200 OK 1047ms]
+
+GET
+http://localhost:9002/_next/static/chunks/277e0_@firebase_auth_dist_esm2017_6c55afd5._.js
+[HTTP/1.1 200 OK 1240ms]
+
+GET
+http://localhost:9002/_next/static/chunks/97dea_date-fns_1c402563._.js
+[HTTP/1.1 200 OK 1137ms]
+
+GET
+http://localhost:9002/_next/static/chunks/97dea_@radix-ui_22600695._.js
+[HTTP/1.1 200 OK 1735ms]
+
+GET
+http://localhost:9002/_next/static/chunks/97dea_zod_v3_f983f72b._.js
+[HTTP/1.1 200 OK 1240ms]
+
+GET
+http://localhost:9002/_next/static/chunks/97dea_@firebase_10411692._.js
+[HTTP/1.1 200 OK 1522ms]
+
+GET
+http://localhost:9002/_next/static/chunks/97dea_@floating-ui_414d532e._.js
+[HTTP/1.1 200 OK 1480ms]
+
+GET
+http://localhost:9002/_next/static/chunks/97dea_a969c15b._.js
+[HTTP/1.1 200 OK 1711ms]
+
+GET
+http://localhost:9002/_next/static/chunks/firebase-orginal_src_app_layout_tsx_d367f37a._.js
+[HTTP/1.1 200 OK 1559ms]
+
+GET
+http://localhost:9002/_next/static/chunks/firebase-orginal_src_app_analytics__components_analytics-tabs_tsx_1f850aa3._.js
+[HTTP/1.1 200 OK 1560ms]
+
+GET
+http://localhost:9002/_next/static/chunks/firebase-orginal_src_app_analytics_layout_tsx_20668f1a._.js
+[HTTP/1.1 200 OK 1595ms]
+
+GET
+http://localhost:9002/_next/static/chunks/firebase-orginal_src_64634efa._.js
+[HTTP/1.1 200 OK 1667ms]
+
+GET
+http://localhost:9002/_next/static/chunks/97dea_lodash_0b65bea8._.js
+[HTTP/1.1 200 OK 1667ms]
+
+GET
+http://localhost:9002/_next/static/chunks/97dea_recharts_es6_f784bf4e._.js
+[HTTP/1.1 200 OK 1753ms]
+
+GET
+http://localhost:9002/_next/static/chunks/97dea_1fa8ebab._.js
+[HTTP/1.1 200 OK 1751ms]
+
+GET
+http://localhost:9002/_next/static/chunks/97dea_date-fns_d53173ec._.js
+[HTTP/1.1 200 OK 1709ms]
+
+GET
+http://localhost:9002/_next/static/chunks/97dea_next_dist_client_components_builtin_global-error_d367f37a.js
+[HTTP/1.1 200 OK 1721ms]
+
+GET
+http://localhost:9002/_next/static/chunks/firebase-orginal_src_app_analytics_page_tsx_5b14a308._.js
+[HTTP/1.1 200 OK 1713ms]
+
+GET
+http://localhost:9002/_next/static/chunks/firebase-orginal_src_app_analytics_page_1272c1e0.css
+[HTTP/1.1 200 OK 139ms]
+
+GET
+https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;500;600;700&display=swap
+[HTTP/3 200  113ms]
+
+GET
+http://localhost:9002/favicon.ico
+NS_BINDING_ABORTED
+
+XHRGET
+http://localhost:39300/.well-known/version
+NS_ERROR_CONNECTION_REFUSED
+
+GET
+http://localhost:9002/_next/static/chunks/[turbopack]_browser_dev_hmr-client_hmr-client_ts_c8c997ce._.js
+[HTTP/1.1 200 OK 942ms]
+
+GET
+http://localhost:9002/_next/static/chunks/[turbopack]_browser_dev_hmr-client_hmr-client_ts_3f8af333._.js
+[HTTP/1.1 200 OK 881ms]
+
+GET
+http://localhost:9002/__nextjs_font/geist-latin.woff2
+[HTTP/1.1 200 OK 920ms]
+
+GET
+ws://localhost:9002/_next/webpack-hmr?id=JSBzxaFhZiFq8nHIp3-7s
+[HTTP/1.1 101 Switching Protocols 877ms]
+
+[HMR] connected 97dea_next_dist_b5d32be2._.js:2295:28
+GET
+http://localhost:9002/favicon.ico?favicon.7ed73651.ico
+[HTTP/1.1 200 OK 2ms]
+
+XHRPOST
+https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=AIzaSyDzFTXPJHLLfjPpzx2eSaVCiI5krW7Hy0s
+[HTTP/3 200  208ms]
+
+Service Worker registered 97dea_next_dist_b5d32be2._.js:2295:28
+XHROPTIONS
+https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=AIzaSyDzFTXPJHLLfjPpzx2eSaVCiI5krW7Hy0s
+[HTTP/3 200  228ms]
+
+GET
+http://localhost:9002/_next/static/chunks/firebase-orginal_src_lib_cache-manager_ts_b1594961._.js
+[HTTP/1.1 200 OK 16ms]
+
+GET
+http://localhost:9002/_next/static/chunks/firebase-orginal_src_lib_cache-manager_ts_9174e966._.js
+[HTTP/1.1 200 OK 2ms]
+
+XHRPOST
+https://firestore.googleapis.com/google.firestore.v1.Firestore/Listen/channel?VER=8&database=projects/synergyflow-pvqrj/databases/(default)&RID=67057&CVER=22&X-HTTP-Session-Id=gsessionid&zx=yb3sp2he9jfd&t=1
+[HTTP/2 200  189ms]
+
+Cross-Origin Request Blocked: The Same Origin Policy disallows reading the remote resource at http://localhost:39300/.well-known/version. (Reason: CORS request did not succeed). Status code: (null).
+XHRPOST
+https://securetoken.googleapis.com/v1/token?key=AIzaSyDzFTXPJHLLfjPpzx2eSaVCiI5krW7Hy0s
+[HTTP/3 200  188ms]
+
+XHROPTIONS
+https://securetoken.googleapis.com/v1/token?key=AIzaSyDzFTXPJHLLfjPpzx2eSaVCiI5krW7Hy0s
+[HTTP/3 200  154ms]
+
+XHRGET
+https://firestore.googleapis.com/google.firestore.v1.Firestore/Listen/channel?gsessionid=oJHK4KQ0-n29MD_EFvQXkhI_Efsv3JfwRj7C6bvSiPQ&VER=8&database=projects/synergyflow-pvqrj/databases/(default)&RID=rpc&SID=bsCLz-r7DiJsUG_DFwdTOw&AID=0&CI=0&TYPE=xmlhttp&zx=ur1km8gagwxa&t=1
+NS_BASE_STREAM_CLOSED
+
+XHRPOST
+https://firestore.googleapis.com/google.firestore.v1.Firestore/Listen/channel?VER=8&database=projects/synergyflow-pvqrj/databases/(default)&gsessionid=oJHK4KQ0-n29MD_EFvQXkhI_Efsv3JfwRj7C6bvSiPQ&SID=bsCLz-r7DiJsUG_DFwdTOw&RID=67058&AID=0&zx=x9805jfrg9ui&t=1
+[HTTP/2 200  106ms]
+
+POST
+https://firestore.googleapis.com/google.firestore.v1.Firestore/Listen/channel?VER=8&database=projects/synergyflow-pvqrj/databases/(default)&gsessionid=oJHK4KQ0-n29MD_EFvQXkhI_Efsv3JfwRj7C6bvSiPQ&SID=bsCLz-r7DiJsUG_DFwdTOw&RID=67059&TYPE=terminate&zx=xeazd6k77la7
+Blocked By uBlock Origin
+
+XHRPOST
+https://firestore.googleapis.com/google.firestore.v1.Firestore/Listen/channel?VER=8&database=projects/synergyflow-pvqrj/databases/(default)&RID=85170&CVER=22&X-HTTP-Session-Id=gsessionid&zx=tnyx45m8ezo7&t=1
+[HTTP/2 200  198ms]
+
+XHRGET
+https://firestore.googleapis.com/google.firestore.v1.Firestore/Listen/channel?gsessionid=2_8uKenrLrp0IsZp-1B-fSlcma3iQ0c7-847mkfBAXw&VER=8&database=projects/synergyflow-pvqrj/databases/(default)&RID=rpc&SID=BhaxrBXT1HNxfi00SAqFnA&AID=0&CI=0&TYPE=xmlhttp&zx=u4yzmmziyjb&t=1
+[HTTP/2 200  192ms]
+
+XHRPOST
+https://firestore.googleapis.com/google.firestore.v1.Firestore/Listen/channel?VER=8&database=projects/synergyflow-pvqrj/databases/(default)&gsessionid=2_8uKenrLrp0IsZp-1B-fSlcma3iQ0c7-847mkfBAXw&SID=BhaxrBXT1HNxfi00SAqFnA&RID=85171&AID=16562&zx=l3ee7va14wrm&t=1
+[HTTP/2 200  72ms]
+
+XHRPOST
+https://firestore.googleapis.com/google.firestore.v1.Firestore/Listen/channel?VER=8&database=projects/synergyflow-pvqrj/databases/(default)&gsessionid=2_8uKenrLrp0IsZp-1B-fSlcma3iQ0c7-847mkfBAXw&SID=BhaxrBXT1HNxfi00SAqFnA&RID=85172&AID=16568&zx=stud3r72679r&t=1
+[HTTP/2 200  95ms]
+
+XHRPOST
+https://firestore.googleapis.com/google.firestore.v1.Firestore/Listen/channel?VER=8&database=projects/synergyflow-pvqrj/databases/(default)&gsessionid=2_8uKenrLrp0IsZp-1B-fSlcma3iQ0c7-847mkfBAXw&SID=BhaxrBXT1HNxfi00SAqFnA&RID=85173&AID=16568&zx=tpvxa8llbfj8&t=1
+[HTTP/2 200  72ms]
+
+XHRPOST
+https://firestore.googleapis.com/google.firestore.v1.Firestore/Listen/channel?VER=8&database=projects/synergyflow-pvqrj/databases/(default)&gsessionid=2_8uKenrLrp0IsZp-1B-fSlcma3iQ0c7-847mkfBAXw&SID=BhaxrBXT1HNxfi00SAqFnA&RID=85174&AID=16573&zx=w1g0h5lkpou0&t=1
+[HTTP/2 200  80ms]
+
+XHRPOST
+https://firestore.googleapis.com/google.firestore.v1.Firestore/Listen/channel?VER=8&database=projects/synergyflow-pvqrj/databases/(default)&gsessionid=2_8uKenrLrp0IsZp-1B-fSlcma3iQ0c7-847mkfBAXw&SID=BhaxrBXT1HNxfi00SAqFnA&RID=85175&AID=16573&zx=uuccds70qk9b&t=1
+[HTTP/2 200  81ms]
+
+XHRPOST
+https://firestore.googleapis.com/google.firestore.v1.Firestore/Listen/channel?VER=8&database=projects/synergyflow-pvqrj/databases/(default)&gsessionid=2_8uKenrLrp0IsZp-1B-fSlcma3iQ0c7-847mkfBAXw&SID=BhaxrBXT1HNxfi00SAqFnA&RID=85176&AID=16573&zx=tagqnjmrb0dl&t=1
+[HTTP/2 200  93ms]
+
+XHRPOST
+https://firestore.googleapis.com/google.firestore.v1.Firestore/Listen/channel?VER=8&database=projects/synergyflow-pvqrj/databases/(default)&gsessionid=2_8uKenrLrp0IsZp-1B-fSlcma3iQ0c7-847mkfBAXw&SID=BhaxrBXT1HNxfi00SAqFnA&RID=85177&AID=16579&zx=2subix19pdbr&t=1
+[HTTP/2 200  104ms]
+
+XHRPOST
+https://firestore.googleapis.com/google.firestore.v1.Firestore/Listen/channel?VER=8&database=projects/synergyflow-pvqrj/databases/(default)&gsessionid=2_8uKenrLrp0IsZp-1B-fSlcma3iQ0c7-847mkfBAXw&SID=BhaxrBXT1HNxfi00SAqFnA&RID=85179&AID=16583&zx=1blflj31xo8v&t=1
+[HTTP/2 200  108ms]
+
+XHRPOST
+https://firestore.googleapis.com/google.firestore.v1.Firestore/Listen/channel?VER=8&database=projects/synergyflow-pvqrj/databases/(default)&gsessionid=2_8uKenrLrp0IsZp-1B-fSlcma3iQ0c7-847mkfBAXw&SID=BhaxrBXT1HNxfi00SAqFnA&RID=85178&AID=16579&zx=s0uov0m8oiyz&t=1
+[HTTP/2 200  107ms]
+
+XHRPOST
+https://firestore.googleapis.com/google.firestore.v1.Firestore/Listen/channel?VER=8&database=projects/synergyflow-pvqrj/databases/(default)&gsessionid=2_8uKenrLrp0IsZp-1B-fSlcma3iQ0c7-847mkfBAXw&SID=BhaxrBXT1HNxfi00SAqFnA&RID=85180&AID=16583&zx=mg6biyluhlf&t=1
+[HTTP/2 200  74ms]
+
+XHRPOST
+https://firestore.googleapis.com/google.firestore.v1.Firestore/Listen/channel?VER=8&database=projects/synergyflow-pvqrj/databases/(default)&gsessionid=2_8uKenrLrp0IsZp-1B-fSlcma3iQ0c7-847mkfBAXw&SID=BhaxrBXT1HNxfi00SAqFnA&RID=85181&AID=16593&zx=78m8q576ebx4&t=1
+[HTTP/2 200  74ms]
+
+XHRPOST
+https://firestore.googleapis.com/google.firestore.v1.Firestore/Listen/channel?VER=8&database=projects/synergyflow-pvqrj/databases/(default)&gsessionid=2_8uKenrLrp0IsZp-1B-fSlcma3iQ0c7-847mkfBAXw&SID=BhaxrBXT1HNxfi00SAqFnA&RID=85182&AID=16598&zx=de551lk8a837&t=1
+[HTTP/2 200  72ms]
+
+XHRPOST
+https://firestore.googleapis.com/google.firestore.v1.Firestore/Listen/channel?VER=8&database=projects/synergyflow-pvqrj/databases/(default)&gsessionid=2_8uKenrLrp0IsZp-1B-fSlcma3iQ0c7-847mkfBAXw&SID=BhaxrBXT1HNxfi00SAqFnA&RID=85183&AID=16603&zx=9okmvb9lp9uz&t=1
+[HTTP/2 200  73ms]
+
+XHRPOST
+https://firestore.googleapis.com/google.firestore.v1.Firestore/Listen/channel?VER=8&database=projects/synergyflow-pvqrj/databases/(default)&gsessionid=2_8uKenrLrp0IsZp-1B-fSlcma3iQ0c7-847mkfBAXw&SID=BhaxrBXT1HNxfi00SAqFnA&RID=85184&AID=16604&zx=ls24zelkxoxo&t=1
+[HTTP/2 200  73ms]
+
+XHRPOST
+https://firestore.googleapis.com/google.firestore.v1.Firestore/Listen/channel?VER=8&database=projects/synergyflow-pvqrj/databases/(default)&gsessionid=2_8uKenrLrp0IsZp-1B-fSlcma3iQ0c7-847mkfBAXw&SID=BhaxrBXT1HNxfi00SAqFnA&RID=85185&AID=16605&zx=fckfaxckkay9&t=1
+[HTTP/2 200  75ms]
+
+XHRPOST
+https://firestore.googleapis.com/google.firestore.v1.Firestore/Listen/channel?VER=8&database=projects/synergyflow-pvqrj/databases/(default)&gsessionid=2_8uKenrLrp0IsZp-1B-fSlcma3iQ0c7-847mkfBAXw&SID=BhaxrBXT1HNxfi00SAqFnA&RID=85186&AID=16622&zx=b078r01lkryr&t=1
+[HTTP/2 200  80ms]
+
+XHRPOST
+https://firestore.googleapis.com/google.firestore.v1.Firestore/Listen/channel?VER=8&database=projects/synergyflow-pvqrj/databases/(default)&gsessionid=2_8uKenrLrp0IsZp-1B-fSlcma3iQ0c7-847mkfBAXw&SID=BhaxrBXT1HNxfi00SAqFnA&RID=85187&AID=18854&zx=g51jpq41umvb&t=1
+[HTTP/2 200  73ms]
+
+XHRGET
+https://firestore.googleapis.com/google.firestore.v1.Firestore/Listen/channel?gsessionid=2_8uKenrLrp0IsZp-1B-fSlcma3iQ0c7-847mkfBAXw&VER=8&database=projects/synergyflow-pvqrj/databases/(default)&RID=rpc&SID=BhaxrBXT1HNxfi00SAqFnA&AID=18856&CI=0&TYPE=xmlhttp&zx=kwzswad9p9qv&t=1
+[HTTP/2 200  75ms]
+
+XHRGET
+https://firestore.googleapis.com/google.firestore.v1.Firestore/Listen/channel?gsessionid=2_8uKenrLrp0IsZp-1B-fSlcma3iQ0c7-847mkfBAXw&VER=8&database=projects/synergyflow-pvqrj/databases/(default)&RID=rpc&SID=BhaxrBXT1HNxfi00SAqFnA&AID=18860&CI=0&TYPE=xmlhttp&zx=7k6jc89ng7ut&t=1
+[HTTP/2 200  nullms]
+

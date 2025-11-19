@@ -1,0 +1,19 @@
+# Ignore dependencies
+node_modules
+
+# Ignore development artifacts
+.next
+npm-debug.log
+*.log
+
+# Ignore version control
+.git
+.gitignore
+
+# Ignore environment variables
+.env
+
+# Ignore Docker files
+Dockerfile
+.dockerignore
+docker-compose.yml

@@ -1,0 +1,18 @@
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  
+  .print-full-width {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+  
+  .print-break-inside-avoid {
+    break-inside: avoid;
+  }
+  
+  @page {
+    margin: 1cm;
+  }
+}
