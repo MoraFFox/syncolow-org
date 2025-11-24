@@ -1,7 +1,7 @@
+
 /** @format */
 
-import { db } from './firebase';
-import { collection, addDoc, query, where, orderBy, getDocs } from 'firebase/firestore';
+import { supabase } from './supabase';
 
 export interface PriceAuditEntry {
   id?: string;
@@ -15,22 +15,18 @@ export interface PriceAuditEntry {
 }
 
 export async function logPriceAudit(entry: Omit<PriceAuditEntry, 'id' | 'timestamp'>) {
-  await addDoc(collection(db, 'priceAudit'), {
+  await supabase.from('priceAudit').insert({
     ...entry,
     timestamp: new Date().toISOString(),
   });
 }
 
 export async function getPriceHistory(productId: string): Promise<PriceAuditEntry[]> {
-  const q = query(
-    collection(db, 'priceAudit'),
-    where('productId', '==', productId),
-    orderBy('timestamp', 'desc')
-  );
+  const { data } = await supabase
+    .from('priceAudit')
+    .select('*')
+    .eq('productId', productId)
+    .order('timestamp', { ascending: false });
   
-  const snapshot = await getDocs(q);
-  return snapshot.docs.map(doc => ({
-    id: doc.id,
-    ...doc.data(),
-  })) as PriceAuditEntry[];
+  return (data || []) as PriceAuditEntry[];
 }

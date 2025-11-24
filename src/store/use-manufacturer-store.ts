@@ -1,19 +1,9 @@
 
 import { create } from 'zustand';
-import {
-  collection,
-  getDocs,
-  addDoc,
-  updateDoc,
-  deleteDoc,
-  doc,
-  writeBatch,
-  query,
-  where,
-} from 'firebase/firestore';
-import { db } from '@/lib/firebase';
+import { supabase } from '@/lib/supabase';
 import { Manufacturer, Product } from '@/lib/types';
 import { storageService } from '@/services/storage-service';
+import { logError, logSupabaseError } from '@/lib/error-logger';
 
 interface ManufacturerState {
   manufacturers: Manufacturer[];
@@ -41,26 +31,14 @@ export const useManufacturerStore = create<ManufacturerState & ManufacturerActio
   fetchManufacturersAndProducts: async () => {
     set({ loading: true, error: null });
     try {
-      const manufacturersCollection = collection(db, 'manufacturers');
-      const productsCollection = collection(db, 'products');
+      const { data: manufacturers } = await supabase.from('manufacturers').select('*');
+      const { data: products } = await supabase.from('products').select('*');
 
-      const [manufacturersSnapshot, productsSnapshot] = await Promise.all([
-        getDocs(manufacturersCollection),
-        getDocs(productsCollection),
-      ]);
-
-      const manufacturers = manufacturersSnapshot.docs.map(doc => ({
-        ...doc.data(),
-        id: doc.id,
-      } as Manufacturer));
-
-      const products = productsSnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      } as Product));
+      const manufacturersList = (manufacturers || []) as Manufacturer[];
+      const productsList = (products || []) as Product[];
 
       const productsByManufacturer: Record<string, Product[]> = {};
-      products.forEach(product => {
+      productsList.forEach(product => {
         const manufacturerId = product.manufacturerId || 'unassigned';
         if (!productsByManufacturer[manufacturerId]) {
           productsByManufacturer[manufacturerId] = [];
@@ -69,12 +47,15 @@ export const useManufacturerStore = create<ManufacturerState & ManufacturerActio
       });
 
       set({
-        manufacturers,
+        manufacturers: manufacturersList,
         productsByManufacturer,
         loading: false,
       });
-    } catch (error) {
-      console.error("Error fetching manufacturers and products:", error);
+    } catch (error: any) {
+      logError(error, {
+        component: 'useManufacturerStore',
+        action: 'fetchManufacturersAndProducts'
+      });
       set({ loading: false, error: 'Failed to fetch data.' });
     }
   },
@@ -88,18 +69,28 @@ export const useManufacturerStore = create<ManufacturerState & ManufacturerActio
     }
 
     const { iconFile, ...rest } = manufacturerData;
-    const docRef = await addDoc(collection(db, 'manufacturers'), { ...rest, icon: iconUrl });
-    const newManufacturer: Manufacturer = {
-      id: docRef.id,
-      ...rest,
-      icon: iconUrl,
-    };
+    const dataToSave = { ...rest, icon: iconUrl };
+    
+    const { data: newManufacturer, error } = await supabase
+        .from('manufacturers')
+        .insert(dataToSave)
+        .select()
+        .single();
+
+    if (error) {
+      logSupabaseError(error, {
+        component: 'useManufacturerStore',
+        action: 'addManufacturer',
+        data: dataToSave
+      });
+      throw error;
+    }
 
     set((state) => ({
-      manufacturers: [...state.manufacturers, newManufacturer]
+      manufacturers: [...state.manufacturers, newManufacturer as Manufacturer]
     }));
 
-    return newManufacturer;
+    return newManufacturer as Manufacturer;
   },
 
   updateManufacturer: async (id, updates) => {
@@ -116,8 +107,15 @@ export const useManufacturerStore = create<ManufacturerState & ManufacturerActio
       updateData.icon = iconUrl;
     }
 
-    const manufacturerRef = doc(db, 'manufacturers', id);
-    await updateDoc(manufacturerRef, updateData);
+    const { error } = await supabase.from('manufacturers').update(updateData).eq('id', id);
+    if (error) {
+      logSupabaseError(error, {
+        component: 'useManufacturerStore',
+        action: 'updateManufacturer',
+        data: { id, updateData }
+      });
+      throw error;
+    }
 
     set((state) => ({
       manufacturers: state.manufacturers.map(m =>
@@ -127,38 +125,29 @@ export const useManufacturerStore = create<ManufacturerState & ManufacturerActio
   },
 
   deleteManufacturer: async (id: string) => {
-    console.log(`Attempting to delete manufacturer with id: ${id}`);
     try {
-      const manufacturerRef = doc(db, 'manufacturers', id);
-      await deleteDoc(manufacturerRef);
-      console.log(`Successfully deleted manufacturer with id: ${id} from Firestore.`);
+      await supabase.from('manufacturers').delete().eq('id', id);
 
       set((state) => ({
         manufacturers: state.manufacturers.filter((m) => m.id !== id),
       }));
-    } catch (error) {
-      console.error('Error deleting manufacturer from Firestore:', error);
+    } catch (error: any) {
+      logError(error, {
+        component: 'useManufacturerStore',
+        action: 'deleteManufacturer',
+        data: { id }
+      });
       set({ error: 'Failed to delete manufacturer' });
-      // Re-throw the error to be caught by the calling component
       throw error;
     }
   },
   
   deleteManufacturerAndProducts: async (manufacturerId: string) => {
-    const batch = writeBatch(db);
-
-    // Delete the manufacturer document
-    const manufacturerRef = doc(db, 'manufacturers', manufacturerId);
-    batch.delete(manufacturerRef);
-
-    // Query for all products with the given manufacturerId
-    const productsQuery = query(collection(db, 'products'), where('manufacturerId', '==', manufacturerId));
-    const productsSnapshot = await getDocs(productsQuery);
-    productsSnapshot.forEach((productDoc) => {
-      batch.delete(productDoc.ref);
-    });
-
-    await batch.commit();
+    // Delete manufacturer
+    await supabase.from('manufacturers').delete().eq('id', manufacturerId);
+    
+    // Delete related products
+    await supabase.from('products').delete().eq('manufacturerId', manufacturerId);
 
     // Refresh local state
     get().fetchManufacturersAndProducts();
@@ -166,8 +155,8 @@ export const useManufacturerStore = create<ManufacturerState & ManufacturerActio
 
   updateProductManufacturer: async (productId, manufacturerId) => {
     try {
-      const productRef = doc(db, 'products', productId);
-      await updateDoc(productRef, { manufacturerId });
+      await supabase.from('products').update({ manufacturerId }).eq('id', productId);
+      
       set((state) => {
         const updatedProductsByManufacturer = { ...state.productsByManufacturer };
         for (const key in updatedProductsByManufacturer) {
@@ -184,8 +173,12 @@ export const useManufacturerStore = create<ManufacturerState & ManufacturerActio
         }
         return { productsByManufacturer: updatedProductsByManufacturer };
       });
-    } catch (error) {
-      console.error('Error updating product manufacturer:', error);
+    } catch (error: any) {
+      logError(error, {
+        component: 'useManufacturerStore',
+        action: 'updateProductManufacturer',
+        data: { productId, manufacturerId }
+      });
       set({ error: 'Failed to update product manufacturer' });
       throw error;
     }
@@ -201,20 +194,26 @@ export const useManufacturerStore = create<ManufacturerState & ManufacturerActio
       }
       let totalCompleted = 0;
       let totalFailed = 0;
+      
       for (let chunkIndex = 0; chunkIndex < chunks.length; chunkIndex++) {
         const chunk = chunks[chunkIndex];
-        const batch = writeBatch(db);
-        chunk.forEach(productId => {
-          const productRef = doc(db, 'products', productId);
-          batch.update(productRef, { manufacturerId });
-        });
-        try {
-          await batch.commit();
-          totalCompleted += chunk.length;
-        } catch (batchError) {
-          console.error(`Error in batch commit (${chunkIndex}):`, batchError);
-          totalFailed += chunk.length;
+        
+        const { error } = await supabase
+            .from('products')
+            .update({ manufacturerId })
+            .in('id', chunk);
+            
+        if (error) {
+            logSupabaseError(error, {
+              component: 'useManufacturerStore',
+              action: 'updateMultipleProductManufacturers',
+              data: { chunkIndex, chunkSize: chunk.length, manufacturerId }
+            });
+            totalFailed += chunk.length;
+        } else {
+            totalCompleted += chunk.length;
         }
+
         if (onProgress) {
           onProgress({
             completed: totalCompleted,
@@ -223,6 +222,7 @@ export const useManufacturerStore = create<ManufacturerState & ManufacturerActio
           });
         }
       }
+      
       set((state) => {
         const updatedProductsByManufacturer = { ...state.productsByManufacturer };
         productIds.forEach(productId => {
@@ -241,11 +241,14 @@ export const useManufacturerStore = create<ManufacturerState & ManufacturerActio
         });
         return { productsByManufacturer: updatedProductsByManufacturer };
       });
-    } catch (error) {
-      console.error('Error updating multiple products:', error);
+    } catch (error: any) {
+      logError(error, {
+        component: 'useManufacturerStore',
+        action: 'updateMultipleProductManufacturers',
+        data: { productCount: productIds.length, manufacturerId }
+      });
       set({ error: 'Failed to update multiple products' });
       throw error;
     }
   },
 }));
-

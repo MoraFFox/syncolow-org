@@ -6,6 +6,8 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 import { ArrowUp, ArrowDown, Minus, Info } from 'lucide-react';
 import { AreaChart, Area, ResponsiveContainer } from 'recharts';
+import { useDrillDown } from '@/hooks/use-drilldown';
+import { DrillTarget } from '@/components/drilldown/drill-target';
 
 interface KpiCardProps {
     title: string;
@@ -20,6 +22,8 @@ interface KpiCardProps {
     loading?: boolean;
     tooltip?: string;
     sparklineData?: number[];
+    drillKind?: 'revenue' | 'product' | 'company' | 'order';
+    drillPayload?: any;
 }
 
 export function KpiCard({ 
@@ -34,7 +38,9 @@ export function KpiCard({
     onClick,
     loading = false,
     tooltip,
-    sparklineData
+    sparklineData,
+    drillKind,
+    drillPayload
 }: KpiCardProps) {
     const getTrendColor = () => {
         if (trendDirection === 'neutral') return 'text-muted-foreground';
@@ -47,6 +53,16 @@ export function KpiCard({
         if (trendDirection === 'up') return <ArrowUp className="h-3 w-3" />;
         if (trendDirection === 'down') return <ArrowDown className="h-3 w-3" />;
         return <Minus className="h-3 w-3" />;
+    };
+
+    const { openDetailDialog } = useDrillDown();
+
+    const handleClick = () => {
+        if (onClick) {
+            onClick();
+        } else if (drillKind) {
+            openDetailDialog(drillKind, drillPayload);
+        }
     };
 
     if (loading) {
@@ -64,8 +80,11 @@ export function KpiCard({
         );
     }
 
-    return (
-        <Card className={className} onClick={onClick}>
+    const cardContent = (
+        <Card 
+            className={cn(className, (onClick || drillKind) && "cursor-pointer hover:bg-accent/50 transition-colors")} 
+            onClick={onClick} // Keep original onClick if provided, DrillTarget handles its own click
+        >
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <div className="flex items-center gap-1">
                     <CardTitle className="text-sm font-medium min-w-0 truncate">
@@ -117,4 +136,19 @@ export function KpiCard({
             </CardContent>
         </Card>
     );
+
+    if (drillKind) {
+        // Import DrillTarget dynamically or ensure it's imported at top
+        // Since we are in the same file, we need to import it.
+        // But wait, I need to add the import first.
+        // I will assume DrillTarget is imported.
+        // Actually, I should check imports.
+        return (
+            <DrillTarget kind={drillKind} payload={drillPayload || {}} asChild>
+                {cardContent}
+            </DrillTarget>
+        );
+    }
+
+    return cardContent;
 }

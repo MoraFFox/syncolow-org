@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { indexedDBStorage, QueuedOperation } from '@/lib/indexeddb-storage';
+import { logError } from '@/lib/error-logger';
 
 interface OfflineQueueState {
   queue: QueuedOperation[];
@@ -21,8 +22,11 @@ export const useOfflineQueueStore = create<OfflineQueueState>((set, get) => ({
     try {
       const queue = await indexedDBStorage.getQueue();
       set({ queue: queue.sort((a, b) => a.timestamp - b.timestamp) });
-    } catch (error) {
-      console.error('Failed to load queue:', error);
+    } catch (error: any) {
+      logError(error, {
+        component: 'useOfflineQueueStore',
+        action: 'loadQueue'
+      });
     }
   },
 
@@ -37,8 +41,12 @@ export const useOfflineQueueStore = create<OfflineQueueState>((set, get) => ({
     try {
       await indexedDBStorage.addToQueue(queuedOp);
       set((state) => ({ queue: [...state.queue, queuedOp] }));
-    } catch (error) {
-      console.error('Failed to add to queue:', error);
+    } catch (error: any) {
+      logError(error, {
+        component: 'useOfflineQueueStore',
+        action: 'addToQueue',
+        data: { operation }
+      });
       throw error;
     }
   },
@@ -47,8 +55,12 @@ export const useOfflineQueueStore = create<OfflineQueueState>((set, get) => ({
     try {
       await indexedDBStorage.removeFromQueue(id);
       set((state) => ({ queue: state.queue.filter((op) => op.id !== id) }));
-    } catch (error) {
-      console.error('Failed to remove from queue:', error);
+    } catch (error: any) {
+      logError(error, {
+        component: 'useOfflineQueueStore',
+        action: 'removeFromQueue',
+        data: { id }
+      });
     }
   },
 
@@ -58,8 +70,12 @@ export const useOfflineQueueStore = create<OfflineQueueState>((set, get) => ({
       set((state) => ({
         queue: state.queue.map((op) => (op.id === operation.id ? operation : op)),
       }));
-    } catch (error) {
-      console.error('Failed to update queue item:', error);
+    } catch (error: any) {
+      logError(error, {
+        component: 'useOfflineQueueStore',
+        action: 'updateQueueItem',
+        data: { operationId: operation.id }
+      });
     }
   },
 
@@ -67,8 +83,11 @@ export const useOfflineQueueStore = create<OfflineQueueState>((set, get) => ({
     try {
       await indexedDBStorage.clearQueue();
       set({ queue: [] });
-    } catch (error) {
-      console.error('Failed to clear queue:', error);
+    } catch (error: any) {
+      logError(error, {
+        component: 'useOfflineQueueStore',
+        action: 'clearQueue'
+      });
     }
   },
 

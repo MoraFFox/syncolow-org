@@ -1,0 +1,1389 @@
+
+Running 3 tests using 3 workers
+
+[1A[2K[1/3] [webkit] ΓÇ║ e2e\notifications.spec.ts:8:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+[1A[2K[2/3] [chromium] ΓÇ║ e2e\notifications.spec.ts:8:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+[1A[2K[3/3] [firefox] ΓÇ║ e2e\notifications.spec.ts:8:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+[1A[2K[chromium] ΓÇ║ e2e\notifications.spec.ts:8:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+Restored auth state from file
+
+[1A[2K>> GET http://localhost:9002/orders
+
+[1A[2K[webkit] ΓÇ║ e2e\notifications.spec.ts:8:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+Restored auth state from file
+
+[1A[2K>> GET http://localhost:9002/orders
+
+[1A[2K<< [33m200[39m http://localhost:9002/orders
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/firebase-orginal_src_app_globals_31e9131b.css
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_099275f4._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_next_dist_compiled_react-dom_92424803._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_next_dist_compiled_react-server-dom-turbopack_fd66e9bc._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_next_dist_compiled_next-devtools_index_a78e6daf.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_next_dist_compiled_e793555b._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_next_dist_client_ce563615._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_next_dist_b5d32be2._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_%40swc_helpers_cjs_b4342a33._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/firebase-orginal_a0ff3932._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/turbopack-firebase-orginal_1df438e4._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_next_dist_e8d2e20c._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/firebase-orginal_src_app_favicon_ico_mjs_b3a5503f._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/firebase-orginal_src_7a0328b7._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/firebase-orginal_src_components_aa73e6bd._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/firebase-orginal_src_store_208195a7._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/firebase-orginal_src_app_5c70d10a._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/firebase-orginal_src_70e3500a._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_next_60f77ba3._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_lucide-react_dist_esm_icons_index_a0c80c48.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_lucide-react_dist_esm_icons_c9f298be._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_lucide-react_dist_esm_lucide-react_88c7da99.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_lucide-react_dist_esm_aadc553c._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_%40supabase_realtime-js_dist_module_bd33ecdc._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_%40supabase_storage-js_dist_module_f441eeb6._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_%40supabase_auth-js_dist_module_69c9005e._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_date-fns_1c402563._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_zod_v3_f983f72b._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_%40radix-ui_22600695._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_%40floating-ui_414d532e._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_4e339880._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/firebase-orginal_src_app_layout_tsx_d367f37a._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/firebase-orginal_src_e9b1c7eb._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_xlsx_xlsx_mjs_45381b09._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_%40dnd-kit_core_dist_core_esm_1ad8394a.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_3b4b0e9d._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/firebase-orginal_src_app_orders_page_tsx_67beaf9d._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_next_dist_client_components_builtin_global-error_d367f37a.js
+
+[1A[2K>> GET https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;500;600;700&display=swap
+
+[1A[2K[chromium] ΓÇ║ e2e\notifications.spec.ts:8:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+<< [33m200[39m http://localhost:9002/orders
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/firebase-orginal_src_app_globals_31e9131b.css
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_099275f4._.js
+
+[1A[2K[webkit] ΓÇ║ e2e\notifications.spec.ts:8:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+<< [33m200[39m http://localhost:9002/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_099275f4._.js
+
+[1A[2K[chromium] ΓÇ║ e2e\notifications.spec.ts:8:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+>> GET https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;500;600;700&display=swap
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_next_dist_compiled_react-dom_92424803._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_next_dist_compiled_react-server-dom-turbopack_fd66e9bc._.js
+
+[1A[2K[webkit] ΓÇ║ e2e\notifications.spec.ts:8:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_next_dist_compiled_next-devtools_index_a78e6daf.js
+
+[1A[2K[chromium] ΓÇ║ e2e\notifications.spec.ts:8:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+>> GET http://localhost:9002/_next/static/chunks/97dea_next_dist_compiled_next-devtools_index_a78e6daf.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_next_dist_compiled_e793555b._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_next_dist_client_ce563615._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_next_dist_b5d32be2._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_%40swc_helpers_cjs_b4342a33._.js
+
+[1A[2K[webkit] ΓÇ║ e2e\notifications.spec.ts:8:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_next_dist_compiled_react-dom_92424803._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/firebase-orginal_src_app_globals_31e9131b.css
+
+[1A[2K[chromium] ΓÇ║ e2e\notifications.spec.ts:8:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+>> GET http://localhost:9002/_next/static/chunks/firebase-orginal_a0ff3932._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/turbopack-firebase-orginal_1df438e4._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_next_dist_e8d2e20c._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/firebase-orginal_src_app_favicon_ico_mjs_b3a5503f._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/firebase-orginal_src_7a0328b7._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/firebase-orginal_src_components_aa73e6bd._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/firebase-orginal_src_store_208195a7._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/firebase-orginal_src_app_5c70d10a._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/firebase-orginal_src_70e3500a._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_next_60f77ba3._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_lucide-react_dist_esm_icons_index_a0c80c48.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_lucide-react_dist_esm_icons_c9f298be._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_lucide-react_dist_esm_lucide-react_88c7da99.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_lucide-react_dist_esm_aadc553c._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_%40supabase_realtime-js_dist_module_bd33ecdc._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_%40supabase_storage-js_dist_module_f441eeb6._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_%40supabase_auth-js_dist_module_69c9005e._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_date-fns_1c402563._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_zod_v3_f983f72b._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_%40radix-ui_22600695._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_%40floating-ui_414d532e._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_4e339880._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/firebase-orginal_src_app_layout_tsx_d367f37a._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/firebase-orginal_src_e9b1c7eb._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_xlsx_xlsx_mjs_45381b09._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_%40dnd-kit_core_dist_core_esm_1ad8394a.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_3b4b0e9d._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/firebase-orginal_src_app_orders_page_tsx_67beaf9d._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_next_dist_client_components_builtin_global-error_d367f37a.js
+
+[1A[2K[webkit] ΓÇ║ e2e\notifications.spec.ts:8:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_next_dist_compiled_react-server-dom-turbopack_fd66e9bc._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/firebase-orginal_a0ff3932._.js
+
+[1A[2K[chromium] ΓÇ║ e2e\notifications.spec.ts:8:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+<< [33m200[39m http://localhost:9002/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_099275f4._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/firebase-orginal_src_app_globals_31e9131b.css
+
+[1A[2K[webkit] ΓÇ║ e2e\notifications.spec.ts:8:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_next_dist_client_ce563615._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/firebase-orginal_src_app_favicon_ico_mjs_b3a5503f._.js
+
+[1A[2K[chromium] ΓÇ║ e2e\notifications.spec.ts:8:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_next_dist_compiled_react-server-dom-turbopack_fd66e9bc._.js
+
+[1A[2K[webkit] ΓÇ║ e2e\notifications.spec.ts:8:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+<< [33m200[39m http://localhost:9002/_next/static/chunks/firebase-orginal_src_store_208195a7._.js
+
+[1A[2K[chromium] ΓÇ║ e2e\notifications.spec.ts:8:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_next_dist_compiled_e793555b._.js
+
+[1A[2K[webkit] ΓÇ║ e2e\notifications.spec.ts:8:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_next_60f77ba3._.js
+
+[1A[2K[chromium] ΓÇ║ e2e\notifications.spec.ts:8:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_%40swc_helpers_cjs_b4342a33._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_next_dist_b5d32be2._.js
+
+[1A[2K[webkit] ΓÇ║ e2e\notifications.spec.ts:8:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_%40supabase_storage-js_dist_module_f441eeb6._.js
+
+[1A[2K<< [33m200[39m https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;500;600;700&display=swap
+
+[1A[2K[chromium] ΓÇ║ e2e\notifications.spec.ts:8:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+<< [33m200[39m http://localhost:9002/_next/static/chunks/firebase-orginal_a0ff3932._.js
+
+[1A[2K[webkit] ΓÇ║ e2e\notifications.spec.ts:8:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_zod_v3_f983f72b._.js
+
+[1A[2K[chromium] ΓÇ║ e2e\notifications.spec.ts:8:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+<< [33m200[39m https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;500;600;700&display=swap
+
+[1A[2K[webkit] ΓÇ║ e2e\notifications.spec.ts:8:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_4e339880._.js
+
+[1A[2K[chromium] ΓÇ║ e2e\notifications.spec.ts:8:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_next_dist_client_ce563615._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/firebase-orginal_src_app_favicon_ico_mjs_b3a5503f._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/turbopack-firebase-orginal_1df438e4._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_next_dist_e8d2e20c._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_next_dist_compiled_react-dom_92424803._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_next_dist_compiled_next-devtools_index_a78e6daf.js
+
+[1A[2KBROWSER LOG: %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+
+[1A[2K[webkit] ΓÇ║ e2e\notifications.spec.ts:8:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_xlsx_xlsx_mjs_45381b09._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_next_dist_compiled_e793555b._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/turbopack-firebase-orginal_1df438e4._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/firebase-orginal_src_components_aa73e6bd._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_lucide-react_dist_esm_aadc553c._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_lucide-react_dist_esm_icons_index_a0c80c48.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_date-fns_1c402563._.js
+
+[1A[2K[chromium] ΓÇ║ e2e\notifications.spec.ts:8:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+>> GET http://localhost:9002/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_c8c997ce._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_3f8af333._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/firebase-orginal_src_7a0328b7._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/firebase-orginal_src_store_208195a7._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/firebase-orginal_src_70e3500a._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_next_60f77ba3._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/firebase-orginal_src_app_5c70d10a._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_lucide-react_dist_esm_aadc553c._.js
+
+[1A[2K[webkit] ΓÇ║ e2e\notifications.spec.ts:8:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+<< [33m200[39m http://localhost:9002/_next/static/chunks/firebase-orginal_src_app_layout_tsx_d367f37a._.js
+
+[1A[2K[chromium] ΓÇ║ e2e\notifications.spec.ts:8:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+<< [33m200[39m http://localhost:9002/_next/static/chunks/firebase-orginal_src_components_aa73e6bd._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_lucide-react_dist_esm_icons_index_a0c80c48.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_%40supabase_realtime-js_dist_module_bd33ecdc._.js
+
+[1A[2K[webkit] ΓÇ║ e2e\notifications.spec.ts:8:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_3b4b0e9d._.js
+
+[1A[2K[chromium] ΓÇ║ e2e\notifications.spec.ts:8:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_%40supabase_storage-js_dist_module_f441eeb6._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_date-fns_1c402563._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_%40supabase_auth-js_dist_module_69c9005e._.js
+
+[1A[2KBROWSER LOG: [HMR] connected
+
+[1A[2K[webkit] ΓÇ║ e2e\notifications.spec.ts:8:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_next_dist_b5d32be2._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/firebase-orginal_src_7a0328b7._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_next_dist_client_components_builtin_global-error_d367f37a.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_lucide-react_dist_esm_icons_c9f298be._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_%40supabase_auth-js_dist_module_69c9005e._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/firebase-orginal_src_e9b1c7eb._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_%40supabase_realtime-js_dist_module_bd33ecdc._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/firebase-orginal_src_app_5c70d10a._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_%40dnd-kit_core_dist_core_esm_1ad8394a.js
+
+[1A[2K[chromium] ΓÇ║ e2e\notifications.spec.ts:8:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_zod_v3_f983f72b._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_%40floating-ui_414d532e._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/firebase-orginal_src_app_layout_tsx_d367f37a._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_lucide-react_dist_esm_lucide-react_88c7da99.js
+
+[1A[2K[webkit] ΓÇ║ e2e\notifications.spec.ts:8:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_next_dist_e8d2e20c._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_%40swc_helpers_cjs_b4342a33._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_%40radix-ui_22600695._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_%40floating-ui_414d532e._.js
+
+[1A[2K[chromium] ΓÇ║ e2e\notifications.spec.ts:8:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_%40radix-ui_22600695._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_4e339880._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_%40dnd-kit_core_dist_core_esm_1ad8394a.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_3b4b0e9d._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/firebase-orginal_src_app_orders_page_tsx_67beaf9d._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_next_dist_client_components_builtin_global-error_d367f37a.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_c8c997ce._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_3f8af333._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/firebase-orginal_src_e9b1c7eb._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_lucide-react_dist_esm_icons_c9f298be._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_xlsx_xlsx_mjs_45381b09._.js
+
+[1A[2K[webkit] ΓÇ║ e2e\notifications.spec.ts:8:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+>> GET http://localhost:9002/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_c8c997ce._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_3f8af333._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/firebase-orginal_src_app_orders_page_tsx_67beaf9d._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/firebase-orginal_src_70e3500a._.js
+
+[1A[2K[chromium] ΓÇ║ e2e\notifications.spec.ts:8:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+>> POST https://ebbigogxixgbajqijgpp.supabase.co/auth/v1/token?grant_type=refresh_token
+
+[1A[2K[webkit] ΓÇ║ e2e\notifications.spec.ts:8:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_lucide-react_dist_esm_lucide-react_88c7da99.js
+
+[1A[2KBROWSER LOG: [HMR] connected
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_3f8af333._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_c8c997ce._.js
+
+[1A[2K[chromium] ΓÇ║ e2e\notifications.spec.ts:8:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+BROWSER LOG: Service Worker registered
+
+[1A[2KBROWSER LOG: [Fast Refresh] rebuilding
+
+[1A[2KBROWSER LOG: [Fast Refresh] done in 165ms
+
+[1A[2KBROWSER LOG: [Fast Refresh] rebuilding
+
+[1A[2KBROWSER LOG: [Fast Refresh] done in 101ms
+
+[1A[2K[webkit] ΓÇ║ e2e\notifications.spec.ts:8:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+>> POST https://ebbigogxixgbajqijgpp.supabase.co/auth/v1/token?grant_type=refresh_token
+
+[1A[2KBROWSER LOG: [Fast Refresh] rebuilding
+
+[1A[2KBROWSER LOG: [Fast Refresh] done in 131ms
+
+[1A[2K>> GET http://localhost:9002/__nextjs_font/geist-latin.woff2
+
+[1A[2K<< [33m200[39m http://localhost:9002/__nextjs_font/geist-latin.woff2
+
+[1A[2K[chromium] ΓÇ║ e2e\notifications.spec.ts:8:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+<< [33m400[39m https://ebbigogxixgbajqijgpp.supabase.co/auth/v1/token?grant_type=refresh_token
+
+[1A[2KBROWSER LOG: Failed to load resource: the server responded with a status of 400 ()
+
+[1A[2K[webkit] ΓÇ║ e2e\notifications.spec.ts:8:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+<< [33m400[39m https://ebbigogxixgbajqijgpp.supabase.co/auth/v1/token?grant_type=refresh_token
+
+[1A[2KBROWSER LOG: Failed to load resource: the server responded with a status of 400 ()
+
+[1A[2KBROWSER LOG: AuthApiError: Refresh token is not valid
+
+[1A[2K[chromium] ΓÇ║ e2e\notifications.spec.ts:8:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+BROWSER LOG: AuthApiError: Refresh token is not valid
+    at handleError (http://localhost:9002/_next/static/chunks/97dea_%40supabase_auth-js_dist_module_69c9005e._.js:897:11)
+    at async _handleRequest (http://localhost:9002/_next/static/chunks/97dea_%40supabase_auth-js_dist_module_69c9005e._.js:947:9)
+    at async _request (http://localhost:9002/_next/static/chunks/97dea_%40supabase_auth-js_dist_module_69c9005e._.js:927:18)
+    at async http://localhost:9002/_next/static/chunks/97dea_%40supabase_auth-js_dist_module_69c9005e._.js:4791:24
+    at async http://localhost:9002/_next/static/chunks/97dea_%40supabase_auth-js_dist_module_69c9005e._.js:656:36
+
+[1A[2K>> POST http://localhost:9002/__nextjs_original-stack-frames
+
+[1A[2K>> GET http://localhost:9002/login?_rsc=1faaj
+
+[1A[2K<< [33m200[39m http://localhost:9002/login?_rsc=1faaj
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/firebase-orginal_src_app_login_page_tsx_67beaf9d._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/firebase-orginal_src_app_login_page_tsx_67beaf9d._.js
+
+[1A[2K>> GET http://localhost:9002/__nextjs_font/geist-latin.woff2
+
+[1A[2K<< [33m200[39m http://localhost:9002/__nextjs_font/geist-latin.woff2
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/firebase-orginal_src_app_login_page_tsx_254c72d9._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/firebase-orginal_src_app_login_page_tsx_254c72d9._.js
+
+[1A[2K[webkit] ΓÇ║ e2e\notifications.spec.ts:8:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+>> GET http://localhost:9002/sw.js
+
+[1A[2K>> POST http://localhost:9002/__nextjs_original-stack-frames
+
+[1A[2K[chromium] ΓÇ║ e2e\notifications.spec.ts:8:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+>> GET http://localhost:9002/_next/static/chunks/firebase-orginal_src_app_login_page_tsx_254c72d9._.js
+
+[1A[2K[webkit] ΓÇ║ e2e\notifications.spec.ts:8:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+<< [33m200[39m http://localhost:9002/sw.js
+
+[1A[2K[chromium] ΓÇ║ e2e\notifications.spec.ts:8:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+<< [33m200[39m http://localhost:9002/_next/static/chunks/firebase-orginal_src_app_login_page_tsx_254c72d9._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/firebase-orginal_src_app_login_page_tsx_67beaf9d._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/firebase-orginal_src_app_login_page_tsx_67beaf9d._.js
+
+[1A[2KBROWSER LOG: [Fast Refresh] rebuilding
+
+[1A[2K[webkit] ΓÇ║ e2e\notifications.spec.ts:8:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+BROWSER LOG: [Fast Refresh] rebuilding
+
+[1A[2K>> GET http://localhost:9002/login?_rsc=1faaj
+
+[1A[2KBROWSER LOG: Service Worker registered
+
+[1A[2K<< [33m200[39m http://localhost:9002/__nextjs_original-stack-frames
+
+[1A[2K<< [33m200[39m http://localhost:9002/login?_rsc=1faaj
+
+[1A[2K[firefox] ΓÇ║ e2e\notifications.spec.ts:8:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+Restored auth state from file
+
+[1A[2K[webkit] ΓÇ║ e2e\notifications.spec.ts:8:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+>> GET http://localhost:9002/_next/static/chunks/firebase-orginal_src_app_login_page_tsx_254c72d9._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/firebase-orginal_src_app_login_page_tsx_67beaf9d._.js
+
+[1A[2K[chromium] ΓÇ║ e2e\notifications.spec.ts:8:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+BROWSER LOG: [Fast Refresh] done in 418ms
+
+[1A[2K[webkit] ΓÇ║ e2e\notifications.spec.ts:8:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+BROWSER LOG: [Fast Refresh] done in 368ms
+
+[1A[2K[chromium] ΓÇ║ e2e\notifications.spec.ts:8:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+<< [33m200[39m http://localhost:9002/__nextjs_original-stack-frames
+
+[1A[2K[webkit] ΓÇ║ e2e\notifications.spec.ts:8:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+<< [33m200[39m http://localhost:9002/_next/static/chunks/firebase-orginal_src_app_login_page_tsx_67beaf9d._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/firebase-orginal_src_app_login_page_tsx_254c72d9._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/firebase-orginal_src_app_login_page_tsx_67beaf9d._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/firebase-orginal_src_app_login_page_tsx_67beaf9d._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/firebase-orginal_src_app_login_page_tsx_254c72d9._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/firebase-orginal_src_app_login_page_tsx_254c72d9._.js
+
+[1A[2K[firefox] ΓÇ║ e2e\notifications.spec.ts:8:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+>> GET http://localhost:9002/orders
+
+[1A[2K<< [33m200[39m http://localhost:9002/orders
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/firebase-orginal_src_app_globals_31e9131b.css
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_099275f4._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_next_dist_compiled_react-dom_92424803._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_next_dist_compiled_react-server-dom-turbopack_fd66e9bc._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_next_dist_compiled_next-devtools_index_a78e6daf.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_next_dist_compiled_e793555b._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_next_dist_client_ce563615._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_next_dist_b5d32be2._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_%40swc_helpers_cjs_b4342a33._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/firebase-orginal_a0ff3932._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/turbopack-firebase-orginal_1df438e4._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_next_dist_e8d2e20c._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/firebase-orginal_src_app_favicon_ico_mjs_b3a5503f._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/firebase-orginal_src_7a0328b7._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/firebase-orginal_src_components_aa73e6bd._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/firebase-orginal_src_store_208195a7._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/firebase-orginal_src_app_5c70d10a._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/firebase-orginal_src_70e3500a._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_next_60f77ba3._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_lucide-react_dist_esm_icons_index_a0c80c48.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_lucide-react_dist_esm_icons_c9f298be._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_lucide-react_dist_esm_lucide-react_88c7da99.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_lucide-react_dist_esm_aadc553c._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_%40supabase_realtime-js_dist_module_bd33ecdc._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_%40supabase_storage-js_dist_module_f441eeb6._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_%40supabase_auth-js_dist_module_69c9005e._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_date-fns_1c402563._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_zod_v3_f983f72b._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_%40radix-ui_22600695._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_%40floating-ui_414d532e._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_4e339880._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/firebase-orginal_src_app_layout_tsx_d367f37a._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/firebase-orginal_src_e9b1c7eb._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_xlsx_xlsx_mjs_45381b09._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_%40dnd-kit_core_dist_core_esm_1ad8394a.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_3b4b0e9d._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/firebase-orginal_src_app_orders_page_tsx_67beaf9d._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_next_dist_client_components_builtin_global-error_d367f37a.js
+
+[1A[2K>> GET https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;500;600;700&display=swap
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/firebase-orginal_src_app_globals_31e9131b.css
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_099275f4._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_next_dist_compiled_react-dom_92424803._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_next_dist_compiled_react-server-dom-turbopack_fd66e9bc._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_next_dist_compiled_next-devtools_index_a78e6daf.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_next_dist_compiled_e793555b._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_next_dist_client_ce563615._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_next_dist_b5d32be2._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_%40swc_helpers_cjs_b4342a33._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/firebase-orginal_a0ff3932._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/turbopack-firebase-orginal_1df438e4._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/firebase-orginal_src_app_favicon_ico_mjs_b3a5503f._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_next_dist_e8d2e20c._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/firebase-orginal_src_7a0328b7._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/firebase-orginal_src_components_aa73e6bd._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/firebase-orginal_src_store_208195a7._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/firebase-orginal_src_app_5c70d10a._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/firebase-orginal_src_70e3500a._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_next_60f77ba3._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_lucide-react_dist_esm_icons_index_a0c80c48.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_lucide-react_dist_esm_icons_c9f298be._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_lucide-react_dist_esm_lucide-react_88c7da99.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_lucide-react_dist_esm_aadc553c._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_%40supabase_realtime-js_dist_module_bd33ecdc._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_%40supabase_storage-js_dist_module_f441eeb6._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_%40supabase_auth-js_dist_module_69c9005e._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_date-fns_1c402563._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_zod_v3_f983f72b._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_%40radix-ui_22600695._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_%40floating-ui_414d532e._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_4e339880._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/firebase-orginal_src_app_layout_tsx_d367f37a._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/firebase-orginal_src_e9b1c7eb._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_xlsx_xlsx_mjs_45381b09._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_%40dnd-kit_core_dist_core_esm_1ad8394a.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_3b4b0e9d._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/firebase-orginal_src_app_orders_page_tsx_67beaf9d._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_next_dist_client_components_builtin_global-error_d367f37a.js
+
+[1A[2K<< [33m200[39m https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;500;600;700&display=swap
+
+[1A[2K>> GET http://localhost:9002/favicon.ico?favicon.7ed73651.ico
+
+[1A[2K<< [33m200[39m http://localhost:9002/favicon.ico?favicon.7ed73651.ico
+
+[1A[2KBROWSER LOG: Download the React DevTools for a better development experience: https://react.dev/link/react-devtools
+
+[1A[2KBROWSER LOG: Server Requests Track
+
+[1A[2KBROWSER LOG: Server Components Track
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_c8c997ce._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_3f8af333._.js
+
+[1A[2K>> GET http://localhost:9002/_next/webpack-hmr?id=oLmfLQGDithSPLCaZ1RlD
+
+[1A[2K<< [33m101[39m http://localhost:9002/_next/webpack-hmr?id=oLmfLQGDithSPLCaZ1RlD
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_3f8af333._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_c8c997ce._.js
+
+[1A[2KBROWSER LOG: Blocking Track
+
+[1A[2KBROWSER LOG: Transition Track
+
+[1A[2KBROWSER LOG: Suspense Track
+
+[1A[2KBROWSER LOG: Idle Track
+
+[1A[2KBROWSER LOG: [HMR] connected
+
+[1A[2KBROWSER LOG: Blocked
+
+[1A[2K>> POST https://ebbigogxixgbajqijgpp.supabase.co/auth/v1/token?grant_type=refresh_token
+
+[1A[2KBROWSER LOG: Blocked
+
+[1A[2KBROWSER LOG: Blocked
+
+[1A[2KBROWSER LOG: Server Requests Track
+
+[1A[2KBROWSER LOG: Server Components Track
+
+[1A[2KBROWSER LOG: ΓÇïPreloads
+
+[1A[2KBROWSER LOG: ΓÇïHTTPAccessErrorFallback
+
+[1A[2KBROWSER LOG: ΓÇïNotFound
+
+[1A[2KBROWSER LOG: ΓÇïRootLayout
+
+[1A[2KBROWSER LOG: ΓÇïNext.MetadataOutlet
+
+[1A[2KBROWSER LOG: ΓÇïSkeleton
+
+[1A[2KBROWSER LOG: ΓÇïSkeleton
+
+[1A[2KBROWSER LOG: ΓÇïSkeleton
+
+[1A[2KBROWSER LOG: ΓÇïSkeleton
+
+[1A[2KBROWSER LOG: ΓÇïSkeleton
+
+[1A[2KBROWSER LOG: ΓÇïSkeleton
+
+[1A[2KBROWSER LOG: ΓÇïSkeleton
+
+[1A[2KBROWSER LOG: ΓÇïSkeleton
+
+[1A[2KBROWSER LOG: ΓÇïLoading
+
+[1A[2KBROWSER LOG: ΓÇïNonIndex
+
+[1A[2KBROWSER LOG: ΓÇïNext.Viewport
+
+[1A[2KBROWSER LOG: ΓÇïNext.Metadata
+
+[1A[2KBROWSER LOG: Blocked
+
+[1A[2KBROWSER LOG: Blocked
+
+[1A[2KBROWSER LOG: Hydrated
+
+[1A[2KBROWSER LOG: ol
+
+[1A[2KBROWSER LOG: Commit
+
+[1A[2KBROWSER LOG: Root
+
+[1A[2KBROWSER LOG: ServerRoot
+
+[1A[2KBROWSER LOG: AppRouter
+
+[1A[2KBROWSER LOG: RootErrorBoundary
+
+[1A[2KBROWSER LOG: ErrorBoundary
+
+[1A[2KBROWSER LOG: ErrorBoundaryHandler
+
+[1A[2KBROWSER LOG: Router
+
+[1A[2KBROWSER LOG: HistoryUpdater
+
+[1A[2KBROWSER LOG: RuntimeStyles
+
+[1A[2KBROWSER LOG: HotReload
+
+[1A[2KBROWSER LOG: AppDevOverlayErrorBoundary
+
+[1A[2KBROWSER LOG: ReplaySsrOnlyErrors
+
+[1A[2KBROWSER LOG: DevRootHTTPAccessFallbackBoundary
+
+[1A[2KBROWSER LOG: HTTPAccessFallbackBoundary
+
+[1A[2KBROWSER LOG: HTTPAccessFallbackErrorBoundary
+
+[1A[2KBROWSER LOG: RedirectBoundary
+
+[1A[2KBROWSER LOG: RedirectErrorBoundary
+
+[1A[2KBROWSER LOG: Head
+
+[1A[2KBROWSER LOG: __next_viewport_boundary__
+
+[1A[2KBROWSER LOG: __next_metadata_boundary__
+
+[1A[2KBROWSER LOG: __next_root_layout_boundary__
+
+[1A[2KBROWSER LOG: SegmentViewNode
+
+[1A[2KBROWSER LOG: SegmentTrieNode
+
+[1A[2KBROWSER LOG: ThemeProvider
+
+[1A[2KBROWSER LOG: z
+
+[1A[2KBROWSER LOG: O
+
+[1A[2KBROWSER LOG: AuthProvider
+
+[1A[2KBROWSER LOG: AppShell
+
+[1A[2KBROWSER LOG: LoaderCircle
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2KBROWSER LOG: AppShell
+
+[1A[2KBROWSER LOG: Toaster
+
+[1A[2KBROWSER LOG: ToastProvider
+
+[1A[2KBROWSER LOG: ToastCollectionProvider
+
+[1A[2KBROWSER LOG: ToastCollectionProviderProvider
+
+[1A[2KBROWSER LOG: ToastProviderProvider
+
+[1A[2KBROWSER LOG: ToastViewport
+
+[1A[2KBROWSER LOG: ToastViewport
+
+[1A[2KBROWSER LOG: DismissableLayerBranch
+
+[1A[2KBROWSER LOG: Primitive.div
+
+[1A[2KBROWSER LOG: ToastCollectionSlot
+
+[1A[2KBROWSER LOG: ToastCollectionSlot.Slot
+
+[1A[2KBROWSER LOG: ToastViewport
+
+[1A[2KBROWSER LOG: O
+
+[1A[2KBROWSER LOG: AppRouterAnnouncer
+
+[1A[2KBROWSER LOG: Remaining Effects
+
+[1A[2KBROWSER LOG: Blocking Track
+
+[1A[2KBROWSER LOG: Transition Track
+
+[1A[2KBROWSER LOG: Suspense Track
+
+[1A[2KBROWSER LOG: Idle Track
+
+[1A[2KBROWSER LOG: Render
+
+[1A[2KBROWSER LOG: ol
+
+[1A[2KBROWSER LOG: Commit
+
+[1A[2KBROWSER LOG: Waiting
+
+[1A[2KBROWSER LOG: O
+
+[1A[2KBROWSER LOG: AppShell
+
+[1A[2KBROWSER LOG: LoaderCircle
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2KBROWSER LOG: ToastProvider
+
+[1A[2KBROWSER LOG: ToastViewport
+
+[1A[2KBROWSER LOG: AppRouterAnnouncer
+
+[1A[2KBROWSER LOG: Remaining Effects
+
+[1A[2KBROWSER LOG: Blocking Track
+
+[1A[2KBROWSER LOG: Transition Track
+
+[1A[2KBROWSER LOG: Suspense Track
+
+[1A[2KBROWSER LOG: Idle Track
+
+[1A[2KBROWSER LOG: Render
+
+[1A[2KBROWSER LOG: Commit
+
+[1A[2KBROWSER LOG: Blocking Track
+
+[1A[2KBROWSER LOG: Transition Track
+
+[1A[2KBROWSER LOG: Suspense Track
+
+[1A[2KBROWSER LOG: Idle Track
+
+[1A[2KBROWSER LOG: Render
+
+[1A[2KBROWSER LOG: Waiting for Paint
+
+[1A[2KBROWSER LOG: Blocking Track
+
+[1A[2KBROWSER LOG: Transition Track
+
+[1A[2KBROWSER LOG: Suspense Track
+
+[1A[2KBROWSER LOG: Idle Track
+
+[1A[2KBROWSER LOG: Prepared
+
+[1A[2KBROWSER LOG: Commit
+
+[1A[2KBROWSER LOG: Waiting for Paint
+
+[1A[2KBROWSER LOG: IconMark
+
+[1A[2KBROWSER LOG: Remaining Effects
+
+[1A[2KBROWSER LOG: Blocking Track
+
+[1A[2KBROWSER LOG: Transition Track
+
+[1A[2KBROWSER LOG: Suspense Track
+
+[1A[2KBROWSER LOG: Idle Track
+
+[1A[2KBROWSER LOG: Event: success
+
+[1A[2KBROWSER LOG: Render
+
+[1A[2KBROWSER LOG: Commit
+
+[1A[2KBROWSER LOG: AppShell
+
+[1A[2KBROWSER LOG: LoaderCircle
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2KBROWSER LOG: Remaining Effects
+
+[1A[2KBROWSER LOG: Service Worker registered
+
+[1A[2KBROWSER LOG: Blocking Track
+
+[1A[2KBROWSER LOG: Transition Track
+
+[1A[2KBROWSER LOG: Suspense Track
+
+[1A[2KBROWSER LOG: Idle Track
+
+[1A[2KBROWSER LOG: Render
+
+[1A[2KBROWSER LOG: Commit
+
+[1A[2KBROWSER LOG: Waiting for Paint
+
+[1A[2KBROWSER LOG: AppShell
+
+[1A[2KBROWSER LOG: Remaining Effects
+
+[1A[2K<< [33m400[39m https://ebbigogxixgbajqijgpp.supabase.co/auth/v1/token?grant_type=refresh_token
+
+[1A[2KBROWSER LOG: Error
+
+[1A[2KBROWSER LOG: Blocking Track
+
+[1A[2KBROWSER LOG: Transition Track
+
+[1A[2KBROWSER LOG: Suspense Track
+
+[1A[2KBROWSER LOG: Idle Track
+
+[1A[2KBROWSER LOG: Render
+
+[1A[2KBROWSER LOG: Commit
+
+[1A[2KBROWSER LOG: Waiting for Paint
+
+[1A[2KBROWSER LOG: AuthProvider
+
+[1A[2KBROWSER LOG: AppShell
+
+[1A[2KBROWSER LOG: Server Requests Track
+
+[1A[2KBROWSER LOG: Server Components Track
+
+[1A[2K>> GET http://localhost:9002/__nextjs_font/geist-latin.woff2
+
+[1A[2KBROWSER LOG: AppShell
+
+[1A[2KBROWSER LOG: Remaining Effects
+
+[1A[2KBROWSER LOG: Blocking Track
+
+[1A[2KBROWSER LOG: Transition Track
+
+[1A[2KBROWSER LOG: Suspense Track
+
+[1A[2KBROWSER LOG: Idle Track
+
+[1A[2KBROWSER LOG: Render
+
+[1A[2KBROWSER LOG: Router
+
+[1A[2KBROWSER LOG: HistoryUpdater
+
+[1A[2KBROWSER LOG: RuntimeStyles
+
+[1A[2KBROWSER LOG: ReplaySsrOnlyErrors
+
+[1A[2KBROWSER LOG: Head
+
+[1A[2KBROWSER LOG: __next_root_layout_boundary__
+
+[1A[2K>> GET http://localhost:9002/login?_rsc=1faaj
+
+[1A[2KBROWSER LOG: AppRouterAnnouncer
+
+[1A[2KBROWSER LOG: Router
+
+[1A[2KBROWSER LOG: Remaining Effects
+
+[1A[2K[chromium] ΓÇ║ e2e\notifications.spec.ts:8:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+BROWSER LOG: [Fast Refresh] rebuilding
+
+[1A[2K[webkit] ΓÇ║ e2e\notifications.spec.ts:8:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+BROWSER LOG: [Fast Refresh] rebuilding
+
+[1A[2K[firefox] ΓÇ║ e2e\notifications.spec.ts:8:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+BROWSER LOG: Blocking Track
+
+[1A[2KBROWSER LOG: Transition Track
+
+[1A[2KBROWSER LOG: Suspense Track
+
+[1A[2KBROWSER LOG: Idle Track
+
+[1A[2KBROWSER LOG: Render
+
+[1A[2K>> POST http://localhost:9002/__nextjs_original-stack-frames
+
+[1A[2KBROWSER LOG: [Fast Refresh] rebuilding
+
+[1A[2KBROWSER LOG: Blocking Track
+
+[1A[2KBROWSER LOG: Transition Track
+
+[1A[2KBROWSER LOG: Suspense Track
+
+[1A[2KBROWSER LOG: Idle Track
+
+[1A[2KBROWSER LOG: Blocked
+
+[1A[2KBROWSER LOG: Prewarm
+
+[1A[2K[chromium] ΓÇ║ e2e\notifications.spec.ts:8:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+BROWSER LOG: [Fast Refresh] done in 123ms
+
+[1A[2K[webkit] ΓÇ║ e2e\notifications.spec.ts:8:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+BROWSER LOG: [Fast Refresh] done in 124ms
+
+[1A[2K[firefox] ΓÇ║ e2e\notifications.spec.ts:8:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+BROWSER LOG: [Fast Refresh] done in 120ms
+
+[1A[2K<< [33m200[39m http://localhost:9002/__nextjs_font/geist-latin.woff2
+
+[1A[2K[chromium] ΓÇ║ e2e\notifications.spec.ts:8:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+BROWSER LOG: [Fast Refresh] rebuilding
+
+[1A[2K[firefox] ΓÇ║ e2e\notifications.spec.ts:8:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+BROWSER LOG: [Fast Refresh] rebuilding
+
+[1A[2K<< [33m200[39m http://localhost:9002/login?_rsc=1faaj
+
+[1A[2K[webkit] ΓÇ║ e2e\notifications.spec.ts:8:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+BROWSER LOG: [Fast Refresh] rebuilding
+
+[1A[2K[firefox] ΓÇ║ e2e\notifications.spec.ts:8:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+BROWSER LOG: Blocking Track
+
+[1A[2KBROWSER LOG: Transition Track
+
+[1A[2KBROWSER LOG: Suspense Track
+
+[1A[2KBROWSER LOG: Idle Track
+
+[1A[2KBROWSER LOG: Suspended
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/firebase-orginal_src_app_login_page_tsx_254c72d9._.js
+
+[1A[2KBROWSER LOG: Render
+
+[1A[2KBROWSER LOG: SegmentViewStateNode
+
+[1A[2KBROWSER LOG: InnerScrollAndFocusHandler
+
+[1A[2KBROWSER LOG: Commit
+
+[1A[2KBROWSER LOG: Waiting for Paint
+
+[1A[2KBROWSER LOG: Router
+
+[1A[2KBROWSER LOG: RuntimeStyles
+
+[1A[2KBROWSER LOG: ReplaySsrOnlyErrors
+
+[1A[2KBROWSER LOG: Head
+
+[1A[2KBROWSER LOG: __next_viewport_boundary__
+
+[1A[2KBROWSER LOG: __next_metadata_boundary__
+
+[1A[2KBROWSER LOG: IconMark
+
+[1A[2KBROWSER LOG: __next_root_layout_boundary__
+
+[1A[2KBROWSER LOG: AppShell
+
+[1A[2KBROWSER LOG: OuterLayoutRouter
+
+[1A[2KBROWSER LOG: SegmentStateProvider
+
+[1A[2KBROWSER LOG: RenderFromTemplateContext
+
+[1A[2KBROWSER LOG: ScrollAndFocusHandler
+
+[1A[2KBROWSER LOG: InnerScrollAndFocusHandler
+
+[1A[2KBROWSER LOG: ErrorBoundary
+
+[1A[2KBROWSER LOG: LoadingBoundary
+
+[1A[2KBROWSER LOG: SegmentViewNode
+
+[1A[2KBROWSER LOG: SegmentTrieNode
+
+[1A[2KBROWSER LOG: SegmentViewStateNode
+
+[1A[2KBROWSER LOG: SegmentViewNode
+
+[1A[2KBROWSER LOG: SegmentTrieNode
+
+[1A[2KBROWSER LOG: SegmentViewNode
+
+[1A[2KBROWSER LOG: SegmentTrieNode
+
+[1A[2KBROWSER LOG: SegmentViewNode
+
+[1A[2KBROWSER LOG: SegmentTrieNode
+
+[1A[2KBROWSER LOG: Remaining Effects
+
+[1A[2KBROWSER LOG: Blocking Track
+
+[1A[2KBROWSER LOG: Transition Track
+
+[1A[2KBROWSER LOG: Suspense Track
+
+[1A[2KBROWSER LOG: Idle Track
+
+[1A[2KBROWSER LOG: Render
+
+[1A[2KBROWSER LOG: Waiting for Paint
+
+[1A[2KBROWSER LOG: Remaining Effects
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/firebase-orginal_src_app_login_page_tsx_67beaf9d._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/firebase-orginal_src_app_login_page_tsx_254c72d9._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/firebase-orginal_src_app_login_page_tsx_67beaf9d._.js
+
+[1A[2KBROWSER LOG: Blocking Track
+
+[1A[2KBROWSER LOG: Transition Track
+
+[1A[2KBROWSER LOG: Suspense Track
+
+[1A[2KBROWSER LOG: Idle Track
+
+[1A[2KBROWSER LOG: Server Requests Track
+
+[1A[2KBROWSER LOG: Server Components Track
+
+[1A[2KBROWSER LOG: ΓÇïNext.MetadataOutlet
+
+[1A[2KBROWSER LOG: ΓÇïNonIndex
+
+[1A[2KBROWSER LOG: ΓÇïNext.Viewport
+
+[1A[2KBROWSER LOG: ΓÇïNext.Metadata
+
+[1A[2KBROWSER LOG: Blocked
+
+[1A[2K<< [33m200[39m http://localhost:9002/__nextjs_original-stack-frames
+
+[1A[2K>> GET http://localhost:9002/favicon.ico?favicon.7ed73651.ico
+
+[1A[2K<< [33m200[39m http://localhost:9002/favicon.ico?favicon.7ed73651.ico
+
+[1A[2KBROWSER LOG: [Fast Refresh] done in 482ms
+
+[1A[2K[webkit] ΓÇ║ e2e\notifications.spec.ts:8:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+BROWSER LOG: [Fast Refresh] done in 473ms
+
+[1A[2K[chromium] ΓÇ║ e2e\notifications.spec.ts:8:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+BROWSER LOG: [Fast Refresh] done in 487ms
+
+[1A[2K[firefox] ΓÇ║ e2e\notifications.spec.ts:8:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+BROWSER LOG: Render
+
+[1A[2KBROWSER LOG: Throttled
+
+[1A[2KBROWSER LOG: a
+
+[1A[2KBROWSER LOG: SegmentViewStateNode
+
+[1A[2KBROWSER LOG: Commit
+
+[1A[2KBROWSER LOG: Waiting for Paint
+
+[1A[2KBROWSER LOG: HTTPAccessFallbackBoundary
+
+[1A[2KBROWSER LOG: HTTPAccessFallbackErrorBoundary
+
+[1A[2KBROWSER LOG: RedirectBoundary
+
+[1A[2KBROWSER LOG: RedirectErrorBoundary
+
+[1A[2KBROWSER LOG: InnerLayoutRouter
+
+[1A[2KBROWSER LOG: OuterLayoutRouter
+
+[1A[2KBROWSER LOG: SegmentStateProvider
+
+[1A[2KBROWSER LOG: RenderFromTemplateContext
+
+[1A[2KBROWSER LOG: ScrollAndFocusHandler
+
+[1A[2KBROWSER LOG: InnerScrollAndFocusHandler
+
+[1A[2KBROWSER LOG: ErrorBoundary
+
+[1A[2KBROWSER LOG: LoadingBoundary
+
+[1A[2KBROWSER LOG: HTTPAccessFallbackBoundary
+
+[1A[2KBROWSER LOG: RedirectBoundary
+
+[1A[2KBROWSER LOG: RedirectErrorBoundary
+
+[1A[2KBROWSER LOG: InnerLayoutRouter
+
+[1A[2KBROWSER LOG: SegmentViewNode
+
+[1A[2KBROWSER LOG: SegmentTrieNode
+
+[1A[2KBROWSER LOG: ClientPageRoot
+
+[1A[2KBROWSER LOG: LoginPage
+
+[1A[2KBROWSER LOG: Card
+
+[1A[2KBROWSER LOG: CardHeader
+
+[1A[2KBROWSER LOG: CardTitle
+
+[1A[2KBROWSER LOG: CardDescription
+
+[1A[2KBROWSER LOG: CardContent
+
+[1A[2KBROWSER LOG: Label
+
+[1A[2KBROWSER LOG: Label
+
+[1A[2KBROWSER LOG: Primitive.label
+
+[1A[2KBROWSER LOG: Input
+
+[1A[2KBROWSER LOG: Label
+
+[1A[2KBROWSER LOG: LinkComponent
+
+[1A[2KBROWSER LOG: Input
+
+[1A[2KBROWSER LOG: Button
+
+[1A[2KBROWSER LOG: LinkComponent
+
+[1A[2KBROWSER LOG: __next_outlet_boundary__
+
+[1A[2KBROWSER LOG: SegmentViewStateNode
+
+[1A[2KBROWSER LOG: Remaining Effects
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/firebase-orginal_src_app_login_page_tsx_254c72d9._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/firebase-orginal_src_app_login_page_tsx_254c72d9._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/firebase-orginal_src_app_login_page_tsx_67beaf9d._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/firebase-orginal_src_app_login_page_tsx_67beaf9d._.js
+
+[1A[2K[chromium] ΓÇ║ e2e\notifications.spec.ts:8:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+Create Order button not found. Page content:
+
+[1A[2K<!DOCTYPE html><html lang="en" class="dark" style="color-scheme: dark;"><head><link rel="stylesheet" href="/_next/static/chunks/firebase-orginal_src_app_globals_31e9131b.css" data-precedence="next_static/chunks/firebase-orginal_src_app_globals_31e9131b.css"><link rel="preload" as="script" fetchpriority="low" href="/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_099275f4._.js"><script src="/_next/static/chunks/97dea_next_dist_compiled_react-dom_92424803._.js" async=""></script><script src="/_next/static/chunks/97dea_next_dist_compiled_react-server-dom-turbopack_fd66e9bc._.js" async=""></script><script src="/_next/static/chunks/97dea_next_dist_compiled_next-devtools_index_a78e6daf.js" async=""></script><script src="/_next/static/chunks/97dea_next_dist_compiled_e793555b._.js" async=""></script><script src="/_next/static/chunks/97dea_next_dist_client_ce563615._.js" async=""></script><script src="/_next/static/chunks/97dea_next_dist_b5d32be2._.js" async=""></script><script src="/_next/static/chunks/97dea_%40swc_helpers_cjs_b4342a33._.js" async=""></script><script src="/_next/static/chunks/firebase-orginal_a0ff3932._.js" async=""></script><script src="/_next/static/chunks/turbopack-firebase-orginal_1df438e4._.js" async=""></script><script src="/_next/static/chunks/97dea_next_dist_e8d2e20c._.js" async=""></script><script src="/_next/static/chunks/firebase-orginal_src_app_favicon_ico_mjs_b3a5503f._.js" async=""></script><script src="/_next/static/chunks/firebase-orginal_src_7a0328b7._.js" async=""></script><script src="/_next/static/chunks/firebase-orginal_src_components_aa73e6bd._.js" async=""></script><script src="/_next/static/chunks/firebase-orginal_src_store_208195a7._.js" async=""></script><script src="/_next/static/chunks/firebase-orginal_src_app_5c70d10a._.js" async=""></script><script src="/_next/static/chunks/firebase-orginal_src_70e3500a._.js" async=""></script><script src="/_next/static/chunks/97dea_next_60f77ba3._.js" async=""></script><script src="/_next/static/chunks/97dea_lucide-react_dist_esm_icons_index_a0c80c48.js" async=""></script><script src="/_next/static/chunks/97dea_lucide-react_dist_esm_icons_c9f298be._.js" async=""></script><script src="/_next/static/chunks/97dea_lucide-react_dist_esm_lucide-react_88c7da99.js" async=""></script><script src="/_next/static/chunks/97dea_lucide-react_dist_esm_aadc553c._.js" async=""></script><script src="/_next/static/chunks/97dea_%40supabase_realtime-js_dist_module_bd33ecdc._.js" async=""></script><script src="/_next/static/chunks/97dea_%40supabase_storage-js_dist_module_f441eeb6._.js" async=""></script><script src="/_next/static/chunks/97dea_%40supabase_auth-js_dist_module_69c9005e._.js" async=""></script><script src="/_next/static/chunks/97dea_date-fns_1c402563._.js" async=""></script><script src="/_next/static/chunks/97dea_zod_v3_f983f72b._.js" async=""></script><script src="/_next/static/chunks/97dea_%40radix-ui_22600695._.js" async=""></script><script src="/_next/static/chunks/97dea_%40floating-ui_414d532e._.js" async=""></script><script src="/_next/static/chunks/97dea_4e339880._.js" async=""></script><script src="/_next/static/chunks/firebase-orginal_src_app_layout_tsx_d367f37a._.js" async=""></script><script src="/_next/static/chunks/firebase-orginal_src_e9b1c7eb._.js" async=""></script><script src="/_next/static/chunks/97dea_xlsx_xlsx_mjs_45381b09._.js" async=""></script><script src="/_next/static/chunks/97dea_%40dnd-kit_core_dist_core_esm_1ad8394a.js" async=""></script><script src="/_next/static/chunks/97dea_3b4b0e9d._.js" async=""></script><script src="/_next/static/chunks/firebase-orginal_src_app_orders_page_tsx_67beaf9d._.js" async=""></script><script src="/_next/static/chunks/97dea_next_dist_client_components_builtin_global-error_d367f37a.js" async=""></script><link rel="preload" href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;500;600;700&amp;display=swap" as="style"><link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;500;600;700&amp;display=swap" rel="stylesheet"><script src="/_next/static/chunks/97dea_next_dist_build_polyfills_polyfill-nomodule.js" nomodule=""></script><script src="/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_c8c997ce._.js"></script><script src="/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_3f8af333._.js"></script><style>@font-face{font-family:'__nextjs-Geist';font-style:normal;font-weight:400 600;font-display:swap;src:url(/__nextjs_font/geist-latin-ext.woff2) format('woff2');unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}@font-face{font-family:'__nextjs-Geist Mono';font-style:normal;font-weight:400 600;font-display:swap;src:url(/__nextjs_font/geist-mono-latin-ext.woff2) format('woff2');unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}@font-face{font-family:'__nextjs-Geist';font-style:normal;font-weight:400 600;font-display:swap;src:url(/__nextjs_font/geist-latin.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}@font-face{font-family:'__nextjs-Geist Mono';font-style:normal;font-weight:400 600;font-display:swap;src:url(/__nextjs_font/geist-mono-latin.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}</style><script src="/_next/static/chunks/firebase-orginal_src_app_login_page_tsx_254c72d9._.js"></script><script src="/_next/static/chunks/firebase-orginal_src_app_login_page_tsx_67beaf9d._.js"></script><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>SynergyFlow</title><meta name="description" content="AI-powered ERP system to manage clients, sales, maintenance, and business analytics."><link rel="icon" href="/favicon.ico?favicon.7ed73651.ico" sizes="48x48" type="image/x-icon"><script src="/_next/static/chunks/firebase-orginal_src_app_login_page_tsx_254c72d9._.js" async=""></script><script src="/_next/static/chunks/firebase-orginal_src_app_login_page_tsx_67beaf9d._.js" async=""></script></head><body><div hidden=""></div><script>!function(){try{var d=document.documentElement,c=d.classList;c.remove('light','dark');var e=localStorage.getItem('theme');if('system'===e||(!e&&false)){var t='(prefers-color-scheme: dark)',m=window.matchMedia(t);if(m.media!==t||m.matches){d.style.colorScheme = 'dark';c.add('dark')}else{d.style.colorScheme = 'light';c.add('light')}}else if(e){c.add(e|| '')}else{c.add('dark')}if(e==='light'||e==='dark'||!e)d.style.colorScheme=e||'dark'}catch(e){}}()</script><div class="flex items-center justify-center min-h-screen bg-background"><div class="rounded-lg border bg-card text-card-foreground shadow-sm w-full max-w-md"><div class="flex flex-col space-y-1.5 p-6 border-b mb-[10px]"><h3 class="font-semibold tracking-tight text-2xl">Login</h3><p class="text-sm text-muted-foreground">Enter your email below to login to your account</p></div><div class="p-6 pt-0"><form><div class="grid gap-4"><div class="grid gap-2"><label class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70" for="email">Email</label><input class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm" id="email" placeholder="m@example.com" required="" type="email" value=""></div><div class="grid gap-2"><div class="flex items-center"><label class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70" for="password">Password</label><a class="ml-auto inline-block text-sm underline" href="/reset-password">Forgot your password?</a></div><input class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm" id="password" required="" type="password" value=""></div><button class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 w-full" type="submit">Login</button></div></form><div class="mt-4 text-center text-sm">Don't have an account? <a class="underline" href="/register">Sign up</a></div></div></div></div><div role="region" aria-label="Notifications (F8)" tabindex="-1" style="pointer-events:none"><ol tabindex="-1" class="fixed top-0 z-[100] flex max-h-screen w-full flex-col-reverse p-4 sm:bottom-0 sm:right-0 sm:top-auto sm:flex-col md:max-w-[420px]"></ol></div><script id="_R_">self.__next_r="ntIrDi6eZ08_mZx9CHa_Y"</script><script src="/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_099275f4._.js" async=""></script><script>(self.__next_f=self.__next_f||[]).push([0])</script><script>self.__next_f.push([1,"5:I[\"[project]/firebase-orginal/node_modules/next/dist/next-devtools/userspace/app/segment-explorer-node.js [app-client] (ecmascript)\",[\"/_next/static/chunks/97dea_next_dist_e8d2e20c._.js\",\"/_next/static/chunks/firebase-orginal_src_app_favicon_ico_mjs_b3a5503f._.js\"],\"SegmentViewNode\"]\n7:\"$Sreact.fragment\"\n2b:I[\"[project]/firebase-orginal/src/components/theme-provider.tsx [app-client] (ecmascript)\",[\"/_next/static/chunks/firebase-orginal_src_7a0328b7._.js\",\"/_next/static/chunks/firebase-orginal_src_components_aa73e6bd._.js\",\"/_next/static/chunks/firebase-orginal_src_store_208195a7._.js\",\"/_next/static/chunks/firebase-orginal_src_app_5c70d10a._.js\",\"/_next/static/chunks/firebase-orginal_src_70e3500a._.js\",\"/_next/static/chunks/97dea_next_60f77ba3._.js\",\"/_next/static/chunks/97dea_lucide-react_dist_esm_icons_index_a0c80c48.js\",\"/_next/static/chunks/97dea_lucide-react_dist_esm_icons_c9f298be._.js\",\"/_next/static/chunks/97dea_lucide-react_dist_esm_lucide-react_88c7da99.js\",\"/_next/static/chunks/97dea_lucide-react_dist_esm_aadc553c._.js\",\"/_next/static/chunks/97dea_%40supabase_realtime-js_dist_module_bd33ecdc._.js\",\"/_next/static/chunks/97dea_%40supabase_storage-js_dist_module_f441eeb6._.js\",\"/_next/static/chunks/97dea_%40supabase_auth-js_dist_module_69c9005e._.js\",\"/_next/static/chunks/97dea_date-fns_1c402563._.js\",\"/_next/static/chunks/97dea_zod_v3_f983f72b._.js\",\"/_next/static/chunks/97dea_%40radix-ui_22600695._.js\",\"/_next/static/chunks/97dea_%40floating-ui_414d532e._.js\",\"/_next/static/chunks/97dea_4e339880._.js\",\"/_next/static/chunks/firebase-orginal_src_app_layout_tsx_d367f37a._.js\"],\"ThemeProvider\"]\n2d:I[\"[project]/firebase-orginal/src/hooks/use-auth.tsx [app-client] (ecmascript)\",[\"/_next/static/chunks/firebase-orginal_src_7a0328b7._.js\",\"/_next/static/chunks/firebase-orginal_src_components_aa73e6bd._.js\",\"/_next/static/chunks/firebase-orginal_src_store_208195a7._.js\",\"/_next/static/chunks/firebase-orginal_src_app_5c70d10a._.js\",\"/_next/static/chunks/firebase-orginal_src_70e3500a._.js\",\"/_next/static/chunks/97dea_next_60f77ba3._.js\",\"/_next/static/chunks/97dea_lucide-react_dist_esm_icons_index_a0c80c48.js\",\"/_next/static/chunks/97dea_lucide-react_dist_esm_icons_c9f298be._.js\",\"/_next/static/chunks/97dea_lucide-react_dist_esm_lucide-react_88c7da99.js\",\"/_next/static/chunks/97dea_lucide-react_dist_esm_aadc553c._.js\",\"/_next/static/chunks/97dea_%40supabase_realtime-js_dist_module_bd33ecdc._.js\",\"/_next/static/chunks/97dea_%40supabase_storage-js_dist_module_f441eeb6._.js\",\"/_next/static/chunks/97dea_%40supabase_auth-js_dist_module_69c9005e._.js\",\"/_next/static/chunks/97dea_date-fns_1c402563._.js\",\"/_next/static/chunks/97dea_zod_v3_f983f72b._.js\",\"/_next/static/chunks/97dea_%40radix-ui_22600695._.js\",\"/_next/static/chunks/97dea_%40floating-ui_414d532e._.js\",\"/_next/static/chunks/97dea_4e339880._.js\",\"/_next/static/chunks/firebase-orginal_src_app_layout_tsx_d367f37a._.js\"],\"AuthProvider\"]\n2f:I[\"[project]/firebase-orginal/src/components/layout/app-shell.tsx [app-client] (ecmascript)\",[\"/_next/static/chunks/firebase-orginal_src_7a0328b7._.js\",\"/_next/static/chunks/firebase-orginal_src_components_aa73e6bd._.js\",\"/_next/static/chunks/firebase-orginal_src_store_208195a7._.js\",\"/_next/static/chunks/firebase-orginal_src_app_5c70d10a._.js\",\"/_next/static/chunks/firebase-orginal_src_70e3500a._.js\",\"/_next/static/chunks/97dea_next_60f77ba3._.js\",\"/_next/static/chunks/97dea_lucide-react_dist_esm_icons_index_a0c80c48.js\",\"/_next/static/chunks/97dea_lucide-react_dist_esm_icons_c9f298be._.js\",\"/_next/static/chunks/97dea_lucide-react_dist_esm_lucide-react_88c7da99.js\",\"/_next/static/chunks/97dea_lucide-react_dist_esm_aadc553c._.js\",\"/_next/static/chunks/97dea_%40supabase_realtime-js_dist_module_bd33ecdc._.js\",\"/_next/static/chunks/97dea_%40supabase_storage-js_dist_module_f441eeb6._.js\",\"/_next/static/chunks/97dea_%40supabase_auth-js_dist_module_69c9005e._.js\",\"/_next/static/chunks/97dea_date-fns_1c402563._.js\",\"/_next/static/chunks/97dea_zod_v3_f983f72b._.js\",\"/_next/static/chunks/97dea_%40radix-ui_22600695._.js\",\"/_next/static/chunks/97"])</script><script>self.__next_f.push([1,"dea_%40floating-ui_414d532e._.js\",\"/_next/static/chunks/97dea_4e339880._.js\",\"/_next/static/chunks/firebase-orginal_src_app_layout_tsx_d367f37a._.js\"],\"AppShell\"]\n31:I[\"[project]/firebase-orginal/node_modules/next/dist/client/components/layout-router.js [app-client] (ecmascript)\",[\"/_next/static/chunks/97dea_next_dist_e8d2e20c._.js\",\"/_next/static/chunks/firebase-orginal_src_app_favicon_ico_mjs_b3a5503f._.js\"],\"default\"]\n33:I[\"[project]/firebase-orginal/node_modules/next/dist/client/components/render-from-template-context.js [app-client] (ecmascript)\",[\"/_next/static/chunks/97dea_next_dist_e8d2e20c._.js\",\"/_next/static/chunks/firebase-orginal_src_app_favicon_ico_mjs_b3a5503f._.js\"],\"default\"]\n42:I[\"[project]/firebase-orginal/src/components/ui/toaster.tsx [app-client] (ecmascript)\",[\"/_next/static/chunks/firebase-orginal_src_7a0328b7._.js\",\"/_next/static/chunks/firebase-orginal_src_components_aa73e6bd._.js\",\"/_next/static/chunks/firebase-orginal_src_store_208195a7._.js\",\"/_next/static/chunks/firebase-orginal_src_app_5c70d10a._.js\",\"/_next/static/chunks/firebase-orginal_src_70e3500a._.js\",\"/_next/static/chunks/97dea_next_60f77ba3._.js\",\"/_next/static/chunks/97dea_lucide-react_dist_esm_icons_index_a0c80c48.js\",\"/_next/static/chunks/97dea_lucide-react_dist_esm_icons_c9f298be._.js\",\"/_next/static/chunks/97dea_lucide-react_dist_esm_lucide-react_88c7da99.js\",\"/_next/static/chunks/97dea_lucide-react_dist_esm_aadc553c._.js\",\"/_next/static/chunks/97dea_%40supabase_realtime-js_dist_module_bd33ecdc._.js\",\"/_next/static/chunks/97dea_%40supabase_storage-js_dist_module_f441eeb6._.js\",\"/_next/static/chunks/97dea_%40supabase_auth-js_dist_module_69c9005e._.js\",\"/_next/static/chunks/97dea_date-fns_1c402563._.js\",\"/_next/static/chunks/97dea_zod_v3_f983f72b._.js\",\"/_next/static/chunks/97dea_%40radix-ui_22600695._.js\",\"/_next/static/chunks/97dea_%40floating-ui_414d532e._.js\",\"/_next/static/chunks/97dea_4e339880._.js\",\"/_next/static/chunks/firebase-orginal_src_app_layout_tsx_d367f37a._.js\"],\"Toaster\"]\n49:I[\"[project]/firebase-orginal/node_modules/next/dist/client/components/client-page.js [app-client] (ecmascript)\",[\"/_next/static/chunks/97dea_next_dist_e8d2e20c._.js\",\"/_next/static/chunks/firebase-orginal_src_app_favicon_ico_mjs_b3a5503f._.js\"],\"ClientPageRoot\"]\n"])</script><script>self.__next_f.push([1,"4a:I[\"[project]/firebase-orginal/src/app/orders/page.tsx [app-client] (ecmascript)\",[\"/_next/static/chunks/firebase-orginal_src_7a0328b7._.js\",\"/_next/static/chunks/firebase-orginal_src_components_aa73e6bd._.js\",\"/_next/static/chunks/firebase-orginal_src_store_208195a7._.js\",\"/_next/static/chunks/firebase-orginal_src_app_5c70d10a._.js\",\"/_next/static/chunks/firebase-orginal_src_70e3500a._.js\",\"/_next/static/chunks/97dea_next_60f77ba3._.js\",\"/_next/static/chunks/97dea_lucide-react_dist_esm_icons_index_a0c80c48.js\",\"/_next/static/chunks/97dea_lucide-react_dist_esm_icons_c9f298be._.js\",\"/_next/static/chunks/97dea_lucide-react_dist_esm_lucide-react_88c7da99.js\",\"/_next/static/chunks/97dea_lucide-react_dist_esm_aadc553c._.js\",\"/_next/static/chunks/97dea_%40supabase_realtime-js_dist_module_bd33ecdc._.js\",\"/_next/static/chunks/97dea_%40supabase_storage-js_dist_module_f441eeb6._.js\",\"/_next/static/chunks/97dea_%40supabase_auth-js_dist_module_69c9005e._.js\",\"/_next/static/chunks/97dea_date-fns_1c402563._.js\",\"/_next/static/chunks/97dea_zod_v3_f983f72b._.js\",\"/_next/static/chunks/97dea_%40radix-ui_22600695._.js\",\"/_next/static/chunks/97dea_%40floating-ui_414d532e._.js\",\"/_next/static/chunks/97dea_4e339880._.js\",\"/_next/static/chunks/firebase-orginal_src_app_layout_tsx_d367f37a._.js\",\"/_next/static/chunks/firebase-orginal_src_e9b1c7eb._.js\",\"/_next/static/chunks/97dea_xlsx_xlsx_mjs_45381b09._.js\",\"/_next/static/chunks/97dea_%40dnd-kit_core_dist_core_esm_1ad8394a.js\",\"/_next/static/chunks/97dea_3b4b0e9d._.js\",\"/_next/static/chunks/firebase-orginal_src_app_orders_page_tsx_67beaf9d._.js\"],\"default\"]\n"])</script><script>self.__next_f.push([1,"53:I[\"[project]/firebase-orginal/node_modules/next/dist/lib/framework/boundary-components.js [app-client] (ecmascript)\",[\"/_next/static/chunks/97dea_next_dist_e8d2e20c._.js\",\"/_next/static/chunks/firebase-orginal_src_app_favicon_ico_mjs_b3a5503f._.js\"],\"OutletBoundary\"]\n55:\"$Sreact.suspense\"\n76:I[\"[project]/firebase-orginal/node_modules/next/dist/lib/framework/boundary-components.js [app-client] (ecmascript)\",[\"/_next/static/chunks/97dea_next_dist_e8d2e20c._.js\",\"/_next/static/chunks/firebase-orginal_src_app_favicon_ico_mjs_b3a5503f._.js\"],\"ViewportBoundary\"]\n7c:I[\"[project]/firebase-orginal/node_modules/next/dist/lib/framework/boundary-components.js [app-client] (ecmascript)\",[\"/_next/static/chunks/97dea_next_dist_e8d2e20c._.js\",\"/_next/static/chunks/firebase-orginal_src_app_favicon_ico_mjs_b3a5503f._.js\"],\"MetadataBoundary\"]\n80:I[\"[project]/firebase-orginal/node_modules/next/dist/client/components/builtin/global-error.js [app-client] (ecmascript)\",[\"/_next/static/chunks/97dea_next_dist_client_components_builtin_global-error_d367f37a.js\"],\"default\"]\n90:I[\"[project]/firebase-orginal/node_modules/next/dist/lib/metadata/generate/icon-mark.js [app-client] (ecmascript)\",[\"/_next/static/chunks/97dea_next_dist_e8d2e20c._.js\",\"/_next/static/chunks/firebase-orginal_src_app_favicon_ico_mjs_b3a5503f._.js\"],\"IconMark\"]\n:HL[\"/_next/static/chunks/firebase-orginal_src_app_globals_31e9131b.css\",\"style\"]\n:HL[\"https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;500;600;700\u0026display=swap\",\"style\"]\n:N1763717640616.3108\n3:\"$EObject.defineProperty(()=\u003e{ctx.componentMod.preloadStyle(fullHref,ctx.renderOpts.crossOrigin,ctx.nonce)},\\\"name\\\",{value:\\\"\\\"})\"\n2:{\"name\":\"Preloads\",\"key\":null,\"env\":\"Server\",\"stack\":[],\"props\":{\"preloadCallbacks\":[\"$3\"]}}\n4:[]\n6:[]\n8:[[\"Array.map\",\"\",0,0,0,0,false]]\n9:[[\"Array.map\",\"\",0,0,0,0,false]]\na:[[\"Array.map\",\"\",0,0,0,0,false]]\nb:[[\"Array.map\",\"\",0,0,0,0,false]]\nc:[[\"Array.map\",\"\",0,0,0,0,false]]\nd:[[\"Array.map\",\"\",0,0,0,0,false]]\ne:[[\"Array.map\",\"\",0,0,0,0,false]]\nf:[[\"Array.map\",\"\",0,0,0,0,false]]\n10:[[\"Array.map\",\"\",0,0,0,0,false]]\n11:[[\"Array.map\",\"\",0,0,0,0,false]]\n12:[[\"Array.map\",\"\",0,0,0,0,false]]\n13:[[\"Array.map\",\"\",0,0,0,0,false]]\n14:[[\"Array.map\",\"\",0,0,0,0,false]]\n15:[[\"Array.map\",\"\",0,0,0,0,false]]\n16:[[\"Array.map\",\"\",0,0,0,0,false]]\n17:[[\"Array.map\",\"\",0,0,0,0,false]]\n18:[[\"Array.map\",\"\",0,0,0,0,false]]\n19:[[\"Array.map\",\"\",0,0,0,0,false]]\n1a:[[\"Array.map\",\"\",0,0,0,0,false]]\n1b:[[\"Array.map\",\"\",0,0,0,0,false]]\n1e:I[\"[project]/firebase-orginal/node_modules/next/dist/client/components/layout-router.js [app-client] (ecmascript)\",[\"/_next/static/chunks/97dea_next_dist_e8d2e20c._.js\",\"/_next/static/chunks/firebase-orginal_src_app_favicon_ico_mjs_b3a5503f._.js\"],\"default\"]\n21:I[\"[project]/firebase-orginal/node_modules/next/dist/client/components/render-from-template-context.js [app-client] (ecmascript)\",[\"/_next/static/chunks/97dea_next_dist_e8d2e20c._.js\",\"/_next/static/chunks/firebase-orginal_src_app_favicon_ico_mjs_b3a5503f._.js\"],\"default\"]\n22:{}\n23:[[\"Function.all\",\"\",0,0,0,0,true]]\n20:{\"children\":[\"$\",\"$L21\",null,\"$22\",null,\"$23\",1]}\n24:[[\"Function.all\",\"\",0,0,0,0,true]]\n1f:{\"parallelRouterKey\":\"children\",\"error\":\"$undefined\",\"errorStyles\":\"$undefined\",\"errorScripts\":\"$undefined\",\"template\":[\"$\",\"$7\",null,\"$20\",null,\"$24\",0],\"templateStyles\":\"$undefined\",\"templateScripts\":\"$undefined\",\"notFound\":\"$Y\",\"forbidden\":\"$undefined\",\"unauthorized\":\"$undefined\",\"segmentViewBoundaries\":\"$Y\"}\n25:[[\"Function.all\",\"\",0,0,0,0,true]]\n1d:{\"name\":\"RootLayout\",\"key\":null,\"env\":\"Server\",\"stack\":[],\"props\":{\"children\":[\"$\",\"$L1e\",null,\"$1f\",null,\"$25\",1],\"params\":\"$Y\"}}\n26:[[\"RootLayout\",\"D:\\\\My projects\\\\firebase-orginal\\\\.next\\\\dev\\\\server\\\\chunks\\\\ssr\\\\firebase-orginal_693b4084._.js\",181,286,180,1,false]]\n27:[[\"RootLayout\",\"D:\\\\My projects\\\\firebase-orginal\\\\.next\\\\dev\\\\server\\\\chunks\\\\ssr\\\\firebase-orginal_693b4084._.js\",185,287,180,1,false]]\n28:[[\"RootLayout\",\"D:\\\\My projects\\\\firebase-orginal\\\\.next\\\\dev\\\\server\\\\chunks\\\\ssr\\\\firebase-orginal_693b4084._.js\",186,301,180,1,false]]\n29:[[\"RootLayout\",\"D:"])</script><script>self.__next_f.push([1,"\\\\My projects\\\\firebase-orginal\\\\.next\\\\dev\\\\server\\\\chunks\\\\ssr\\\\firebase-orginal_693b4084._.js\",199,287,180,1,false]]\n2a:[[\"RootLayout\",\"D:\\\\My projects\\\\firebase-orginal\\\\.next\\\\dev\\\\server\\\\chunks\\\\ssr\\\\firebase-orginal_693b4084._.js\",200,301,180,1,false]]\n2c:[[\"RootLayout\",\"D:\\\\My projects\\\\firebase-orginal\\\\.next\\\\dev\\\\server\\\\chunks\\\\ssr\\\\firebase-orginal_693b4084._.js\",205,299,180,1,false]]\n2e:[[\"RootLayout\",\"D:\\\\My projects\\\\firebase-orginal\\\\.next\\\\dev\\\\server\\\\chunks\\\\ssr\\\\firebase-orginal_693b4084._.js\",206,313,180,1,false]]\n30:[[\"Function.all\",\"\",0,0,0,0,true]]\n32:[[\"Function.all\",\"\",0,0,0,0,true]]\n34:[]\n36:{\"name\":\"NotFound\",\"key\":null,\"env\":\"Server\",\"stack\":[],\"props\":{}}\n37:{\"name\":\"HTTPAccessErrorFallback\",\"key\":null,\"env\":\"Server\",\"owner\":\"$36\",\"stack\":[],\"props\":{\"status\":404,\"message\":\"This page could not be found.\"}}\n38:[]\n39:[]\n3a:[]\n3b:[]\n3c:[]\n3e:[[\"Function.all\",\"\",0,0,0,0,true]]\n3f:[[\"Function.all\",\"\",0,0,0,0,true]]\n40:[[\"Function.all\",\"\",0,0,0,0,true]]\n41:[[\"RootLayout\",\"D:\\\\My projects\\\\firebase-orginal\\\\.next\\\\dev\\\\server\\\\chunks\\\\ssr\\\\firebase-orginal_693b4084._.js\",218,299,180,1,false]]\n43:[[\"Function.all\",\"\",0,0,0,0,true]]\n44:[[\"Function.all\",\"\",0,0,0,0,true],[\"Function.all\",\"\",0,0,0,0,true]]\n45:[[\"Function.all\",\"\",0,0,0,0,true],[\"Function.all\",\"\",0,0,0,0,true]]\n46:[[\"Function.all\",\"\",0,0,0,0,true],[\"Function.all\",\"\",0,0,0,0,true]]\n47:[[\"Function.all\",\"\",0,0,0,0,true],[\"Function.all\",\"\",0,0,0,0,true]]\n48:[[\"Function.all\",\"\",0,0,0,0,true],[\"Function.all\",\"\",0,0,0,0,true]]\n4b:[[\"Array.map\",\"\",0,0,0,0,false],[\"Array.map\",\"\",0,0,0,0,false],[\"Function.all\",\"\",0,0,0,0,true]]\n4c:[[\"Array.map\",\"\",0,0,0,0,false],[\"Array.map\",\"\",0,0,0,0,false],[\"Function.all\",\"\",0,0,0,0,true]]\n4d:[[\"Array.map\",\"\",0,0,0,0,false],[\"Array.map\",\"\",0,0,0,0,false],[\"Function.all\",\"\",0,0,0,0,true]]\n4e:[[\"Array.map\",\"\",0,0,0,0,false],[\"Array.map\",\"\",0,0,0,0,false],[\"Function.all\",\"\",0,0,0,0,true]]\n4f:[[\"Array.map\",\"\",0,0,0,0,false],[\"Array.map\",\"\",0,0,0,0,false],[\"Function.all\",\"\",0,0,0,0,true]]\n51:{\"name\":\"Next.MetadataOutlet\",\"key\":null,\"env\":\"Server\",\"stack\":[[\"Function.all\",\"\",0,0,0,0,true],[\"Function.all\",\"\",0,0,0,0,true]],\"props\":{}}\n52:[]\n54:[]\n57:[]\n59:{\"name\":\"Loading\",\"key\":\"l\",\"env\":\"Server\",\"stack\":[],\"props\":{}}\n5a:[[\"Loading\",\"D:\\\\My projects\\\\firebase-orginal\\\\.next\\\\dev\\\\server\\\\chunks\\\\ssr\\\\firebase-orginal_8b28ce83._.js\",61,286,59,1,false]]\n5c:{\"name\":\"Skeleton\",\"key\":null,\"env\":\"Server\",\"owner\":\"$59\",\"stack\":[[\"Loading\",\"D:\\\\My projects\\\\firebase-orginal\\\\.next\\\\dev\\\\server\\\\chunks\\\\ssr\\\\firebase-orginal_8b28ce83._.js\",64,287,59,1,false]],\"props\":{\"className\":\"h-8 w-64\"}}\n5d:[[\"Skeleton\",\"D:\\\\My projects\\\\firebase-orginal\\\\.next\\\\dev\\\\server\\\\chunks\\\\ssr\\\\firebase-orginal_8b28ce83._.js\",37,286,36,1,false]]\n5e:[[\"Loading\",\"D:\\\\My projects\\\\firebase-orginal\\\\.next\\\\dev\\\\server\\\\chunks\\\\ssr\\\\firebase-orginal_8b28ce83._.js\",71,287,59,1,false]]\n60:{\"name\":\"Skeleton\",\"key\":null,\"env\":\"Server\",\"owner\":\"$59\",\"stack\":[[\"Loading\",\"D:\\\\My projects\\\\firebase-orginal\\\\.next\\\\dev\\\\server\\\\chunks\\\\ssr\\\\firebase-orginal_8b28ce83._.js\",74,295,59,1,false]],\"props\":{\"className\":\"h-32 w-full\"}}\n61:[[\"Skeleton\",\"D:\\\\My projects\\\\firebase-orginal\\\\.next\\\\dev\\\\server\\\\chunks\\\\ssr\\\\firebase-orginal_8b28ce83._.js\",37,286,36,1,false]]\n63:{\"name\":\"Skeleton\",\"key\":null,\"env\":\"Server\",\"owner\":\"$59\",\"stack\":[[\"Loading\",\"D:\\\\My projects\\\\firebase-orginal\\\\.next\\\\dev\\\\server\\\\chunks\\\\ssr\\\\firebase-orginal_8b28ce83._.js\",81,295,59,1,false]],\"props\":{\"className\":\"h-32 w-full\"}}\n64:[[\"Skeleton\",\"D:\\\\My projects\\\\firebase-orginal\\\\.next\\\\dev\\\\server\\\\chunks\\\\ssr\\\\firebase-orginal_8b28ce83._.js\",37,286,36,1,false]]\n66:{\"name\":\"Skeleton\",\"key\":null,\"env\":\"Server\",\"owner\":\"$59\",\"stack\":[[\"Loading\",\"D:\\\\My projects\\\\firebase-orginal\\\\.next\\\\dev\\\\server\\\\chunks\\\\ssr\\\\firebase-orginal_8b28ce83._.js\",88,295,59,1,false]],\"props\":{\"className\":\"h-32 w-full\"}}\n67:[[\"Skeleton\",\"D:\\\\My projects\\\\firebase-orginal\\\\.next\\\\dev\\\\server\\\\chunks\\\\ssr\\\\firebase-orginal_8b28ce83._.js\",37,286,36,1,false]]\n69:{\"name\":\"Skeleton\",\"key\":null,\"env\":\"Server\",\"owner\":\""])</script><script>self.__next_f.push([1,"$59\",\"stack\":[[\"Loading\",\"D:\\\\My projects\\\\firebase-orginal\\\\.next\\\\dev\\\\server\\\\chunks\\\\ssr\\\\firebase-orginal_8b28ce83._.js\",95,295,59,1,false]],\"props\":{\"className\":\"h-32 w-full\"}}\n6a:[[\"Skeleton\",\"D:\\\\My projects\\\\firebase-orginal\\\\.next\\\\dev\\\\server\\\\chunks\\\\ssr\\\\firebase-orginal_8b28ce83._.js\",37,286,36,1,false]]\n6b:[[\"Loading\",\"D:\\\\My projects\\\\firebase-orginal\\\\.next\\\\dev\\\\server\\\\chunks\\\\ssr\\\\firebase-orginal_8b28ce83._.js\",108,287,59,1,false]]\n6f:[]\n"])</script><script>self.__next_f.push([1,"72:\"$EObject.defineProperty(function(type,config,children){for(var propName,i=2;i\u003carguments.length;i++)validateChildKeys(arguments[i]);i={};var key=null;if(null!=config)for(propName in didWarnAboutOldJSXRuntime||!(\\\"__self\\\"in config)||\\\"key\\\"in config||(didWarnAboutOldJSXRuntime=!0,console.warn(\\\"Your app (or one of its dependencies) is using an outdated JSX transform. Update to the modern JSX transform for faster performance: https://react.dev/link/new-jsx-transform\\\")),hasValidKey(config)\u0026\u0026(checkKeyStringCoercion(config.key),key=\\\"\\\"+config.key),config)hasOwnProperty.call(config,propName)\u0026\u0026\\\"key\\\"!==propName\u0026\u0026\\\"__self\\\"!==propName\u0026\u0026\\\"__source\\\"!==propName\u0026\u0026(i[propName]=config[propName]);var childrenLength=arguments.length-2;if(1===childrenLength)i.children=children;else if(1\u003cchildrenLength){for(var childArray=Array(childrenLength),_i=0;_i\u003cchildrenLength;_i++)childArray[_i]=arguments[_i+2];Object.freeze\u0026\u0026Object.freeze(childArray),i.children=childArray}if(type\u0026\u0026type.defaultProps)for(propName in childrenLength=type.defaultProps)void 0===i[propName]\u0026\u0026(i[propName]=childrenLength[propName]);return key\u0026\u0026function(props,displayName){function warnAboutAccessingKey(){specialPropKeyWarningShown||(specialPropKeyWarningShown=!0,console.error(\\\"%s: `key` is not a prop. Trying to access it will result in `undefined` being returned. If you need to access the same value within the child component, you should pass it as a different prop. (https://react.dev/link/special-props)\\\",displayName))}warnAboutAccessingKey.isReactWarning=!0,Object.defineProperty(props,\\\"key\\\",{get:warnAboutAccessingKey,configurable:!0})}(i,\\\"function\\\"==typeof type?type.displayName||type.name||\\\"Unknown\\\":type),(propName=1e4\u003eReactSharedInternals.recentlyCreatedOwnerStacks++)?(childArray=Error.stackTraceLimit,Error.stackTraceLimit=10,childrenLength=Error(\\\"react-stack-top-frame\\\"),Error.stackTraceLimit=childArray):childrenLength=unknownOwnerDebugStack,ReactElement(type,key,i,getOwner(),childrenLength,propName?createTask(getTaskName(type)):unknownOwnerDebugTask)},\\\"name\\\",{value:\\\"\\\"})\"\n"])</script><script>self.__next_f.push([1,"71:{\"name\":\"NonIndex\",\"key\":null,\"env\":\"Server\",\"stack\":[],\"props\":{\"createElement\":\"$72\",\"pagePath\":\"/orders\",\"statusCode\":200,\"isPossibleServerAction\":false}}\n74:{\"name\":\"Next.Viewport\",\"key\":null,\"env\":\"Server\",\"stack\":[],\"props\":{}}\n75:[]\n79:{\"name\":\"Next.Metadata\",\"key\":null,\"env\":\"Server\",\"stack\":[],\"props\":{}}\n7a:[]\n7b:[]\n7d:[]\n81:[]\n82:[]\n83:[]\n84:{\"name\":\"Skeleton\",\"key\":null,\"env\":\"Server\",\"owner\":\"$59\",\"stack\":[[\"Loading\",\"D:\\\\My projects\\\\firebase-orginal\\\\.next\\\\dev\\\\server\\\\chunks\\\\ssr\\\\firebase-orginal_8b28ce83._.js\",111,295,59,1,false]],\"props\":{\"className\":\"h-80 w-full\"}}\n85:[[\"Skeleton\",\"D:\\\\My projects\\\\firebase-orginal\\\\.next\\\\dev\\\\server\\\\chunks\\\\ssr\\\\firebase-orginal_8b28ce83._.js\",37,286,36,1,false]]\n86:{\"name\":\"Skeleton\",\"key\":null,\"env\":\"Server\",\"owner\":\"$59\",\"stack\":[[\"Loading\",\"D:\\\\My projects\\\\firebase-orginal\\\\.next\\\\dev\\\\server\\\\chunks\\\\ssr\\\\firebase-orginal_8b28ce83._.js\",118,295,59,1,false]],\"props\":{\"className\":\"h-80 w-full\"}}\n87:[[\"Skeleton\",\"D:\\\\My projects\\\\firebase-orginal\\\\.next\\\\dev\\\\server\\\\chunks\\\\ssr\\\\firebase-orginal_8b28ce83._.js\",37,286,36,1,false]]\n88:{\"name\":\"Skeleton\",\"key\":null,\"env\":\"Server\",\"owner\":\"$59\",\"stack\":[[\"Loading\",\"D:\\\\My projects\\\\firebase-orginal\\\\.next\\\\dev\\\\server\\\\chunks\\\\ssr\\\\firebase-orginal_8b28ce83._.js\",131,287,59,1,false]],\"props\":{\"className\":\"h-48 w-full\"}}\n89:[[\"Skeleton\",\"D:\\\\My projects\\\\firebase-orginal\\\\.next\\\\dev\\\\server\\\\chunks\\\\ssr\\\\firebase-orginal_8b28ce83._.js\",37,286,36,1,false]]\n8a:[]\n8b:[]\n8c:[]\n8d:[]\n8e:[[\"Array.map\",\"\",0,0,0,0,false]]\n8f:[]\n1:D{\"time\":0.6530000001657754}\n1:D\"$2\"\n1:D{\"time\":0.7700000000186265}\n1:null\n1c:D{\"time\":15.242300000041723}\n1c:D\"$1d\"\n1c:D{\"time\":15.783500000135973}\n35:D{\"time\":20.226800000062212}\n35:D\"$36\"\n35:D{\"time\":20.50329999998212}\n35:D\"$37\"\n35:D{\"time\":20.82550000003539}\n35:[[\"$\",\"title\",null,{\"children\":\"404: This page could not be found.\"},\"$37\",\"$38\",1],[\"$\",\"div\",null,{\"style\":{\"fontFamily\":\"system-ui,\\\"Segoe UI\\\",Roboto,Helvetica,Arial,sans-serif,\\\"Apple Color Emoji\\\",\\\"Segoe UI Emoji\\\"\",\"height\":\"100vh\",\"textAlign\":\"center\",\"display\":\"flex\",\"flexDirection\":\"column\",\"alignItems\":\"center\",\"justifyContent\":\"center\"},\"children\":[\"$\",\"div\",null,{\"children\":[[\"$\",\"style\",null,{\"dangerouslySetInnerHTML\":{\"__html\":\"body{color:#000;background:#fff;margin:0}.next-error-h1{border-right:1px solid rgba(0,0,0,.3)}@media (prefers-color-scheme:dark){body{color:#fff;background:#000}.next-error-h1{border-right:1px solid rgba(255,255,255,.3)}}\"}},\"$37\",\"$3b\",1],[\"$\",\"h1\",null,{\"className\":\"next-error-h1\",\"style\":{\"display\":\"inline-block\",\"margin\":\"0 20px 0 0\",\"padding\":\"0 23px 0 0\",\"fontSize\":24,\"fontWeight\":500,\"verticalAlign\":\"top\",\"lineHeight\":\"49px\"},\"children\":404},\"$37\",\"$3c\",1],\"$L3d\"]},\"$37\",\"$3a\",1]},\"$37\",\"$39\",1]]\n"])</script><script>self.__next_f.push([1,"1c:[\"$\",\"html\",null,{\"lang\":\"en\",\"suppressHydrationWarning\":true,\"children\":[[\"$\",\"head\",null,{\"children\":[\"$\",\"link\",null,{\"href\":\"https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;500;600;700\u0026display=swap\",\"rel\":\"stylesheet\"},\"$1d\",\"$28\",1]},\"$1d\",\"$27\",1],[\"$\",\"body\",null,{\"children\":[\"$\",\"$L2b\",null,{\"attribute\":\"class\",\"defaultTheme\":\"dark\",\"disableTransitionOnChange\":true,\"children\":[[\"$\",\"$L2d\",null,{\"children\":[\"$\",\"$L2f\",null,{\"children\":[\"$\",\"$L31\",null,{\"parallelRouterKey\":\"children\",\"error\":\"$undefined\",\"errorStyles\":\"$undefined\",\"errorScripts\":\"$undefined\",\"template\":[\"$\",\"$L33\",null,{},null,\"$32\",1],\"templateStyles\":\"$undefined\",\"templateScripts\":\"$undefined\",\"notFound\":[\"$\",\"$L5\",\"c-not-found\",{\"type\":\"not-found\",\"pagePath\":\"__next_builtin__not-found.js\",\"children\":[\"$35\",[]]},null,\"$34\",0],\"forbidden\":\"$undefined\",\"unauthorized\":\"$undefined\",\"segmentViewBoundaries\":[[\"$\",\"$L5\",null,{\"type\":\"boundary:not-found\",\"pagePath\":\"__next_builtin__not-found.js@boundary\"},null,\"$3e\",1],[\"$\",\"$L5\",null,{\"type\":\"boundary:loading\",\"pagePath\":\"/firebase-orginal/src/app/loading.tsx@boundary\"},null,\"$3f\",1],\"$undefined\",[\"$\",\"$L5\",null,{\"type\":\"boundary:global-error\",\"pagePath\":\"__next_builtin__global-error.js\"},null,\"$40\",1]]},null,\"$30\",1]},\"$1d\",\"$2e\",1]},\"$1d\",\"$2c\",1],[\"$\",\"$L42\",null,{},\"$1d\",\"$41\",1]]},\"$1d\",\"$2a\",1]},\"$1d\",\"$29\",1]]},\"$1d\",\"$26\",1]\n"])</script><script>self.__next_f.push([1,"50:D{\"time\":26.42489999998361}\n50:D\"$51\"\n50:D{\"time\":36.75370000000112}\n50:[\"$\",\"$L53\",null,{\"children\":[\"$\",\"$55\",null,{\"name\":\"Next.MetadataOutlet\",\"children\":\"$@56\"},\"$51\",\"$54\",1]},\"$51\",\"$52\",1]\n58:D{\"time\":37.831500000087544}\n58:D\"$59\"\n58:D{\"time\":38.27960000000894}\n5b:D{\"time\":38.40529999998398}\n5b:D\"$5c\"\n5b:D{\"time\":38.55020000017248}\n5b:[\"$\",\"div\",null,{\"className\":\"animate-pulse rounded-md bg-muted h-8 w-64\"},\"$5c\",\"$5d\",1]\n5f:D{\"time\":38.74790000007488}\n5f:D\"$60\"\n5f:D{\"time\":38.877400000113994}\n5f:[\"$\",\"div\",null,{\"className\":\"animate-pulse rounded-md bg-muted h-32 w-full\"},\"$60\",\"$61\",1]\n62:D{\"time\":38.98640000005253}\n62:D\"$63\"\n62:D{\"time\":39.11030000005849}\n62:[\"$\",\"div\",null,{\"className\":\"animate-pulse rounded-md bg-muted h-32 w-full\"},\"$63\",\"$64\",1]\n65:D{\"time\":39.239400000078604}\n65:D\"$66\"\n65:D{\"time\":39.361500000115484}\n65:[\"$\",\"div\",null,{\"className\":\"animate-pulse rounded-md bg-muted h-32 w-full\"},\"$66\",\"$67\",1]\n68:D{\"time\":39.47360000014305}\n68:D\"$69\"\n68:D{\"time\":39.59780000010505}\n68:[\"$\",\"div\",null,{\"className\":\"animate-pulse rounded-md bg-muted h-32 w-full\"},\"$69\",\"$6a\",1]\n58:[\"$\",\"div\",\"l\",{\"className\":\"space-y-8\",\"children\":[\"$5b\",[\"$\",\"div\",null,{\"className\":\"grid gap-4 md:grid-cols-2 lg:grid-cols-4\",\"children\":[\"$5f\",\"$62\",\"$65\",\"$68\"]},\"$59\",\"$5e\",1],[\"$\",\"div\",null,{\"className\":\"grid gap-4 md:grid-cols-2\",\"children\":[\"$L6c\",\"$L6d\"]},\"$59\",\"$6b\",1],\"$L6e\"]},\"$59\",\"$5a\",1]\n70:D{\"time\":40.16220000013709}\n70:D\"$71\"\n70:D{\"time\":40.18090000003576}\n70:null\n73:D{\"time\":40.33860000013374}\n73:D\"$74\"\n73:D{\"time\":40.652299999957904}\n73:[\"$\",\"$L76\",null,{\"children\":\"$@77\"},\"$74\",\"$75\",1]\n78:D{\"time\":41.26240000012331}\n78:D\"$79\"\n78:D{\"time\":41.60000000009313}\n78:[\"$\",\"div\",null,{\"hidden\":true,\"children\":[\"$\",\"$L7c\",null,{\"children\":[\"$\",\"$55\",null,{\"name\":\"Next.Metadata\",\"children\":\"$@7e\"},\"$79\",\"$7d\",1]},\"$79\",\"$7b\",1]},\"$79\",\"$7a\",1]\n7f:[]\n"])</script><script>self.__next_f.push([1,"0:{\"P\":\"$1\",\"b\":\"development\",\"c\":[\"\",\"orders\"],\"q\":\"\",\"i\":false,\"f\":[[[\"\",{\"children\":[\"orders\",{\"children\":[\"__PAGE__\",{}]}]},\"$undefined\",\"$undefined\",true],[[\"$\",\"$L5\",\"layout\",{\"type\":\"layout\",\"pagePath\":\"/firebase-orginal/src/app/layout.tsx\",\"children\":[\"$\",\"$7\",\"c\",{\"children\":[[[\"$\",\"link\",\"0\",{\"rel\":\"stylesheet\",\"href\":\"/_next/static/chunks/firebase-orginal_src_app_globals_31e9131b.css\",\"precedence\":\"next_static/chunks/firebase-orginal_src_app_globals_31e9131b.css\",\"crossOrigin\":\"$undefined\",\"nonce\":\"$undefined\"},null,\"$8\",0],[\"$\",\"script\",\"script-0\",{\"src\":\"/_next/static/chunks/firebase-orginal_src_7a0328b7._.js\",\"async\":true,\"nonce\":\"$undefined\"},null,\"$9\",0],[\"$\",\"script\",\"script-1\",{\"src\":\"/_next/static/chunks/firebase-orginal_src_components_aa73e6bd._.js\",\"async\":true,\"nonce\":\"$undefined\"},null,\"$a\",0],[\"$\",\"script\",\"script-2\",{\"src\":\"/_next/static/chunks/firebase-orginal_src_store_208195a7._.js\",\"async\":true,\"nonce\":\"$undefined\"},null,\"$b\",0],[\"$\",\"script\",\"script-3\",{\"src\":\"/_next/static/chunks/firebase-orginal_src_app_5c70d10a._.js\",\"async\":true,\"nonce\":\"$undefined\"},null,\"$c\",0],[\"$\",\"script\",\"script-4\",{\"src\":\"/_next/static/chunks/firebase-orginal_src_70e3500a._.js\",\"async\":true,\"nonce\":\"$undefined\"},null,\"$d\",0],[\"$\",\"script\",\"script-5\",{\"src\":\"/_next/static/chunks/97dea_next_60f77ba3._.js\",\"async\":true,\"nonce\":\"$undefined\"},null,\"$e\",0],[\"$\",\"script\",\"script-6\",{\"src\":\"/_next/static/chunks/97dea_lucide-react_dist_esm_icons_index_a0c80c48.js\",\"async\":true,\"nonce\":\"$undefined\"},null,\"$f\",0],[\"$\",\"script\",\"script-7\",{\"src\":\"/_next/static/chunks/97dea_lucide-react_dist_esm_icons_c9f298be._.js\",\"async\":true,\"nonce\":\"$undefined\"},null,\"$10\",0],[\"$\",\"script\",\"script-8\",{\"src\":\"/_next/static/chunks/97dea_lucide-react_dist_esm_lucide-react_88c7da99.js\",\"async\":true,\"nonce\":\"$undefined\"},null,\"$11\",0],[\"$\",\"script\",\"script-9\",{\"src\":\"/_next/static/chunks/97dea_lucide-react_dist_esm_aadc553c._.js\",\"async\":true,\"nonce\":\"$undefined\"},null,\"$12\",0],[\"$\",\"script\",\"script-10\",{\"src\":\"/_next/static/chunks/97dea_%40supabase_realtime-js_dist_module_bd33ecdc._.js\",\"async\":true,\"nonce\":\"$undefined\"},null,\"$13\",0],[\"$\",\"script\",\"script-11\",{\"src\":\"/_next/static/chunks/97dea_%40supabase_storage-js_dist_module_f441eeb6._.js\",\"async\":true,\"nonce\":\"$undefined\"},null,\"$14\",0],[\"$\",\"script\",\"script-12\",{\"src\":\"/_next/static/chunks/97dea_%40supabase_auth-js_dist_module_69c9005e._.js\",\"async\":true,\"nonce\":\"$undefined\"},null,\"$15\",0],[\"$\",\"script\",\"script-13\",{\"src\":\"/_next/static/chunks/97dea_date-fns_1c402563._.js\",\"async\":true,\"nonce\":\"$undefined\"},null,\"$16\",0],[\"$\",\"script\",\"script-14\",{\"src\":\"/_next/static/chunks/97dea_zod_v3_f983f72b._.js\",\"async\":true,\"nonce\":\"$undefined\"},null,\"$17\",0],[\"$\",\"script\",\"script-15\",{\"src\":\"/_next/static/chunks/97dea_%40radix-ui_22600695._.js\",\"async\":true,\"nonce\":\"$undefined\"},null,\"$18\",0],[\"$\",\"script\",\"script-16\",{\"src\":\"/_next/static/chunks/97dea_%40floating-ui_414d532e._.js\",\"async\":true,\"nonce\":\"$undefined\"},null,\"$19\",0],[\"$\",\"script\",\"script-17\",{\"src\":\"/_next/static/chunks/97dea_4e339880._.js\",\"async\":true,\"nonce\":\"$undefined\"},null,\"$1a\",0],[\"$\",\"script\",\"script-18\",{\"src\":\"/_next/static/chunks/firebase-orginal_src_app_layout_tsx_d367f37a._.js\",\"async\":true,\"nonce\":\"$undefined\"},null,\"$1b\",0]],\"$1c\"]},null,\"$6\",1]},null,\"$4\",0],{\"children\":[[\"$\",\"$7\",\"c\",{\"children\":[null,[\"$\",\"$L31\",null,{\"parallelRouterKey\":\"children\",\"error\":\"$undefined\",\"errorStyles\":\"$undefined\",\"errorScripts\":\"$undefined\",\"template\":[\"$\",\"$L33\",null,{},null,\"$45\",1],\"templateStyles\":\"$undefined\",\"templateScripts\":\"$undefined\",\"notFound\":\"$undefined\",\"forbidden\":\"$undefined\",\"unauthorized\":\"$undefined\",\"segmentViewBoundaries\":[\"$undefined\",\"$undefined\",\"$undefined\",\"$undefined\"]},null,\"$44\",1]]},null,\"$43\",0],{\"children\":[[\"$\",\"$7\",\"c\",{\"children\":[[\"$\",\"$L5\",\"c-page\",{\"type\":\"page\",\"pagePath\":\"/firebase-orginal/src/app/orders/page.tsx\",\"children\":[\"$\",\"$L49\",null,{\"Component\":\"$4a\",\"serverProvidedParams\":{\"searchParams\":{},\"params\":{},\"promises\":null}},null,\"$48\",1]},null,\"$47\",1],[[\"$\",\"script\",\"script-0\",{\"src\":\"/_next/static/chunks/firebase-orginal_src_e9b1c7eb._.js\",\"async\":true,\"nonce\":\"$undefined\"},null,\"$4b\",0],[\"$\",\"script\",\"script-1\",{\"src\":\"/_next/static/chunks/97dea_xlsx_xlsx_mjs_45381b09._.js\",\"async\":true,\"nonce\":\"$undefined\"},null,\"$4c\",0],[\"$\",\"script\",\"script-2\",{\"src\":\"/_next/static/chunks/97dea_%40dnd-kit_core_dist_core_esm_1ad8394a.js\",\"async\":true,\"nonce\":\"$undefined\"},null,\"$4d\",0],[\"$\",\"script\",\"script-3\",{\"src\":\"/_next/static/chunks/97dea_3b4b0e9d._.js\",\"async\":true,\"nonce\":\"$undefined\"},null,\"$4e\",0],[\"$\",\"script\",\"script-4\",{\"src\":\"/_next/static/chunks/firebase-orginal_src_app_orders_page_tsx_67beaf9d._.js\",\"async\":true,\"nonce\":\"$undefined\"},null,\"$4f\",0]],\"$50\"]},null,\"$46\",0],{},null,false,false]},null,false,false]},[[\"$\",\"$L5\",\"c-loading\",{\"type\":\"loading\",\"pagePath\":\"/firebase-orginal/src/app/loading.tsx\",\"children\":\"$58\"},null,\"$57\",0],[],[]],false,false],[\"$\",\"$7\",\"h\",{\"children\":[\"$70\",\"$73\",\"$78\",null]},null,\"$6f\",0],false]],\"m\":\"$W7f\",\"G\":[\"$80\",[\"$\",\"$L5\",\"ge-svn\",{\"type\":\"global-error\",\"pagePath\":\"__next_builtin__global-error.js\",\"children\":[]},null,\"$81\",0]],\"s\":false,\"S\":false}\n"])</script><script>self.__next_f.push([1,"3d:D{\"time\":42.534500000067055}\n3d:[\"$\",\"div\",null,{\"style\":{\"display\":\"inline-block\"},\"children\":[\"$\",\"h2\",null,{\"style\":{\"fontSize\":14,\"fontWeight\":400,\"lineHeight\":\"49px\",\"margin\":0},\"children\":\"This page could not be found.\"},\"$37\",\"$83\",1]},\"$37\",\"$82\",1]\n6c:D{\"time\":42.758900000015274}\n6c:D\"$84\"\n6c:D{\"time\":42.906300000147894}\n6c:[\"$\",\"div\",null,{\"className\":\"animate-pulse rounded-md bg-muted h-80 w-full\"},\"$84\",\"$85\",1]\n6d:D{\"time\":43.01010000007227}\n6d:D\"$86\"\n6d:D{\"time\":43.14240000001155}\n6d:[\"$\",\"div\",null,{\"className\":\"animate-pulse rounded-md bg-muted h-80 w-full\"},\"$86\",\"$87\",1]\n6e:D{\"time\":43.266800000099465}\n6e:D\"$88\"\n6e:D{\"time\":43.38580000004731}\n6e:[\"$\",\"div\",null,{\"className\":\"animate-pulse rounded-md bg-muted h-48 w-full\"},\"$88\",\"$89\",1]\n77:D{\"time\":49.9621000001207}\n77:[[\"$\",\"meta\",\"0\",{\"charSet\":\"utf-8\"},\"$51\",\"$8a\",0],[\"$\",\"meta\",\"1\",{\"name\":\"viewport\",\"content\":\"width=device-width, initial-scale=1\"},\"$51\",\"$8b\",0]]\n7e:D{\"time\":51.769700000062585}\n7e:[[\"$\",\"title\",\"0\",{\"children\":\"SynergyFlow\"},\"$51\",\"$8c\",0],[\"$\",\"meta\",\"1\",{\"name\":\"description\",\"content\":\"AI-powered ERP system to manage clients, sales, maintenance, and business analytics.\"},\"$51\",\"$8d\",0],[\"$\",\"link\",\"2\",{\"rel\":\"icon\",\"href\":\"/favicon.ico?favicon.7ed73651.ico\",\"sizes\":\"48x48\",\"type\":\"image/x-icon\"},\"$51\",\"$8e\",0],[\"$\",\"$L90\",\"3\",{},\"$51\",\"$8f\",0]]\n56:D{\"time\":52.27670000004582}\n56:null\n"])</script><script data-nextjs-dev-overlay="true" style="display: block; position: absolute;"><nextjs-portal style="--nextjs-dev-tools-scale: 1;"></nextjs-portal></script><next-route-announcer style="position: absolute;"></next-route-announcer></body></html>
+
+[1A[2K  1) [chromium] ΓÇ║ e2e\notifications.spec.ts:8:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order 
+
+    TimeoutError: locator.click: Timeout 10000ms exceeded.
+    Call log:
+    [2m  - waiting for getByRole('button', { name: 'Create Order' })[22m
+
+
+      30 |     // 2. Open New Order Wizard
+      31 |     try {
+    > 32 |         await page.getByRole('button', { name: 'Create Order' }).click({ timeout: 10000 });
+         |                                                                  ^
+      33 |     } catch (e) {
+      34 |         console.log('Create Order button not found. Page content:');
+      35 |         console.log(await page.content());
+        at D:\My projects\firebase-orginal\e2e\notifications.spec.ts:32:66
+
+    Error Context: test-results\notifications-Notification-ea3ea-tion-for-a-high-value-order-chromium\error-context.md
+
+
+[1A[2K[webkit] ΓÇ║ e2e\notifications.spec.ts:8:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+Create Order button not found. Page content:
+
+[1A[2K<!DOCTYPE html><html lang="en" class="dark" style="color-scheme: dark;"><head><link rel="stylesheet" href="/_next/static/chunks/firebase-orginal_src_app_globals_31e9131b.css" data-precedence="next_static/chunks/firebase-orginal_src_app_globals_31e9131b.css"><link rel="preload" as="script" fetchpriority="low" href="/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_099275f4._.js"><script src="/_next/static/chunks/97dea_next_dist_compiled_react-dom_92424803._.js" async=""></script><script src="/_next/static/chunks/97dea_next_dist_compiled_react-server-dom-turbopack_fd66e9bc._.js" async=""></script><script src="/_next/static/chunks/97dea_next_dist_compiled_next-devtools_index_a78e6daf.js" async=""></script><script src="/_next/static/chunks/97dea_next_dist_compiled_e793555b._.js" async=""></script><script src="/_next/static/chunks/97dea_next_dist_client_ce563615._.js" async=""></script><script src="/_next/static/chunks/97dea_next_dist_b5d32be2._.js" async=""></script><script src="/_next/static/chunks/97dea_%40swc_helpers_cjs_b4342a33._.js" async=""></script><script src="/_next/static/chunks/firebase-orginal_a0ff3932._.js" async=""></script><script src="/_next/static/chunks/turbopack-firebase-orginal_1df438e4._.js" async=""></script><script src="/_next/static/chunks/97dea_next_dist_e8d2e20c._.js" async=""></script><script src="/_next/static/chunks/firebase-orginal_src_app_favicon_ico_mjs_b3a5503f._.js" async=""></script><script src="/_next/static/chunks/firebase-orginal_src_7a0328b7._.js" async=""></script><script src="/_next/static/chunks/firebase-orginal_src_components_aa73e6bd._.js" async=""></script><script src="/_next/static/chunks/firebase-orginal_src_store_208195a7._.js" async=""></script><script src="/_next/static/chunks/firebase-orginal_src_app_5c70d10a._.js" async=""></script><script src="/_next/static/chunks/firebase-orginal_src_70e3500a._.js" async=""></script><script src="/_next/static/chunks/97dea_next_60f77ba3._.js" async=""></script><script src="/_next/static/chunks/97dea_lucide-react_dist_esm_icons_index_a0c80c48.js" async=""></script><script src="/_next/static/chunks/97dea_lucide-react_dist_esm_icons_c9f298be._.js" async=""></script><script src="/_next/static/chunks/97dea_lucide-react_dist_esm_lucide-react_88c7da99.js" async=""></script><script src="/_next/static/chunks/97dea_lucide-react_dist_esm_aadc553c._.js" async=""></script><script src="/_next/static/chunks/97dea_%40supabase_realtime-js_dist_module_bd33ecdc._.js" async=""></script><script src="/_next/static/chunks/97dea_%40supabase_storage-js_dist_module_f441eeb6._.js" async=""></script><script src="/_next/static/chunks/97dea_%40supabase_auth-js_dist_module_69c9005e._.js" async=""></script><script src="/_next/static/chunks/97dea_date-fns_1c402563._.js" async=""></script><script src="/_next/static/chunks/97dea_zod_v3_f983f72b._.js" async=""></script><script src="/_next/static/chunks/97dea_%40radix-ui_22600695._.js" async=""></script><script src="/_next/static/chunks/97dea_%40floating-ui_414d532e._.js" async=""></script><script src="/_next/static/chunks/97dea_4e339880._.js" async=""></script><script src="/_next/static/chunks/firebase-orginal_src_app_layout_tsx_d367f37a._.js" async=""></script><script src="/_next/static/chunks/firebase-orginal_src_e9b1c7eb._.js" async=""></script><script src="/_next/static/chunks/97dea_xlsx_xlsx_mjs_45381b09._.js" async=""></script><script src="/_next/static/chunks/97dea_%40dnd-kit_core_dist_core_esm_1ad8394a.js" async=""></script><script src="/_next/static/chunks/97dea_3b4b0e9d._.js" async=""></script><script src="/_next/static/chunks/firebase-orginal_src_app_orders_page_tsx_67beaf9d._.js" async=""></script><script src="/_next/static/chunks/97dea_next_dist_client_components_builtin_global-error_d367f37a.js" async=""></script><link rel="preload" href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;500;600;700&amp;display=swap" as="style"><link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;500;600;700&amp;display=swap" rel="stylesheet"><script src="/_next/static/chunks/97dea_next_dist_build_polyfills_polyfill-nomodule.js" nomodule=""></script><script src="/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_c8c997ce._.js"></script><script src="/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_3f8af333._.js"></script><style>@font-face{font-family:'__nextjs-Geist';font-style:normal;font-weight:400 600;font-display:swap;src:url(/__nextjs_font/geist-latin-ext.woff2) format('woff2');unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}@font-face{font-family:'__nextjs-Geist Mono';font-style:normal;font-weight:400 600;font-display:swap;src:url(/__nextjs_font/geist-mono-latin-ext.woff2) format('woff2');unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}@font-face{font-family:'__nextjs-Geist';font-style:normal;font-weight:400 600;font-display:swap;src:url(/__nextjs_font/geist-latin.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}@font-face{font-family:'__nextjs-Geist Mono';font-style:normal;font-weight:400 600;font-display:swap;src:url(/__nextjs_font/geist-mono-latin.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}</style><script src="/_next/static/chunks/firebase-orginal_src_app_login_page_tsx_254c72d9._.js"></script><script src="/_next/static/chunks/firebase-orginal_src_app_login_page_tsx_67beaf9d._.js"></script><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>SynergyFlow</title><meta name="description" content="AI-powered ERP system to manage clients, sales, maintenance, and business analytics."><link rel="icon" href="/favicon.ico?favicon.7ed73651.ico" sizes="48x48" type="image/x-icon"><script src="/_next/static/chunks/firebase-orginal_src_app_login_page_tsx_254c72d9._.js" async=""></script><script src="/_next/static/chunks/firebase-orginal_src_app_login_page_tsx_67beaf9d._.js" async=""></script></head><body><div hidden=""></div><script>!function(){try{var d=document.documentElement,c=d.classList;c.remove('light','dark');var e=localStorage.getItem('theme');if('system'===e||(!e&&false)){var t='(prefers-color-scheme: dark)',m=window.matchMedia(t);if(m.media!==t||m.matches){d.style.colorScheme = 'dark';c.add('dark')}else{d.style.colorScheme = 'light';c.add('light')}}else if(e){c.add(e|| '')}else{c.add('dark')}if(e==='light'||e==='dark'||!e)d.style.colorScheme=e||'dark'}catch(e){}}()</script><div class="flex items-center justify-center min-h-screen bg-background"><div class="rounded-lg border bg-card text-card-foreground shadow-sm w-full max-w-md"><div class="flex flex-col space-y-1.5 p-6 border-b mb-[10px]"><h3 class="font-semibold tracking-tight text-2xl">Login</h3><p class="text-sm text-muted-foreground">Enter your email below to login to your account</p></div><div class="p-6 pt-0"><form><div class="grid gap-4"><div class="grid gap-2"><label class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70" for="email">Email</label><input class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm" id="email" placeholder="m@example.com" required="" type="email" value=""></div><div class="grid gap-2"><div class="flex items-center"><label class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70" for="password">Password</label><a class="ml-auto inline-block text-sm underline" href="/reset-password">Forgot your password?</a></div><input class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm" id="password" required="" type="password" value=""></div><button class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 w-full" type="submit">Login</button></div></form><div class="mt-4 text-center text-sm">Don't have an account? <a class="underline" href="/register">Sign up</a></div></div></div></div><div role="region" aria-label="Notifications (F8)" tabindex="-1" style="pointer-events:none"><ol tabindex="-1" class="fixed top-0 z-[100] flex max-h-screen w-full flex-col-reverse p-4 sm:bottom-0 sm:right-0 sm:top-auto sm:flex-col md:max-w-[420px]"></ol></div><script id="_R_">self.__next_r="mDZju0s4GJe0AE5pHnBIH"</script><script src="/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_099275f4._.js" async=""></script><script>(self.__next_f=self.__next_f||[]).push([0])</script><script>self.__next_f.push([1,"5:I[\"[project]/firebase-orginal/node_modules/next/dist/next-devtools/userspace/app/segment-explorer-node.js [app-client] (ecmascript)\",[\"/_next/static/chunks/97dea_next_dist_e8d2e20c._.js\",\"/_next/static/chunks/firebase-orginal_src_app_favicon_ico_mjs_b3a5503f._.js\"],\"SegmentViewNode\"]\n7:\"$Sreact.fragment\"\n2b:I[\"[project]/firebase-orginal/src/components/theme-provider.tsx [app-client] (ecmascript)\",[\"/_next/static/chunks/firebase-orginal_src_7a0328b7._.js\",\"/_next/static/chunks/firebase-orginal_src_components_aa73e6bd._.js\",\"/_next/static/chunks/firebase-orginal_src_store_208195a7._.js\",\"/_next/static/chunks/firebase-orginal_src_app_5c70d10a._.js\",\"/_next/static/chunks/firebase-orginal_src_70e3500a._.js\",\"/_next/static/chunks/97dea_next_60f77ba3._.js\",\"/_next/static/chunks/97dea_lucide-react_dist_esm_icons_index_a0c80c48.js\",\"/_next/static/chunks/97dea_lucide-react_dist_esm_icons_c9f298be._.js\",\"/_next/static/chunks/97dea_lucide-react_dist_esm_lucide-react_88c7da99.js\",\"/_next/static/chunks/97dea_lucide-react_dist_esm_aadc553c._.js\",\"/_next/static/chunks/97dea_%40supabase_realtime-js_dist_module_bd33ecdc._.js\",\"/_next/static/chunks/97dea_%40supabase_storage-js_dist_module_f441eeb6._.js\",\"/_next/static/chunks/97dea_%40supabase_auth-js_dist_module_69c9005e._.js\",\"/_next/static/chunks/97dea_date-fns_1c402563._.js\",\"/_next/static/chunks/97dea_zod_v3_f983f72b._.js\",\"/_next/static/chunks/97dea_%40radix-ui_22600695._.js\",\"/_next/static/chunks/97dea_%40floating-ui_414d532e._.js\",\"/_next/static/chunks/97dea_4e339880._.js\",\"/_next/static/chunks/firebase-orginal_src_app_layout_tsx_d367f37a._.js\"],\"ThemeProvider\"]\n2d:I[\"[project]/firebase-orginal/src/hooks/use-auth.tsx [app-client] (ecmascript)\",[\"/_next/static/chunks/firebase-orginal_src_7a0328b7._.js\",\"/_next/static/chunks/firebase-orginal_src_components_aa73e6bd._.js\",\"/_next/static/chunks/firebase-orginal_src_store_208195a7._.js\",\"/_next/static/chunks/firebase-orginal_src_app_5c70d10a._.js\",\"/_next/static/chunks/firebase-orginal_src_70e3500a._.js\",\"/_next/static/chunks/97dea_next_60f77ba3._.js\",\"/_next/static/chunks/97dea_lucide-react_dist_esm_icons_index_a0c80c48.js\",\"/_next/static/chunks/97dea_lucide-react_dist_esm_icons_c9f298be._.js\",\"/_next/static/chunks/97dea_lucide-react_dist_esm_lucide-react_88c7da99.js\",\"/_next/static/chunks/97dea_lucide-react_dist_esm_aadc553c._.js\",\"/_next/static/chunks/97dea_%40supabase_realtime-js_dist_module_bd33ecdc._.js\",\"/_next/static/chunks/97dea_%40supabase_storage-js_dist_module_f441eeb6._.js\",\"/_next/static/chunks/97dea_%40supabase_auth-js_dist_module_69c9005e._.js\",\"/_next/static/chunks/97dea_date-fns_1c402563._.js\",\"/_next/static/chunks/97dea_zod_v3_f983f72b._.js\",\"/_next/static/chunks/97dea_%40radix-ui_22600695._.js\",\"/_next/static/chunks/97dea_%40floating-ui_414d532e._.js\",\"/_next/static/chunks/97dea_4e339880._.js\",\"/_next/static/chunks/firebase-orginal_src_app_layout_tsx_d367f37a._.js\"],\"AuthProvider\"]\n2f:I[\"[project]/firebase-orginal/src/components/layout/app-shell.tsx [app-client] (ecmascript)\",[\"/_next/static/chunks/firebase-orginal_src_7a0328b7._.js\",\"/_next/static/chunks/firebase-orginal_src_components_aa73e6bd._.js\",\"/_next/static/chunks/firebase-orginal_src_store_208195a7._.js\",\"/_next/static/chunks/firebase-orginal_src_app_5c70d10a._.js\",\"/_next/static/chunks/firebase-orginal_src_70e3500a._.js\",\"/_next/static/chunks/97dea_next_60f77ba3._.js\",\"/_next/static/chunks/97dea_lucide-react_dist_esm_icons_index_a0c80c48.js\",\"/_next/static/chunks/97dea_lucide-react_dist_esm_icons_c9f298be._.js\",\"/_next/static/chunks/97dea_lucide-react_dist_esm_lucide-react_88c7da99.js\",\"/_next/static/chunks/97dea_lucide-react_dist_esm_aadc553c._.js\",\"/_next/static/chunks/97dea_%40supabase_realtime-js_dist_module_bd33ecdc._.js\",\"/_next/static/chunks/97dea_%40supabase_storage-js_dist_module_f441eeb6._.js\",\"/_next/static/chunks/97dea_%40supabase_auth-js_dist_module_69c9005e._.js\",\"/_next/static/chunks/97dea_date-fns_1c402563._.js\",\"/_next/static/chunks/97dea_zod_v3_f983f72b._.js\",\"/_next/static/chunks/97dea_%40radix-ui_22600695._.js\",\"/_next/static/chunks/97"])</script><script>self.__next_f.push([1,"dea_%40floating-ui_414d532e._.js\",\"/_next/static/chunks/97dea_4e339880._.js\",\"/_next/static/chunks/firebase-orginal_src_app_layout_tsx_d367f37a._.js\"],\"AppShell\"]\n31:I[\"[project]/firebase-orginal/node_modules/next/dist/client/components/layout-router.js [app-client] (ecmascript)\",[\"/_next/static/chunks/97dea_next_dist_e8d2e20c._.js\",\"/_next/static/chunks/firebase-orginal_src_app_favicon_ico_mjs_b3a5503f._.js\"],\"default\"]\n33:I[\"[project]/firebase-orginal/node_modules/next/dist/client/components/render-from-template-context.js [app-client] (ecmascript)\",[\"/_next/static/chunks/97dea_next_dist_e8d2e20c._.js\",\"/_next/static/chunks/firebase-orginal_src_app_favicon_ico_mjs_b3a5503f._.js\"],\"default\"]\n42:I[\"[project]/firebase-orginal/src/components/ui/toaster.tsx [app-client] (ecmascript)\",[\"/_next/static/chunks/firebase-orginal_src_7a0328b7._.js\",\"/_next/static/chunks/firebase-orginal_src_components_aa73e6bd._.js\",\"/_next/static/chunks/firebase-orginal_src_store_208195a7._.js\",\"/_next/static/chunks/firebase-orginal_src_app_5c70d10a._.js\",\"/_next/static/chunks/firebase-orginal_src_70e3500a._.js\",\"/_next/static/chunks/97dea_next_60f77ba3._.js\",\"/_next/static/chunks/97dea_lucide-react_dist_esm_icons_index_a0c80c48.js\",\"/_next/static/chunks/97dea_lucide-react_dist_esm_icons_c9f298be._.js\",\"/_next/static/chunks/97dea_lucide-react_dist_esm_lucide-react_88c7da99.js\",\"/_next/static/chunks/97dea_lucide-react_dist_esm_aadc553c._.js\",\"/_next/static/chunks/97dea_%40supabase_realtime-js_dist_module_bd33ecdc._.js\",\"/_next/static/chunks/97dea_%40supabase_storage-js_dist_module_f441eeb6._.js\",\"/_next/static/chunks/97dea_%40supabase_auth-js_dist_module_69c9005e._.js\",\"/_next/static/chunks/97dea_date-fns_1c402563._.js\",\"/_next/static/chunks/97dea_zod_v3_f983f72b._.js\",\"/_next/static/chunks/97dea_%40radix-ui_22600695._.js\",\"/_next/static/chunks/97dea_%40floating-ui_414d532e._.js\",\"/_next/static/chunks/97dea_4e339880._.js\",\"/_next/static/chunks/firebase-orginal_src_app_layout_tsx_d367f37a._.js\"],\"Toaster\"]\n49:I[\"[project]/firebase-orginal/node_modules/next/dist/client/components/client-page.js [app-client] (ecmascript)\",[\"/_next/static/chunks/97dea_next_dist_e8d2e20c._.js\",\"/_next/static/chunks/firebase-orginal_src_app_favicon_ico_mjs_b3a5503f._.js\"],\"ClientPageRoot\"]\n"])</script><script>self.__next_f.push([1,"4a:I[\"[project]/firebase-orginal/src/app/orders/page.tsx [app-client] (ecmascript)\",[\"/_next/static/chunks/firebase-orginal_src_7a0328b7._.js\",\"/_next/static/chunks/firebase-orginal_src_components_aa73e6bd._.js\",\"/_next/static/chunks/firebase-orginal_src_store_208195a7._.js\",\"/_next/static/chunks/firebase-orginal_src_app_5c70d10a._.js\",\"/_next/static/chunks/firebase-orginal_src_70e3500a._.js\",\"/_next/static/chunks/97dea_next_60f77ba3._.js\",\"/_next/static/chunks/97dea_lucide-react_dist_esm_icons_index_a0c80c48.js\",\"/_next/static/chunks/97dea_lucide-react_dist_esm_icons_c9f298be._.js\",\"/_next/static/chunks/97dea_lucide-react_dist_esm_lucide-react_88c7da99.js\",\"/_next/static/chunks/97dea_lucide-react_dist_esm_aadc553c._.js\",\"/_next/static/chunks/97dea_%40supabase_realtime-js_dist_module_bd33ecdc._.js\",\"/_next/static/chunks/97dea_%40supabase_storage-js_dist_module_f441eeb6._.js\",\"/_next/static/chunks/97dea_%40supabase_auth-js_dist_module_69c9005e._.js\",\"/_next/static/chunks/97dea_date-fns_1c402563._.js\",\"/_next/static/chunks/97dea_zod_v3_f983f72b._.js\",\"/_next/static/chunks/97dea_%40radix-ui_22600695._.js\",\"/_next/static/chunks/97dea_%40floating-ui_414d532e._.js\",\"/_next/static/chunks/97dea_4e339880._.js\",\"/_next/static/chunks/firebase-orginal_src_app_layout_tsx_d367f37a._.js\",\"/_next/static/chunks/firebase-orginal_src_e9b1c7eb._.js\",\"/_next/static/chunks/97dea_xlsx_xlsx_mjs_45381b09._.js\",\"/_next/static/chunks/97dea_%40dnd-kit_core_dist_core_esm_1ad8394a.js\",\"/_next/static/chunks/97dea_3b4b0e9d._.js\",\"/_next/static/chunks/firebase-orginal_src_app_orders_page_tsx_67beaf9d._.js\"],\"default\"]\n"])</script><script>self.__next_f.push([1,"53:I[\"[project]/firebase-orginal/node_modules/next/dist/lib/framework/boundary-components.js [app-client] (ecmascript)\",[\"/_next/static/chunks/97dea_next_dist_e8d2e20c._.js\",\"/_next/static/chunks/firebase-orginal_src_app_favicon_ico_mjs_b3a5503f._.js\"],\"OutletBoundary\"]\n55:\"$Sreact.suspense\"\n76:I[\"[project]/firebase-orginal/node_modules/next/dist/lib/framework/boundary-components.js [app-client] (ecmascript)\",[\"/_next/static/chunks/97dea_next_dist_e8d2e20c._.js\",\"/_next/static/chunks/firebase-orginal_src_app_favicon_ico_mjs_b3a5503f._.js\"],\"ViewportBoundary\"]\n7c:I[\"[project]/firebase-orginal/node_modules/next/dist/lib/framework/boundary-components.js [app-client] (ecmascript)\",[\"/_next/static/chunks/97dea_next_dist_e8d2e20c._.js\",\"/_next/static/chunks/firebase-orginal_src_app_favicon_ico_mjs_b3a5503f._.js\"],\"MetadataBoundary\"]\n80:I[\"[project]/firebase-orginal/node_modules/next/dist/client/components/builtin/global-error.js [app-client] (ecmascript)\",[\"/_next/static/chunks/97dea_next_dist_client_components_builtin_global-error_d367f37a.js\"],\"default\"]\n90:I[\"[project]/firebase-orginal/node_modules/next/dist/lib/metadata/generate/icon-mark.js [app-client] (ecmascript)\",[\"/_next/static/chunks/97dea_next_dist_e8d2e20c._.js\",\"/_next/static/chunks/firebase-orginal_src_app_favicon_ico_mjs_b3a5503f._.js\"],\"IconMark\"]\n:HL[\"/_next/static/chunks/firebase-orginal_src_app_globals_31e9131b.css\",\"style\"]\n:HL[\"https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;500;600;700\u0026display=swap\",\"style\"]\n:N1763717640481.3838\n3:\"$EObject.defineProperty(()=\u003e{ctx.componentMod.preloadStyle(fullHref,ctx.renderOpts.crossOrigin,ctx.nonce)},\\\"name\\\",{value:\\\"\\\"})\"\n2:{\"name\":\"Preloads\",\"key\":null,\"env\":\"Server\",\"stack\":[],\"props\":{\"preloadCallbacks\":[\"$3\"]}}\n4:[]\n6:[]\n8:[[\"Array.map\",\"\",0,0,0,0,false]]\n9:[[\"Array.map\",\"\",0,0,0,0,false]]\na:[[\"Array.map\",\"\",0,0,0,0,false]]\nb:[[\"Array.map\",\"\",0,0,0,0,false]]\nc:[[\"Array.map\",\"\",0,0,0,0,false]]\nd:[[\"Array.map\",\"\",0,0,0,0,false]]\ne:[[\"Array.map\",\"\",0,0,0,0,false]]\nf:[[\"Array.map\",\"\",0,0,0,0,false]]\n10:[[\"Array.map\",\"\",0,0,0,0,false]]\n11:[[\"Array.map\",\"\",0,0,0,0,false]]\n12:[[\"Array.map\",\"\",0,0,0,0,false]]\n13:[[\"Array.map\",\"\",0,0,0,0,false]]\n14:[[\"Array.map\",\"\",0,0,0,0,false]]\n15:[[\"Array.map\",\"\",0,0,0,0,false]]\n16:[[\"Array.map\",\"\",0,0,0,0,false]]\n17:[[\"Array.map\",\"\",0,0,0,0,false]]\n18:[[\"Array.map\",\"\",0,0,0,0,false]]\n19:[[\"Array.map\",\"\",0,0,0,0,false]]\n1a:[[\"Array.map\",\"\",0,0,0,0,false]]\n1b:[[\"Array.map\",\"\",0,0,0,0,false]]\n1e:I[\"[project]/firebase-orginal/node_modules/next/dist/client/components/layout-router.js [app-client] (ecmascript)\",[\"/_next/static/chunks/97dea_next_dist_e8d2e20c._.js\",\"/_next/static/chunks/firebase-orginal_src_app_favicon_ico_mjs_b3a5503f._.js\"],\"default\"]\n21:I[\"[project]/firebase-orginal/node_modules/next/dist/client/components/render-from-template-context.js [app-client] (ecmascript)\",[\"/_next/static/chunks/97dea_next_dist_e8d2e20c._.js\",\"/_next/static/chunks/firebase-orginal_src_app_favicon_ico_mjs_b3a5503f._.js\"],\"default\"]\n22:{}\n23:[[\"Function.all\",\"\",0,0,0,0,true]]\n20:{\"children\":[\"$\",\"$L21\",null,\"$22\",null,\"$23\",1]}\n24:[[\"Function.all\",\"\",0,0,0,0,true]]\n1f:{\"parallelRouterKey\":\"children\",\"error\":\"$undefined\",\"errorStyles\":\"$undefined\",\"errorScripts\":\"$undefined\",\"template\":[\"$\",\"$7\",null,\"$20\",null,\"$24\",0],\"templateStyles\":\"$undefined\",\"templateScripts\":\"$undefined\",\"notFound\":\"$Y\",\"forbidden\":\"$undefined\",\"unauthorized\":\"$undefined\",\"segmentViewBoundaries\":\"$Y\"}\n25:[[\"Function.all\",\"\",0,0,0,0,true]]\n1d:{\"name\":\"RootLayout\",\"key\":null,\"env\":\"Server\",\"stack\":[],\"props\":{\"children\":[\"$\",\"$L1e\",null,\"$1f\",null,\"$25\",1],\"params\":\"$Y\"}}\n26:[[\"RootLayout\",\"D:\\\\My projects\\\\firebase-orginal\\\\.next\\\\dev\\\\server\\\\chunks\\\\ssr\\\\firebase-orginal_693b4084._.js\",181,286,180,1,false]]\n27:[[\"RootLayout\",\"D:\\\\My projects\\\\firebase-orginal\\\\.next\\\\dev\\\\server\\\\chunks\\\\ssr\\\\firebase-orginal_693b4084._.js\",185,287,180,1,false]]\n28:[[\"RootLayout\",\"D:\\\\My projects\\\\firebase-orginal\\\\.next\\\\dev\\\\server\\\\chunks\\\\ssr\\\\firebase-orginal_693b4084._.js\",186,301,180,1,false]]\n29:[[\"RootLayout\",\"D:"])</script><script>self.__next_f.push([1,"\\\\My projects\\\\firebase-orginal\\\\.next\\\\dev\\\\server\\\\chunks\\\\ssr\\\\firebase-orginal_693b4084._.js\",199,287,180,1,false]]\n2a:[[\"RootLayout\",\"D:\\\\My projects\\\\firebase-orginal\\\\.next\\\\dev\\\\server\\\\chunks\\\\ssr\\\\firebase-orginal_693b4084._.js\",200,301,180,1,false]]\n2c:[[\"RootLayout\",\"D:\\\\My projects\\\\firebase-orginal\\\\.next\\\\dev\\\\server\\\\chunks\\\\ssr\\\\firebase-orginal_693b4084._.js\",205,299,180,1,false]]\n2e:[[\"RootLayout\",\"D:\\\\My projects\\\\firebase-orginal\\\\.next\\\\dev\\\\server\\\\chunks\\\\ssr\\\\firebase-orginal_693b4084._.js\",206,313,180,1,false]]\n30:[[\"Function.all\",\"\",0,0,0,0,true]]\n32:[[\"Function.all\",\"\",0,0,0,0,true]]\n34:[]\n36:{\"name\":\"NotFound\",\"key\":null,\"env\":\"Server\",\"stack\":[],\"props\":{}}\n37:{\"name\":\"HTTPAccessErrorFallback\",\"key\":null,\"env\":\"Server\",\"owner\":\"$36\",\"stack\":[],\"props\":{\"status\":404,\"message\":\"This page could not be found.\"}}\n38:[]\n39:[]\n3a:[]\n3b:[]\n3c:[]\n3e:[[\"Function.all\",\"\",0,0,0,0,true]]\n3f:[[\"Function.all\",\"\",0,0,0,0,true]]\n40:[[\"Function.all\",\"\",0,0,0,0,true]]\n41:[[\"RootLayout\",\"D:\\\\My projects\\\\firebase-orginal\\\\.next\\\\dev\\\\server\\\\chunks\\\\ssr\\\\firebase-orginal_693b4084._.js\",218,299,180,1,false]]\n43:[[\"Function.all\",\"\",0,0,0,0,true]]\n44:[[\"Function.all\",\"\",0,0,0,0,true],[\"Function.all\",\"\",0,0,0,0,true]]\n45:[[\"Function.all\",\"\",0,0,0,0,true],[\"Function.all\",\"\",0,0,0,0,true]]\n46:[[\"Function.all\",\"\",0,0,0,0,true],[\"Function.all\",\"\",0,0,0,0,true]]\n47:[[\"Function.all\",\"\",0,0,0,0,true],[\"Function.all\",\"\",0,0,0,0,true]]\n48:[[\"Function.all\",\"\",0,0,0,0,true],[\"Function.all\",\"\",0,0,0,0,true]]\n4b:[[\"Array.map\",\"\",0,0,0,0,false],[\"Array.map\",\"\",0,0,0,0,false],[\"Function.all\",\"\",0,0,0,0,true]]\n4c:[[\"Array.map\",\"\",0,0,0,0,false],[\"Array.map\",\"\",0,0,0,0,false],[\"Function.all\",\"\",0,0,0,0,true]]\n4d:[[\"Array.map\",\"\",0,0,0,0,false],[\"Array.map\",\"\",0,0,0,0,false],[\"Function.all\",\"\",0,0,0,0,true]]\n4e:[[\"Array.map\",\"\",0,0,0,0,false],[\"Array.map\",\"\",0,0,0,0,false],[\"Function.all\",\"\",0,0,0,0,true]]\n4f:[[\"Array.map\",\"\",0,0,0,0,false],[\"Array.map\",\"\",0,0,0,0,false],[\"Function.all\",\"\",0,0,0,0,true]]\n51:{\"name\":\"Next.MetadataOutlet\",\"key\":null,\"env\":\"Server\",\"stack\":[[\"Function.all\",\"\",0,0,0,0,true],[\"Function.all\",\"\",0,0,0,0,true]],\"props\":{}}\n52:[]\n54:[]\n57:[]\n59:{\"name\":\"Loading\",\"key\":\"l\",\"env\":\"Server\",\"stack\":[],\"props\":{}}\n5a:[[\"Loading\",\"D:\\\\My projects\\\\firebase-orginal\\\\.next\\\\dev\\\\server\\\\chunks\\\\ssr\\\\firebase-orginal_8b28ce83._.js\",61,286,59,1,false]]\n5c:{\"name\":\"Skeleton\",\"key\":null,\"env\":\"Server\",\"owner\":\"$59\",\"stack\":[[\"Loading\",\"D:\\\\My projects\\\\firebase-orginal\\\\.next\\\\dev\\\\server\\\\chunks\\\\ssr\\\\firebase-orginal_8b28ce83._.js\",64,287,59,1,false]],\"props\":{\"className\":\"h-8 w-64\"}}\n5d:[[\"Skeleton\",\"D:\\\\My projects\\\\firebase-orginal\\\\.next\\\\dev\\\\server\\\\chunks\\\\ssr\\\\firebase-orginal_8b28ce83._.js\",37,286,36,1,false]]\n5e:[[\"Loading\",\"D:\\\\My projects\\\\firebase-orginal\\\\.next\\\\dev\\\\server\\\\chunks\\\\ssr\\\\firebase-orginal_8b28ce83._.js\",71,287,59,1,false]]\n60:{\"name\":\"Skeleton\",\"key\":null,\"env\":\"Server\",\"owner\":\"$59\",\"stack\":[[\"Loading\",\"D:\\\\My projects\\\\firebase-orginal\\\\.next\\\\dev\\\\server\\\\chunks\\\\ssr\\\\firebase-orginal_8b28ce83._.js\",74,295,59,1,false]],\"props\":{\"className\":\"h-32 w-full\"}}\n61:[[\"Skeleton\",\"D:\\\\My projects\\\\firebase-orginal\\\\.next\\\\dev\\\\server\\\\chunks\\\\ssr\\\\firebase-orginal_8b28ce83._.js\",37,286,36,1,false]]\n63:{\"name\":\"Skeleton\",\"key\":null,\"env\":\"Server\",\"owner\":\"$59\",\"stack\":[[\"Loading\",\"D:\\\\My projects\\\\firebase-orginal\\\\.next\\\\dev\\\\server\\\\chunks\\\\ssr\\\\firebase-orginal_8b28ce83._.js\",81,295,59,1,false]],\"props\":{\"className\":\"h-32 w-full\"}}\n64:[[\"Skeleton\",\"D:\\\\My projects\\\\firebase-orginal\\\\.next\\\\dev\\\\server\\\\chunks\\\\ssr\\\\firebase-orginal_8b28ce83._.js\",37,286,36,1,false]]\n66:{\"name\":\"Skeleton\",\"key\":null,\"env\":\"Server\",\"owner\":\"$59\",\"stack\":[[\"Loading\",\"D:\\\\My projects\\\\firebase-orginal\\\\.next\\\\dev\\\\server\\\\chunks\\\\ssr\\\\firebase-orginal_8b28ce83._.js\",88,295,59,1,false]],\"props\":{\"className\":\"h-32 w-full\"}}\n67:[[\"Skeleton\",\"D:\\\\My projects\\\\firebase-orginal\\\\.next\\\\dev\\\\server\\\\chunks\\\\ssr\\\\firebase-orginal_8b28ce83._.js\",37,286,36,1,false]]\n69:{\"name\":\"Skeleton\",\"key\":null,\"env\":\"Server\",\"owner\":\""])</script><script>self.__next_f.push([1,"$59\",\"stack\":[[\"Loading\",\"D:\\\\My projects\\\\firebase-orginal\\\\.next\\\\dev\\\\server\\\\chunks\\\\ssr\\\\firebase-orginal_8b28ce83._.js\",95,295,59,1,false]],\"props\":{\"className\":\"h-32 w-full\"}}\n6a:[[\"Skeleton\",\"D:\\\\My projects\\\\firebase-orginal\\\\.next\\\\dev\\\\server\\\\chunks\\\\ssr\\\\firebase-orginal_8b28ce83._.js\",37,286,36,1,false]]\n6b:[[\"Loading\",\"D:\\\\My projects\\\\firebase-orginal\\\\.next\\\\dev\\\\server\\\\chunks\\\\ssr\\\\firebase-orginal_8b28ce83._.js\",108,287,59,1,false]]\n6f:[]\n"])</script><script>self.__next_f.push([1,"72:\"$EObject.defineProperty(function(type,config,children){for(var propName,i=2;i\u003carguments.length;i++)validateChildKeys(arguments[i]);i={};var key=null;if(null!=config)for(propName in didWarnAboutOldJSXRuntime||!(\\\"__self\\\"in config)||\\\"key\\\"in config||(didWarnAboutOldJSXRuntime=!0,console.warn(\\\"Your app (or one of its dependencies) is using an outdated JSX transform. Update to the modern JSX transform for faster performance: https://react.dev/link/new-jsx-transform\\\")),hasValidKey(config)\u0026\u0026(checkKeyStringCoercion(config.key),key=\\\"\\\"+config.key),config)hasOwnProperty.call(config,propName)\u0026\u0026\\\"key\\\"!==propName\u0026\u0026\\\"__self\\\"!==propName\u0026\u0026\\\"__source\\\"!==propName\u0026\u0026(i[propName]=config[propName]);var childrenLength=arguments.length-2;if(1===childrenLength)i.children=children;else if(1\u003cchildrenLength){for(var childArray=Array(childrenLength),_i=0;_i\u003cchildrenLength;_i++)childArray[_i]=arguments[_i+2];Object.freeze\u0026\u0026Object.freeze(childArray),i.children=childArray}if(type\u0026\u0026type.defaultProps)for(propName in childrenLength=type.defaultProps)void 0===i[propName]\u0026\u0026(i[propName]=childrenLength[propName]);return key\u0026\u0026function(props,displayName){function warnAboutAccessingKey(){specialPropKeyWarningShown||(specialPropKeyWarningShown=!0,console.error(\\\"%s: `key` is not a prop. Trying to access it will result in `undefined` being returned. If you need to access the same value within the child component, you should pass it as a different prop. (https://react.dev/link/special-props)\\\",displayName))}warnAboutAccessingKey.isReactWarning=!0,Object.defineProperty(props,\\\"key\\\",{get:warnAboutAccessingKey,configurable:!0})}(i,\\\"function\\\"==typeof type?type.displayName||type.name||\\\"Unknown\\\":type),(propName=1e4\u003eReactSharedInternals.recentlyCreatedOwnerStacks++)?(childArray=Error.stackTraceLimit,Error.stackTraceLimit=10,childrenLength=Error(\\\"react-stack-top-frame\\\"),Error.stackTraceLimit=childArray):childrenLength=unknownOwnerDebugStack,ReactElement(type,key,i,getOwner(),childrenLength,propName?createTask(getTaskName(type)):unknownOwnerDebugTask)},\\\"name\\\",{value:\\\"\\\"})\"\n"])</script><script>self.__next_f.push([1,"71:{\"name\":\"NonIndex\",\"key\":null,\"env\":\"Server\",\"stack\":[],\"props\":{\"createElement\":\"$72\",\"pagePath\":\"/orders\",\"statusCode\":200,\"isPossibleServerAction\":false}}\n74:{\"name\":\"Next.Viewport\",\"key\":null,\"env\":\"Server\",\"stack\":[],\"props\":{}}\n75:[]\n79:{\"name\":\"Next.Metadata\",\"key\":null,\"env\":\"Server\",\"stack\":[],\"props\":{}}\n7a:[]\n7b:[]\n7d:[]\n81:[]\n82:[]\n83:[]\n84:{\"name\":\"Skeleton\",\"key\":null,\"env\":\"Server\",\"owner\":\"$59\",\"stack\":[[\"Loading\",\"D:\\\\My projects\\\\firebase-orginal\\\\.next\\\\dev\\\\server\\\\chunks\\\\ssr\\\\firebase-orginal_8b28ce83._.js\",111,295,59,1,false]],\"props\":{\"className\":\"h-80 w-full\"}}\n85:[[\"Skeleton\",\"D:\\\\My projects\\\\firebase-orginal\\\\.next\\\\dev\\\\server\\\\chunks\\\\ssr\\\\firebase-orginal_8b28ce83._.js\",37,286,36,1,false]]\n86:{\"name\":\"Skeleton\",\"key\":null,\"env\":\"Server\",\"owner\":\"$59\",\"stack\":[[\"Loading\",\"D:\\\\My projects\\\\firebase-orginal\\\\.next\\\\dev\\\\server\\\\chunks\\\\ssr\\\\firebase-orginal_8b28ce83._.js\",118,295,59,1,false]],\"props\":{\"className\":\"h-80 w-full\"}}\n87:[[\"Skeleton\",\"D:\\\\My projects\\\\firebase-orginal\\\\.next\\\\dev\\\\server\\\\chunks\\\\ssr\\\\firebase-orginal_8b28ce83._.js\",37,286,36,1,false]]\n88:{\"name\":\"Skeleton\",\"key\":null,\"env\":\"Server\",\"owner\":\"$59\",\"stack\":[[\"Loading\",\"D:\\\\My projects\\\\firebase-orginal\\\\.next\\\\dev\\\\server\\\\chunks\\\\ssr\\\\firebase-orginal_8b28ce83._.js\",131,287,59,1,false]],\"props\":{\"className\":\"h-48 w-full\"}}\n89:[[\"Skeleton\",\"D:\\\\My projects\\\\firebase-orginal\\\\.next\\\\dev\\\\server\\\\chunks\\\\ssr\\\\firebase-orginal_8b28ce83._.js\",37,286,36,1,false]]\n8a:[]\n8b:[]\n8c:[]\n8d:[]\n8e:[[\"Array.map\",\"\",0,0,0,0,false]]\n8f:[]\n1:D{\"time\":0.9615999998059124}\n1:D\"$2\"\n1:D{\"time\":1.0756999999284744}\n1:null\n1c:D{\"time\":4.551099999807775}\n1c:D\"$1d\"\n1c:D{\"time\":4.9980999999679625}\n35:D{\"time\":6.253799999831244}\n35:D\"$36\"\n35:D{\"time\":6.454299999866635}\n35:D\"$37\"\n35:D{\"time\":6.706199999898672}\n35:[[\"$\",\"title\",null,{\"children\":\"404: This page could not be found.\"},\"$37\",\"$38\",1],[\"$\",\"div\",null,{\"style\":{\"fontFamily\":\"system-ui,\\\"Segoe UI\\\",Roboto,Helvetica,Arial,sans-serif,\\\"Apple Color Emoji\\\",\\\"Segoe UI Emoji\\\"\",\"height\":\"100vh\",\"textAlign\":\"center\",\"display\":\"flex\",\"flexDirection\":\"column\",\"alignItems\":\"center\",\"justifyContent\":\"center\"},\"children\":[\"$\",\"div\",null,{\"children\":[[\"$\",\"style\",null,{\"dangerouslySetInnerHTML\":{\"__html\":\"body{color:#000;background:#fff;margin:0}.next-error-h1{border-right:1px solid rgba(0,0,0,.3)}@media (prefers-color-scheme:dark){body{color:#fff;background:#000}.next-error-h1{border-right:1px solid rgba(255,255,255,.3)}}\"}},\"$37\",\"$3b\",1],[\"$\",\"h1\",null,{\"className\":\"next-error-h1\",\"style\":{\"display\":\"inline-block\",\"margin\":\"0 20px 0 0\",\"padding\":\"0 23px 0 0\",\"fontSize\":24,\"fontWeight\":500,\"verticalAlign\":\"top\",\"lineHeight\":\"49px\"},\"children\":404},\"$37\",\"$3c\",1],\"$L3d\"]},\"$37\",\"$3a\",1]},\"$37\",\"$39\",1]]\n"])</script><script>self.__next_f.push([1,"1c:[\"$\",\"html\",null,{\"lang\":\"en\",\"suppressHydrationWarning\":true,\"children\":[[\"$\",\"head\",null,{\"children\":[\"$\",\"link\",null,{\"href\":\"https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;500;600;700\u0026display=swap\",\"rel\":\"stylesheet\"},\"$1d\",\"$28\",1]},\"$1d\",\"$27\",1],[\"$\",\"body\",null,{\"children\":[\"$\",\"$L2b\",null,{\"attribute\":\"class\",\"defaultTheme\":\"dark\",\"disableTransitionOnChange\":true,\"children\":[[\"$\",\"$L2d\",null,{\"children\":[\"$\",\"$L2f\",null,{\"children\":[\"$\",\"$L31\",null,{\"parallelRouterKey\":\"children\",\"error\":\"$undefined\",\"errorStyles\":\"$undefined\",\"errorScripts\":\"$undefined\",\"template\":[\"$\",\"$L33\",null,{},null,\"$32\",1],\"templateStyles\":\"$undefined\",\"templateScripts\":\"$undefined\",\"notFound\":[\"$\",\"$L5\",\"c-not-found\",{\"type\":\"not-found\",\"pagePath\":\"__next_builtin__not-found.js\",\"children\":[\"$35\",[]]},null,\"$34\",0],\"forbidden\":\"$undefined\",\"unauthorized\":\"$undefined\",\"segmentViewBoundaries\":[[\"$\",\"$L5\",null,{\"type\":\"boundary:not-found\",\"pagePath\":\"__next_builtin__not-found.js@boundary\"},null,\"$3e\",1],[\"$\",\"$L5\",null,{\"type\":\"boundary:loading\",\"pagePath\":\"/firebase-orginal/src/app/loading.tsx@boundary\"},null,\"$3f\",1],\"$undefined\",[\"$\",\"$L5\",null,{\"type\":\"boundary:global-error\",\"pagePath\":\"__next_builtin__global-error.js\"},null,\"$40\",1]]},null,\"$30\",1]},\"$1d\",\"$2e\",1]},\"$1d\",\"$2c\",1],[\"$\",\"$L42\",null,{},\"$1d\",\"$41\",1]]},\"$1d\",\"$2a\",1]},\"$1d\",\"$29\",1]]},\"$1d\",\"$26\",1]\n"])</script><script>self.__next_f.push([1,"50:D{\"time\":11.25179999996908}\n50:D\"$51\"\n50:D{\"time\":14.947999999858439}\n50:[\"$\",\"$L53\",null,{\"children\":[\"$\",\"$55\",null,{\"name\":\"Next.MetadataOutlet\",\"children\":\"$@56\"},\"$51\",\"$54\",1]},\"$51\",\"$52\",1]\n58:D{\"time\":15.92589999991469}\n58:D\"$59\"\n58:D{\"time\":16.320599999977276}\n5b:D{\"time\":16.479199999943376}\n5b:D\"$5c\"\n5b:D{\"time\":16.607499999925494}\n5b:[\"$\",\"div\",null,{\"className\":\"animate-pulse rounded-md bg-muted h-8 w-64\"},\"$5c\",\"$5d\",1]\n5f:D{\"time\":16.80629999982193}\n5f:D\"$60\"\n5f:D{\"time\":16.901799999875948}\n5f:[\"$\",\"div\",null,{\"className\":\"animate-pulse rounded-md bg-muted h-32 w-full\"},\"$60\",\"$61\",1]\n62:D{\"time\":17.018199999816716}\n62:D\"$63\"\n62:D{\"time\":17.128399999812245}\n62:[\"$\",\"div\",null,{\"className\":\"animate-pulse rounded-md bg-muted h-32 w-full\"},\"$63\",\"$64\",1]\n65:D{\"time\":17.22249999991618}\n65:D\"$66\"\n65:D{\"time\":17.326399999903515}\n65:[\"$\",\"div\",null,{\"className\":\"animate-pulse rounded-md bg-muted h-32 w-full\"},\"$66\",\"$67\",1]\n68:D{\"time\":17.41179999988526}\n68:D\"$69\"\n68:D{\"time\":17.566200000001118}\n68:[\"$\",\"div\",null,{\"className\":\"animate-pulse rounded-md bg-muted h-32 w-full\"},\"$69\",\"$6a\",1]\n58:[\"$\",\"div\",\"l\",{\"className\":\"space-y-8\",\"children\":[\"$5b\",[\"$\",\"div\",null,{\"className\":\"grid gap-4 md:grid-cols-2 lg:grid-cols-4\",\"children\":[\"$5f\",\"$62\",\"$65\",\"$68\"]},\"$59\",\"$5e\",1],[\"$\",\"div\",null,{\"className\":\"grid gap-4 md:grid-cols-2\",\"children\":[\"$L6c\",\"$L6d\"]},\"$59\",\"$6b\",1],\"$L6e\"]},\"$59\",\"$5a\",1]\n70:D{\"time\":18.02199999988079}\n70:D\"$71\"\n70:D{\"time\":18.040299999993294}\n70:null\n73:D{\"time\":18.153599999845028}\n73:D\"$74\"\n73:D{\"time\":18.51839999994263}\n73:[\"$\",\"$L76\",null,{\"children\":\"$@77\"},\"$74\",\"$75\",1]\n78:D{\"time\":19.0097999998834}\n78:D\"$79\"\n78:D{\"time\":19.48629999998957}\n78:[\"$\",\"div\",null,{\"hidden\":true,\"children\":[\"$\",\"$L7c\",null,{\"children\":[\"$\",\"$55\",null,{\"name\":\"Next.Metadata\",\"children\":\"$@7e\"},\"$79\",\"$7d\",1]},\"$79\",\"$7b\",1]},\"$79\",\"$7a\",1]\n7f:[]\n"])</script><script>self.__next_f.push([1,"0:{\"P\":\"$1\",\"b\":\"development\",\"c\":[\"\",\"orders\"],\"q\":\"\",\"i\":false,\"f\":[[[\"\",{\"children\":[\"orders\",{\"children\":[\"__PAGE__\",{}]}]},\"$undefined\",\"$undefined\",true],[[\"$\",\"$L5\",\"layout\",{\"type\":\"layout\",\"pagePath\":\"/firebase-orginal/src/app/layout.tsx\",\"children\":[\"$\",\"$7\",\"c\",{\"children\":[[[\"$\",\"link\",\"0\",{\"rel\":\"stylesheet\",\"href\":\"/_next/static/chunks/firebase-orginal_src_app_globals_31e9131b.css\",\"precedence\":\"next_static/chunks/firebase-orginal_src_app_globals_31e9131b.css\",\"crossOrigin\":\"$undefined\",\"nonce\":\"$undefined\"},null,\"$8\",0],[\"$\",\"script\",\"script-0\",{\"src\":\"/_next/static/chunks/firebase-orginal_src_7a0328b7._.js\",\"async\":true,\"nonce\":\"$undefined\"},null,\"$9\",0],[\"$\",\"script\",\"script-1\",{\"src\":\"/_next/static/chunks/firebase-orginal_src_components_aa73e6bd._.js\",\"async\":true,\"nonce\":\"$undefined\"},null,\"$a\",0],[\"$\",\"script\",\"script-2\",{\"src\":\"/_next/static/chunks/firebase-orginal_src_store_208195a7._.js\",\"async\":true,\"nonce\":\"$undefined\"},null,\"$b\",0],[\"$\",\"script\",\"script-3\",{\"src\":\"/_next/static/chunks/firebase-orginal_src_app_5c70d10a._.js\",\"async\":true,\"nonce\":\"$undefined\"},null,\"$c\",0],[\"$\",\"script\",\"script-4\",{\"src\":\"/_next/static/chunks/firebase-orginal_src_70e3500a._.js\",\"async\":true,\"nonce\":\"$undefined\"},null,\"$d\",0],[\"$\",\"script\",\"script-5\",{\"src\":\"/_next/static/chunks/97dea_next_60f77ba3._.js\",\"async\":true,\"nonce\":\"$undefined\"},null,\"$e\",0],[\"$\",\"script\",\"script-6\",{\"src\":\"/_next/static/chunks/97dea_lucide-react_dist_esm_icons_index_a0c80c48.js\",\"async\":true,\"nonce\":\"$undefined\"},null,\"$f\",0],[\"$\",\"script\",\"script-7\",{\"src\":\"/_next/static/chunks/97dea_lucide-react_dist_esm_icons_c9f298be._.js\",\"async\":true,\"nonce\":\"$undefined\"},null,\"$10\",0],[\"$\",\"script\",\"script-8\",{\"src\":\"/_next/static/chunks/97dea_lucide-react_dist_esm_lucide-react_88c7da99.js\",\"async\":true,\"nonce\":\"$undefined\"},null,\"$11\",0],[\"$\",\"script\",\"script-9\",{\"src\":\"/_next/static/chunks/97dea_lucide-react_dist_esm_aadc553c._.js\",\"async\":true,\"nonce\":\"$undefined\"},null,\"$12\",0],[\"$\",\"script\",\"script-10\",{\"src\":\"/_next/static/chunks/97dea_%40supabase_realtime-js_dist_module_bd33ecdc._.js\",\"async\":true,\"nonce\":\"$undefined\"},null,\"$13\",0],[\"$\",\"script\",\"script-11\",{\"src\":\"/_next/static/chunks/97dea_%40supabase_storage-js_dist_module_f441eeb6._.js\",\"async\":true,\"nonce\":\"$undefined\"},null,\"$14\",0],[\"$\",\"script\",\"script-12\",{\"src\":\"/_next/static/chunks/97dea_%40supabase_auth-js_dist_module_69c9005e._.js\",\"async\":true,\"nonce\":\"$undefined\"},null,\"$15\",0],[\"$\",\"script\",\"script-13\",{\"src\":\"/_next/static/chunks/97dea_date-fns_1c402563._.js\",\"async\":true,\"nonce\":\"$undefined\"},null,\"$16\",0],[\"$\",\"script\",\"script-14\",{\"src\":\"/_next/static/chunks/97dea_zod_v3_f983f72b._.js\",\"async\":true,\"nonce\":\"$undefined\"},null,\"$17\",0],[\"$\",\"script\",\"script-15\",{\"src\":\"/_next/static/chunks/97dea_%40radix-ui_22600695._.js\",\"async\":true,\"nonce\":\"$undefined\"},null,\"$18\",0],[\"$\",\"script\",\"script-16\",{\"src\":\"/_next/static/chunks/97dea_%40floating-ui_414d532e._.js\",\"async\":true,\"nonce\":\"$undefined\"},null,\"$19\",0],[\"$\",\"script\",\"script-17\",{\"src\":\"/_next/static/chunks/97dea_4e339880._.js\",\"async\":true,\"nonce\":\"$undefined\"},null,\"$1a\",0],[\"$\",\"script\",\"script-18\",{\"src\":\"/_next/static/chunks/firebase-orginal_src_app_layout_tsx_d367f37a._.js\",\"async\":true,\"nonce\":\"$undefined\"},null,\"$1b\",0]],\"$1c\"]},null,\"$6\",1]},null,\"$4\",0],{\"children\":[[\"$\",\"$7\",\"c\",{\"children\":[null,[\"$\",\"$L31\",null,{\"parallelRouterKey\":\"children\",\"error\":\"$undefined\",\"errorStyles\":\"$undefined\",\"errorScripts\":\"$undefined\",\"template\":[\"$\",\"$L33\",null,{},null,\"$45\",1],\"templateStyles\":\"$undefined\",\"templateScripts\":\"$undefined\",\"notFound\":\"$undefined\",\"forbidden\":\"$undefined\",\"unauthorized\":\"$undefined\",\"segmentViewBoundaries\":[\"$undefined\",\"$undefined\",\"$undefined\",\"$undefined\"]},null,\"$44\",1]]},null,\"$43\",0],{\"children\":[[\"$\",\"$7\",\"c\",{\"children\":[[\"$\",\"$L5\",\"c-page\",{\"type\":\"page\",\"pagePath\":\"/firebase-orginal/src/app/orders/page.tsx\",\"children\":[\"$\",\"$L49\",null,{\"Component\":\"$4a\",\"serverProvidedParams\":{\"searchParams\":{},\"params\":{},\"promises\":null}},null,\"$48\",1]},null,\"$47\",1],[[\"$\",\"script\",\"script-0\",{\"src\":\"/_next/static/chunks/firebase-orginal_src_e9b1c7eb._.js\",\"async\":true,\"nonce\":\"$undefined\"},null,\"$4b\",0],[\"$\",\"script\",\"script-1\",{\"src\":\"/_next/static/chunks/97dea_xlsx_xlsx_mjs_45381b09._.js\",\"async\":true,\"nonce\":\"$undefined\"},null,\"$4c\",0],[\"$\",\"script\",\"script-2\",{\"src\":\"/_next/static/chunks/97dea_%40dnd-kit_core_dist_core_esm_1ad8394a.js\",\"async\":true,\"nonce\":\"$undefined\"},null,\"$4d\",0],[\"$\",\"script\",\"script-3\",{\"src\":\"/_next/static/chunks/97dea_3b4b0e9d._.js\",\"async\":true,\"nonce\":\"$undefined\"},null,\"$4e\",0],[\"$\",\"script\",\"script-4\",{\"src\":\"/_next/static/chunks/firebase-orginal_src_app_orders_page_tsx_67beaf9d._.js\",\"async\":true,\"nonce\":\"$undefined\"},null,\"$4f\",0]],\"$50\"]},null,\"$46\",0],{},null,false,false]},null,false,false]},[[\"$\",\"$L5\",\"c-loading\",{\"type\":\"loading\",\"pagePath\":\"/firebase-orginal/src/app/loading.tsx\",\"children\":\"$58\"},null,\"$57\",0],[],[]],false,false],[\"$\",\"$7\",\"h\",{\"children\":[\"$70\",\"$73\",\"$78\",null]},null,\"$6f\",0],false]],\"m\":\"$W7f\",\"G\":[\"$80\",[\"$\",\"$L5\",\"ge-svn\",{\"type\":\"global-error\",\"pagePath\":\"__next_builtin__global-error.js\",\"children\":[]},null,\"$81\",0]],\"s\":false,\"S\":false}\n"])</script><script>self.__next_f.push([1,"3d:D{\"time\":23.71029999991879}\n3d:[\"$\",\"div\",null,{\"style\":{\"display\":\"inline-block\"},\"children\":[\"$\",\"h2\",null,{\"style\":{\"fontSize\":14,\"fontWeight\":400,\"lineHeight\":\"49px\",\"margin\":0},\"children\":\"This page could not be found.\"},\"$37\",\"$83\",1]},\"$37\",\"$82\",1]\n6c:D{\"time\":24.001199999824166}\n6c:D\"$84\"\n6c:D{\"time\":24.255999999819323}\n6c:[\"$\",\"div\",null,{\"className\":\"animate-pulse rounded-md bg-muted h-80 w-full\"},\"$84\",\"$85\",1]\n6d:D{\"time\":24.40419999998994}\n6d:D\"$86\"\n6d:D{\"time\":24.559399999910966}\n6d:[\"$\",\"div\",null,{\"className\":\"animate-pulse rounded-md bg-muted h-80 w-full\"},\"$86\",\"$87\",1]\n6e:D{\"time\":24.91079999995418}\n6e:D\"$88\"\n6e:D{\"time\":25.17050000000745}\n6e:[\"$\",\"div\",null,{\"className\":\"animate-pulse rounded-md bg-muted h-48 w-full\"},\"$88\",\"$89\",1]\n77:D{\"time\":32.42119999998249}\n77:[[\"$\",\"meta\",\"0\",{\"charSet\":\"utf-8\"},\"$51\",\"$8a\",0],[\"$\",\"meta\",\"1\",{\"name\":\"viewport\",\"content\":\"width=device-width, initial-scale=1\"},\"$51\",\"$8b\",0]]\n7e:D{\"time\":34.34829999995418}\n7e:[[\"$\",\"title\",\"0\",{\"children\":\"SynergyFlow\"},\"$51\",\"$8c\",0],[\"$\",\"meta\",\"1\",{\"name\":\"description\",\"content\":\"AI-powered ERP system to manage clients, sales, maintenance, and business analytics.\"},\"$51\",\"$8d\",0],[\"$\",\"link\",\"2\",{\"rel\":\"icon\",\"href\":\"/favicon.ico?favicon.7ed73651.ico\",\"sizes\":\"48x48\",\"type\":\"image/x-icon\"},\"$51\",\"$8e\",0],[\"$\",\"$L90\",\"3\",{},\"$51\",\"$8f\",0]]\n56:D{\"time\":35.04539999994449}\n56:null\n"])</script><script data-nextjs-dev-overlay="true" style="display: block; position: absolute;"><nextjs-portal style="--nextjs-dev-tools-scale: 1;"></nextjs-portal></script><next-route-announcer style="position: absolute;"></next-route-announcer></body></html>
+
+[1A[2K  2) [webkit] ΓÇ║ e2e\notifications.spec.ts:8:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order 
+
+    TimeoutError: locator.click: Timeout 10000ms exceeded.
+    Call log:
+    [2m  - waiting for getByRole('button', { name: 'Create Order' })[22m
+
+
+      30 |     // 2. Open New Order Wizard
+      31 |     try {
+    > 32 |         await page.getByRole('button', { name: 'Create Order' }).click({ timeout: 10000 });
+         |                                                                  ^
+      33 |     } catch (e) {
+      34 |         console.log('Create Order button not found. Page content:');
+      35 |         console.log(await page.content());
+        at D:\My projects\firebase-orginal\e2e\notifications.spec.ts:32:66
+
+    Error Context: test-results\notifications-Notification-ea3ea-tion-for-a-high-value-order-webkit\error-context.md
+
+
+[1A[2K[firefox] ΓÇ║ e2e\notifications.spec.ts:8:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+Create Order button not found. Page content:
+
+[1A[2K<!DOCTYPE html><html lang="en" class="dark" style="color-scheme: dark;"><head><link rel="stylesheet" href="/_next/static/chunks/firebase-orginal_src_app_globals_31e9131b.css" data-precedence="next_static/chunks/firebase-orginal_src_app_globals_31e9131b.css"><link rel="preload" as="script" fetchpriority="low" href="/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_099275f4._.js"><script src="/_next/static/chunks/97dea_next_dist_compiled_react-dom_92424803._.js" async=""></script><script src="/_next/static/chunks/97dea_next_dist_compiled_react-server-dom-turbopack_fd66e9bc._.js" async=""></script><script src="/_next/static/chunks/97dea_next_dist_compiled_next-devtools_index_a78e6daf.js" async=""></script><script src="/_next/static/chunks/97dea_next_dist_compiled_e793555b._.js" async=""></script><script src="/_next/static/chunks/97dea_next_dist_client_ce563615._.js" async=""></script><script src="/_next/static/chunks/97dea_next_dist_b5d32be2._.js" async=""></script><script src="/_next/static/chunks/97dea_%40swc_helpers_cjs_b4342a33._.js" async=""></script><script src="/_next/static/chunks/firebase-orginal_a0ff3932._.js" async=""></script><script src="/_next/static/chunks/turbopack-firebase-orginal_1df438e4._.js" async=""></script><script src="/_next/static/chunks/97dea_next_dist_e8d2e20c._.js" async=""></script><script src="/_next/static/chunks/firebase-orginal_src_app_favicon_ico_mjs_b3a5503f._.js" async=""></script><script src="/_next/static/chunks/firebase-orginal_src_7a0328b7._.js" async=""></script><script src="/_next/static/chunks/firebase-orginal_src_components_aa73e6bd._.js" async=""></script><script src="/_next/static/chunks/firebase-orginal_src_store_208195a7._.js" async=""></script><script src="/_next/static/chunks/firebase-orginal_src_app_5c70d10a._.js" async=""></script><script src="/_next/static/chunks/firebase-orginal_src_70e3500a._.js" async=""></script><script src="/_next/static/chunks/97dea_next_60f77ba3._.js" async=""></script><script src="/_next/static/chunks/97dea_lucide-react_dist_esm_icons_index_a0c80c48.js" async=""></script><script src="/_next/static/chunks/97dea_lucide-react_dist_esm_icons_c9f298be._.js" async=""></script><script src="/_next/static/chunks/97dea_lucide-react_dist_esm_lucide-react_88c7da99.js" async=""></script><script src="/_next/static/chunks/97dea_lucide-react_dist_esm_aadc553c._.js" async=""></script><script src="/_next/static/chunks/97dea_%40supabase_realtime-js_dist_module_bd33ecdc._.js" async=""></script><script src="/_next/static/chunks/97dea_%40supabase_storage-js_dist_module_f441eeb6._.js" async=""></script><script src="/_next/static/chunks/97dea_%40supabase_auth-js_dist_module_69c9005e._.js" async=""></script><script src="/_next/static/chunks/97dea_date-fns_1c402563._.js" async=""></script><script src="/_next/static/chunks/97dea_zod_v3_f983f72b._.js" async=""></script><script src="/_next/static/chunks/97dea_%40radix-ui_22600695._.js" async=""></script><script src="/_next/static/chunks/97dea_%40floating-ui_414d532e._.js" async=""></script><script src="/_next/static/chunks/97dea_4e339880._.js" async=""></script><script src="/_next/static/chunks/firebase-orginal_src_app_layout_tsx_d367f37a._.js" async=""></script><script src="/_next/static/chunks/firebase-orginal_src_e9b1c7eb._.js" async=""></script><script src="/_next/static/chunks/97dea_xlsx_xlsx_mjs_45381b09._.js" async=""></script><script src="/_next/static/chunks/97dea_%40dnd-kit_core_dist_core_esm_1ad8394a.js" async=""></script><script src="/_next/static/chunks/97dea_3b4b0e9d._.js" async=""></script><script src="/_next/static/chunks/firebase-orginal_src_app_orders_page_tsx_67beaf9d._.js" async=""></script><script src="/_next/static/chunks/97dea_next_dist_client_components_builtin_global-error_d367f37a.js" async=""></script><link rel="preload" href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;500;600;700&amp;display=swap" as="style"><link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;500;600;700&amp;display=swap" rel="stylesheet"><script src="/_next/static/chunks/97dea_next_dist_build_polyfills_polyfill-nomodule.js" nomodule=""></script><script src="/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_c8c997ce._.js"></script><script src="/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_3f8af333._.js"></script><style>@font-face{font-family:'__nextjs-Geist';font-style:normal;font-weight:400 600;font-display:swap;src:url(/__nextjs_font/geist-latin-ext.woff2) format('woff2');unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}@font-face{font-family:'__nextjs-Geist Mono';font-style:normal;font-weight:400 600;font-display:swap;src:url(/__nextjs_font/geist-mono-latin-ext.woff2) format('woff2');unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}@font-face{font-family:'__nextjs-Geist';font-style:normal;font-weight:400 600;font-display:swap;src:url(/__nextjs_font/geist-latin.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}@font-face{font-family:'__nextjs-Geist Mono';font-style:normal;font-weight:400 600;font-display:swap;src:url(/__nextjs_font/geist-mono-latin.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}</style><script src="/_next/static/chunks/firebase-orginal_src_app_login_page_tsx_254c72d9._.js"></script><script src="/_next/static/chunks/firebase-orginal_src_app_login_page_tsx_67beaf9d._.js"></script><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>SynergyFlow</title><meta name="description" content="AI-powered ERP system to manage clients, sales, maintenance, and business analytics."><link rel="icon" href="/favicon.ico?favicon.7ed73651.ico" sizes="48x48" type="image/x-icon"><script src="/_next/static/chunks/firebase-orginal_src_app_login_page_tsx_254c72d9._.js" async=""></script><script src="/_next/static/chunks/firebase-orginal_src_app_login_page_tsx_67beaf9d._.js" async=""></script></head><body><div hidden=""></div><script>!function(){try{var d=document.documentElement,c=d.classList;c.remove('light','dark');var e=localStorage.getItem('theme');if('system'===e||(!e&&false)){var t='(prefers-color-scheme: dark)',m=window.matchMedia(t);if(m.media!==t||m.matches){d.style.colorScheme = 'dark';c.add('dark')}else{d.style.colorScheme = 'light';c.add('light')}}else if(e){c.add(e|| '')}else{c.add('dark')}if(e==='light'||e==='dark'||!e)d.style.colorScheme=e||'dark'}catch(e){}}()</script><div class="flex items-center justify-center min-h-screen bg-background"><div class="rounded-lg border bg-card text-card-foreground shadow-sm w-full max-w-md"><div class="flex flex-col space-y-1.5 p-6 border-b mb-[10px]"><h3 class="font-semibold tracking-tight text-2xl">Login</h3><p class="text-sm text-muted-foreground">Enter your email below to login to your account</p></div><div class="p-6 pt-0"><form><div class="grid gap-4"><div class="grid gap-2"><label class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70" for="email">Email</label><input class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm" id="email" placeholder="m@example.com" required="" type="email" value=""></div><div class="grid gap-2"><div class="flex items-center"><label class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70" for="password">Password</label><a class="ml-auto inline-block text-sm underline" href="/reset-password">Forgot your password?</a></div><input class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm" id="password" required="" type="password" value=""></div><button class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 w-full" type="submit">Login</button></div></form><div class="mt-4 text-center text-sm">Don't have an account? <a class="underline" href="/register">Sign up</a></div></div></div></div><div role="region" aria-label="Notifications (F8)" tabindex="-1" style="pointer-events:none"><ol tabindex="-1" class="fixed top-0 z-[100] flex max-h-screen w-full flex-col-reverse p-4 sm:bottom-0 sm:right-0 sm:top-auto sm:flex-col md:max-w-[420px]"></ol></div><script id="_R_">self.__next_r="oLmfLQGDithSPLCaZ1RlD"</script><script src="/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_099275f4._.js" async=""></script><script>(self.__next_f=self.__next_f||[]).push([0])</script><script>self.__next_f.push([1,"5:I[\"[project]/firebase-orginal/node_modules/next/dist/next-devtools/userspace/app/segment-explorer-node.js [app-client] (ecmascript)\",[\"/_next/static/chunks/97dea_next_dist_e8d2e20c._.js\",\"/_next/static/chunks/firebase-orginal_src_app_favicon_ico_mjs_b3a5503f._.js\"],\"SegmentViewNode\"]\n7:\"$Sreact.fragment\"\n2b:I[\"[project]/firebase-orginal/src/components/theme-provider.tsx [app-client] (ecmascript)\",[\"/_next/static/chunks/firebase-orginal_src_7a0328b7._.js\",\"/_next/static/chunks/firebase-orginal_src_components_aa73e6bd._.js\",\"/_next/static/chunks/firebase-orginal_src_store_208195a7._.js\",\"/_next/static/chunks/firebase-orginal_src_app_5c70d10a._.js\",\"/_next/static/chunks/firebase-orginal_src_70e3500a._.js\",\"/_next/static/chunks/97dea_next_60f77ba3._.js\",\"/_next/static/chunks/97dea_lucide-react_dist_esm_icons_index_a0c80c48.js\",\"/_next/static/chunks/97dea_lucide-react_dist_esm_icons_c9f298be._.js\",\"/_next/static/chunks/97dea_lucide-react_dist_esm_lucide-react_88c7da99.js\",\"/_next/static/chunks/97dea_lucide-react_dist_esm_aadc553c._.js\",\"/_next/static/chunks/97dea_%40supabase_realtime-js_dist_module_bd33ecdc._.js\",\"/_next/static/chunks/97dea_%40supabase_storage-js_dist_module_f441eeb6._.js\",\"/_next/static/chunks/97dea_%40supabase_auth-js_dist_module_69c9005e._.js\",\"/_next/static/chunks/97dea_date-fns_1c402563._.js\",\"/_next/static/chunks/97dea_zod_v3_f983f72b._.js\",\"/_next/static/chunks/97dea_%40radix-ui_22600695._.js\",\"/_next/static/chunks/97dea_%40floating-ui_414d532e._.js\",\"/_next/static/chunks/97dea_4e339880._.js\",\"/_next/static/chunks/firebase-orginal_src_app_layout_tsx_d367f37a._.js\"],\"ThemeProvider\"]\n2d:I[\"[project]/firebase-orginal/src/hooks/use-auth.tsx [app-client] (ecmascript)\",[\"/_next/static/chunks/firebase-orginal_src_7a0328b7._.js\",\"/_next/static/chunks/firebase-orginal_src_components_aa73e6bd._.js\",\"/_next/static/chunks/firebase-orginal_src_store_208195a7._.js\",\"/_next/static/chunks/firebase-orginal_src_app_5c70d10a._.js\",\"/_next/static/chunks/firebase-orginal_src_70e3500a._.js\",\"/_next/static/chunks/97dea_next_60f77ba3._.js\",\"/_next/static/chunks/97dea_lucide-react_dist_esm_icons_index_a0c80c48.js\",\"/_next/static/chunks/97dea_lucide-react_dist_esm_icons_c9f298be._.js\",\"/_next/static/chunks/97dea_lucide-react_dist_esm_lucide-react_88c7da99.js\",\"/_next/static/chunks/97dea_lucide-react_dist_esm_aadc553c._.js\",\"/_next/static/chunks/97dea_%40supabase_realtime-js_dist_module_bd33ecdc._.js\",\"/_next/static/chunks/97dea_%40supabase_storage-js_dist_module_f441eeb6._.js\",\"/_next/static/chunks/97dea_%40supabase_auth-js_dist_module_69c9005e._.js\",\"/_next/static/chunks/97dea_date-fns_1c402563._.js\",\"/_next/static/chunks/97dea_zod_v3_f983f72b._.js\",\"/_next/static/chunks/97dea_%40radix-ui_22600695._.js\",\"/_next/static/chunks/97dea_%40floating-ui_414d532e._.js\",\"/_next/static/chunks/97dea_4e339880._.js\",\"/_next/static/chunks/firebase-orginal_src_app_layout_tsx_d367f37a._.js\"],\"AuthProvider\"]\n2f:I[\"[project]/firebase-orginal/src/components/layout/app-shell.tsx [app-client] (ecmascript)\",[\"/_next/static/chunks/firebase-orginal_src_7a0328b7._.js\",\"/_next/static/chunks/firebase-orginal_src_components_aa73e6bd._.js\",\"/_next/static/chunks/firebase-orginal_src_store_208195a7._.js\",\"/_next/static/chunks/firebase-orginal_src_app_5c70d10a._.js\",\"/_next/static/chunks/firebase-orginal_src_70e3500a._.js\",\"/_next/static/chunks/97dea_next_60f77ba3._.js\",\"/_next/static/chunks/97dea_lucide-react_dist_esm_icons_index_a0c80c48.js\",\"/_next/static/chunks/97dea_lucide-react_dist_esm_icons_c9f298be._.js\",\"/_next/static/chunks/97dea_lucide-react_dist_esm_lucide-react_88c7da99.js\",\"/_next/static/chunks/97dea_lucide-react_dist_esm_aadc553c._.js\",\"/_next/static/chunks/97dea_%40supabase_realtime-js_dist_module_bd33ecdc._.js\",\"/_next/static/chunks/97dea_%40supabase_storage-js_dist_module_f441eeb6._.js\",\"/_next/static/chunks/97dea_%40supabase_auth-js_dist_module_69c9005e._.js\",\"/_next/static/chunks/97dea_date-fns_1c402563._.js\",\"/_next/static/chunks/97dea_zod_v3_f983f72b._.js\",\"/_next/static/chunks/97dea_%40radix-ui_22600695._.js\",\"/_next/static/chunks/97"])</script><script>self.__next_f.push([1,"dea_%40floating-ui_414d532e._.js\",\"/_next/static/chunks/97dea_4e339880._.js\",\"/_next/static/chunks/firebase-orginal_src_app_layout_tsx_d367f37a._.js\"],\"AppShell\"]\n31:I[\"[project]/firebase-orginal/node_modules/next/dist/client/components/layout-router.js [app-client] (ecmascript)\",[\"/_next/static/chunks/97dea_next_dist_e8d2e20c._.js\",\"/_next/static/chunks/firebase-orginal_src_app_favicon_ico_mjs_b3a5503f._.js\"],\"default\"]\n33:I[\"[project]/firebase-orginal/node_modules/next/dist/client/components/render-from-template-context.js [app-client] (ecmascript)\",[\"/_next/static/chunks/97dea_next_dist_e8d2e20c._.js\",\"/_next/static/chunks/firebase-orginal_src_app_favicon_ico_mjs_b3a5503f._.js\"],\"default\"]\n42:I[\"[project]/firebase-orginal/src/components/ui/toaster.tsx [app-client] (ecmascript)\",[\"/_next/static/chunks/firebase-orginal_src_7a0328b7._.js\",\"/_next/static/chunks/firebase-orginal_src_components_aa73e6bd._.js\",\"/_next/static/chunks/firebase-orginal_src_store_208195a7._.js\",\"/_next/static/chunks/firebase-orginal_src_app_5c70d10a._.js\",\"/_next/static/chunks/firebase-orginal_src_70e3500a._.js\",\"/_next/static/chunks/97dea_next_60f77ba3._.js\",\"/_next/static/chunks/97dea_lucide-react_dist_esm_icons_index_a0c80c48.js\",\"/_next/static/chunks/97dea_lucide-react_dist_esm_icons_c9f298be._.js\",\"/_next/static/chunks/97dea_lucide-react_dist_esm_lucide-react_88c7da99.js\",\"/_next/static/chunks/97dea_lucide-react_dist_esm_aadc553c._.js\",\"/_next/static/chunks/97dea_%40supabase_realtime-js_dist_module_bd33ecdc._.js\",\"/_next/static/chunks/97dea_%40supabase_storage-js_dist_module_f441eeb6._.js\",\"/_next/static/chunks/97dea_%40supabase_auth-js_dist_module_69c9005e._.js\",\"/_next/static/chunks/97dea_date-fns_1c402563._.js\",\"/_next/static/chunks/97dea_zod_v3_f983f72b._.js\",\"/_next/static/chunks/97dea_%40radix-ui_22600695._.js\",\"/_next/static/chunks/97dea_%40floating-ui_414d532e._.js\",\"/_next/static/chunks/97dea_4e339880._.js\",\"/_next/static/chunks/firebase-orginal_src_app_layout_tsx_d367f37a._.js\"],\"Toaster\"]\n49:I[\"[project]/firebase-orginal/node_modules/next/dist/client/components/client-page.js [app-client] (ecmascript)\",[\"/_next/static/chunks/97dea_next_dist_e8d2e20c._.js\",\"/_next/static/chunks/firebase-orginal_src_app_favicon_ico_mjs_b3a5503f._.js\"],\"ClientPageRoot\"]\n"])</script><script>self.__next_f.push([1,"4a:I[\"[project]/firebase-orginal/src/app/orders/page.tsx [app-client] (ecmascript)\",[\"/_next/static/chunks/firebase-orginal_src_7a0328b7._.js\",\"/_next/static/chunks/firebase-orginal_src_components_aa73e6bd._.js\",\"/_next/static/chunks/firebase-orginal_src_store_208195a7._.js\",\"/_next/static/chunks/firebase-orginal_src_app_5c70d10a._.js\",\"/_next/static/chunks/firebase-orginal_src_70e3500a._.js\",\"/_next/static/chunks/97dea_next_60f77ba3._.js\",\"/_next/static/chunks/97dea_lucide-react_dist_esm_icons_index_a0c80c48.js\",\"/_next/static/chunks/97dea_lucide-react_dist_esm_icons_c9f298be._.js\",\"/_next/static/chunks/97dea_lucide-react_dist_esm_lucide-react_88c7da99.js\",\"/_next/static/chunks/97dea_lucide-react_dist_esm_aadc553c._.js\",\"/_next/static/chunks/97dea_%40supabase_realtime-js_dist_module_bd33ecdc._.js\",\"/_next/static/chunks/97dea_%40supabase_storage-js_dist_module_f441eeb6._.js\",\"/_next/static/chunks/97dea_%40supabase_auth-js_dist_module_69c9005e._.js\",\"/_next/static/chunks/97dea_date-fns_1c402563._.js\",\"/_next/static/chunks/97dea_zod_v3_f983f72b._.js\",\"/_next/static/chunks/97dea_%40radix-ui_22600695._.js\",\"/_next/static/chunks/97dea_%40floating-ui_414d532e._.js\",\"/_next/static/chunks/97dea_4e339880._.js\",\"/_next/static/chunks/firebase-orginal_src_app_layout_tsx_d367f37a._.js\",\"/_next/static/chunks/firebase-orginal_src_e9b1c7eb._.js\",\"/_next/static/chunks/97dea_xlsx_xlsx_mjs_45381b09._.js\",\"/_next/static/chunks/97dea_%40dnd-kit_core_dist_core_esm_1ad8394a.js\",\"/_next/static/chunks/97dea_3b4b0e9d._.js\",\"/_next/static/chunks/firebase-orginal_src_app_orders_page_tsx_67beaf9d._.js\"],\"default\"]\n"])</script><script>self.__next_f.push([1,"53:I[\"[project]/firebase-orginal/node_modules/next/dist/lib/framework/boundary-components.js [app-client] (ecmascript)\",[\"/_next/static/chunks/97dea_next_dist_e8d2e20c._.js\",\"/_next/static/chunks/firebase-orginal_src_app_favicon_ico_mjs_b3a5503f._.js\"],\"OutletBoundary\"]\n55:\"$Sreact.suspense\"\n76:I[\"[project]/firebase-orginal/node_modules/next/dist/lib/framework/boundary-components.js [app-client] (ecmascript)\",[\"/_next/static/chunks/97dea_next_dist_e8d2e20c._.js\",\"/_next/static/chunks/firebase-orginal_src_app_favicon_ico_mjs_b3a5503f._.js\"],\"ViewportBoundary\"]\n7c:I[\"[project]/firebase-orginal/node_modules/next/dist/lib/framework/boundary-components.js [app-client] (ecmascript)\",[\"/_next/static/chunks/97dea_next_dist_e8d2e20c._.js\",\"/_next/static/chunks/firebase-orginal_src_app_favicon_ico_mjs_b3a5503f._.js\"],\"MetadataBoundary\"]\n80:I[\"[project]/firebase-orginal/node_modules/next/dist/client/components/builtin/global-error.js [app-client] (ecmascript)\",[\"/_next/static/chunks/97dea_next_dist_client_components_builtin_global-error_d367f37a.js\"],\"default\"]\n90:I[\"[project]/firebase-orginal/node_modules/next/dist/lib/metadata/generate/icon-mark.js [app-client] (ecmascript)\",[\"/_next/static/chunks/97dea_next_dist_e8d2e20c._.js\",\"/_next/static/chunks/firebase-orginal_src_app_favicon_ico_mjs_b3a5503f._.js\"],\"IconMark\"]\n:HL[\"/_next/static/chunks/firebase-orginal_src_app_globals_31e9131b.css\",\"style\"]\n:HL[\"https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;500;600;700\u0026display=swap\",\"style\"]\n:N1763717643905.145\n3:\"$EObject.defineProperty(()=\u003e{ctx.componentMod.preloadStyle(fullHref,ctx.renderOpts.crossOrigin,ctx.nonce)},\\\"name\\\",{value:\\\"\\\"})\"\n2:{\"name\":\"Preloads\",\"key\":null,\"env\":\"Server\",\"stack\":[],\"props\":{\"preloadCallbacks\":[\"$3\"]}}\n4:[]\n6:[]\n8:[[\"Array.map\",\"\",0,0,0,0,false]]\n9:[[\"Array.map\",\"\",0,0,0,0,false]]\na:[[\"Array.map\",\"\",0,0,0,0,false]]\nb:[[\"Array.map\",\"\",0,0,0,0,false]]\nc:[[\"Array.map\",\"\",0,0,0,0,false]]\nd:[[\"Array.map\",\"\",0,0,0,0,false]]\ne:[[\"Array.map\",\"\",0,0,0,0,false]]\nf:[[\"Array.map\",\"\",0,0,0,0,false]]\n10:[[\"Array.map\",\"\",0,0,0,0,false]]\n11:[[\"Array.map\",\"\",0,0,0,0,false]]\n12:[[\"Array.map\",\"\",0,0,0,0,false]]\n13:[[\"Array.map\",\"\",0,0,0,0,false]]\n14:[[\"Array.map\",\"\",0,0,0,0,false]]\n15:[[\"Array.map\",\"\",0,0,0,0,false]]\n16:[[\"Array.map\",\"\",0,0,0,0,false]]\n17:[[\"Array.map\",\"\",0,0,0,0,false]]\n18:[[\"Array.map\",\"\",0,0,0,0,false]]\n19:[[\"Array.map\",\"\",0,0,0,0,false]]\n1a:[[\"Array.map\",\"\",0,0,0,0,false]]\n1b:[[\"Array.map\",\"\",0,0,0,0,false]]\n1e:I[\"[project]/firebase-orginal/node_modules/next/dist/client/components/layout-router.js [app-client] (ecmascript)\",[\"/_next/static/chunks/97dea_next_dist_e8d2e20c._.js\",\"/_next/static/chunks/firebase-orginal_src_app_favicon_ico_mjs_b3a5503f._.js\"],\"default\"]\n21:I[\"[project]/firebase-orginal/node_modules/next/dist/client/components/render-from-template-context.js [app-client] (ecmascript)\",[\"/_next/static/chunks/97dea_next_dist_e8d2e20c._.js\",\"/_next/static/chunks/firebase-orginal_src_app_favicon_ico_mjs_b3a5503f._.js\"],\"default\"]\n22:{}\n23:[[\"Function.all\",\"\",0,0,0,0,true]]\n20:{\"children\":[\"$\",\"$L21\",null,\"$22\",null,\"$23\",1]}\n24:[[\"Function.all\",\"\",0,0,0,0,true]]\n1f:{\"parallelRouterKey\":\"children\",\"error\":\"$undefined\",\"errorStyles\":\"$undefined\",\"errorScripts\":\"$undefined\",\"template\":[\"$\",\"$7\",null,\"$20\",null,\"$24\",0],\"templateStyles\":\"$undefined\",\"templateScripts\":\"$undefined\",\"notFound\":\"$Y\",\"forbidden\":\"$undefined\",\"unauthorized\":\"$undefined\",\"segmentViewBoundaries\":\"$Y\"}\n25:[[\"Function.all\",\"\",0,0,0,0,true]]\n1d:{\"name\":\"RootLayout\",\"key\":null,\"env\":\"Server\",\"stack\":[],\"props\":{\"children\":[\"$\",\"$L1e\",null,\"$1f\",null,\"$25\",1],\"params\":\"$Y\"}}\n26:[[\"RootLayout\",\"D:\\\\My projects\\\\firebase-orginal\\\\.next\\\\dev\\\\server\\\\chunks\\\\ssr\\\\firebase-orginal_693b4084._.js\",181,286,180,1,false]]\n27:[[\"RootLayout\",\"D:\\\\My projects\\\\firebase-orginal\\\\.next\\\\dev\\\\server\\\\chunks\\\\ssr\\\\firebase-orginal_693b4084._.js\",185,287,180,1,false]]\n28:[[\"RootLayout\",\"D:\\\\My projects\\\\firebase-orginal\\\\.next\\\\dev\\\\server\\\\chunks\\\\ssr\\\\firebase-orginal_693b4084._.js\",186,301,180,1,false]]\n29:[[\"RootLayout\",\"D:\\"])</script><script>self.__next_f.push([1,"\\My projects\\\\firebase-orginal\\\\.next\\\\dev\\\\server\\\\chunks\\\\ssr\\\\firebase-orginal_693b4084._.js\",199,287,180,1,false]]\n2a:[[\"RootLayout\",\"D:\\\\My projects\\\\firebase-orginal\\\\.next\\\\dev\\\\server\\\\chunks\\\\ssr\\\\firebase-orginal_693b4084._.js\",200,301,180,1,false]]\n2c:[[\"RootLayout\",\"D:\\\\My projects\\\\firebase-orginal\\\\.next\\\\dev\\\\server\\\\chunks\\\\ssr\\\\firebase-orginal_693b4084._.js\",205,299,180,1,false]]\n2e:[[\"RootLayout\",\"D:\\\\My projects\\\\firebase-orginal\\\\.next\\\\dev\\\\server\\\\chunks\\\\ssr\\\\firebase-orginal_693b4084._.js\",206,313,180,1,false]]\n30:[[\"Function.all\",\"\",0,0,0,0,true]]\n32:[[\"Function.all\",\"\",0,0,0,0,true]]\n34:[]\n36:{\"name\":\"NotFound\",\"key\":null,\"env\":\"Server\",\"stack\":[],\"props\":{}}\n37:{\"name\":\"HTTPAccessErrorFallback\",\"key\":null,\"env\":\"Server\",\"owner\":\"$36\",\"stack\":[],\"props\":{\"status\":404,\"message\":\"This page could not be found.\"}}\n38:[]\n39:[]\n3a:[]\n3b:[]\n3c:[]\n3e:[[\"Function.all\",\"\",0,0,0,0,true]]\n3f:[[\"Function.all\",\"\",0,0,0,0,true]]\n40:[[\"Function.all\",\"\",0,0,0,0,true]]\n41:[[\"RootLayout\",\"D:\\\\My projects\\\\firebase-orginal\\\\.next\\\\dev\\\\server\\\\chunks\\\\ssr\\\\firebase-orginal_693b4084._.js\",218,299,180,1,false]]\n43:[[\"Function.all\",\"\",0,0,0,0,true]]\n44:[[\"Function.all\",\"\",0,0,0,0,true],[\"Function.all\",\"\",0,0,0,0,true]]\n45:[[\"Function.all\",\"\",0,0,0,0,true],[\"Function.all\",\"\",0,0,0,0,true]]\n46:[[\"Function.all\",\"\",0,0,0,0,true],[\"Function.all\",\"\",0,0,0,0,true]]\n47:[[\"Function.all\",\"\",0,0,0,0,true],[\"Function.all\",\"\",0,0,0,0,true]]\n48:[[\"Function.all\",\"\",0,0,0,0,true],[\"Function.all\",\"\",0,0,0,0,true]]\n4b:[[\"Array.map\",\"\",0,0,0,0,false],[\"Array.map\",\"\",0,0,0,0,false],[\"Function.all\",\"\",0,0,0,0,true]]\n4c:[[\"Array.map\",\"\",0,0,0,0,false],[\"Array.map\",\"\",0,0,0,0,false],[\"Function.all\",\"\",0,0,0,0,true]]\n4d:[[\"Array.map\",\"\",0,0,0,0,false],[\"Array.map\",\"\",0,0,0,0,false],[\"Function.all\",\"\",0,0,0,0,true]]\n4e:[[\"Array.map\",\"\",0,0,0,0,false],[\"Array.map\",\"\",0,0,0,0,false],[\"Function.all\",\"\",0,0,0,0,true]]\n4f:[[\"Array.map\",\"\",0,0,0,0,false],[\"Array.map\",\"\",0,0,0,0,false],[\"Function.all\",\"\",0,0,0,0,true]]\n51:{\"name\":\"Next.MetadataOutlet\",\"key\":null,\"env\":\"Server\",\"stack\":[[\"Function.all\",\"\",0,0,0,0,true],[\"Function.all\",\"\",0,0,0,0,true]],\"props\":{}}\n52:[]\n54:[]\n57:[]\n59:{\"name\":\"Loading\",\"key\":\"l\",\"env\":\"Server\",\"stack\":[],\"props\":{}}\n5a:[[\"Loading\",\"D:\\\\My projects\\\\firebase-orginal\\\\.next\\\\dev\\\\server\\\\chunks\\\\ssr\\\\firebase-orginal_8b28ce83._.js\",61,286,59,1,false]]\n5c:{\"name\":\"Skeleton\",\"key\":null,\"env\":\"Server\",\"owner\":\"$59\",\"stack\":[[\"Loading\",\"D:\\\\My projects\\\\firebase-orginal\\\\.next\\\\dev\\\\server\\\\chunks\\\\ssr\\\\firebase-orginal_8b28ce83._.js\",64,287,59,1,false]],\"props\":{\"className\":\"h-8 w-64\"}}\n5d:[[\"Skeleton\",\"D:\\\\My projects\\\\firebase-orginal\\\\.next\\\\dev\\\\server\\\\chunks\\\\ssr\\\\firebase-orginal_8b28ce83._.js\",37,286,36,1,false]]\n5e:[[\"Loading\",\"D:\\\\My projects\\\\firebase-orginal\\\\.next\\\\dev\\\\server\\\\chunks\\\\ssr\\\\firebase-orginal_8b28ce83._.js\",71,287,59,1,false]]\n60:{\"name\":\"Skeleton\",\"key\":null,\"env\":\"Server\",\"owner\":\"$59\",\"stack\":[[\"Loading\",\"D:\\\\My projects\\\\firebase-orginal\\\\.next\\\\dev\\\\server\\\\chunks\\\\ssr\\\\firebase-orginal_8b28ce83._.js\",74,295,59,1,false]],\"props\":{\"className\":\"h-32 w-full\"}}\n61:[[\"Skeleton\",\"D:\\\\My projects\\\\firebase-orginal\\\\.next\\\\dev\\\\server\\\\chunks\\\\ssr\\\\firebase-orginal_8b28ce83._.js\",37,286,36,1,false]]\n63:{\"name\":\"Skeleton\",\"key\":null,\"env\":\"Server\",\"owner\":\"$59\",\"stack\":[[\"Loading\",\"D:\\\\My projects\\\\firebase-orginal\\\\.next\\\\dev\\\\server\\\\chunks\\\\ssr\\\\firebase-orginal_8b28ce83._.js\",81,295,59,1,false]],\"props\":{\"className\":\"h-32 w-full\"}}\n64:[[\"Skeleton\",\"D:\\\\My projects\\\\firebase-orginal\\\\.next\\\\dev\\\\server\\\\chunks\\\\ssr\\\\firebase-orginal_8b28ce83._.js\",37,286,36,1,false]]\n66:{\"name\":\"Skeleton\",\"key\":null,\"env\":\"Server\",\"owner\":\"$59\",\"stack\":[[\"Loading\",\"D:\\\\My projects\\\\firebase-orginal\\\\.next\\\\dev\\\\server\\\\chunks\\\\ssr\\\\firebase-orginal_8b28ce83._.js\",88,295,59,1,false]],\"props\":{\"className\":\"h-32 w-full\"}}\n67:[[\"Skeleton\",\"D:\\\\My projects\\\\firebase-orginal\\\\.next\\\\dev\\\\server\\\\chunks\\\\ssr\\\\firebase-orginal_8b28ce83._.js\",37,286,36,1,false]]\n69:{\"name\":\"Skeleton\",\"key\":null,\"env\":\"Server\",\"owner\":\"$"])</script><script>self.__next_f.push([1,"59\",\"stack\":[[\"Loading\",\"D:\\\\My projects\\\\firebase-orginal\\\\.next\\\\dev\\\\server\\\\chunks\\\\ssr\\\\firebase-orginal_8b28ce83._.js\",95,295,59,1,false]],\"props\":{\"className\":\"h-32 w-full\"}}\n6a:[[\"Skeleton\",\"D:\\\\My projects\\\\firebase-orginal\\\\.next\\\\dev\\\\server\\\\chunks\\\\ssr\\\\firebase-orginal_8b28ce83._.js\",37,286,36,1,false]]\n6b:[[\"Loading\",\"D:\\\\My projects\\\\firebase-orginal\\\\.next\\\\dev\\\\server\\\\chunks\\\\ssr\\\\firebase-orginal_8b28ce83._.js\",108,287,59,1,false]]\n6f:[]\n"])</script><script>self.__next_f.push([1,"72:\"$EObject.defineProperty(function(type,config,children){for(var propName,i=2;i\u003carguments.length;i++)validateChildKeys(arguments[i]);i={};var key=null;if(null!=config)for(propName in didWarnAboutOldJSXRuntime||!(\\\"__self\\\"in config)||\\\"key\\\"in config||(didWarnAboutOldJSXRuntime=!0,console.warn(\\\"Your app (or one of its dependencies) is using an outdated JSX transform. Update to the modern JSX transform for faster performance: https://react.dev/link/new-jsx-transform\\\")),hasValidKey(config)\u0026\u0026(checkKeyStringCoercion(config.key),key=\\\"\\\"+config.key),config)hasOwnProperty.call(config,propName)\u0026\u0026\\\"key\\\"!==propName\u0026\u0026\\\"__self\\\"!==propName\u0026\u0026\\\"__source\\\"!==propName\u0026\u0026(i[propName]=config[propName]);var childrenLength=arguments.length-2;if(1===childrenLength)i.children=children;else if(1\u003cchildrenLength){for(var childArray=Array(childrenLength),_i=0;_i\u003cchildrenLength;_i++)childArray[_i]=arguments[_i+2];Object.freeze\u0026\u0026Object.freeze(childArray),i.children=childArray}if(type\u0026\u0026type.defaultProps)for(propName in childrenLength=type.defaultProps)void 0===i[propName]\u0026\u0026(i[propName]=childrenLength[propName]);return key\u0026\u0026function(props,displayName){function warnAboutAccessingKey(){specialPropKeyWarningShown||(specialPropKeyWarningShown=!0,console.error(\\\"%s: `key` is not a prop. Trying to access it will result in `undefined` being returned. If you need to access the same value within the child component, you should pass it as a different prop. (https://react.dev/link/special-props)\\\",displayName))}warnAboutAccessingKey.isReactWarning=!0,Object.defineProperty(props,\\\"key\\\",{get:warnAboutAccessingKey,configurable:!0})}(i,\\\"function\\\"==typeof type?type.displayName||type.name||\\\"Unknown\\\":type),(propName=1e4\u003eReactSharedInternals.recentlyCreatedOwnerStacks++)?(childArray=Error.stackTraceLimit,Error.stackTraceLimit=10,childrenLength=Error(\\\"react-stack-top-frame\\\"),Error.stackTraceLimit=childArray):childrenLength=unknownOwnerDebugStack,ReactElement(type,key,i,getOwner(),childrenLength,propName?createTask(getTaskName(type)):unknownOwnerDebugTask)},\\\"name\\\",{value:\\\"\\\"})\"\n"])</script><script>self.__next_f.push([1,"71:{\"name\":\"NonIndex\",\"key\":null,\"env\":\"Server\",\"stack\":[],\"props\":{\"createElement\":\"$72\",\"pagePath\":\"/orders\",\"statusCode\":200,\"isPossibleServerAction\":false}}\n74:{\"name\":\"Next.Viewport\",\"key\":null,\"env\":\"Server\",\"stack\":[],\"props\":{}}\n75:[]\n79:{\"name\":\"Next.Metadata\",\"key\":null,\"env\":\"Server\",\"stack\":[],\"props\":{}}\n7a:[]\n7b:[]\n7d:[]\n81:[]\n82:[]\n83:[]\n84:{\"name\":\"Skeleton\",\"key\":null,\"env\":\"Server\",\"owner\":\"$59\",\"stack\":[[\"Loading\",\"D:\\\\My projects\\\\firebase-orginal\\\\.next\\\\dev\\\\server\\\\chunks\\\\ssr\\\\firebase-orginal_8b28ce83._.js\",111,295,59,1,false]],\"props\":{\"className\":\"h-80 w-full\"}}\n85:[[\"Skeleton\",\"D:\\\\My projects\\\\firebase-orginal\\\\.next\\\\dev\\\\server\\\\chunks\\\\ssr\\\\firebase-orginal_8b28ce83._.js\",37,286,36,1,false]]\n86:{\"name\":\"Skeleton\",\"key\":null,\"env\":\"Server\",\"owner\":\"$59\",\"stack\":[[\"Loading\",\"D:\\\\My projects\\\\firebase-orginal\\\\.next\\\\dev\\\\server\\\\chunks\\\\ssr\\\\firebase-orginal_8b28ce83._.js\",118,295,59,1,false]],\"props\":{\"className\":\"h-80 w-full\"}}\n87:[[\"Skeleton\",\"D:\\\\My projects\\\\firebase-orginal\\\\.next\\\\dev\\\\server\\\\chunks\\\\ssr\\\\firebase-orginal_8b28ce83._.js\",37,286,36,1,false]]\n88:{\"name\":\"Skeleton\",\"key\":null,\"env\":\"Server\",\"owner\":\"$59\",\"stack\":[[\"Loading\",\"D:\\\\My projects\\\\firebase-orginal\\\\.next\\\\dev\\\\server\\\\chunks\\\\ssr\\\\firebase-orginal_8b28ce83._.js\",131,287,59,1,false]],\"props\":{\"className\":\"h-48 w-full\"}}\n89:[[\"Skeleton\",\"D:\\\\My projects\\\\firebase-orginal\\\\.next\\\\dev\\\\server\\\\chunks\\\\ssr\\\\firebase-orginal_8b28ce83._.js\",37,286,36,1,false]]\n8a:[]\n8b:[]\n8c:[]\n8d:[]\n8e:[[\"Array.map\",\"\",0,0,0,0,false]]\n8f:[]\n1:D{\"time\":0.47149999998509884}\n1:D\"$2\"\n1:D{\"time\":0.5925000000279397}\n1:null\n1c:D{\"time\":2.638299999991432}\n1c:D\"$1d\"\n1c:D{\"time\":3.015499999979511}\n35:D{\"time\":3.6687000000383705}\n35:D\"$36\"\n35:D{\"time\":3.8972000000067055}\n35:D\"$37\"\n35:D{\"time\":4.548299999907613}\n35:[[\"$\",\"title\",null,{\"children\":\"404: This page could not be found.\"},\"$37\",\"$38\",1],[\"$\",\"div\",null,{\"style\":{\"fontFamily\":\"system-ui,\\\"Segoe UI\\\",Roboto,Helvetica,Arial,sans-serif,\\\"Apple Color Emoji\\\",\\\"Segoe UI Emoji\\\"\",\"height\":\"100vh\",\"textAlign\":\"center\",\"display\":\"flex\",\"flexDirection\":\"column\",\"alignItems\":\"center\",\"justifyContent\":\"center\"},\"children\":[\"$\",\"div\",null,{\"children\":[[\"$\",\"style\",null,{\"dangerouslySetInnerHTML\":{\"__html\":\"body{color:#000;background:#fff;margin:0}.next-error-h1{border-right:1px solid rgba(0,0,0,.3)}@media (prefers-color-scheme:dark){body{color:#fff;background:#000}.next-error-h1{border-right:1px solid rgba(255,255,255,.3)}}\"}},\"$37\",\"$3b\",1],[\"$\",\"h1\",null,{\"className\":\"next-error-h1\",\"style\":{\"display\":\"inline-block\",\"margin\":\"0 20px 0 0\",\"padding\":\"0 23px 0 0\",\"fontSize\":24,\"fontWeight\":500,\"verticalAlign\":\"top\",\"lineHeight\":\"49px\"},\"children\":404},\"$37\",\"$3c\",1],\"$L3d\"]},\"$37\",\"$3a\",1]},\"$37\",\"$39\",1]]\n"])</script><script>self.__next_f.push([1,"1c:[\"$\",\"html\",null,{\"lang\":\"en\",\"suppressHydrationWarning\":true,\"children\":[[\"$\",\"head\",null,{\"children\":[\"$\",\"link\",null,{\"href\":\"https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;500;600;700\u0026display=swap\",\"rel\":\"stylesheet\"},\"$1d\",\"$28\",1]},\"$1d\",\"$27\",1],[\"$\",\"body\",null,{\"children\":[\"$\",\"$L2b\",null,{\"attribute\":\"class\",\"defaultTheme\":\"dark\",\"disableTransitionOnChange\":true,\"children\":[[\"$\",\"$L2d\",null,{\"children\":[\"$\",\"$L2f\",null,{\"children\":[\"$\",\"$L31\",null,{\"parallelRouterKey\":\"children\",\"error\":\"$undefined\",\"errorStyles\":\"$undefined\",\"errorScripts\":\"$undefined\",\"template\":[\"$\",\"$L33\",null,{},null,\"$32\",1],\"templateStyles\":\"$undefined\",\"templateScripts\":\"$undefined\",\"notFound\":[\"$\",\"$L5\",\"c-not-found\",{\"type\":\"not-found\",\"pagePath\":\"__next_builtin__not-found.js\",\"children\":[\"$35\",[]]},null,\"$34\",0],\"forbidden\":\"$undefined\",\"unauthorized\":\"$undefined\",\"segmentViewBoundaries\":[[\"$\",\"$L5\",null,{\"type\":\"boundary:not-found\",\"pagePath\":\"__next_builtin__not-found.js@boundary\"},null,\"$3e\",1],[\"$\",\"$L5\",null,{\"type\":\"boundary:loading\",\"pagePath\":\"/firebase-orginal/src/app/loading.tsx@boundary\"},null,\"$3f\",1],\"$undefined\",[\"$\",\"$L5\",null,{\"type\":\"boundary:global-error\",\"pagePath\":\"__next_builtin__global-error.js\"},null,\"$40\",1]]},null,\"$30\",1]},\"$1d\",\"$2e\",1]},\"$1d\",\"$2c\",1],[\"$\",\"$L42\",null,{},\"$1d\",\"$41\",1]]},\"$1d\",\"$2a\",1]},\"$1d\",\"$29\",1]]},\"$1d\",\"$26\",1]\n"])</script><script>self.__next_f.push([1,"50:D{\"time\":8.932199999922886}\n50:D\"$51\"\n50:D{\"time\":13.523000000044703}\n50:[\"$\",\"$L53\",null,{\"children\":[\"$\",\"$55\",null,{\"name\":\"Next.MetadataOutlet\",\"children\":\"$@56\"},\"$51\",\"$54\",1]},\"$51\",\"$52\",1]\n58:D{\"time\":14.61449999990873}\n58:D\"$59\"\n58:D{\"time\":15.304299999959767}\n5b:D{\"time\":15.457200000062585}\n5b:D\"$5c\"\n5b:D{\"time\":15.666999999899417}\n5b:[\"$\",\"div\",null,{\"className\":\"animate-pulse rounded-md bg-muted h-8 w-64\"},\"$5c\",\"$5d\",1]\n5f:D{\"time\":15.867099999915808}\n5f:D\"$60\"\n5f:D{\"time\":16.043599999975413}\n5f:[\"$\",\"div\",null,{\"className\":\"animate-pulse rounded-md bg-muted h-32 w-full\"},\"$60\",\"$61\",1]\n62:D{\"time\":16.165599999949336}\n62:D\"$63\"\n62:D{\"time\":16.3086000001058}\n62:[\"$\",\"div\",null,{\"className\":\"animate-pulse rounded-md bg-muted h-32 w-full\"},\"$63\",\"$64\",1]\n65:D{\"time\":16.414099999936298}\n65:D\"$66\"\n65:D{\"time\":16.553000000072643}\n65:[\"$\",\"div\",null,{\"className\":\"animate-pulse rounded-md bg-muted h-32 w-full\"},\"$66\",\"$67\",1]\n68:D{\"time\":16.664799999911338}\n68:D\"$69\"\n68:D{\"time\":16.80309999990277}\n68:[\"$\",\"div\",null,{\"className\":\"animate-pulse rounded-md bg-muted h-32 w-full\"},\"$69\",\"$6a\",1]\n58:[\"$\",\"div\",\"l\",{\"className\":\"space-y-8\",\"children\":[\"$5b\",[\"$\",\"div\",null,{\"className\":\"grid gap-4 md:grid-cols-2 lg:grid-cols-4\",\"children\":[\"$5f\",\"$62\",\"$65\",\"$68\"]},\"$59\",\"$5e\",1],[\"$\",\"div\",null,{\"className\":\"grid gap-4 md:grid-cols-2\",\"children\":[\"$L6c\",\"$L6d\"]},\"$59\",\"$6b\",1],\"$L6e\"]},\"$59\",\"$5a\",1]\n70:D{\"time\":17.703900000080466}\n70:D\"$71\"\n70:D{\"time\":17.74130000011064}\n70:null\n73:D{\"time\":17.907399999909103}\n73:D\"$74\"\n73:D{\"time\":18.32810000004247}\n73:[\"$\",\"$L76\",null,{\"children\":\"$@77\"},\"$74\",\"$75\",1]\n78:D{\"time\":19.045300000114366}\n78:D\"$79\"\n78:D{\"time\":19.544999999925494}\n78:[\"$\",\"div\",null,{\"hidden\":true,\"children\":[\"$\",\"$L7c\",null,{\"children\":[\"$\",\"$55\",null,{\"name\":\"Next.Metadata\",\"children\":\"$@7e\"},\"$79\",\"$7d\",1]},\"$79\",\"$7b\",1]},\"$79\",\"$7a\",1]\n7f:[]\n"])</script><script>self.__next_f.push([1,"0:{\"P\":\"$1\",\"b\":\"development\",\"c\":[\"\",\"orders\"],\"q\":\"\",\"i\":false,\"f\":[[[\"\",{\"children\":[\"orders\",{\"children\":[\"__PAGE__\",{}]}]},\"$undefined\",\"$undefined\",true],[[\"$\",\"$L5\",\"layout\",{\"type\":\"layout\",\"pagePath\":\"/firebase-orginal/src/app/layout.tsx\",\"children\":[\"$\",\"$7\",\"c\",{\"children\":[[[\"$\",\"link\",\"0\",{\"rel\":\"stylesheet\",\"href\":\"/_next/static/chunks/firebase-orginal_src_app_globals_31e9131b.css\",\"precedence\":\"next_static/chunks/firebase-orginal_src_app_globals_31e9131b.css\",\"crossOrigin\":\"$undefined\",\"nonce\":\"$undefined\"},null,\"$8\",0],[\"$\",\"script\",\"script-0\",{\"src\":\"/_next/static/chunks/firebase-orginal_src_7a0328b7._.js\",\"async\":true,\"nonce\":\"$undefined\"},null,\"$9\",0],[\"$\",\"script\",\"script-1\",{\"src\":\"/_next/static/chunks/firebase-orginal_src_components_aa73e6bd._.js\",\"async\":true,\"nonce\":\"$undefined\"},null,\"$a\",0],[\"$\",\"script\",\"script-2\",{\"src\":\"/_next/static/chunks/firebase-orginal_src_store_208195a7._.js\",\"async\":true,\"nonce\":\"$undefined\"},null,\"$b\",0],[\"$\",\"script\",\"script-3\",{\"src\":\"/_next/static/chunks/firebase-orginal_src_app_5c70d10a._.js\",\"async\":true,\"nonce\":\"$undefined\"},null,\"$c\",0],[\"$\",\"script\",\"script-4\",{\"src\":\"/_next/static/chunks/firebase-orginal_src_70e3500a._.js\",\"async\":true,\"nonce\":\"$undefined\"},null,\"$d\",0],[\"$\",\"script\",\"script-5\",{\"src\":\"/_next/static/chunks/97dea_next_60f77ba3._.js\",\"async\":true,\"nonce\":\"$undefined\"},null,\"$e\",0],[\"$\",\"script\",\"script-6\",{\"src\":\"/_next/static/chunks/97dea_lucide-react_dist_esm_icons_index_a0c80c48.js\",\"async\":true,\"nonce\":\"$undefined\"},null,\"$f\",0],[\"$\",\"script\",\"script-7\",{\"src\":\"/_next/static/chunks/97dea_lucide-react_dist_esm_icons_c9f298be._.js\",\"async\":true,\"nonce\":\"$undefined\"},null,\"$10\",0],[\"$\",\"script\",\"script-8\",{\"src\":\"/_next/static/chunks/97dea_lucide-react_dist_esm_lucide-react_88c7da99.js\",\"async\":true,\"nonce\":\"$undefined\"},null,\"$11\",0],[\"$\",\"script\",\"script-9\",{\"src\":\"/_next/static/chunks/97dea_lucide-react_dist_esm_aadc553c._.js\",\"async\":true,\"nonce\":\"$undefined\"},null,\"$12\",0],[\"$\",\"script\",\"script-10\",{\"src\":\"/_next/static/chunks/97dea_%40supabase_realtime-js_dist_module_bd33ecdc._.js\",\"async\":true,\"nonce\":\"$undefined\"},null,\"$13\",0],[\"$\",\"script\",\"script-11\",{\"src\":\"/_next/static/chunks/97dea_%40supabase_storage-js_dist_module_f441eeb6._.js\",\"async\":true,\"nonce\":\"$undefined\"},null,\"$14\",0],[\"$\",\"script\",\"script-12\",{\"src\":\"/_next/static/chunks/97dea_%40supabase_auth-js_dist_module_69c9005e._.js\",\"async\":true,\"nonce\":\"$undefined\"},null,\"$15\",0],[\"$\",\"script\",\"script-13\",{\"src\":\"/_next/static/chunks/97dea_date-fns_1c402563._.js\",\"async\":true,\"nonce\":\"$undefined\"},null,\"$16\",0],[\"$\",\"script\",\"script-14\",{\"src\":\"/_next/static/chunks/97dea_zod_v3_f983f72b._.js\",\"async\":true,\"nonce\":\"$undefined\"},null,\"$17\",0],[\"$\",\"script\",\"script-15\",{\"src\":\"/_next/static/chunks/97dea_%40radix-ui_22600695._.js\",\"async\":true,\"nonce\":\"$undefined\"},null,\"$18\",0],[\"$\",\"script\",\"script-16\",{\"src\":\"/_next/static/chunks/97dea_%40floating-ui_414d532e._.js\",\"async\":true,\"nonce\":\"$undefined\"},null,\"$19\",0],[\"$\",\"script\",\"script-17\",{\"src\":\"/_next/static/chunks/97dea_4e339880._.js\",\"async\":true,\"nonce\":\"$undefined\"},null,\"$1a\",0],[\"$\",\"script\",\"script-18\",{\"src\":\"/_next/static/chunks/firebase-orginal_src_app_layout_tsx_d367f37a._.js\",\"async\":true,\"nonce\":\"$undefined\"},null,\"$1b\",0]],\"$1c\"]},null,\"$6\",1]},null,\"$4\",0],{\"children\":[[\"$\",\"$7\",\"c\",{\"children\":[null,[\"$\",\"$L31\",null,{\"parallelRouterKey\":\"children\",\"error\":\"$undefined\",\"errorStyles\":\"$undefined\",\"errorScripts\":\"$undefined\",\"template\":[\"$\",\"$L33\",null,{},null,\"$45\",1],\"templateStyles\":\"$undefined\",\"templateScripts\":\"$undefined\",\"notFound\":\"$undefined\",\"forbidden\":\"$undefined\",\"unauthorized\":\"$undefined\",\"segmentViewBoundaries\":[\"$undefined\",\"$undefined\",\"$undefined\",\"$undefined\"]},null,\"$44\",1]]},null,\"$43\",0],{\"children\":[[\"$\",\"$7\",\"c\",{\"children\":[[\"$\",\"$L5\",\"c-page\",{\"type\":\"page\",\"pagePath\":\"/firebase-orginal/src/app/orders/page.tsx\",\"children\":[\"$\",\"$L49\",null,{\"Component\":\"$4a\",\"serverProvidedParams\":{\"searchParams\":{},\"params\":{},\"promises\":null}},null,\"$48\",1]},null,\"$47\",1],[[\"$\",\"script\",\"script-0\",{\"src\":\"/_next/static/chunks/firebase-orginal_src_e9b1c7eb._.js\",\"async\":true,\"nonce\":\"$undefined\"},null,\"$4b\",0],[\"$\",\"script\",\"script-1\",{\"src\":\"/_next/static/chunks/97dea_xlsx_xlsx_mjs_45381b09._.js\",\"async\":true,\"nonce\":\"$undefined\"},null,\"$4c\",0],[\"$\",\"script\",\"script-2\",{\"src\":\"/_next/static/chunks/97dea_%40dnd-kit_core_dist_core_esm_1ad8394a.js\",\"async\":true,\"nonce\":\"$undefined\"},null,\"$4d\",0],[\"$\",\"script\",\"script-3\",{\"src\":\"/_next/static/chunks/97dea_3b4b0e9d._.js\",\"async\":true,\"nonce\":\"$undefined\"},null,\"$4e\",0],[\"$\",\"script\",\"script-4\",{\"src\":\"/_next/static/chunks/firebase-orginal_src_app_orders_page_tsx_67beaf9d._.js\",\"async\":true,\"nonce\":\"$undefined\"},null,\"$4f\",0]],\"$50\"]},null,\"$46\",0],{},null,false,false]},null,false,false]},[[\"$\",\"$L5\",\"c-loading\",{\"type\":\"loading\",\"pagePath\":\"/firebase-orginal/src/app/loading.tsx\",\"children\":\"$58\"},null,\"$57\",0],[],[]],false,false],[\"$\",\"$7\",\"h\",{\"children\":[\"$70\",\"$73\",\"$78\",null]},null,\"$6f\",0],false]],\"m\":\"$W7f\",\"G\":[\"$80\",[\"$\",\"$L5\",\"ge-svn\",{\"type\":\"global-error\",\"pagePath\":\"__next_builtin__global-error.js\",\"children\":[]},null,\"$81\",0]],\"s\":false,\"S\":false}\n"])</script><script>self.__next_f.push([1,"3d:D{\"time\":20.87639999995008}\n3d:[\"$\",\"div\",null,{\"style\":{\"display\":\"inline-block\"},\"children\":[\"$\",\"h2\",null,{\"style\":{\"fontSize\":14,\"fontWeight\":400,\"lineHeight\":\"49px\",\"margin\":0},\"children\":\"This page could not be found.\"},\"$37\",\"$83\",1]},\"$37\",\"$82\",1]\n6c:D{\"time\":21.173500000033528}\n6c:D\"$84\"\n6c:D{\"time\":21.48450000002049}\n6c:[\"$\",\"div\",null,{\"className\":\"animate-pulse rounded-md bg-muted h-80 w-full\"},\"$84\",\"$85\",1]\n6d:D{\"time\":21.69329999992624}\n6d:D\"$86\"\n6d:D{\"time\":22.182000000029802}\n6d:[\"$\",\"div\",null,{\"className\":\"animate-pulse rounded-md bg-muted h-80 w-full\"},\"$86\",\"$87\",1]\n6e:D{\"time\":22.31030000001192}\n6e:D\"$88\"\n6e:D{\"time\":22.491200000047684}\n6e:[\"$\",\"div\",null,{\"className\":\"animate-pulse rounded-md bg-muted h-48 w-full\"},\"$88\",\"$89\",1]\n77:D{\"time\":30.138899999903515}\n77:[[\"$\",\"meta\",\"0\",{\"charSet\":\"utf-8\"},\"$51\",\"$8a\",0],[\"$\",\"meta\",\"1\",{\"name\":\"viewport\",\"content\":\"width=device-width, initial-scale=1\"},\"$51\",\"$8b\",0]]\n7e:D{\"time\":32.559399999910966}\n7e:[[\"$\",\"title\",\"0\",{\"children\":\"SynergyFlow\"},\"$51\",\"$8c\",0],[\"$\",\"meta\",\"1\",{\"name\":\"description\",\"content\":\"AI-powered ERP system to manage clients, sales, maintenance, and business analytics.\"},\"$51\",\"$8d\",0],[\"$\",\"link\",\"2\",{\"rel\":\"icon\",\"href\":\"/favicon.ico?favicon.7ed73651.ico\",\"sizes\":\"48x48\",\"type\":\"image/x-icon\"},\"$51\",\"$8e\",0],[\"$\",\"$L90\",\"3\",{},\"$51\",\"$8f\",0]]\n56:D{\"time\":33.06070000003092}\n56:null\n"])</script><script style="display: block; position: absolute;" data-nextjs-dev-overlay="true"><nextjs-portal style="--nextjs-dev-tools-scale: 1;"></nextjs-portal></script><next-route-announcer style="position: absolute;"></next-route-announcer></body></html>
+
+[1A[2K  3) [firefox] ΓÇ║ e2e\notifications.spec.ts:8:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order 
+
+    TimeoutError: locator.click: Timeout 10000ms exceeded.
+    Call log:
+    [2m  - waiting for getByRole('button', { name: 'Create Order' })[22m
+
+
+      30 |     // 2. Open New Order Wizard
+      31 |     try {
+    > 32 |         await page.getByRole('button', { name: 'Create Order' }).click({ timeout: 10000 });
+         |                                                                  ^
+      33 |     } catch (e) {
+      34 |         console.log('Create Order button not found. Page content:');
+      35 |         console.log(await page.content());
+        at D:\My projects\firebase-orginal\e2e\notifications.spec.ts:32:66
+
+    Error Context: test-results\notifications-Notification-ea3ea-tion-for-a-high-value-order-firefox\error-context.md
+
+
+[1A[2K  3 failed
+    [chromium] ΓÇ║ e2e\notifications.spec.ts:8:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order 
+    [firefox] ΓÇ║ e2e\notifications.spec.ts:8:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order 
+    [webkit] ΓÇ║ e2e\notifications.spec.ts:8:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order 
+
+[36m  Serving HTML report at http://localhost:54329. Press Ctrl+C to quit.[39m

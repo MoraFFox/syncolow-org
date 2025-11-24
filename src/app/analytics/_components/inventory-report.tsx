@@ -26,8 +26,12 @@ interface InventoryReportProps {
     dateRange: { from: string; to: string };
 }
 
+import { useDrillDown } from '@/hooks/use-drilldown';
+import { DrillTarget } from '@/components/drilldown/drill-target';
+
 export function InventoryReport({ dateRange }: InventoryReportProps) {
     const { products, analyticsOrders } = useOrderStore();
+    const { goToDetail } = useDrillDown();
     const [searchTerm, setSearchTerm] = useState('');
     const [sortConfig, setSortConfig] = useState<{ key: string; direction: 'asc' | 'desc' } | null>(null);
     const [visibleCount, setVisibleCount] = useState(10);
@@ -175,21 +179,30 @@ export function InventoryReport({ dateRange }: InventoryReportProps) {
                         </TableHeader>
                         <TableBody>
                             {visibleInventoryData.map((product) => (
-                                <TableRow key={product.id}>
-                                    <TableCell className="font-medium">{product.name}</TableCell>
-                                    <TableCell className="text-right">
-                                        <Badge variant={product.stock < 10 ? "destructive" : "secondary"}>{product.stock}</Badge>
-                                    </TableCell>
-                                    <TableCell className="text-right">{product.unitsSold}</TableCell>
-                                    <TableCell className="text-right">
-                                        <span className="text-muted-foreground">{product.turnoverRate.toFixed(2)}x</span>
-                                    </TableCell>
-                                    <TableCell className="text-right">
-                                        <Button variant="outline" size="sm" asChild>
-                                            <Link href={`/products/${product.id}`}>View</Link>
-                                        </Button>
-                                    </TableCell>
-                                </TableRow>
+                                <DrillTarget 
+                                    key={product.id}
+                                    kind="product"
+                                    payload={{ id: product.id, name: product.name, stock: product.stock }}
+                                    asChild
+                                >
+                                    <TableRow 
+                                        className="cursor-pointer hover:bg-muted/50"
+                                    >
+                                        <TableCell className="font-medium">{product.name}</TableCell>
+                                        <TableCell className="text-right">
+                                            <Badge variant={product.stock < 10 ? "destructive" : "secondary"}>{product.stock}</Badge>
+                                        </TableCell>
+                                        <TableCell className="text-right">{product.unitsSold}</TableCell>
+                                        <TableCell className="text-right">
+                                            <span className="text-muted-foreground">{product.turnoverRate.toFixed(2)}x</span>
+                                        </TableCell>
+                                        <TableCell className="text-right">
+                                            <Button variant="outline" size="sm" asChild onClick={(e) => e.stopPropagation()}>
+                                                <Link href={`/products/${product.id}`}>View</Link>
+                                            </Button>
+                                        </TableCell>
+                                    </TableRow>
+                                </DrillTarget>
                             ))}
                         </TableBody>
                     </Table>

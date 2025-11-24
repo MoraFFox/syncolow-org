@@ -32,7 +32,7 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
   markAsRead: async (notificationId) => {
     set((state) => ({
       notifications: state.notifications.map((n) =>
-        n.id === notificationId ? { ...n, isRead: true } : n
+        n.id === notificationId ? { ...n, read: true } : n
       ),
     }));
     await NotificationService.markAsRead(notificationId);
@@ -40,7 +40,7 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
 
   markAllAsRead: async (userId) => {
     set((state) => ({
-      notifications: state.notifications.map((n) => ({ ...n, isRead: true })),
+      notifications: state.notifications.map((n) => ({ ...n, read: true })),
     }));
     await NotificationService.markAllAsRead(userId);
   },
@@ -49,7 +49,7 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
     set((state) => ({
       notifications: state.notifications.map((n) =>
         n.id === notificationId
-          ? { ...n, snoozedUntil: snoozeUntil.toISOString(), isRead: true }
+          ? { ...n, snoozedUntil: snoozeUntil.toISOString(), read: true }
           : n
       ),
     }));
@@ -60,7 +60,7 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
     set((state) => ({
       notifications: state.notifications.map((n) =>
         n.id === notificationId
-          ? { ...n, snoozedUntil: undefined, isRead: false }
+          ? { ...n, snoozedUntil: undefined, read: false }
           : n
       ),
     }));

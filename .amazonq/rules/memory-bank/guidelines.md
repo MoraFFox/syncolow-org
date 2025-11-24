@@ -2,391 +2,512 @@
 
 ## Code Quality Standards
 
-### File Headers & Formatting
-- **Format Pragma**: Use `/** @format */` at the top of files (observed in 1/5 files)
-- **"use client" Directive**: Required for client-side React components (observed in 4/5 files)
-- **Consistent Spacing**: 2-space indentation throughout the codebase
-- **Line Length**: Keep lines readable, break long imports and function signatures appropriately
+### File Headers
+- **Format Comment**: All files start with `/** @format */` comment (5/5 files)
+- Indicates code formatting standards are enforced project-wide
+
+### Strict Mode Directives
+- **"use client"**: Used in all client-side React components and hooks (4/5 files)
+- Required for Next.js App Router client components
+- Placed at the top of files after format comment
 
 ### Import Organization
-- **Grouped Imports**: Organize imports in logical groups:
+- **Grouped imports** in logical order:
   1. External libraries (React, third-party packages)
-  2. Firebase/Firestore imports
-  3. Internal types from `@/lib/types`
-  4. Internal utilities from `@/lib/*`
-  5. Store imports from `@/store/*`
-  6. Component imports from `@/components/*`
-  7. Hook imports from `@/hooks/*`
-- **Path Aliases**: Always use `@/` prefix for internal imports
-- **Type Imports**: Use `import type` for TypeScript types when importing only types
+  2. Internal utilities and types (`@/lib/*`, `@/components/*`)
+  3. Relative imports
+- **Type imports** use `type` keyword: `import type { Order, Product } from "@/lib/types"`
+- **Path aliases**: All internal imports use `@/*` alias pointing to `src/*`
 
 ### Naming Conventions
-- **Components**: PascalCase with descriptive names (e.g., `CsvImporterDialog`, `PriceRangeFilter`)
-- **Files**: kebab-case for component files (e.g., `csv-importer-dialog.tsx`, `price-range-filter.tsx`)
-- **Hooks**: camelCase starting with "use" (e.g., `useToast`, `useCarousel`, `useOrderStore`)
-- **Functions**: camelCase with descriptive verb-noun patterns (e.g., `handleFileChange`, `calculateNextDeliveryDate`)
-- **Constants**: UPPER_SNAKE_CASE (e.g., `TOAST_LIMIT`, `TOAST_REMOVE_DELAY`, `CHUNK_SIZE`)
-- **Type Aliases**: PascalCase (e.g., `CarouselApi`, `ToasterToast`, `ImportStage`)
-- **Interfaces**: PascalCase with descriptive suffixes (e.g., `AppState`, `CarouselProps`, `PriceRangeFilterProps`)
+- **Files**: kebab-case for components (`csv-importer-dialog.tsx`, `use-toast.ts`)
+- **Components**: PascalCase (`CsvImporterDialog`, `ChartContainer`)
+- **Functions/Variables**: camelCase (`handleFileChange`, `runImport`, `fetchOrders`)
+- **Constants**: UPPER_SNAKE_CASE (`TOAST_LIMIT`, `INITIAL_SERVICES_CATALOG`, `CHUNK_SIZE`)
+- **Types/Interfaces**: PascalCase (`ImportStage`, `MaintenanceState`, `ChartConfig`)
+- **Private variables**: camelCase with descriptive names (`toastTimeouts`, `memoryState`)
 
-### TypeScript Standards
-- **Strict Typing**: Always define explicit types for props, state, and function parameters
-- **Type Inference**: Let TypeScript infer return types when obvious
-- **Interface vs Type**: Use interfaces for component props, types for unions and complex types
-- **Generic Types**: Use generics for reusable patterns (e.g., `React.forwardRef<HTMLDivElement, Props>`)
-- **Optional Properties**: Use `?` for optional props and parameters
-- **Type Guards**: Implement proper type checking before operations
-- **Avoid Any**: Never use `any` type - use `unknown` or proper types
+### Code Structure Standards
+- **Consistent indentation**: 2 spaces (TypeScript/React standard)
+- **Line length**: Generally kept under 120 characters
+- **Semicolons**: Used consistently at end of statements
+- **Quotes**: Single quotes for strings, double quotes for JSX attributes
+- **Trailing commas**: Used in multi-line objects and arrays
 
-## React Patterns
+## TypeScript Patterns
+
+### Type Safety
+- **Strict typing**: All function parameters and return types explicitly typed
+- **Type assertions**: Minimal use, only when necessary with proper casting
+- **Generic types**: Used extensively in Zustand stores and React components
+- **Union types**: For state machines and status enums (`ImportStage`, `MaintenanceVisit['status']`)
+- **Type guards**: Runtime type checking where needed
+
+### Interface Definitions
+```typescript
+// State interfaces define complete store shape
+interface MaintenanceState {
+  maintenanceVisits: MaintenanceVisit[];
+  loading: boolean;
+  fetchInitialData: () => Promise<void>;
+  addMaintenanceVisit: (visit: Omit<MaintenanceVisit, 'id'>) => Promise<void>;
+}
+
+// Props interfaces for components
+interface CsvImporterDialogProps {
+  isOpen: boolean;
+  onOpenChange: (isOpen: boolean) => void;
+  entityType: ImportableEntityType;
+}
+```
+
+### Type Utilities
+- **Omit<T, K>**: Remove properties from types (`Omit<Product, "id">`)
+- **Partial<T>**: Make all properties optional (`Partial<MaintenanceVisit>`)
+- **Record<K, V>**: Create object types (`Record<string, unknown>`)
+- **as const**: Create readonly literal types for constants
+
+## State Management Patterns
+
+### Zustand Store Structure
+```typescript
+// Standard Zustand store pattern (5/5 stores follow this)
+export const useOrderStore = create<AppState>((set, get) => ({
+  // State properties
+  orders: [],
+  loading: true,
+  
+  // Actions that modify state
+  fetchOrders: async (limitCount) => {
+    set({ ordersLoading: true });
+    // ... async logic
+    set({ orders: data, ordersLoading: false });
+  },
+  
+  // Actions using Immer for immutable updates
+  updateOrderStatus: async (orderId, status) => {
+    set(
+      produce((state: AppState) => {
+        const order = state.orders.find((o) => o.id === orderId);
+        if (order) {
+          order.status = status;
+        }
+      })
+    );
+  }
+}));
+```
+
+### Immer Integration
+- **produce()**: Used for complex nested state updates (100% of mutation operations)
+- **Immutability**: Never mutate state directly, always use `set()` or `produce()`
+- **Type safety**: State type passed to produce for full type checking
+
+### State Access Patterns
+```typescript
+// Get current state within store
+const { orders } = get();
+
+// Access other stores
+const { companies } = useCompanyStore.getState();
+
+// Set state directly
+set({ loading: false });
+
+// Set state with function
+set(produce((state) => { /* mutations */ }));
+```
+
+## React Component Patterns
 
 ### Component Structure
-- **Functional Components**: Use function declarations with React.FC or explicit typing
-- **Props Interface**: Define props interface immediately before component
-- **Component Organization**:
-  1. Props interface/type definition
-  2. Component function declaration
-  3. State declarations (useState, useReducer)
-  4. Refs (useRef)
-  5. Context usage (useContext)
-  6. Custom hooks
-  7. useEffect hooks
-  8. Event handlers
-  9. Helper functions
-  10. Render logic
-- **Display Names**: Set displayName for forwardRef components (e.g., `Carousel.displayName = "Carousel"`)
+```typescript
+// 1. Type definitions
+interface ComponentProps {
+  // props
+}
 
-### State Management Patterns
-- **Zustand Stores**: Use Zustand for global state with Immer for immutable updates
-  ```typescript
-  export const useOrderStore = create<AppState>((set, get) => ({
-    // State properties
-    orders: [],
-    loading: false,
-    
-    // Actions
-    fetchOrders: async () => {
-      set({ loading: true });
-      // Logic here
-      set({ loading: false });
-    },
-    
-    // Immer for complex updates
-    updateOrder: (id, data) => {
-      set(produce((state: AppState) => {
-        const order = state.orders.find(o => o.id === id);
-        if (order) {
-          Object.assign(order, data);
-        }
-      }));
-    }
-  }));
-  ```
-
-- **Local State**: Use useState for component-specific state
-- **Derived State**: Use useMemo for computed values
-- **State Updates**: Use functional updates when depending on previous state
-
-### Hooks Patterns
-- **Custom Hooks**: Extract reusable logic into custom hooks
-- **Hook Dependencies**: Always specify complete dependency arrays
-- **Cleanup Functions**: Return cleanup functions from useEffect when needed
-- **Hook Composition**: Build complex hooks from simpler ones
-
-### Context Pattern
-- **Context Creation**: Create context with null default and custom hook
-  ```typescript
-  const CarouselContext = React.createContext<CarouselContextProps | null>(null);
+// 2. Component definition with forwardRef if needed
+export function Component({ prop1, prop2 }: ComponentProps) {
+  // 3. Hooks (in order: state, refs, context, custom hooks)
+  const [state, setState] = useState();
+  const ref = useRef();
+  const { data } = useStore();
   
-  function useCarousel() {
-    const context = React.useContext(CarouselContext);
-    if (!context) {
-      throw new Error("useCarousel must be used within a <Carousel />");
-    }
-    return context;
-  }
-  ```
+  // 4. Derived state and memoization
+  const computed = useMemo(() => {}, [deps]);
+  
+  // 5. Effects
+  useEffect(() => {}, [deps]);
+  
+  // 6. Event handlers
+  const handleClick = useCallback(() => {}, [deps]);
+  
+  // 7. Render helpers
+  const renderContent = () => {};
+  
+  // 8. Return JSX
+  return <div>...</div>;
+}
+```
 
-### Event Handlers
-- **Naming**: Prefix with "handle" (e.g., `handleFileChange`, `handleSliderChange`)
-- **useCallback**: Wrap handlers in useCallback with proper dependencies
-- **Async Handlers**: Use async/await for asynchronous operations
-- **Error Handling**: Always wrap async operations in try/catch blocks
+### Hook Usage Patterns
+- **useState**: For local component state
+- **useCallback**: Memoize event handlers and callbacks (used extensively)
+- **useMemo**: Memoize expensive computations
+- **useEffect**: Side effects, subscriptions, cleanup
+- **Custom hooks**: Extract reusable logic (use-toast, use-auth, use-online-status)
 
-## Firebase Integration
+### Conditional Rendering
+```typescript
+// Early returns for loading/error states
+if (stage === 'mapping') {
+  return <ColumnMappingStep />;
+}
 
-### Firestore Operations
-- **Batch Operations**: Use writeBatch for multiple writes
-  ```typescript
-  const batch = writeBatch(db);
-  items.forEach(item => {
-    batch.update(doc(db, 'collection', item.id), item.data);
+// Ternary for inline conditions
+{isLoading ? <Loader /> : <Content />}
+
+// Logical AND for conditional display
+{error && <ErrorMessage />}
+
+// Switch-like pattern with multiple conditions
+const renderContent = () => {
+  if (stage === 'upload') return <UploadUI />;
+  if (stage === 'parsing') return <ParsingUI />;
+  return <DefaultUI />;
+};
+```
+
+## Async Patterns
+
+### Error Handling
+```typescript
+// Try-catch with user feedback
+try {
+  const result = await importFlow({ entityType, data });
+  toast({ title: 'Success' });
+} catch (error: any) {
+  toast({ 
+    title: 'Error', 
+    description: error.message, 
+    variant: 'destructive' 
   });
-  await batch.commit();
-  ```
+}
 
-- **Transactions**: Use runTransaction for atomic operations
-- **Query Patterns**: Use query builders with proper constraints
-  ```typescript
-  const q = query(
-    collection(db, 'orders'),
-    where('status', '==', 'Pending'),
-    orderBy('orderDate', 'desc'),
-    limit(20)
-  );
-  ```
+// Silent error handling for non-critical operations
+try {
+  await syncToCache();
+} catch {
+  // Error handled silently or logged
+}
+```
 
-- **Pagination**: Implement cursor-based pagination with startAfter
-- **Data Mapping**: Always map Firestore docs to typed objects
-  ```typescript
-  const orders = snapshot.docs.map(doc => ({
-    id: doc.id,
-    ...doc.data()
-  })) as Order[];
-  ```
+### Promise Patterns
+```typescript
+// Parallel execution with Promise.all
+await Promise.all([
+  supabase.from('orders').upsert(orderUpdates),
+  supabase.from('companies').upsert(companyUpdates)
+]);
 
-### Firebase Best Practices
-- **Collection References**: Use collection() and doc() helpers
-- **Incremental Updates**: Use increment() for counters
-- **Null Handling**: Set null explicitly for optional fields
-- **Timestamps**: Use ISO strings for dates (toISOString())
-- **Error Handling**: Catch and handle Firebase errors gracefully
+// Sequential async operations
+const data = await parseFile(file);
+const validated = await validateData(data);
+await importData(validated);
+```
+
+### Loading States
+```typescript
+// Set loading before async operation
+set({ ordersLoading: true });
+try {
+  const data = await fetchData();
+  set({ orders: data, ordersLoading: false });
+} catch {
+  set({ ordersLoading: false });
+}
+```
+
+## Data Fetching Patterns
+
+### Supabase Query Patterns
+```typescript
+// Basic select
+const { data } = await supabase.from('orders').select('*');
+
+// With filters
+const { data } = await supabase
+  .from('orders')
+  .select('*')
+  .eq('status', 'Pending')
+  .gte('orderDate', from)
+  .lte('orderDate', to);
+
+// With ordering and pagination
+const { data } = await supabase
+  .from('orders')
+  .select('*')
+  .order('orderDate', { ascending: false })
+  .range(0, 49);
+
+// Insert with return
+const { data, error } = await supabase
+  .from('products')
+  .insert([productData])
+  .select()
+  .single();
+
+// Update
+await supabase
+  .from('orders')
+  .update({ status: 'Completed' })
+  .eq('id', orderId);
+
+// Delete
+await supabase
+  .from('orders')
+  .delete()
+  .eq('id', orderId);
+```
+
+### Caching Strategy
+```typescript
+// Check cache before fetching
+const cached = AnalyticsCache.get(from, to);
+if (cached) {
+  set({ analyticsOrders: cached });
+  return;
+}
+
+// Fetch and cache
+const { data } = await supabase.from('orders').select('*');
+AnalyticsCache.set(from, to, data);
+set({ analyticsOrders: data });
+```
 
 ## UI Component Patterns
 
 ### shadcn/ui Integration
-- **Component Composition**: Build complex components from shadcn primitives
-- **Variant Props**: Use variant props for component variations
-- **Forwarding Refs**: Use React.forwardRef for DOM access
-- **Spread Props**: Spread remaining props to underlying elements
-  ```typescript
-  const Component = React.forwardRef<HTMLDivElement, Props>(
-    ({ className, variant, ...props }, ref) => {
-      return <div ref={ref} className={cn(baseClass, className)} {...props} />;
-    }
-  );
-  ```
+```typescript
+// Import from @/components/ui
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogHeader } from '@/components/ui/dialog';
+
+// Use with consistent props
+<Button 
+  variant="default" 
+  size="sm" 
+  onClick={handleClick}
+  disabled={isLoading}
+>
+  {isLoading ? <Loader2 className="animate-spin" /> : 'Submit'}
+</Button>
+```
+
+### Icon Usage (Lucide React)
+```typescript
+// Import specific icons
+import { FileUp, Loader2, CheckCircle, AlertTriangle } from 'lucide-react';
+
+// Use with consistent sizing
+<FileUp className="h-4 w-4 mr-2" />
+<Loader2 className="h-12 w-12 animate-spin text-primary" />
+```
 
 ### Styling Patterns
-- **cn Utility**: Use cn() from @/lib/utils for conditional classes
-  ```typescript
-  className={cn(
-    "base-classes",
-    condition && "conditional-classes",
-    className
-  )}
-  ```
+```typescript
+// Use cn() utility for conditional classes
+import { cn } from '@/lib/utils';
 
-- **Tailwind Classes**: Use Tailwind utility classes exclusively
-- **Responsive Design**: Use responsive prefixes (sm:, md:, lg:)
-- **Dark Mode**: Use dark: prefix for dark mode variants
-- **Dynamic Classes**: Use cn() for dynamic class composition
-
-### Dialog/Modal Patterns
-- **Controlled State**: Use controlled open/onOpenChange pattern
-- **State Reset**: Reset internal state when dialog closes
-- **Multi-Step Flows**: Use stage/step state for complex workflows
-- **Footer Actions**: Place primary actions in DialogFooter
+<div className={cn(
+  "base-classes",
+  condition && "conditional-classes",
+  variant === 'primary' && "variant-classes",
+  className // Allow prop override
+)} />
+```
 
 ### Form Patterns
-- **Controlled Inputs**: Use controlled components with state
-- **Validation**: Validate on change and on submit
-- **Error Display**: Show inline errors near inputs
-- **Loading States**: Disable inputs and show loading indicators during submission
-
-## Data Handling
-
-### Async Operations
-- **Loading States**: Always track loading state for async operations
-- **Error States**: Track and display errors appropriately
-- **Toast Notifications**: Use toast for user feedback
-  ```typescript
-  try {
-    setLoading(true);
-    await operation();
-    toast({ title: 'Success', description: 'Operation completed' });
-  } catch (error) {
-    toast({ 
-      title: 'Error', 
-      description: error.message, 
-      variant: 'destructive' 
-    });
-  } finally {
-    setLoading(false);
-  }
-  ```
-
-### Data Transformation
-- **Type Safety**: Cast data to proper types after fetching
-- **Null Safety**: Handle null/undefined values explicitly
-- **Default Values**: Provide sensible defaults for optional fields
-- **Data Sanitization**: Clean data before submission
-  ```typescript
-  const sanitizedItems = items.map(item => ({
-    productId: item.productId,
-    quantity: item.quantity,
-    price: item.price,
-    taxRate: item.taxRate || 0,
-    discountValue: item.discountValue || null
-  }));
-  ```
-
-### Pagination & Infinite Scroll
-- **Cursor-Based**: Use lastDoc cursor for pagination
-- **hasMore Flag**: Track if more data is available
-- **Load More**: Implement loadMore function with proper state management
-
-## Performance Optimization
-
-### Memoization
-- **useMemo**: Memoize expensive computations
-  ```typescript
-  const allErrorsResolved = useMemo(() => {
-    const blockingErrorIndexes = new Set(errors.filter(e => e.blocking).map(e => e.rowIndex));
-    return Array.from(blockingErrorIndexes).every(index => resolvedErrors.has(index));
-  }, [errors, resolvedErrors]);
-  ```
-
-- **useCallback**: Memoize callback functions
-- **React.memo**: Memoize components when appropriate
-
-### Chunking & Batching
-- **Large Operations**: Split into chunks to avoid limits
-  ```typescript
-  const CHUNK_SIZE = 500;
-  for (let i = 0; i < data.length; i += CHUNK_SIZE) {
-    const chunk = data.slice(i, i + CHUNK_SIZE);
-    await processChunk(chunk);
-  }
-  ```
-
-- **Progress Tracking**: Update progress during chunked operations
-- **Error Recovery**: Handle partial failures gracefully
-
-## Error Handling
-
-### User-Facing Errors
-- **Toast Notifications**: Use toast for immediate feedback
-- **Error Messages**: Provide clear, actionable error messages
-- **Variant Types**: Use 'destructive' variant for errors
-- **Duration**: Set appropriate duration for error toasts
-
-### Developer Errors
-- **Console Logging**: Log errors to console for debugging
-- **Error Boundaries**: Implement error boundaries for component trees
-- **Validation Errors**: Collect and display validation errors clearly
-- **Error Recovery**: Provide retry mechanisms where appropriate
-
-### Error Logging
-- **Detailed Logs**: Maintain detailed error logs for debugging
-- **Timestamps**: Include timestamps in error logs
-- **Error Context**: Capture relevant context with errors
-- **Export Logs**: Allow users to download error logs
-
-## Code Documentation
-
-### JSDoc Comments
-- **Function Documentation**: Document complex functions with JSDoc
-- **Parameter Descriptions**: Describe non-obvious parameters
-- **Return Values**: Document return value types and meanings
-- **Examples**: Include usage examples for complex APIs
-
-### Inline Comments
-- **Why Not What**: Explain why, not what the code does
-- **Complex Logic**: Comment complex algorithms and business logic
-- **TODOs**: Mark incomplete work with TODO comments
-- **Warnings**: Use comments to warn about gotchas
-
-## Testing Considerations
-
-### Component Testing
-- **Test User Interactions**: Test button clicks, form submissions
-- **Test State Changes**: Verify state updates correctly
-- **Test Error States**: Test error handling and display
-- **Test Loading States**: Verify loading indicators appear
-
-### Integration Testing
-- **Test Data Flow**: Verify data flows through components
-- **Test API Integration**: Mock Firebase calls and test responses
-- **Test Store Integration**: Test Zustand store actions and state
-
-## Common Patterns
-
-### Conditional Rendering
 ```typescript
-{stage === 'upload' && <UploadUI />}
-{stage === 'loading' && <LoadingSpinner />}
-{errors.length > 0 && <ErrorList errors={errors} />}
+// React Hook Form with Controller for custom inputs
+<Controller
+  name="region"
+  control={control}
+  render={({ field }) => (
+    <Select
+      onValueChange={field.onChange}
+      defaultValue={field.value}
+    >
+      <SelectTrigger>
+        <SelectValue placeholder="Select" />
+      </SelectTrigger>
+      <SelectContent>
+        <SelectItem value="A">Option A</SelectItem>
+      </SelectContent>
+    </Select>
+  )}
+/>
+
+// Register for native inputs
+<Input {...register("name")} />
+{errors.name && <p className="text-destructive">{errors.name.message}</p>}
 ```
 
-### List Rendering
-```typescript
-{items.map((item, index) => (
-  <ItemComponent key={item.id || index} item={item} />
-))}
-```
+## Performance Patterns
 
-### Async Data Fetching
+### Chunked Processing
 ```typescript
-useEffect(() => {
-  const fetchData = async () => {
-    try {
-      setLoading(true);
-      const data = await fetchFromFirebase();
-      setData(data);
-    } catch (error) {
-      setError(error.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-  fetchData();
-}, [dependencies]);
-```
-
-### Store Actions Pattern
-```typescript
-// In store
-fetchData: async () => {
-  set({ loading: true });
-  try {
-    const data = await getData();
-    set({ data, loading: false });
-  } catch (e) {
-    set({ loading: false });
-    toast({ title: 'Error', variant: 'destructive' });
-  }
+// Process large datasets in chunks
+const CHUNK_SIZE = 500;
+for (let i = 0; i < data.length; i += CHUNK_SIZE) {
+  const chunk = data.slice(i, i + CHUNK_SIZE);
+  await processChunk(chunk);
+  setProgress(Math.round((i / data.length) * 100));
 }
 ```
 
-## Accessibility
+### Pagination
+```typescript
+// Offset-based pagination
+const { data } = await supabase
+  .from('orders')
+  .select('*')
+  .range(offset, offset + limit - 1);
 
-### ARIA Attributes
-- **Roles**: Use appropriate ARIA roles (e.g., `role="region"`, `role="group"`)
-- **Labels**: Provide aria-roledescription for custom components
-- **Screen Reader Text**: Use sr-only class for screen reader only text
-  ```typescript
-  <span className="sr-only">Previous slide</span>
-  ```
+set({
+  orders: [...existingOrders, ...data],
+  offset: offset + limit,
+  hasMore: data.length === limit
+});
+```
 
-### Keyboard Navigation
-- **Keyboard Handlers**: Implement keyboard event handlers
-- **Focus Management**: Manage focus appropriately in modals and dialogs
-- **Tab Order**: Ensure logical tab order
+### Memoization
+```typescript
+// Memoize expensive computations
+const allErrorsResolved = useMemo(() => {
+  const blockingErrorIndexes = new Set(errors.filter(e => e.blocking).map(e => e.rowIndex));
+  return Array.from(blockingErrorIndexes).every(index => resolvedErrors.has(index));
+}, [errors, resolvedErrors]);
+```
 
-## File Organization
+## User Feedback Patterns
 
-### Component Files
-- **Single Responsibility**: One main component per file
-- **Sub-components**: Export related sub-components from same file
-- **Barrel Exports**: Use index files for grouped exports
+### Toast Notifications
+```typescript
+// Success toast
+toast({ 
+  title: 'Order Created',
+  description: 'Order has been placed successfully'
+});
 
-### Utility Files
-- **Pure Functions**: Keep utilities as pure functions
-- **Single Purpose**: Each utility file has a clear purpose
-- **Type Exports**: Export types alongside utilities
+// Error toast
+toast({ 
+  title: 'Error',
+  description: error.message,
+  variant: 'destructive'
+});
 
-### Store Files
-- **Feature-Based**: One store per feature domain
-- **Complete State**: Include all related state and actions
-- **Type Safety**: Fully type store state and actions
+// With duration
+toast({ 
+  title: 'Warning',
+  duration: 5000
+});
+```
+
+### Progress Indicators
+```typescript
+// Progress state
+const [importProgress, setImportProgress] = useState(0);
+const [importStageDetails, setImportStageDetails] = useState('');
+
+// Update during operation
+setImportProgress(Math.round((current / total) * 100));
+setImportStageDetails(`Processing ${current} of ${total}...`);
+
+// Display
+<Progress value={importProgress} />
+<p className="text-xs text-muted-foreground">{importStageDetails}</p>
+```
+
+## Common Utilities
+
+### Date Handling
+```typescript
+// date-fns for date operations
+import { parseISO, isValid, differenceInDays } from 'date-fns';
+
+const date = parseISO(dateString);
+if (isValid(date)) {
+  const days = differenceInDays(new Date(), date);
+}
+```
+
+### Data Sanitization
+```typescript
+// Remove undefined values before database operations
+const cleanData = { ...data };
+Object.keys(cleanData).forEach(key => {
+  if (cleanData[key] === undefined) {
+    delete cleanData[key];
+  }
+});
+```
+
+### Search Implementation
+```typescript
+// Client-side search with lowercase comparison
+const searchLower = searchTerm.toLowerCase();
+const filtered = items.filter(item =>
+  (item.name && item.name.toLowerCase().includes(searchLower)) ||
+  (item.description && item.description.toLowerCase().includes(searchLower))
+);
+```
+
+## Best Practices Summary
+
+### DO:
+- ✅ Use TypeScript strict mode with explicit types
+- ✅ Use Immer's produce() for nested state updates
+- ✅ Implement proper error handling with user feedback
+- ✅ Use async/await for asynchronous operations
+- ✅ Memoize expensive computations and callbacks
+- ✅ Provide loading states for async operations
+- ✅ Use path aliases (@/*) for imports
+- ✅ Follow consistent naming conventions
+- ✅ Use "use client" directive for client components
+- ✅ Implement proper cleanup in useEffect
+- ✅ Use toast notifications for user feedback
+- ✅ Cache frequently accessed data
+- ✅ Process large datasets in chunks
+- ✅ Validate and sanitize data before operations
+
+### DON'T:
+- ❌ Mutate state directly (always use set() or produce())
+- ❌ Use `any` type without justification
+- ❌ Ignore error handling in async operations
+- ❌ Forget to set loading states back to false
+- ❌ Use inline styles (use Tailwind classes)
+- ❌ Create deeply nested component structures
+- ❌ Forget cleanup functions in useEffect
+- ❌ Use magic numbers (define constants)
+- ❌ Leave console.log statements in production code
+- ❌ Skip type definitions for function parameters
+- ❌ Use var (always use const/let)
+- ❌ Forget to handle edge cases (null, undefined, empty arrays)
+
+## Code Review Checklist
+
+Before committing code, ensure:
+1. ✅ All TypeScript errors resolved
+2. ✅ ESLint warnings addressed
+3. ✅ Proper error handling implemented
+4. ✅ Loading states managed correctly
+5. ✅ User feedback provided (toasts, progress)
+6. ✅ Types explicitly defined
+7. ✅ Imports organized and using path aliases
+8. ✅ No unused variables or imports
+9. ✅ Consistent naming conventions followed
+10. ✅ Comments added for complex logic
+11. ✅ Proper cleanup in effects
+12. ✅ Accessibility attributes included

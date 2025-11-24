@@ -1,11 +1,10 @@
 
 import { create } from 'zustand';
 import { produce } from 'immer';
-import { db } from '@/lib/firebase';
-import { collection, getDocs, addDoc, doc, updateDoc, writeBatch, query, where, getDoc, deleteDoc } from 'firebase/firestore';
-import type { Company, Branch, Barista, MaintenanceVisit, Order, Feedback, DeliveryArea } from '@/lib/types';
+import { supabase } from '@/lib/supabase';
+import type { Company, Branch, Barista, MaintenanceVisit, Feedback, DeliveryArea } from '@/lib/types';
 import { toast } from '@/hooks/use-toast';
-import { useOrderStore } from './use-order-store';
+import { logError, logSupabaseError, logDebug } from '@/lib/error-logger';
 
 interface CompanyState {
   companies: Company[];
@@ -18,7 +17,7 @@ interface CompanyState {
     branchesData?: (Omit<Partial<Branch>, 'baristas'> & { baristas?: Partial<Barista>[], maintenanceHistory?: Omit<MaintenanceVisit, 'id' | 'branchId'>[] })[]
   ) => Promise<Company>;
   updateCompanyAndBranches: (companyId: string, companyData: Partial<Company>, branchesData: (Omit<Partial<Branch>, 'baristas'> & { baristas?: Partial<Barista>[] })[]) => Promise<void>;
-  deleteCompany: (companyId: string) => Promise<void>;
+  deleteCompany: (companyId: string, forceCascade?: boolean, reassignToCompanyId?: string) => Promise<void>;
   mergeCompanies: (parentCompanyIdOrName: string, childCompanyIds: string[]) => Promise<void>;
   fetchBranchesForCompany: (companyId: string) => Promise<Company[]>;
   addBarista: (companyId: string, branchId: string, baristaData: Omit<Barista, 'id' | 'branchId'>) => Promise<void>;
@@ -38,13 +37,8 @@ export const useCompanyStore = create<CompanyState>((set, get) => ({
   loading: true,
 
   addCompanyAndRelatedData: async (companyData, branchesData) => {
-    const batch = writeBatch(db);
-    const companyRef = doc(collection(db, 'companies'));
-
     const newCompanyData: any = {
         name: companyData.name || 'Unnamed Company',
-        industry: companyData.industry || 'Unknown',
-        isBranch: false,
         parentCompanyId: null,
         location: companyData.location ?? null,
         region: companyData.region || 'A',
@@ -54,6 +48,9 @@ export const useCompanyStore = create<CompanyState>((set, get) => ({
         paymentMethod: companyData.paymentMethod || 'transfer',
         paymentDueType: companyData.paymentDueType || 'days_after_order',
         paymentDueDays: companyData.paymentDueDays || 30,
+        currentPaymentScore: 100,
+        totalOutstandingAmount: 0,
+        totalUnpaidOrders: 0,
     };
     
     if (companyData.email) newCompanyData.email = companyData.email;
@@ -63,19 +60,30 @@ export const useCompanyStore = create<CompanyState>((set, get) => ({
         newCompanyData.paymentDueDate = companyData.paymentDueDate;
     }
     if (companyData.bulkPaymentSchedule) newCompanyData.bulkPaymentSchedule = companyData.bulkPaymentSchedule;
-    batch.set(companyRef, newCompanyData);
 
-    const fullCompany: Company = { id: companyRef.id, ...newCompanyData };
+    const { data: company, error: companyError } = await supabase
+        .from('companies')
+        .insert(newCompanyData)
+        .select()
+        .single();
+
+    if (companyError) {
+      logSupabaseError(companyError, {
+        component: 'useCompanyStore',
+        action: 'addCompanyAndRelatedData - insert company',
+        data: newCompanyData
+      });
+      throw companyError;
+    }
+
+    const fullCompany = company as Company;
 
     if (branchesData) {
         for (const branch of branchesData) {
             const { baristas, maintenanceHistory, ...branchDetails } = branch;
-            const branchRef = doc(collection(db, 'companies'));
             const newBranchData: any = { 
                 name: branchDetails.name ?? 'Unnamed Branch',
-                isBranch: true, 
-                parentCompanyId: companyRef.id, 
-                industry: newCompanyData.industry,
+                parentCompanyId: fullCompany.id, 
                 location: branchDetails.location || null,
                 region: branchDetails.region || 'A',
                 createdAt: new Date().toISOString(),
@@ -85,48 +93,61 @@ export const useCompanyStore = create<CompanyState>((set, get) => ({
             
             if (branchDetails.email) newBranchData.email = branchDetails.email;
             if (branchDetails.area) newBranchData.area = branchDetails.area;
-            batch.set(branchRef, newBranchData);
+
+            const { data: newBranch, error: branchError } = await supabase
+                .from('companies')
+                .insert(newBranchData)
+                .select()
+                .single();
+
+            if (branchError) {
+                console.error("Error creating branch:", branchError);
+                continue;
+            }
 
             if (baristas) {
-                for (const barista of baristas) {
-                    const baristaRef = doc(collection(db, 'baristas'));
-                    batch.set(baristaRef, { ...barista, branchId: branchRef.id });
+                const baristasToInsert = baristas.map(b => ({ ...b, branchId: newBranch.id }));
+                if (baristasToInsert.length > 0) {
+                    await supabase.from('baristas').insert(baristasToInsert);
                 }
             }
              if (maintenanceHistory) {
-                for (const visit of maintenanceHistory) {
-                    const visitRef = doc(collection(db, 'maintenance'));
-                    batch.set(visitRef, { ...visit, branchId: branchRef.id, companyId: companyRef.id });
+                const visitsToInsert = maintenanceHistory.map(v => ({ ...v, branchId: newBranch.id, companyId: fullCompany.id }));
+                if (visitsToInsert.length > 0) {
+                    await supabase.from('maintenance').insert(visitsToInsert);
                 }
             }
         }
     }
-    await batch.commit();
-    toast({ title: "Company Created", description: "Successfully created company and all related data in Firestore." });
+
+    toast({ title: "Company Created", description: "Successfully created company and all related data." });
     
-    // Update local state instead of full refetch
+    // Update local state
     set(produce((state: CompanyState) => {
       state.companies.push(fullCompany);
     }));
     
-    // Refresh to get actual IDs
-    const companiesSnapshot = await getDocs(collection(db, 'companies'));
-    const companies = companiesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Company[];
-    set({ companies });
+    // Refresh to get all data including branches (exclude deleted placeholders)
+    const { data: allCompanies } = await supabase.from('companies').select('*').not('name', 'like', '[DELETED]%');
+    if (allCompanies) {
+        set({ companies: allCompanies as Company[] });
+    }
     
     return fullCompany;
   },
 
   updateCompanyAndBranches: async (companyId, companyData, branchesData) => {
-    const batch = writeBatch(db);
-    const companyRef = doc(db, "companies", companyId);
-    
-    const cleanCompanyData = { ...companyData };
+    const dataToUpdate = (companyData as any).formState || companyData;
+    const { id, createdAt, parentCompanyId, industry, currentPaymentScore, totalOutstandingAmount, totalUnpaidOrders, pendingBulkPaymentAmount, paymentStatus, deliveryDays, managerName, ...cleanCompanyData } = dataToUpdate as any;
     if (cleanCompanyData.email === '') {
-        (cleanCompanyData as any).email = null;
+        cleanCompanyData.email = null;
     }
 
-    batch.update(companyRef, cleanCompanyData as { [x: string]: any; });
+    const { error: companyError } = await supabase.from('companies').update(cleanCompanyData).eq('id', companyId);
+    if (companyError) {
+      console.error('Company update error:', companyError);
+      throw companyError;
+    }
 
     // Get existing branches
     const existingBranches = get().companies.filter(c => c.parentCompanyId === companyId);
@@ -134,58 +155,126 @@ export const useCompanyStore = create<CompanyState>((set, get) => ({
     
     // Delete branches that were removed
     const branchesToDelete = existingBranches.filter(b => !submittedBranchIds.includes(b.id));
-    for (const branch of branchesToDelete) {
-        const branchRef = doc(db, 'companies', branch.id);
-        batch.delete(branchRef);
+    if (branchesToDelete.length > 0) {
+        await supabase.from('companies').delete().in('id', branchesToDelete.map(b => b.id));
     }
 
     if (branchesData) {
         for (const branch of branchesData) {
-            const cleanBranchData = { ...branch };
+            const { id, createdAt, parentCompanyId, industry, currentPaymentScore, totalOutstandingAmount, totalUnpaidOrders, pendingBulkPaymentAmount, paymentStatus, deliveryDays, managerName, baristas, performanceScore, ...cleanBranchData } = branch as any;
             if (cleanBranchData.email === '') {
-                (cleanBranchData as any).email = null;
+                cleanBranchData.email = null;
             }
 
-            if (branch.id) {
-                const branchRef = doc(db, 'companies', branch.id);
-                batch.update(branchRef, cleanBranchData as { [x: string]: any; });
+            if (id) {
+                const { error: branchError } = await supabase.from('companies').update(cleanBranchData).eq('id', id);
+                if (branchError) {
+                  console.error('Branch update error:', branchError, 'Data:', cleanBranchData);
+                  throw branchError;
+                }
             } else {
-                const branchRef = doc(collection(db, 'companies'));
-                const newBranchData = { ...cleanBranchData, isBranch: true, parentCompanyId: companyId, createdAt: new Date().toISOString() };
-                batch.set(branchRef, newBranchData);
+                const newBranchData = { ...cleanBranchData, parentCompanyId: companyId, createdAt: new Date().toISOString() };
+                await supabase.from('companies').insert(newBranchData);
             }
         }
     }
 
-    await batch.commit();
+    // Update local state (exclude deleted placeholders)
+    const { data: allCompanies } = await supabase.from('companies').select('*').not('name', 'like', '[DELETED]%');
+    if (allCompanies) {
+        set({ companies: allCompanies as Company[] });
+    }
     
-    // Update local state
-    const companiesSnapshot = await getDocs(collection(db, 'companies'));
-    const companies = companiesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Company[];
-    set({ companies });
-    
-    toast({ title: 'Company Updated', description: 'Company details have been updated in Firestore.' });
+    toast({ title: 'Company Updated', description: 'Company details have been updated.' });
   },
 
-  deleteCompany: async (companyId: string) => {
-    const batch = writeBatch(db);
-    const companyRef = doc(db, 'companies', companyId);
-    batch.delete(companyRef);
-    
-    const branches = get().companies.filter(c => c.parentCompanyId === companyId);
-    branches.forEach(branch => {
-        const branchRef = doc(db, 'companies', branch.id);
-        batch.delete(branchRef);
-    });
-
-    await batch.commit();
-    
-    // Update local state
-    set(produce((state: CompanyState) => {
-      state.companies = state.companies.filter((c: Company) => c.id !== companyId && c.parentCompanyId !== companyId);
-    }));
-    
-    toast({ title: "Company Deleted", description: `Company and its branches have been removed.`});
+  deleteCompany: async (companyId: string, forceCascade: boolean = false, reassignToCompanyId?: string) => {
+    try {
+      const companyToDelete = get().companies.find(c => c.id === companyId);
+      if (!companyToDelete) throw new Error('Company not found');
+      
+      const branches = get().companies.filter(c => c.parentCompanyId === companyId);
+      const idsToDelete = [companyId, ...branches.map(b => b.id)];
+      
+      if (forceCascade) {
+        // Delete all related data
+        await supabase.from('orders').delete().in('companyId', idsToDelete);
+        await supabase.from('orders').delete().in('branchId', idsToDelete);
+        await supabase.from('baristas').delete().in('branchId', idsToDelete);
+        await supabase.from('maintenance').delete().in('companyId', idsToDelete);
+        await supabase.from('maintenance').delete().in('branchId', idsToDelete);
+        await supabase.from('feedback').delete().in('clientId', idsToDelete);
+        await supabase.from('visits').delete().in('clientId', idsToDelete);
+      } else if (reassignToCompanyId) {
+        // Reassign related data to another company
+        await supabase.from('orders').update({ companyId: reassignToCompanyId, branchId: null }).in('companyId', idsToDelete);
+        await supabase.from('orders').update({ branchId: null }).in('branchId', idsToDelete);
+        await supabase.from('baristas').update({ branchId: null }).in('branchId', idsToDelete);
+        await supabase.from('maintenance').update({ companyId: reassignToCompanyId, branchId: null }).in('companyId', idsToDelete);
+        await supabase.from('maintenance').update({ branchId: null }).in('branchId', idsToDelete);
+        await supabase.from('feedback').update({ clientId: reassignToCompanyId }).in('clientId', idsToDelete);
+        await supabase.from('visits').update({ clientId: reassignToCompanyId }).in('clientId', idsToDelete);
+      } else {
+        // Create placeholder company for orphaned data
+        const placeholderName = `[DELETED] ${companyToDelete.name}`;
+        const { data: placeholder } = await supabase.from('companies').insert({
+          name: placeholderName,
+          parentCompanyId: null,
+          region: companyToDelete.region || 'A',
+          email: null,
+          location: null,
+          createdAt: new Date().toISOString(),
+          machineOwned: false,
+          currentPaymentScore: 0,
+          totalOutstandingAmount: 0,
+          totalUnpaidOrders: 0,
+        }).select().single();
+        
+        if (placeholder) {
+          // Reassign all related data to placeholder
+          await supabase.from('orders').update({ companyId: placeholder.id, branchId: null }).in('companyId', idsToDelete);
+          await supabase.from('orders').update({ branchId: null }).in('branchId', idsToDelete);
+          await supabase.from('baristas').update({ branchId: null }).in('branchId', idsToDelete);
+          await supabase.from('maintenance').update({ companyId: placeholder.id, branchId: null }).in('companyId', idsToDelete);
+          await supabase.from('maintenance').update({ branchId: null }).in('branchId', idsToDelete);
+          await supabase.from('feedback').update({ clientId: placeholder.id }).in('clientId', idsToDelete);
+          await supabase.from('visits').update({ clientId: placeholder.id }).in('clientId', idsToDelete);
+        }
+      }
+      
+      const { error } = await supabase.from('companies').delete().in('id', idsToDelete);
+      
+      if (error) {
+        if (error.code === '23503' || error.message?.includes('foreign key') || error.message?.includes('violates')) {
+          toast({ 
+            title: "Cannot Delete", 
+            description: "Failed to reassign data. Please try again.",
+            variant: 'destructive'
+          });
+          return;
+        }
+        throw error;
+      }
+      
+      set(produce((state: CompanyState) => {
+        state.companies = state.companies.filter((c: Company) => c.id !== companyId && c.parentCompanyId !== companyId);
+      }));
+      
+      // Refresh companies list (exclude deleted placeholders)
+      const { data: allCompanies } = await supabase.from('companies').select('*').not('name', 'like', '[DELETED]%');
+      if (allCompanies) {
+        set({ companies: allCompanies as Company[] });
+      }
+      
+      const msg = forceCascade ? "Company and all related data removed." : reassignToCompanyId ? "Company deleted and data reassigned." : `Company deleted. Related data preserved under "[DELETED] ${companyToDelete.name}".`;
+      toast({ title: "Company Deleted", description: msg });
+    } catch (error: any) {
+      toast({ 
+        title: "Delete Failed", 
+        description: error.message || 'Failed to delete company',
+        variant: 'destructive'
+      });
+    }
   },
 
   mergeCompanies: async (parentCompanyIdOrName, childCompanyIds) => {
@@ -195,7 +284,6 @@ export const useCompanyStore = create<CompanyState>((set, get) => ({
         const newParentName = parentCompanyIdOrName.split(':')[1];
         const newParentCompany = await get().addCompanyAndRelatedData({
             name: newParentName,
-            industry: 'Holding',
             region: 'A',
             createdAt: new Date().toISOString(),
             machineOwned: false
@@ -203,18 +291,13 @@ export const useCompanyStore = create<CompanyState>((set, get) => ({
         parentId = newParentCompany.id;
     }
 
-    const batch = writeBatch(db);
-    for (const childId of childCompanyIds) {
-      const childRef = doc(db, 'companies', childId);
-      batch.update(childRef, { isBranch: true, parentCompanyId: parentId });
+    await supabase.from('companies').update({ parentCompanyId: parentId }).in('id', childCompanyIds);
+    
+    // Update local state (exclude deleted placeholders)
+    const { data: allCompanies } = await supabase.from('companies').select('*').not('name', 'like', '[DELETED]%');
+    if (allCompanies) {
+        set({ companies: allCompanies as Company[] });
     }
-    
-    await batch.commit();
-    
-    // Update local state
-    const companiesSnapshot = await getDocs(collection(db, 'companies'));
-    const companies = companiesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Company[];
-    set({ companies });
     
     toast({ title: "Merge Complete", description: "Companies have been successfully merged." });
   },
@@ -225,15 +308,22 @@ export const useCompanyStore = create<CompanyState>((set, get) => ({
 
   addBarista: async (companyId, branchId, baristaData) => {
     const newBarista = { ...baristaData, branchId };
-    const docRef = await addDoc(collection(db, 'baristas'), newBarista);
+    const { data: insertedBarista, error } = await supabase
+        .from('baristas')
+        .insert(newBarista)
+        .select()
+        .single();
+        
+    if (error) throw error;
+
     set(produce((state: CompanyState) => {
-      state.baristas.push({ id: docRef.id, ...newBarista });
+      state.baristas.push(insertedBarista as Barista);
     }));
     toast({ title: 'Barista Added'});
   },
   
   updateBarista: async (baristaId, baristaData) => {
-    await updateDoc(doc(db, 'baristas', baristaId), baristaData);
+    await supabase.from('baristas').update(baristaData).eq('id', baristaId);
     set(produce((state: CompanyState) => {
       const index = state.baristas.findIndex((b: Barista) => b.id === baristaId);
       if (index !== -1) {
@@ -244,22 +334,36 @@ export const useCompanyStore = create<CompanyState>((set, get) => ({
   },
 
   addFeedback: async (feedbackData) => {
-      const docRef = await addDoc(collection(db, 'feedback'), feedbackData);
+      const { data: insertedFeedback, error } = await supabase
+        .from('feedback')
+        .insert(feedbackData)
+        .select()
+        .single();
+        
+      if (error) throw error;
+
       set(produce((state: CompanyState) => {
-        state.feedback.push({ id: docRef.id, ...feedbackData });
+        state.feedback.push(insertedFeedback as Feedback);
       }));
   },
 
   // Area Management
   addArea: async (area) => {
-    const docRef = await addDoc(collection(db, 'areas'), area);
+    const { data: insertedArea, error } = await supabase
+        .from('areas')
+        .insert(area)
+        .select()
+        .single();
+        
+    if (error) throw error;
+
     set(produce((state: CompanyState) => {
-      state.areas.push({ id: docRef.id, ...area });
+      state.areas.push(insertedArea as DeliveryArea);
     }));
     toast({ title: 'Area Added' });
   },
   updateArea: async (areaId, areaData) => {
-    await updateDoc(doc(db, 'areas', areaId), areaData);
+    await supabase.from('areas').update(areaData).eq('id', areaId);
     set(produce((state: CompanyState) => {
       const index = state.areas.findIndex((a: DeliveryArea) => a.id === areaId);
       if (index !== -1) {
@@ -269,11 +373,10 @@ export const useCompanyStore = create<CompanyState>((set, get) => ({
     toast({ title: 'Area Updated' });
   },
   deleteArea: async (areaId: string) => {
-    await deleteDoc(doc(db, 'areas', areaId));
+    await supabase.from('areas').delete().eq('id', areaId);
     set(produce((state: CompanyState) => {
       state.areas = state.areas.filter((a: DeliveryArea) => a.id !== areaId);
     }));
     toast({ title: 'Area Deleted', variant: 'destructive' });
   },
 }));
-

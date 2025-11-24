@@ -53,6 +53,7 @@ const branchSchema = z.object({
   location: z.string().min(1, "Location is required"),
   machineOwned: z.boolean().default(false),
   machineLeased: z.boolean().optional(),
+  leaseMonthlyCost: z.number().nullable().optional().or(z.nan().transform(() => null)),
   taxNumber: z.string().optional(),
   warehouseContacts: z.array(contactSchema).optional(),
   warehouseLocation: z.string().optional(),
@@ -77,6 +78,7 @@ const companyWizardSchema = z.object({
   // Fields for single entity
   machineOwned: z.boolean().default(false),
   machineLeased: z.boolean().optional(),
+  leaseMonthlyCost: z.number().nullable().optional().or(z.nan().transform(() => null)),
   warehouseContacts: z.array(contactSchema).optional(),
   warehouseLocation: z.string().optional(),
   // Payment Configuration

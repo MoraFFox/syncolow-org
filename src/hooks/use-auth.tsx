@@ -1,27 +1,9 @@
-
-
 "use client";
 
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import type { User } from '@/lib/types';
-import { db, app, storage } from '@/lib/firebase';
-import { doc, setDoc } from 'firebase/firestore';
-import { 
-  getAuth,
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  signOut,
-  sendPasswordResetEmail,
-  onAuthStateChanged,
-  updateProfile as firebaseUpdateProfile,
-  AuthError,
-  setPersistence,
-  browserLocalPersistence,
-  inMemoryPersistence
-} from 'firebase/auth';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-
+import { supabase } from '@/lib/supabase';
 
 interface AuthContextType {
   user: User | null;
@@ -35,32 +17,6 @@ interface AuthContextType {
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
-const auth = getAuth(app);
-
-// In a test environment, Firebase's browser-based persistence can cause errors.
-// This sets it to in-memory persistence when running in Jest.
-if (process.env.NODE_ENV === 'test') {
-    setPersistence(auth, inMemoryPersistence);
-}
-
-const handleAuthError = (error: unknown): string => {
-    const err = error as AuthError;
-    switch (err.code) {
-        case 'auth/user-not-found':
-        case 'auth/wrong-password':
-        case 'auth/invalid-credential':
-            return 'Invalid email or password. Please try again.';
-        case 'auth/email-already-in-use':
-            return 'An account with this email address already exists.';
-        case 'auth/weak-password':
-            return 'The password is too weak. It must be at least 6 characters long.';
-        case 'auth/invalid-email':
-            return 'Please enter a valid email address.';
-        default:
-            console.error("Authentication error:", err);
-            return 'An unexpected error occurred. Please try again later.';
-    }
-}
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -68,81 +24,140 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const router = useRouter();
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
-      if (firebaseUser) {
+    const fetchSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user) {
+        const { user: supabaseUser } = session;
         const userProfile: User = {
-          id: firebaseUser.uid,
-          email: firebaseUser.email!,
-          displayName: firebaseUser.displayName,
-          photoURL: firebaseUser.photoURL,
-          role: 'Admin', 
+          id: supabaseUser.id,
+          email: supabaseUser.email!,
+          displayName: supabaseUser.user_metadata?.full_name || supabaseUser.user_metadata?.displayName,
+          photoURL: supabaseUser.user_metadata?.avatar_url || supabaseUser.user_metadata?.photoURL,
+          role: supabaseUser.user_metadata?.role || 'Admin', // Default to Admin or fetch from metadata
         };
         setUser(userProfile);
       } else {
         setUser(null);
       }
       setLoading(false);
+    };
+
+    fetchSession();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      if (session?.user) {
+        const { user: supabaseUser } = session;
+        const newUserProfile: User = {
+          id: supabaseUser.id,
+          email: supabaseUser.email!,
+          displayName: supabaseUser.user_metadata?.full_name || supabaseUser.user_metadata?.displayName,
+          photoURL: supabaseUser.user_metadata?.avatar_url || supabaseUser.user_metadata?.photoURL,
+          role: supabaseUser.user_metadata?.role || 'Admin',
+        };
+
+        // Only update if user data has actually changed
+        setUser(prev => {
+          if (!prev) return newUserProfile;
+          if (
+            prev.id === newUserProfile.id &&
+            prev.email === newUserProfile.email &&
+            prev.displayName === newUserProfile.displayName &&
+            prev.photoURL === newUserProfile.photoURL &&
+            prev.role === newUserProfile.role
+          ) {
+            return prev;
+          }
+          return newUserProfile;
+        });
+      } else {
+        setUser(null);
+      }
+      setLoading(false);
     });
 
-    return () => unsubscribe();
+    return () => {
+      subscription.unsubscribe();
+    };
   }, []);
 
-
   const login = async (email: string, password: string): Promise<void> => {
-    try {
-        await signInWithEmailAndPassword(auth, email, password);
-    } catch (error) {
-        throw new Error(handleAuthError(error));
-    }
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+    if (error) throw error;
   };
 
   const logout = async () => {
-    await signOut(auth);
+    await supabase.auth.signOut();
     router.push('/login');
   };
 
   const register = async (email: string, password: string): Promise<void> => {
-    try {
-        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-        const firebaseUser = userCredential.user;
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: {
+          role: 'Admin', // Default role
+        },
+      },
+    });
 
-        const newUser: Omit<User, 'id' | 'password'> = {
-        email,
-        role: 'Admin'
-        };
-        await setDoc(doc(db, "users", firebaseUser.uid), newUser);
-    } catch (error) {
-        throw new Error(handleAuthError(error));
+    if (error) throw error;
+
+    if (data.user) {
+       // Optional: Create a user record in a 'users' table if you have one
+       // const { error: dbError } = await supabase.from('users').insert([{ id: data.user.id, email, role: 'Admin' }]);
+       // if (dbError) console.error("Error creating user record:", dbError);
     }
   };
 
   const requestPasswordReset = async (email: string): Promise<void> => {
-    try {
-        await sendPasswordResetEmail(auth, email);
-    } catch(error) {
-        throw new Error(handleAuthError(error));
-    }
-  }
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/auth/callback?next=/account/update-password`,
+    });
+    if (error) throw error;
+  };
 
   const updateProfile = async (data: { displayName?: string }) => {
-    if (!auth.currentUser) throw new Error("Not authenticated");
-    await firebaseUpdateProfile(auth.currentUser, data);
-    // Manually update local state to reflect changes immediately
-    setUser(prevUser => prevUser ? { ...prevUser, ...data } : null);
-  }
+    const { error } = await supabase.auth.updateUser({
+      data: {
+        displayName: data.displayName,
+        full_name: data.displayName, // Sync both common keys
+      },
+    });
+    if (error) throw error;
+    
+    // Local state update happens via onAuthStateChange
+  };
 
   const updateProfilePicture = async (file: File) => {
-    if (!auth.currentUser) throw new Error("Not authenticated");
+    if (!user) throw new Error("Not authenticated");
 
-    const storageRef = ref(storage, `profile-pictures/${auth.currentUser.uid}`);
-    await uploadBytes(storageRef, file);
-    const photoURL = await getDownloadURL(storageRef);
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${user.id}.${fileExt}`;
+    const filePath = `${fileName}`;
 
-    await firebaseUpdateProfile(auth.currentUser, { photoURL });
-     // Manually update local state
-    setUser(prevUser => prevUser ? { ...prevUser, photoURL } : null);
-  }
+    const { error: uploadError } = await supabase.storage
+      .from('profile-pictures')
+      .upload(filePath, file, { upsert: true });
 
+    if (uploadError) throw uploadError;
+
+    const { data: { publicUrl } } = supabase.storage
+      .from('profile-pictures')
+      .getPublicUrl(filePath);
+
+    const { error: updateError } = await supabase.auth.updateUser({
+      data: {
+        photoURL: publicUrl,
+        avatar_url: publicUrl,
+      },
+    });
+
+    if (updateError) throw updateError;
+  };
 
   return (
     <AuthContext.Provider value={{ user, loading, login, logout, register, requestPasswordReset, updateProfile, updateProfilePicture }}>

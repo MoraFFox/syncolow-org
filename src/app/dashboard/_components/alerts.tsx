@@ -16,6 +16,7 @@ import type { Product } from '@/lib/types';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
+import { DrillTarget } from '@/components/drilldown/drill-target';
 
 const AlertItem = ({ alert }: { alert: any }) => {
     const AlertIcon = ({ type }: { type: 'Overdue Payment' | 'Low Stock' | 'Inactive Client' | 'Tomorrow Delivery' }) => {
@@ -38,10 +39,39 @@ const AlertItem = ({ alert }: { alert: any }) => {
                  <AlertIcon type={alert.type} />
                 <div className="min-w-0 flex-1">
                     <AlertTitle className="text-sm font-semibold">
-                        {alert.type === 'Overdue Payment' && `Order #${alert.data.id.slice(0, 5)} Overdue`}
-                        {alert.type === 'Low Stock' && `${alert.data.name} is Low`}
-                        {alert.type === 'Inactive Client' && `${alert.data.name} is Inactive`}
-                        {alert.type === 'Tomorrow Delivery' && `Delivery for #${alert.data.id.slice(0, 5)}`}
+                        {alert.type === 'Overdue Payment' && (
+                            <span className="flex items-center gap-1 flex-wrap">
+                                <span>Order</span>
+                                <DrillTarget kind="order" payload={{ id: alert.data.id }} asChild>
+                                    <span className="hover:underline cursor-pointer">#{alert.data.id.slice(0, 5)}</span>
+                                </DrillTarget>
+                                <span>Overdue</span>
+                            </span>
+                        )}
+                        {alert.type === 'Low Stock' && (
+                            <span className="flex items-center gap-1 flex-wrap">
+                                <DrillTarget kind="product" payload={{ id: alert.data.id, name: alert.data.name, stock: alert.data.stock }} asChild>
+                                    <span className="hover:underline cursor-pointer">{alert.data.name}</span>
+                                </DrillTarget>
+                                <span>is Low</span>
+                            </span>
+                        )}
+                        {alert.type === 'Inactive Client' && (
+                            <span className="flex items-center gap-1 flex-wrap">
+                                <DrillTarget kind="company" payload={{ id: alert.data.id, name: alert.data.name }} asChild>
+                                    <span className="hover:underline cursor-pointer">{alert.data.name}</span>
+                                </DrillTarget>
+                                <span>is Inactive</span>
+                            </span>
+                        )}
+                        {alert.type === 'Tomorrow Delivery' && (
+                            <span className="flex items-center gap-1 flex-wrap">
+                                <span>Delivery for</span>
+                                <DrillTarget kind="order" payload={{ id: alert.data.id }} asChild>
+                                    <span className="hover:underline cursor-pointer">#{alert.data.id.slice(0, 5)}</span>
+                                </DrillTarget>
+                            </span>
+                        )}
                     </AlertTitle>
                     <AlertDescription className="text-xs">
                         {alert.type === 'Low Stock' && `Stock level is low (${alert.data.stock}).`}

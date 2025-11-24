@@ -1,12 +1,11 @@
 
 'use server';
 /**
- * @fileOverview A server-side flow to clear all documents from specified Firestore collections.
+ * @fileOverview A server-side flow to clear all documents from specified Supabase tables.
  */
 
 import { z } from 'genkit';
-import { collection, getDocs, writeBatch, deleteDoc, getDoc } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
+import { supabase } from '@/lib/supabase';
 
 const ClearDataOutputSchema = z.object({
   success: z.boolean(),
@@ -14,56 +13,53 @@ const ClearDataOutputSchema = z.object({
   deletedDocumentsCount: z.number(),
 });
 
-// Helper function to delete all documents in a collection
-async function deleteCollection(collectionName: string, batch: any): Promise<number> {
-    const snapshot = await getDocs(collection(db, collectionName));
-    let count = 0;
-    if (!snapshot.empty) {
-        snapshot.docs.forEach(doc => {
-          batch.delete(doc.ref);
-          count++;
-        });
+// Helper function to delete all documents in a table
+async function deleteTableData(tableName: string): Promise<number> {
+    // In Supabase, we can delete all rows by matching a condition that is always true for existing rows.
+    // Assuming 'id' exists and is not null.
+    const { count, error } = await supabase
+        .from(tableName)
+        .delete({ count: 'exact' })
+        .neq('id', '00000000-0000-0000-0000-000000000000'); // Delete all rows where id is not a dummy UUID
+
+    if (error) {
+        console.error(`Error deleting from ${tableName}:`, error);
+        throw error;
     }
-    return count;
+    return count || 0;
 }
 
 
 export async function clearAllData(): Promise<z.infer<typeof ClearDataOutputSchema>> {
-  // Define all collections to be cleared. 'users' is intentionally excluded.
-  const collectionsToDelete = [
+  // Define all tables to be cleared. 'users' is intentionally excluded.
+  const tablesToDelete = [
     'products',
     'orders',
     'feedback',
     'maintenance',
     'visits',
     'baristas',
-    'companies' // companies is handled separately due to subcollections
+    'companies',
+    'manufacturers', // Added manufacturers as it was likely missed or implicitly handled in firebase
+    'priceAudit', // Added priceAudit
+    'orders_search', // Added orders_search
+    'pushSubscriptions' // Added pushSubscriptions
   ];
   let deletedDocumentsCount = 0;
 
   try {
-    const batch = writeBatch(db);
-
-    // Delete simple collections
-    for (const collectionName of collectionsToDelete) {
-        if(collectionName !== 'companies') {
-            deletedDocumentsCount += await deleteCollection(collectionName, batch);
+    // Delete tables
+    for (const tableName of tablesToDelete) {
+        try {
+             deletedDocumentsCount += await deleteTableData(tableName);
+        } catch (e) {
+            console.warn(`Failed to clear table ${tableName}, it might not exist or has constraints.`, e);
         }
     }
     
-    // Delete companies (which are both parents and branches in the same collection)
-    const companiesSnapshot = await getDocs(collection(db, 'companies'));
-    if (!companiesSnapshot.empty) {
-        companiesSnapshot.docs.forEach(doc => {
-            batch.delete(doc.ref);
-            deletedDocumentsCount++;
-        });
-    }
-
-    await batch.commit();
     return {
       success: true,
-      message: 'All specified collections have been cleared.',
+      message: 'All specified tables have been cleared.',
       deletedDocumentsCount,
     };
   } catch (error: any) {

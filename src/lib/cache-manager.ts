@@ -1,6 +1,6 @@
+
 import { indexedDBStorage } from './indexeddb-storage';
-import { db } from './firebase';
-import { collection, getDocs, query, where, orderBy, limit } from 'firebase/firestore';
+import { supabase } from './supabase';
 
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 const COLLECTIONS_TO_CACHE = ['orders', 'companies', 'products', 'maintenance', 'manufacturers', 'categories', 'taxes'];
@@ -28,17 +28,20 @@ export class CacheManager {
       return cached as T[];
     }
 
-    // No cache, fetch from Firestore
+    // No cache, fetch from Supabase
     return await this.fetchAndCache<T>(collectionName);
   }
 
   private async fetchAndCache<T>(collectionName: string): Promise<T[]> {
     try {
-      const snapshot = await getDocs(collection(db, collectionName));
-      const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as T[];
+      const { data, error } = await supabase.from(collectionName).select('*');
       
-      await indexedDBStorage.setCache(collectionName, data);
-      return data;
+      if (error) throw error;
+      
+      const result = (data || []) as T[];
+      
+      await indexedDBStorage.setCache(collectionName, result);
+      return result;
     } catch (error) {
       console.error(`Error fetching ${collectionName}:`, error);
       
@@ -71,4 +74,3 @@ export class CacheManager {
 }
 
 export const cacheManager = new CacheManager();
-

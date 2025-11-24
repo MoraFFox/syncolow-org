@@ -1,10 +1,20 @@
 
 import type { Metadata } from 'next';
+import { Mulish } from 'next/font/google';
 import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
 import { AuthProvider } from '@/hooks/use-auth';
 import { AppShell } from '@/components/layout/app-shell';
 import { ThemeProvider } from '@/components/theme-provider';
+import { DrillPreviewTooltip } from '@/components/drilldown/drill-preview-tooltip';
+import { DrillDialogWrapper } from '@/components/drilldown/drill-dialog-wrapper';
+import { cn } from '@/lib/utils';
+
+const mulish = Mulish({
+  subsets: ['latin'],
+  variable: '--font-sans',
+  display: 'swap',
+});
 
 export const metadata: Metadata = {
   title: 'SynergyFlow',
@@ -18,10 +28,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <head>
-        <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;500;600;700&display=swap" rel="stylesheet" />
-      </head>
-      <body>
+      <body className={cn('min-h-screen bg-background font-sans antialiased', mulish.variable)}>
         <ThemeProvider
           attribute="class"
           defaultTheme="dark"
@@ -29,6 +36,8 @@ export default function RootLayout({
         >
             <AuthProvider>
               <AppShell>{children}</AppShell>
+              <DrillPreviewTooltip />
+              <DrillDialogWrapper />
             </AuthProvider>
             <Toaster />
         </ThemeProvider>

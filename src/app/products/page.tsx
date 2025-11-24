@@ -216,8 +216,17 @@ function ProductsPageContent() {
   };
 
   const handleDeleteAllConfirm = async () => {
-    await deleteAllProducts();
-    setIsDeleteAllAlertOpen(false);
+    try {
+      await deleteAllProducts();
+    } catch (error) {
+      toast({
+        title: "Error Deleting Products",
+        description: "Failed to delete all products. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsDeleteAllAlertOpen(false);
+    }
   };
 
   const onSubmit = async (data: AddProductData) => {

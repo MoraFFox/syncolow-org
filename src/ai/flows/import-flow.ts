@@ -1,7 +1,6 @@
 
 'use server';
-import { collection, getDocs, writeBatch, doc, query, where, documentId } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
+import { supabaseAdmin } from '@/lib/supabase';
 import { Company, Order, Product, ImportRowError, CsvRow, ImportResult, ImportableEntityType } from '@/lib/types';
 import { logPriceAudit } from '@/lib/price-audit';
 
@@ -32,43 +31,55 @@ const findValueRobust = (row: CsvRow, ...keySubstrings: string[]): string | unde
 interface ImportInput {
   entityType: ImportableEntityType;
   data: CsvRow[];
+  companies?: Company[];
+  products?: Product[];
 }
 
-// Helper function to query Firestore with 'in' operator in chunks of 30
-async function queryInBatches<T>(collectionRef: any, field: string, values: string[]): Promise<T[]> {
+// Helper function to query Supabase with 'in' operator in chunks
+async function queryInBatches<T>(table: string, field: string, values: string[]): Promise<T[]> {
     if (values.length === 0) {
         return [];
     }
+    // Supabase 'in' filter handles reasonably large arrays, but let's chunk to be safe
+    const CHUNK_SIZE = 50;
     const chunks = [];
-    for (let i = 0; i < values.length; i += 30) {
-        chunks.push(values.slice(i, i + 30));
+    for (let i = 0; i < values.length; i += CHUNK_SIZE) {
+        chunks.push(values.slice(i, i + CHUNK_SIZE));
     }
 
-    const isDocumentIdQuery = field === documentId().toString();
-
     const snapshotPromises = chunks.map(chunk => {
-        if (isDocumentIdQuery) {
-            return getDocs(query(collectionRef, where(documentId(), 'in', chunk)));
-        }
-        return getDocs(query(collectionRef, where(field, 'in', chunk)));
+        return supabaseAdmin.from(table).select('*').in(field, chunk);
     });
 
     const snapshots = await Promise.all(snapshotPromises);
     
     const results: T[] = [];
-    snapshots.forEach(snapshot => {
-        snapshot.docs.forEach(doc => {
-            results.push({ id: doc.id, ...(doc.data() as Partial<T>) } as T);
-        });
+    snapshots.forEach(result => {
+        if (result.data) {
+            results.push(...(result.data as T[]));
+        }
     });
 
     return results;
 }
 
 
+const parseNumber = (val: any): number => {
+  if (val === null || val === undefined || val === '') return 0;
+  if (typeof val === 'number') return val;
+  const str = String(val).trim();
+  // Remove all characters that are not digits, dots, or minus signs
+  // This handles "1,000" -> "1000", "$100" -> "100"
+  const clean = str.replace(/[^0-9.-]/g, '');
+  const num = parseFloat(clean);
+  return isNaN(num) ? 0 : num;
+};
+
 export async function importFlow({
   entityType,
   data,
+  companies: providedCompanies,
+  products: providedProducts,
 }: ImportInput): Promise<ImportResult> {
   console.log('Import flow started', { entityType, rowCount: data.length });
   console.log('Data size:', JSON.stringify(data).length, 'bytes');
@@ -91,36 +102,45 @@ export async function importFlow({
     console.log('First row keys:', Object.keys(rowsToImport[0] || {}));
     console.log('First row data:', rowsToImport[0]);
 
-    const companyNames = new Set<string>();
-    const productNames = new Set<string>();
-    for (const row of rowsToImport) {
-        const companyName = findValueRobust(row, 'customer', 'client', 'company', 'branch');
-        if (companyName) companyNames.add(companyName);
-
-        const productName = findValueRobust(row, 'product name', 'product', 'item');
-        if (productName) productNames.add(productName);
-    }
-
-    const companiesAndBranches = await queryInBatches<Company>(collection(db, 'companies'), 'name', Array.from(companyNames));
+    let allCompanies: Company[];
+    let products: Product[];
     
-    // New logic: find parent companies for any branches found
-    const parentCompanyIds = new Set<string>();
-    const existingCompanyIds = new Set(companiesAndBranches.map(c => c.id));
-    companiesAndBranches.forEach(c => {
-        if (c.isBranch && c.parentCompanyId && !existingCompanyIds.has(c.parentCompanyId)) {
-            parentCompanyIds.add(c.parentCompanyId);
-        }
-    });
+    // Use provided data if available, otherwise query Supabase
+    if (providedCompanies && providedProducts) {
+      console.log('Using provided companies and products from client');
+      allCompanies = providedCompanies;
+      products = providedProducts;
+    } else {
+      const companyNames = new Set<string>();
+      const productNames = new Set<string>();
+      for (const row of rowsToImport) {
+          const companyName = findValueRobust(row, 'customer', 'client', 'company', 'branch');
+          if (companyName) companyNames.add(companyName);
 
-    let allCompanies = [...companiesAndBranches];
-    if (parentCompanyIds.size > 0) {
-        const parentCompanies = await queryInBatches<Company>(collection(db, 'companies'), documentId().toString(), Array.from(parentCompanyIds));
-        allCompanies = [...allCompanies, ...parentCompanies];
+          const productName = findValueRobust(row, 'product name', 'product', 'item');
+          if (productName) productNames.add(productName);
+      }
+
+      const companiesAndBranches = await queryInBatches<Company>('companies', 'name', Array.from(companyNames));
+      
+      const parentCompanyIds = new Set<string>();
+      const existingCompanyIds = new Set(companiesAndBranches.map(c => c.id));
+      companiesAndBranches.forEach(c => {
+          if (c.isBranch && c.parentCompanyId && !existingCompanyIds.has(c.parentCompanyId)) {
+              parentCompanyIds.add(c.parentCompanyId);
+          }
+      });
+
+      allCompanies = [...companiesAndBranches];
+      if (parentCompanyIds.size > 0) {
+          const parentCompanies = await queryInBatches<Company>('companies', 'id', Array.from(parentCompanyIds));
+          allCompanies = [...allCompanies, ...parentCompanies];
+      }
+
+      products = await queryInBatches<Product>('products', 'name', Array.from(productNames));
     }
-    // End of new logic
-
-
-    const products = await queryInBatches<Product>(collection(db, 'products'), 'name', Array.from(productNames));
+    
+    const productNames = new Set(products.map(p => p.name));
     
     console.log('Product names to search:', Array.from(productNames));
     console.log('Products found in DB:', products.map(p => ({ id: p.id, name: p.name })));
@@ -145,25 +165,26 @@ export async function importFlow({
     
     // Check for existing hashes to prevent duplicates
     const hashes = rowsToImport.map(row => simpleHash(JSON.stringify(row)));
-    const existingOrders = await queryInBatches<Order>(collection(db, 'orders'), 'importHash', hashes);
-    const existingHashes = new Set(existingOrders.map(o => o.importHash));
+    const existingOrders = await queryInBatches<Order>('orders', 'importHash', hashes);
+    const seenHashes = new Set(existingOrders.map(o => o.importHash));
     let skippedDuplicates = 0;
+
+    // Group rows by Order ID (if available) or treat as single orders
+    const orderGroups = new Map<string, any>();
+    const standaloneOrders: any[] = [];
 
     for (const [index, row] of rowsToImport.entries()) {
       const originalRowIndex = data.indexOf(row);
-      const rowHash = simpleHash(JSON.stringify(row));
       
-      // Skip if already imported
-      if (existingHashes.has(rowHash)) {
-        console.log('Skipping duplicate row', index, 'with hash', rowHash);
-        skippedDuplicates++;
-        continue;
-      }
+      // Try to find a unique Order Identifier
+      const orderIdVal = findValueRobust(row, 'order id', 'invoice', 'ref', 'order no', 'id', 'number');
+      
+      // If no ID, we can't group reliably, so treat as standalone (or maybe group by Company+Date?)
+      // For now, let's treat as standalone to be safe, unless we want to try heuristic grouping.
+      const groupKey = orderIdVal ? orderIdVal.toString().trim() : `standalone-${index}`;
 
       const companyName = findValueRobust(row, 'customer', 'client', 'company', 'branch') || '';
-      console.log('Processing row', index, '- Company name found:', companyName);
       const potentialMatch = companyMap.get(companyName.toLowerCase());
-      console.log('Company match in DB:', potentialMatch ? 'FOUND' : 'NOT FOUND');
 
       if (!potentialMatch) {
          errors.push({
@@ -194,7 +215,6 @@ export async function importFlow({
           branchId = potentialMatch.id;
           parentCompany = parent;
         } else {
-          // Parent doesn't exist, treat branch as standalone company
           companyId = potentialMatch.id;
           branchId = potentialMatch.id;
           parentCompany = potentialMatch;
@@ -205,15 +225,12 @@ export async function importFlow({
         parentCompany = potentialMatch;
       }
 
-
       const productName = findValueRobust(row, 'product name', 'product', 'item');
-      console.log('Product name found:', productName);
       const priceStr = findValueRobust(row, 'unit price', 'price');
-      const price = priceStr ? parseFloat(priceStr) : 0;
+      const price = parseNumber(priceStr);
       
       if (productName) {
           const product = productMap.get(productName.toLowerCase());
-          console.log('Product match in DB:', product ? 'FOUND' : 'NOT FOUND');
 
           if (!product) {
               errors.push({
@@ -230,8 +247,8 @@ export async function importFlow({
               continue;
           }
 
-          const quantityStr = findValueRobust(row, 'quantity', 'order', 'qty');
-          const quantityRaw = quantityStr ? parseFloat(quantityStr) : 0;
+          const quantityStr = findValueRobust(row, 'quantity', 'qty', 'inv. qty', 'inv qty');
+          const quantityRaw = parseNumber(quantityStr);
           
           const isReturn = quantityRaw < 0;
           const quantity = Math.abs(quantityRaw);
@@ -246,21 +263,18 @@ export async function importFlow({
               continue;
           }
 
-          const orderDateStr = findValueRobust(row, 'date', 'order');
+          const orderDateStr = findValueRobust(row, 'date', 'order date', 'inv. date', 'inv date');
           let orderDate: string;
           if (orderDateStr) {
             const numericDate = Number(orderDateStr);
             if (!isNaN(numericDate) && numericDate > 1000) {
-              // Excel serial date number (days since 1900-01-01)
               const excelEpoch = new Date(1899, 11, 30);
               const date = new Date(excelEpoch.getTime() + numericDate * 86400000);
-              
-              // Validate date is reasonable (between 2000 and 2100)
               if (date.getFullYear() < 2000 || date.getFullYear() > 2100 || isNaN(date.getTime())) {
-                errors.push({
+                 errors.push({
                   rowIndex: originalRowIndex,
                   errorType: 'invalid-data',
-                  errorMessage: `Invalid date: ${orderDateStr} parsed to ${date.toISOString()}. Year must be between 2000-2100.`,
+                  errorMessage: `Invalid date.`,
                   blocking: false,
                 });
                 continue;
@@ -273,128 +287,158 @@ export async function importFlow({
             orderDate = new Date().toISOString();
           }
           
-          // Step 1: Calculate Subtotal = Qty × Price
-          const subtotal = price * quantity;
-          
-          // Step 2: Calculate Discount Amount
           const discountStr = ((row['discount'] ?? row['Discount'] ?? '') || '').toString().trim();
           const discountTypeStr = ((row['discountType'] ?? row['DiscountType'] ?? 'fixed') || 'fixed').toString().trim();
-          const discountValue = discountStr && !isNaN(parseFloat(discountStr)) ? parseFloat(discountStr) : 0;
+          const discountValue = parseNumber(discountStr);
           const discountType = discountTypeStr === 'percentage' ? 'percentage' : 'fixed';
           
-          // For negative orders, discount is already negative in the CSV
-          let discountAmount = 0;
-          if (discountValue !== 0 && !isNaN(discountValue)) {
-            discountAmount = discountType === 'percentage' ? (subtotal * discountValue / 100) : Math.abs(discountValue);
-          }
-          
-          // Step 3: Calculate Net Amount = Subtotal − Discount
-          const netAmount = subtotal - discountAmount;
-          
-          // Step 4: Calculate VAT Amount = Net Amount × VAT Rate
           const taxStr = ((row['tax'] ?? row['Tax'] ?? row['VAT'] ?? '') || '').toString().trim().replace('%', '');
-          let taxRate = taxStr && !isNaN(parseFloat(taxStr)) ? parseFloat(taxStr) : 0;
-          // If tax is in decimal form (0.14), use directly; if percentage (14), divide by 100
-          const taxMultiplier = (taxRate > 0 && taxRate < 1) ? taxRate : (taxRate / 100);
-          const taxAmount = taxRate > 0 && !isNaN(taxRate) ? (netAmount * taxMultiplier) : 0;
-          // Store taxRate as percentage for display
+          let taxRate = parseNumber(taxStr);
           if (taxRate > 0 && taxRate < 1) {
             taxRate = taxRate * 100;
           }
-          
-          // Step 5: Calculate Total = Net Amount + VAT Amount
-          // For returns (negative qty), make all amounts negative to subtract from revenue
-          const grandTotal = isReturn ? -(netAmount + taxAmount) : (netAmount + taxAmount);
-          
-          console.log('Order calculation for row', index, ':', {
-            isReturn,
-            qty: quantityRaw,
-            absQty: quantity,
-            price,
-            subtotal,
-            discountStr,
-            discountType,
-            discountValue,
-            discountAmount,
-            netAmount,
-            taxStr,
-            taxRate,
-            taxAmount,
-            grandTotal,
-            expectedTotal: isReturn ? -15754.8 : 'N/A'
-          });
-          
+
           const areaStr = findValueRobust(row, 'area', 'region', 'location');
           
-          const orderStatus = isReturn ? 'Cancelled' as const : 'Delivered' as const;
-          const orderPaymentStatus = isReturn ? 'Pending' as const : 'Paid' as const;
-          
-          const newOrderData: any = {
-            importHash: rowHash,
-            companyId: companyId,
-            branchId: branchId || companyId,
-            companyName: parentCompany.name,
-            branchName: potentialMatch.name,
-            area: areaStr || null,
-            orderDate,
-            deliveryDate: null,
-            paymentDueDate: null,
-            status: orderStatus,
-            paymentStatus: orderPaymentStatus,
-            subtotal: isReturn ? -subtotal : subtotal,
-            totalTax: isReturn ? -taxAmount : taxAmount,
-            grandTotal,
-            total: grandTotal,
-            items: [{
-                id: `item-${Date.now()}`,
-                productId: product.id,
-                productName: product.name,
-                quantity: quantity,
-                price: price,
-                taxId: null,
-                taxRate: taxRate > 0 ? taxRate : null,
-                taxAmount: taxAmount > 0 ? taxAmount : null,
-                discountType: null,
-                discountValue: null,
-            }],
-            statusHistory: [{status: orderStatus, timestamp: orderDate}],
-            isReturn: isReturn,
+          // Item Data
+          const itemData = {
+              id: `item-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+              productId: product.id,
+              productName: product.name,
+              quantity: quantity,
+              price: price,
+              taxId: null,
+              taxRate: taxRate > 0 ? taxRate : null,
+              // taxAmount calculated later based on line item total
+              discountType: discountValue > 0 ? discountType : null,
+              discountValue: discountValue > 0 ? discountValue : null,
+              isReturn
           };
-          
-          if (isReturn) {
-            newOrderData.cancellationReason = 'item returned';
-            newOrderData.cancellationNotes = 'Auto-detected return from import (negative quantity)';
+
+          // Initialize group if needed
+          if (!orderGroups.has(groupKey)) {
+            orderGroups.set(groupKey, {
+                companyId,
+                branchId: branchId || companyId,
+                companyName: parentCompany.name,
+                branchName: potentialMatch.name,
+                area: areaStr || null,
+                orderDate,
+                status: isReturn ? 'Cancelled' : 'Delivered',
+                paymentStatus: isReturn ? 'Pending' : 'Paid',
+                items: [],
+                cancellationReason: isReturn ? 'item returned' : null,
+                cancellationNotes: isReturn ? 'Auto-detected return' : null,
+                // We will calculate totals after aggregating all items
+            });
           }
           
-          if (discountValue > 0) {
-            newOrderData.discountType = discountType;
-            newOrderData.discountValue = discountValue;
-            newOrderData.discountAmount = discountAmount;
-          }
-          validOrders.push(newOrderData);
+          const group = orderGroups.get(groupKey);
+          
+          // Conflict resolution: if dates differ in the same group, take the latest? Or first?
+          // Let's stick to the first one for simplicity, or maybe update if this row has a date?
+          // For now, assume grouped rows have consistent header data.
+          
+          group.items.push(itemData);
       }
     }
 
+    // Process Groups into Valid Orders
+    for (const [key, group] of orderGroups) {
+        let grandTotal = 0;
+        let totalSubtotal = 0;
+        let totalTax = 0;
+        
+        const processedItems = group.items.map((item: any) => {
+            const { isReturn, price, quantity, discountType, discountValue, taxRate } = item;
+            
+            const subtotal = price * quantity;
+            
+            let discountAmount = 0;
+            if (discountValue && discountValue > 0) {
+                discountAmount = discountType === 'percentage' ? (subtotal * discountValue / 100) : discountValue;
+            }
+            
+            const netAmount = subtotal - discountAmount;
+            
+            const taxMultiplier = (taxRate || 0) / 100;
+            const taxAmount = netAmount * taxMultiplier;
+            
+            const itemTotal = netAmount + taxAmount;
+            
+            // Accumulate Order Totals
+            if (isReturn) {
+                totalSubtotal -= subtotal;
+                totalTax -= taxAmount;
+                grandTotal -= itemTotal;
+            } else {
+                totalSubtotal += subtotal;
+                totalTax += taxAmount;
+                grandTotal += itemTotal;
+            }
+            
+            return {
+                ...item,
+                taxAmount: taxAmount > 0 ? taxAmount : null,
+                // Remove temp flags
+                isReturn: undefined
+            };
+        });
+        
+        // If mixed return/sale, determine main status
+        // If grandTotal < 0, it's a return.
+        const isOverallReturn = grandTotal < 0;
+        const finalStatus = isOverallReturn ? 'Cancelled' : 'Delivered';
+        const finalPaymentStatus = isOverallReturn ? 'Pending' : 'Paid';
+
+        const orderData = {
+            ...group,
+            status: finalStatus,
+            paymentStatus: finalPaymentStatus,
+            subtotal: totalSubtotal,
+            totalTax: totalTax,
+            grandTotal: grandTotal,
+            total: grandTotal,
+            items: processedItems,
+            statusHistory: [{status: finalStatus, timestamp: group.orderDate}],
+        };
+        
+        // Generate Hash for the WHOLE order
+        const orderHash = simpleHash(JSON.stringify({
+            cid: orderData.companyId,
+            date: orderData.orderDate,
+            items: orderData.items.map((i: any) => i.productId + i.quantity),
+            total: orderData.total
+        }));
+        
+        orderData.importHash = orderHash;
+        
+        if (seenHashes.has(orderHash)) {
+            console.log('Skipping duplicate order group', key);
+            skippedDuplicates++;
+            continue;
+        }
+        seenHashes.add(orderHash);
+        
+        validOrders.push(orderData);
+    }
+
     if (validOrders.length > 0 && errors.filter(e => e.blocking).length === 0) {
-      console.log('Writing', validOrders.length, 'orders to Firestore');
+      console.log('Writing', validOrders.length, 'orders to Supabase');
       
       const BATCH_SIZE = 500;
-      const batches = [];
       
       for (let i = 0; i < validOrders.length; i += BATCH_SIZE) {
         const batchOrders = validOrders.slice(i, i + BATCH_SIZE);
-        const batch = writeBatch(db);
+        const { error } = await supabaseAdmin.from('orders').insert(batchOrders);
         
-        batchOrders.forEach(order => {
-          const newOrderRef = doc(collection(db, 'orders'));
-          batch.set(newOrderRef, order);
-        });
-        
-        batches.push(batch.commit());
+        if (error) {
+            console.error('Error inserting batch:', error);
+            throw error;
+        }
       }
       
-      await Promise.all(batches);
-      console.log('Batch commit successful');
+      console.log('Batch insert successful');
       
       // Log price audit entries only after successful order creation
       for (const order of validOrders) {

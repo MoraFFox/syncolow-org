@@ -23,6 +23,7 @@ import type { Branch, Company, Contact } from "@/lib/types";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { ContactsSubForm } from './company-form';
+import { useCompanyStore } from '@/store/use-company-store';
 
 const contactSchema = z.object({
   name: z.string().min(1, "Contact name is required."),
@@ -37,6 +38,8 @@ const branchSchema = z.object({
   warehouseLocation: z.string().optional().nullable(),
   machineOwned: z.boolean().default(false),
   machineLeased: z.boolean().optional(),
+  leaseMonthlyCost: z.number().optional().nullable(),
+  maintenanceLocation: z.enum(['inside_cairo', 'outside_cairo', 'sahel']).optional().nullable(),
   contacts: z.array(contactSchema).optional(),
   warehouseContacts: z.array(contactSchema).optional(),
   region: z.enum(['A', 'B', 'Custom']).optional(),
@@ -54,6 +57,7 @@ interface BranchFormProps {
 }
 
 export function BranchForm({ isOpen, onOpenChange, onSubmit, branch }: BranchFormProps) {
+  const { areas } = useCompanyStore();
   const { register, handleSubmit, reset, watch, setValue, control, formState: { errors, isSubmitting } } = useForm<BranchFormData>({
     resolver: zodResolver(branchSchema),
     mode: 'onBlur',
@@ -64,6 +68,8 @@ export function BranchForm({ isOpen, onOpenChange, onSubmit, branch }: BranchFor
       warehouseLocation: '',
       machineOwned: false,
       machineLeased: false,
+      leaseMonthlyCost: null,
+      maintenanceLocation: null,
       contacts: [],
       warehouseContacts: [],
       region: 'A',
@@ -84,6 +90,8 @@ export function BranchForm({ isOpen, onOpenChange, onSubmit, branch }: BranchFor
         warehouseLocation: branch.warehouseLocation || '',
         machineOwned: branch.machineOwned || false,
         machineLeased: branch.machineLeased || false,
+        leaseMonthlyCost: branch.leaseMonthlyCost || null,
+        maintenanceLocation: branch.maintenanceLocation || null,
         contacts: branch.contacts || [],
         warehouseContacts: branch.warehouseContacts || [],
         region: branch.region || 'A',
@@ -99,13 +107,15 @@ export function BranchForm({ isOpen, onOpenChange, onSubmit, branch }: BranchFor
         name: data.name,
         location: data.location,
         machineOwned: data.machineOwned,
+        machineLeased: data.machineLeased,
+        leaseMonthlyCost: data.leaseMonthlyCost ?? undefined,
+        maintenanceLocation: data.maintenanceLocation ?? undefined,
         region: data.region || 'A',
         contacts: data.contacts || [],
         email: data.email || undefined,
         area: data.area || undefined,
         taxNumber: data.taxNumber || undefined,
         warehouseLocation: data.warehouseLocation,
-        machineLeased: data.machineLeased,
         warehouseContacts: data.warehouseContacts,
       };
 
@@ -178,7 +188,7 @@ export function BranchForm({ isOpen, onOpenChange, onSubmit, branch }: BranchFor
                   name="region"
                   control={control}
                   render={({ field }) => (
-                    <Select value={field.value} onValueChange={field.onChange}>
+                    <Select value={field.value || ''} onValueChange={field.onChange}>
                       <SelectTrigger>
                         <SelectValue />
                       </SelectTrigger>
@@ -194,7 +204,42 @@ export function BranchForm({ isOpen, onOpenChange, onSubmit, branch }: BranchFor
 
               <div className="grid gap-2">
                 <Label>Area</Label>
-                <Input {...register('area')} />
+                <Controller
+                  name="area"
+                  control={control}
+                  render={({ field }) => (
+                    <Select value={field.value || ''} onValueChange={field.onChange}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select area" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {areas.map(area => (
+                          <SelectItem key={area.id} value={area.name}>{area.name}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+              </div>
+
+              <div className="grid gap-2">
+                <Label>Maintenance Location</Label>
+                <Controller
+                  name="maintenanceLocation"
+                  control={control}
+                  render={({ field }) => (
+                    <Select value={field.value || ''} onValueChange={field.onChange}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select maintenance location" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="inside_cairo">Inside Cairo (500 EGP)</SelectItem>
+                        <SelectItem value="outside_cairo">Outside Cairo (1500 EGP)</SelectItem>
+                        <SelectItem value="sahel">Sahel (4000 EGP)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
               </div>
 
               <div className="grid gap-2">
@@ -218,7 +263,7 @@ export function BranchForm({ isOpen, onOpenChange, onSubmit, branch }: BranchFor
                 </div>
               </div>
 
-              <div className="flex items-center gap-4">
+              <div className="space-y-4">
                 <div className="flex items-center gap-2">
                   <Controller
                     name="machineOwned"
@@ -227,18 +272,28 @@ export function BranchForm({ isOpen, onOpenChange, onSubmit, branch }: BranchFor
                       <Checkbox checked={field.value} onCheckedChange={field.onChange} />
                     )}
                   />
-                  <Label>Machine Owned</Label>
+                  <Label>Client Owns the Machine</Label>
                 </div>
-                <div className="flex items-center gap-2">
-                  <Controller
-                    name="machineLeased"
-                    control={control}
-                    render={({ field }) => (
-                      <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                {!watch('machineOwned') && (
+                  <>
+                    <div className="flex items-center gap-2">
+                      <Controller
+                        name="machineLeased"
+                        control={control}
+                        render={({ field }) => (
+                          <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                        )}
+                      />
+                      <Label>Machine Leased (SynergyFlow Owned)</Label>
+                    </div>
+                    {watch('machineLeased') && (
+                      <div className="grid gap-2">
+                        <Label>Monthly Lease Cost (EGP)</Label>
+                        <Input type="number" {...register('leaseMonthlyCost', { valueAsNumber: true })} placeholder="e.g. 1000" />
+                      </div>
                     )}
-                  />
-                  <Label>Machine Leased</Label>
-                </div>
+                  </>
+                )}
               </div>
 
               <div className="space-y-4 pt-4 border-t">

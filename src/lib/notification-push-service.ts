@@ -1,9 +1,11 @@
+
 /**
  * Browser Push Notification Service
  * Implements Web Push API for desktop notifications
  */
 
 import { useState, useEffect } from 'react';
+import { supabase } from '@/lib/supabase';
 
 export class PushNotificationService {
   private static vapidPublicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY || '';
@@ -50,7 +52,7 @@ export class PushNotificationService {
         applicationServerKey: this.urlBase64ToUint8Array(this.vapidPublicKey) as BufferSource,
       });
 
-      // Save subscription to Firestore
+      // Save subscription to Supabase
       await this.saveSubscription(userId, subscription);
 
       return subscription;
@@ -101,13 +103,11 @@ export class PushNotificationService {
   }
 
   /**
-   * Save subscription to Firestore
+   * Save subscription to Supabase
    */
   private static async saveSubscription(userId: string, subscription: PushSubscription): Promise<void> {
-    const { db } = await import('./firebase');
-    const { doc, setDoc } = await import('firebase/firestore');
-
-    await setDoc(doc(db, 'pushSubscriptions', userId), {
+    await supabase.from('pushSubscriptions').upsert({
+      id: userId, // Assuming userId is the primary key or unique
       subscription: subscription.toJSON(),
       createdAt: new Date().toISOString(),
       userAgent: navigator.userAgent,
@@ -115,13 +115,10 @@ export class PushNotificationService {
   }
 
   /**
-   * Remove subscription from Firestore
+   * Remove subscription from Supabase
    */
   private static async removeSubscription(userId: string): Promise<void> {
-    const { db } = await import('./firebase');
-    const { doc, deleteDoc } = await import('firebase/firestore');
-
-    await deleteDoc(doc(db, 'pushSubscriptions', userId));
+    await supabase.from('pushSubscriptions').delete().eq('id', userId);
   }
 
   /**
@@ -173,4 +170,3 @@ export function usePushNotifications(userId: string | undefined) {
 
   return { permission, isSubscribed, requestPermission, unsubscribe };
 }
-

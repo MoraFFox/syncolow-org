@@ -1,0 +1,4890 @@
+
+Running 3 tests using 3 workers
+
+[1A[2K[1/3] [firefox] ΓÇ║ e2e\notifications.spec.ts:10:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+[1A[2K[2/3] [chromium] ΓÇ║ e2e\notifications.spec.ts:10:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+[1A[2K[3/3] [webkit] ΓÇ║ e2e\notifications.spec.ts:10:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+[1A[2K[chromium] ΓÇ║ e2e\notifications.spec.ts:10:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+Setting up Supabase mocks...
+
+[1A[2KRestored auth state from file
+
+[1A[2KSetting up Supabase mocks...
+
+[1A[2K>> GET http://localhost:9002/orders
+
+[1A[2K[webkit] ΓÇ║ e2e\notifications.spec.ts:10:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+Setting up Supabase mocks...
+
+[1A[2KRestored auth state from file
+
+[1A[2KSetting up Supabase mocks...
+
+[1A[2K>> GET http://localhost:9002/orders
+
+[1A[2K[chromium] ΓÇ║ e2e\notifications.spec.ts:10:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+<< [33m200[39m http://localhost:9002/orders
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/firebase-orginal_src_app_globals_31e9131b.css
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_099275f4._.js
+
+[1A[2K>> GET https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;500;600;700&display=swap
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_next_dist_compiled_react-dom_92424803._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_next_dist_compiled_react-server-dom-turbopack_fd66e9bc._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_next_dist_compiled_next-devtools_index_a78e6daf.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_next_dist_compiled_e793555b._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_next_dist_client_ce563615._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_next_dist_b5d32be2._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_%40swc_helpers_cjs_b4342a33._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/firebase-orginal_a0ff3932._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/turbopack-firebase-orginal_1df438e4._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_next_dist_e8d2e20c._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/firebase-orginal_src_app_favicon_ico_mjs_b3a5503f._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/firebase-orginal_src_7a0328b7._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/firebase-orginal_src_components_aa73e6bd._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/firebase-orginal_src_store_208195a7._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/firebase-orginal_src_app_5c70d10a._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/firebase-orginal_src_70e3500a._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_next_60f77ba3._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_lucide-react_dist_esm_icons_index_a0c80c48.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_lucide-react_dist_esm_icons_c9f298be._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_lucide-react_dist_esm_lucide-react_88c7da99.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_lucide-react_dist_esm_aadc553c._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_%40supabase_realtime-js_dist_module_bd33ecdc._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_%40supabase_storage-js_dist_module_f441eeb6._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_%40supabase_auth-js_dist_module_69c9005e._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_date-fns_1c402563._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_zod_v3_f983f72b._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_%40radix-ui_22600695._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_%40floating-ui_414d532e._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_4e339880._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/firebase-orginal_src_app_layout_tsx_d367f37a._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/firebase-orginal_src_e9b1c7eb._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_xlsx_xlsx_mjs_45381b09._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_%40dnd-kit_core_dist_core_esm_1ad8394a.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_3b4b0e9d._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/firebase-orginal_src_app_orders_page_tsx_67beaf9d._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_next_dist_client_components_builtin_global-error_d367f37a.js
+
+[1A[2K[webkit] ΓÇ║ e2e\notifications.spec.ts:10:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+<< [33m200[39m http://localhost:9002/orders
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/firebase-orginal_src_app_globals_31e9131b.css
+
+[1A[2K[chromium] ΓÇ║ e2e\notifications.spec.ts:10:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+<< [33m200[39m http://localhost:9002/_next/static/chunks/firebase-orginal_src_app_globals_31e9131b.css
+
+[1A[2K[webkit] ΓÇ║ e2e\notifications.spec.ts:10:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+>> GET http://localhost:9002/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_099275f4._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_next_dist_compiled_react-dom_92424803._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_next_dist_compiled_react-server-dom-turbopack_fd66e9bc._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_next_dist_compiled_next-devtools_index_a78e6daf.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_next_dist_compiled_e793555b._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_next_dist_client_ce563615._.js
+
+[1A[2K[chromium] ΓÇ║ e2e\notifications.spec.ts:10:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+<< [33m200[39m http://localhost:9002/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_099275f4._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_next_dist_compiled_react-server-dom-turbopack_fd66e9bc._.js
+
+[1A[2K[webkit] ΓÇ║ e2e\notifications.spec.ts:10:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+>> GET http://localhost:9002/_next/static/chunks/97dea_next_dist_b5d32be2._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_%40swc_helpers_cjs_b4342a33._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/firebase-orginal_a0ff3932._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/turbopack-firebase-orginal_1df438e4._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_next_dist_e8d2e20c._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/firebase-orginal_src_app_favicon_ico_mjs_b3a5503f._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/firebase-orginal_src_7a0328b7._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/firebase-orginal_src_components_aa73e6bd._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/firebase-orginal_src_store_208195a7._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/firebase-orginal_src_app_5c70d10a._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/firebase-orginal_src_70e3500a._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_next_60f77ba3._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_lucide-react_dist_esm_icons_index_a0c80c48.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_lucide-react_dist_esm_icons_c9f298be._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_lucide-react_dist_esm_lucide-react_88c7da99.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_lucide-react_dist_esm_aadc553c._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_%40supabase_realtime-js_dist_module_bd33ecdc._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_%40supabase_storage-js_dist_module_f441eeb6._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_%40supabase_auth-js_dist_module_69c9005e._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_date-fns_1c402563._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_zod_v3_f983f72b._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_%40radix-ui_22600695._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_%40floating-ui_414d532e._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_4e339880._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/firebase-orginal_src_app_layout_tsx_d367f37a._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/firebase-orginal_src_e9b1c7eb._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_xlsx_xlsx_mjs_45381b09._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_%40dnd-kit_core_dist_core_esm_1ad8394a.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_3b4b0e9d._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/firebase-orginal_src_app_orders_page_tsx_67beaf9d._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_next_dist_client_components_builtin_global-error_d367f37a.js
+
+[1A[2K>> GET https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;500;600;700&display=swap
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_099275f4._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/firebase-orginal_src_app_globals_31e9131b.css
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_next_dist_compiled_next-devtools_index_a78e6daf.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_next_dist_compiled_react-server-dom-turbopack_fd66e9bc._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_next_dist_compiled_react-dom_92424803._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/firebase-orginal_a0ff3932._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/firebase-orginal_src_app_favicon_ico_mjs_b3a5503f._.js
+
+[1A[2K[chromium] ΓÇ║ e2e\notifications.spec.ts:10:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_next_dist_compiled_e793555b._.js
+
+[1A[2K[webkit] ΓÇ║ e2e\notifications.spec.ts:10:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_next_dist_compiled_e793555b._.js
+
+[1A[2K[chromium] ΓÇ║ e2e\notifications.spec.ts:10:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_next_dist_b5d32be2._.js
+
+[1A[2K[webkit] ΓÇ║ e2e\notifications.spec.ts:10:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_next_dist_client_ce563615._.js
+
+[1A[2K[chromium] ΓÇ║ e2e\notifications.spec.ts:10:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+<< [33m200[39m http://localhost:9002/_next/static/chunks/firebase-orginal_a0ff3932._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_%40swc_helpers_cjs_b4342a33._.js
+
+[1A[2K[webkit] ΓÇ║ e2e\notifications.spec.ts:10:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+<< [33m200[39m http://localhost:9002/_next/static/chunks/firebase-orginal_src_app_5c70d10a._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_lucide-react_dist_esm_aadc553c._.js
+
+[1A[2K[chromium] ΓÇ║ e2e\notifications.spec.ts:10:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_next_dist_compiled_next-devtools_index_a78e6daf.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/firebase-orginal_src_app_favicon_ico_mjs_b3a5503f._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/turbopack-firebase-orginal_1df438e4._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_next_dist_compiled_react-dom_92424803._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_next_dist_e8d2e20c._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/firebase-orginal_src_7a0328b7._.js
+
+[1A[2K[webkit] ΓÇ║ e2e\notifications.spec.ts:10:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_lucide-react_dist_esm_icons_index_a0c80c48.js
+
+[1A[2K[chromium] ΓÇ║ e2e\notifications.spec.ts:10:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_next_dist_client_ce563615._.js
+
+[1A[2K[webkit] ΓÇ║ e2e\notifications.spec.ts:10:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_%40supabase_auth-js_dist_module_69c9005e._.js
+
+[1A[2K[chromium] ΓÇ║ e2e\notifications.spec.ts:10:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+<< [33m200[39m http://localhost:9002/_next/static/chunks/firebase-orginal_src_store_208195a7._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/firebase-orginal_src_70e3500a._.js
+
+[1A[2K[webkit] ΓÇ║ e2e\notifications.spec.ts:10:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_next_dist_client_components_builtin_global-error_d367f37a.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/firebase-orginal_src_app_layout_tsx_d367f37a._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_%40radix-ui_22600695._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_next_dist_e8d2e20c._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_%40dnd-kit_core_dist_core_esm_1ad8394a.js
+
+[1A[2K[chromium] ΓÇ║ e2e\notifications.spec.ts:10:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_next_60f77ba3._.js
+
+[1A[2K[webkit] ΓÇ║ e2e\notifications.spec.ts:10:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_next_dist_b5d32be2._.js
+
+[1A[2K[chromium] ΓÇ║ e2e\notifications.spec.ts:10:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+<< [33m200[39m http://localhost:9002/_next/static/chunks/firebase-orginal_src_app_5c70d10a._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/firebase-orginal_src_components_aa73e6bd._.js
+
+[1A[2K[webkit] ΓÇ║ e2e\notifications.spec.ts:10:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+<< [33m200[39m http://localhost:9002/_next/static/chunks/firebase-orginal_src_store_208195a7._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_%40supabase_realtime-js_dist_module_bd33ecdc._.js
+
+[1A[2K[chromium] ΓÇ║ e2e\notifications.spec.ts:10:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_lucide-react_dist_esm_icons_index_a0c80c48.js
+
+[1A[2K[webkit] ΓÇ║ e2e\notifications.spec.ts:10:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_zod_v3_f983f72b._.js
+
+[1A[2K[chromium] ΓÇ║ e2e\notifications.spec.ts:10:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_lucide-react_dist_esm_aadc553c._.js
+
+[1A[2K[webkit] ΓÇ║ e2e\notifications.spec.ts:10:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+<< [33m200[39m http://localhost:9002/_next/static/chunks/firebase-orginal_src_app_orders_page_tsx_67beaf9d._.js
+
+[1A[2K[chromium] ΓÇ║ e2e\notifications.spec.ts:10:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_%40supabase_realtime-js_dist_module_bd33ecdc._.js
+
+[1A[2K[webkit] ΓÇ║ e2e\notifications.spec.ts:10:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+<< [33m200[39m http://localhost:9002/_next/static/chunks/firebase-orginal_src_e9b1c7eb._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/firebase-orginal_src_7a0328b7._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_next_60f77ba3._.js
+
+[1A[2K[chromium] ΓÇ║ e2e\notifications.spec.ts:10:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_%40supabase_storage-js_dist_module_f441eeb6._.js
+
+[1A[2K<< [33m200[39m https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;500;600;700&display=swap
+
+[1A[2K[webkit] ΓÇ║ e2e\notifications.spec.ts:10:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_4e339880._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_%40supabase_storage-js_dist_module_f441eeb6._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_%40swc_helpers_cjs_b4342a33._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/firebase-orginal_src_70e3500a._.js
+
+[1A[2K[chromium] ΓÇ║ e2e\notifications.spec.ts:10:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+BROWSER LOG: %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+
+[1A[2K[webkit] ΓÇ║ e2e\notifications.spec.ts:10:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_date-fns_1c402563._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_%40floating-ui_414d532e._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/turbopack-firebase-orginal_1df438e4._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_lucide-react_dist_esm_icons_c9f298be._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_lucide-react_dist_esm_lucide-react_88c7da99.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_3b4b0e9d._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_xlsx_xlsx_mjs_45381b09._.js
+
+[1A[2K<< [33m200[39m https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;500;600;700&display=swap
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/firebase-orginal_src_components_aa73e6bd._.js
+
+[1A[2K[chromium] ΓÇ║ e2e\notifications.spec.ts:10:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+>> GET http://localhost:9002/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_c8c997ce._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_3f8af333._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_date-fns_1c402563._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_%40supabase_auth-js_dist_module_69c9005e._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_zod_v3_f983f72b._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/firebase-orginal_src_app_layout_tsx_d367f37a._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_%40floating-ui_414d532e._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_%40radix-ui_22600695._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_%40dnd-kit_core_dist_core_esm_1ad8394a.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_4e339880._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/firebase-orginal_src_app_orders_page_tsx_67beaf9d._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_next_dist_client_components_builtin_global-error_d367f37a.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_3b4b0e9d._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/firebase-orginal_src_e9b1c7eb._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_lucide-react_dist_esm_lucide-react_88c7da99.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_xlsx_xlsx_mjs_45381b09._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_3f8af333._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_c8c997ce._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_lucide-react_dist_esm_icons_c9f298be._.js
+
+[1A[2KBROWSER LOG: [HMR] connected
+
+[1A[2K>> POST https://ebbigogxixgbajqijgpp.supabase.co/auth/v1/token?grant_type=refresh_token
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/auth/v1/token?grant_type=refresh_token
+
+[1A[2KBROWSER LOG: Service Worker registration failed: Error: SW registration blocked by Playwright
+    at window.navigator.serviceWorker.register (<anonymous>:6:72)
+    at registerServiceWorker (http://localhost:9002/_next/static/chunks/firebase-orginal_src_70e3500a._.js:2633:60)
+    at useServiceWorker.useEffect (http://localhost:9002/_next/static/chunks/firebase-orginal_src_70e3500a._.js:536:211)
+    at Object.react_stack_bottom_frame (http://localhost:9002/_next/static/chunks/97dea_next_dist_compiled_react-dom_92424803._.js:14796:22)
+    at runWithFiberInDEV (http://localhost:9002/_next/static/chunks/97dea_next_dist_compiled_react-dom_92424803._.js:959:74)
+    at commitHookEffectListMount (http://localhost:9002/_next/static/chunks/97dea_next_dist_compiled_react-dom_92424803._.js:7208:167)
+    at commitHookPassiveMountEffects (http://localhost:9002/_next/static/chunks/97dea_next_dist_compiled_react-dom_92424803._.js:7243:60)
+    at commitPassiveMountOnFiber (http://localhost:9002/_next/static/chunks/97dea_next_dist_compiled_react-dom_92424803._.js:8621:33)
+    at recursivelyTraversePassiveMountEffects (http://localhost:9002/_next/static/chunks/97dea_next_dist_compiled_react-dom_92424803._.js:8608:316)
+    at commitPassiveMountOnFiber (http://localhost:9002/_next/static/chunks/97dea_next_dist_compiled_react-dom_92424803._.js:8682:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:9002/_next/static/chunks/97dea_next_dist_compiled_react-dom_92424803._.js:8608:316)
+    at commitPassiveMountOnFiber (http://localhost:9002/_next/static/chunks/97dea_next_dist_compiled_react-dom_92424803._.js:8620:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:9002/_next/static/chunks/97dea_next_dist_compiled_react-dom_92424803._.js:8608:316)
+    at commitPassiveMountOnFiber (http://localhost:9002/_next/static/chunks/97dea_next_dist_compiled_react-dom_92424803._.js:8682:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:9002/_next/static/chunks/97dea_next_dist_compiled_react-dom_92424803._.js:8608:316)
+    at commitPassiveMountOnFiber (http://localhost:9002/_next/static/chunks/97dea_next_dist_compiled_react-dom_92424803._.js:8682:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:9002/_next/static/chunks/97dea_next_dist_compiled_react-dom_92424803._.js:8608:316)
+    at commitPassiveMountOnFiber (http://localhost:9002/_next/static/chunks/97dea_next_dist_compiled_react-dom_92424803._.js:8620:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:9002/_next/static/chunks/97dea_next_dist_compiled_react-dom_92424803._.js:8608:316)
+    at commitPassiveMountOnFiber (http://localhost:9002/_next/static/chunks/97dea_next_dist_compiled_react-dom_92424803._.js:8620:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:9002/_next/static/chunks/97dea_next_dist_compiled_react-dom_92424803._.js:8608:316)
+    at commitPassiveMountOnFiber (http://localhost:9002/_next/static/chunks/97dea_next_dist_compiled_react-dom_92424803._.js:8620:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:9002/_next/static/chunks/97dea_next_dist_compiled_react-dom_92424803._.js:8608:316)
+    at commitPassiveMountOnFiber (http://localhost:9002/_next/static/chunks/97dea_next_dist_compiled_react-dom_92424803._.js:8682:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:9002/_next/static/chunks/97dea_next_dist_compiled_react-dom_92424803._.js:8608:316)
+    at commitPassiveMountOnFiber (http://localhost:9002/_next/static/chunks/97dea_next_dist_compiled_react-dom_92424803._.js:8682:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:9002/_next/static/chunks/97dea_next_dist_compiled_react-dom_92424803._.js:8608:316)
+    at commitPassiveMountOnFiber (http://localhost:9002/_next/static/chunks/97dea_next_dist_compiled_react-dom_92424803._.js:8682:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:9002/_next/static/chunks/97dea_next_dist_compiled_react-dom_92424803._.js:8608:316)
+    at commitPassiveMountOnFiber (http://localhost:9002/_next/static/chunks/97dea_next_dist_compiled_react-dom_92424803._.js:8620:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:9002/_next/static/chunks/97dea_next_dist_compiled_react-dom_92424803._.js:8608:316)
+    at commitPassiveMountOnFiber (http://localhost:9002/_next/static/chunks/97dea_next_dist_compiled_react-dom_92424803._.js:8620:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:9002/_next/static/chunks/97dea_next_dist_compiled_react-dom_92424803._.js:8608:316)
+    at commitPassiveMountOnFiber (http://localhost:9002/_next/static/chunks/97dea_next_dist_compiled_react-dom_92424803._.js:8625:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:9002/_next/static/chunks/97dea_next_dist_compiled_react-dom_92424803._.js:8608:316)
+    at commitPassiveMountOnFiber (http://localhost:9002/_next/static/chunks/97dea_next_dist_compiled_react-dom_92424803._.js:8620:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:9002/_next/static/chunks/97dea_next_dist_compiled_react-dom_92424803._.js:8608:316)
+    at commitPassiveMountOnFiber (http://localhost:9002/_next/static/chunks/97dea_next_dist_compiled_react-dom_92424803._.js:8625:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:9002/_next/static/chunks/97dea_next_dist_compiled_react-dom_92424803._.js:8608:316)
+    at commitPassiveMountOnFiber (http://localhost:9002/_next/static/chunks/97dea_next_dist_compiled_react-dom_92424803._.js:8620:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:9002/_next/static/chunks/97dea_next_dist_compiled_react-dom_92424803._.js:8608:316)
+    at commitPassiveMountOnFiber (http://localhost:9002/_next/static/chunks/97dea_next_dist_compiled_react-dom_92424803._.js:8620:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:9002/_next/static/chunks/97dea_next_dist_compiled_react-dom_92424803._.js:8608:316)
+    at commitPassiveMountOnFiber (http://localhost:9002/_next/static/chunks/97dea_next_dist_compiled_react-dom_92424803._.js:8625:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:9002/_next/static/chunks/97dea_next_dist_compiled_react-dom_92424803._.js:8608:316)
+    at commitPassiveMountOnFiber (http://localhost:9002/_next/static/chunks/97dea_next_dist_compiled_react-dom_92424803._.js:8620:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:9002/_next/static/chunks/97dea_next_dist_compiled_react-dom_92424803._.js:8608:316)
+    at commitPassiveMountOnFiber (http://localhost:9002/_next/static/chunks/97dea_next_dist_compiled_react-dom_92424803._.js:8682:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:9002/_next/static/chunks/97dea_next_dist_compiled_react-dom_92424803._.js:8608:316)
+    at commitPassiveMountOnFiber (http://localhost:9002/_next/static/chunks/97dea_next_dist_compiled_react-dom_92424803._.js:8682:17)
+
+[1A[2K>> GET http://localhost:9002/__nextjs_font/geist-latin.woff2
+
+[1A[2K>> POST http://localhost:9002/__nextjs_original-stack-frames
+
+[1A[2K[webkit] ΓÇ║ e2e\notifications.spec.ts:10:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+>> GET http://localhost:9002/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_c8c997ce._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_3f8af333._.js
+
+[1A[2K[chromium] ΓÇ║ e2e\notifications.spec.ts:10:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+>> GET http://localhost:9002/_next/static/chunks/firebase-orginal_src_lib_cache-manager_ts_b1594961._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/firebase-orginal_src_lib_cache-manager_ts_bb34e3e9._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/__nextjs_original-stack-frames
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/firebase-orginal_src_lib_cache-manager_ts_bb34e3e9._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/firebase-orginal_src_lib_cache-manager_ts_b1594961._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/__nextjs_font/geist-latin.woff2
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/notifications?select=*&userId=eq.test-user-id&order=createdAt.desc&limit=50
+
+[1A[2KIntercepted Supabase request: GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/notifications?select=*&userId=eq.test-user-id&order=createdAt.desc&limit=50
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/orders?select=*&order=orderDate.desc&offset=0&limit=20
+
+[1A[2KIntercepted Supabase request: GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/orders?select=*&order=orderDate.desc&offset=0&limit=20
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/notifications?select=*&userId=eq.test-user-id&order=createdAt.desc&limit=50
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/visits?select=*
+
+[1A[2KIntercepted Supabase request: GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/visits?select=*
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/companies?select=*&name=not.like.%5BDELETED%5D%25
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/baristas?select=*
+
+[1A[2KIntercepted Supabase request: GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/baristas?select=*
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/feedback?select=*
+
+[1A[2KIntercepted Supabase request: GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/feedback?select=*
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/areas?select=*
+
+[1A[2KIntercepted Supabase request: GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/areas?select=*
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/maintenance?select=*
+
+[1A[2KIntercepted Supabase request: GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/maintenance?select=*
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/maintenanceEmployees?select=*
+
+[1A[2KIntercepted Supabase request: GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/maintenanceEmployees?select=*
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/cancellationReasons?select=*
+
+[1A[2KIntercepted Supabase request: GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/cancellationReasons?select=*
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/manufacturers?select=*
+
+[1A[2KIntercepted Supabase request: GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/manufacturers?select=*
+
+[1A[2K[webkit] ΓÇ║ e2e\notifications.spec.ts:10:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+BROWSER LOG: [HMR] connected
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_3f8af333._.js
+
+[1A[2K[chromium] ΓÇ║ e2e\notifications.spec.ts:10:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/categories?select=*
+
+[1A[2K[webkit] ΓÇ║ e2e\notifications.spec.ts:10:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+<< [33m200[39m http://localhost:9002/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_c8c997ce._.js
+
+[1A[2K[chromium] ΓÇ║ e2e\notifications.spec.ts:10:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+Intercepted Supabase request: GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/categories?select=*
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/taxes?select=*
+
+[1A[2KIntercepted Supabase request: GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/taxes?select=*
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/orders?select=*&order=orderDate.desc&offset=0&limit=50
+
+[1A[2KIntercepted Supabase request: GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/orders?select=*&order=orderDate.desc&offset=0&limit=50
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/orders?select=*
+
+[1A[2KIntercepted Supabase request: GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/orders?select=*
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/companies?select=*
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/products?select=*
+
+[1A[2K[webkit] ΓÇ║ e2e\notifications.spec.ts:10:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+>> POST https://ebbigogxixgbajqijgpp.supabase.co/auth/v1/token?grant_type=refresh_token
+
+[1A[2K[chromium] ΓÇ║ e2e\notifications.spec.ts:10:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/maintenance?select=*
+
+[1A[2KIntercepted Supabase request: GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/maintenance?select=*
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/manufacturers?select=*
+
+[1A[2KIntercepted Supabase request: GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/manufacturers?select=*
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/categories?select=*
+
+[1A[2KIntercepted Supabase request: GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/categories?select=*
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/taxes?select=*
+
+[1A[2KIntercepted Supabase request: GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/taxes?select=*
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/visits?select=*
+
+[1A[2KIntercepted Supabase request: GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/visits?select=*
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/companies?select=*&name=not.like.%5BDELETED%5D%25
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/baristas?select=*
+
+[1A[2KIntercepted Supabase request: GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/baristas?select=*
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/feedback?select=*
+
+[1A[2KIntercepted Supabase request: GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/feedback?select=*
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/areas?select=*
+
+[1A[2KIntercepted Supabase request: GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/areas?select=*
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/maintenance?select=*
+
+[1A[2KIntercepted Supabase request: GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/maintenance?select=*
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/maintenanceEmployees?select=*
+
+[1A[2KIntercepted Supabase request: GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/maintenanceEmployees?select=*
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/cancellationReasons?select=*
+
+[1A[2KIntercepted Supabase request: GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/cancellationReasons?select=*
+
+[1A[2K[webkit] ΓÇ║ e2e\notifications.spec.ts:10:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/auth/v1/token?grant_type=refresh_token
+
+[1A[2K[chromium] ΓÇ║ e2e\notifications.spec.ts:10:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/manufacturers?select=*
+
+[1A[2KIntercepted Supabase request: GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/manufacturers?select=*
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/categories?select=*
+
+[1A[2KIntercepted Supabase request: GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/categories?select=*
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/taxes?select=*
+
+[1A[2KIntercepted Supabase request: GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/taxes?select=*
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/orders?select=*&order=orderDate.desc&offset=0&limit=50
+
+[1A[2KIntercepted Supabase request: GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/orders?select=*&order=orderDate.desc&offset=0&limit=50
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/orders?select=*
+
+[1A[2KIntercepted Supabase request: GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/orders?select=*
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/companies?select=*
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/products?select=*
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/maintenance?select=*
+
+[1A[2KIntercepted Supabase request: GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/maintenance?select=*
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/manufacturers?select=*
+
+[1A[2KIntercepted Supabase request: GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/manufacturers?select=*
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/categories?select=*
+
+[1A[2KIntercepted Supabase request: GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/categories?select=*
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/taxes?select=*
+
+[1A[2KIntercepted Supabase request: GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/taxes?select=*
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/orders?select=*&order=orderDate.desc&offset=0&limit=20
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/visits?select=*
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/companies?select=*&name=not.like.%5BDELETED%5D%25
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/baristas?select=*
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/feedback?select=*
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/areas?select=*
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/maintenance?select=*
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/maintenanceEmployees?select=*
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/cancellationReasons?select=*
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/manufacturers?select=*
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/categories?select=*
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/taxes?select=*
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/orders?select=*&order=orderDate.desc&offset=0&limit=50
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/orders?select=*
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/companies?select=*
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/products?select=*
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/maintenance?select=*
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/manufacturers?select=*
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/categories?select=*
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/taxes?select=*
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/visits?select=*
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/companies?select=*&name=not.like.%5BDELETED%5D%25
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/baristas?select=*
+
+[1A[2K[webkit] ΓÇ║ e2e\notifications.spec.ts:10:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+>> GET http://localhost:9002/__nextjs_font/geist-latin.woff2
+
+[1A[2K[chromium] ΓÇ║ e2e\notifications.spec.ts:10:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/feedback?select=*
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/areas?select=*
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/maintenance?select=*
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/maintenanceEmployees?select=*
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/cancellationReasons?select=*
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/manufacturers?select=*
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/categories?select=*
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/taxes?select=*
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/orders?select=*&order=orderDate.desc&offset=0&limit=50
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/orders?select=*
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/companies?select=*
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/products?select=*
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/maintenance?select=*
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/manufacturers?select=*
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/categories?select=*
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/taxes?select=*
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/products?select=*&offset=0&limit=50
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/products?select=*&offset=0&limit=50
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/products?select=*&offset=0&limit=50
+
+[1A[2K[webkit] ΓÇ║ e2e\notifications.spec.ts:10:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+<< [33m200[39m http://localhost:9002/__nextjs_font/geist-latin.woff2
+
+[1A[2K[chromium] ΓÇ║ e2e\notifications.spec.ts:10:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/products?select=*&offset=0&limit=50
+
+[1A[2K[webkit] ΓÇ║ e2e\notifications.spec.ts:10:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+BROWSER LOG: Service Worker registration failed: Error: SW registration blocked by Playwright
+
+[1A[2K>> POST http://localhost:9002/__nextjs_original-stack-frames
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/firebase-orginal_src_lib_cache-manager_ts_b1594961._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/firebase-orginal_src_lib_cache-manager_ts_bb34e3e9._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/__nextjs_original-stack-frames
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/firebase-orginal_src_lib_cache-manager_ts_bb34e3e9._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/firebase-orginal_src_lib_cache-manager_ts_b1594961._.js
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/notifications?select=*&userId=eq.test-user-id&order=createdAt.desc&limit=50
+
+[1A[2KIntercepted Supabase request: GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/notifications?select=*&userId=eq.test-user-id&order=createdAt.desc&limit=50
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/notifications?select=*&userId=eq.test-user-id&order=createdAt.desc&limit=50
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/orders?select=*&order=orderDate.desc&offset=0&limit=20
+
+[1A[2KIntercepted Supabase request: GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/orders?select=*&order=orderDate.desc&offset=0&limit=20
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/visits?select=*
+
+[1A[2KIntercepted Supabase request: GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/visits?select=*
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/orders?select=*&order=orderDate.desc&offset=0&limit=20
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/visits?select=*
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/companies?select=*&name=not.like.%5BDELETED%5D%25
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/baristas?select=*
+
+[1A[2KIntercepted Supabase request: GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/baristas?select=*
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/feedback?select=*
+
+[1A[2KIntercepted Supabase request: GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/feedback?select=*
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/companies?select=*&name=not.like.%5BDELETED%5D%25
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/areas?select=*
+
+[1A[2KIntercepted Supabase request: GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/areas?select=*
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/maintenance?select=*
+
+[1A[2KIntercepted Supabase request: GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/maintenance?select=*
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/maintenanceEmployees?select=*
+
+[1A[2KIntercepted Supabase request: GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/maintenanceEmployees?select=*
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/cancellationReasons?select=*
+
+[1A[2KIntercepted Supabase request: GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/cancellationReasons?select=*
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/manufacturers?select=*
+
+[1A[2KIntercepted Supabase request: GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/manufacturers?select=*
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/baristas?select=*
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/categories?select=*
+
+[1A[2KIntercepted Supabase request: GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/categories?select=*
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/feedback?select=*
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/taxes?select=*
+
+[1A[2KIntercepted Supabase request: GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/taxes?select=*
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/areas?select=*
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/maintenance?select=*
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/maintenanceEmployees?select=*
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/cancellationReasons?select=*
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/manufacturers?select=*
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/orders?select=*&order=orderDate.desc&offset=0&limit=50
+
+[1A[2KIntercepted Supabase request: GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/orders?select=*&order=orderDate.desc&offset=0&limit=50
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/visits?select=*
+
+[1A[2KIntercepted Supabase request: GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/visits?select=*
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/categories?select=*
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/companies?select=*&name=not.like.%5BDELETED%5D%25
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/baristas?select=*
+
+[1A[2KIntercepted Supabase request: GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/baristas?select=*
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/feedback?select=*
+
+[1A[2KIntercepted Supabase request: GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/feedback?select=*
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/areas?select=*
+
+[1A[2KIntercepted Supabase request: GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/areas?select=*
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/maintenance?select=*
+
+[1A[2KIntercepted Supabase request: GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/maintenance?select=*
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/maintenanceEmployees?select=*
+
+[1A[2KIntercepted Supabase request: GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/maintenanceEmployees?select=*
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/taxes?select=*
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/cancellationReasons?select=*
+
+[1A[2KIntercepted Supabase request: GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/cancellationReasons?select=*
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/manufacturers?select=*
+
+[1A[2KIntercepted Supabase request: GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/manufacturers?select=*
+
+[1A[2K[firefox] ΓÇ║ e2e\notifications.spec.ts:10:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+Setting up Supabase mocks...
+
+[1A[2K[webkit] ΓÇ║ e2e\notifications.spec.ts:10:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/categories?select=*
+
+[1A[2KIntercepted Supabase request: GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/categories?select=*
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/taxes?select=*
+
+[1A[2KIntercepted Supabase request: GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/taxes?select=*
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/orders?select=*&order=orderDate.desc&offset=0&limit=50
+
+[1A[2KIntercepted Supabase request: GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/orders?select=*&order=orderDate.desc&offset=0&limit=50
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/orders?select=*
+
+[1A[2KIntercepted Supabase request: GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/orders?select=*
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/companies?select=*
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/products?select=*
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/maintenance?select=*
+
+[1A[2KIntercepted Supabase request: GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/maintenance?select=*
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/manufacturers?select=*
+
+[1A[2KIntercepted Supabase request: GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/manufacturers?select=*
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/categories?select=*
+
+[1A[2KIntercepted Supabase request: GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/categories?select=*
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/taxes?select=*
+
+[1A[2KIntercepted Supabase request: GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/taxes?select=*
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/orders?select=*
+
+[1A[2KIntercepted Supabase request: GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/orders?select=*
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/orders?select=*&order=orderDate.desc&offset=0&limit=50
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/visits?select=*
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/companies?select=*&name=not.like.%5BDELETED%5D%25
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/baristas?select=*
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/feedback?select=*
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/areas?select=*
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/maintenance?select=*
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/companies?select=*
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/products?select=*
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/maintenance?select=*
+
+[1A[2KIntercepted Supabase request: GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/maintenance?select=*
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/manufacturers?select=*
+
+[1A[2KIntercepted Supabase request: GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/manufacturers?select=*
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/maintenanceEmployees?select=*
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/cancellationReasons?select=*
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/manufacturers?select=*
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/categories?select=*
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/categories?select=*
+
+[1A[2KIntercepted Supabase request: GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/categories?select=*
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/taxes?select=*
+
+[1A[2KIntercepted Supabase request: GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/taxes?select=*
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/products?select=*&offset=0&limit=50
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/taxes?select=*
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/orders?select=*&order=orderDate.desc&offset=0&limit=50
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/orders?select=*
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/companies?select=*
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/products?select=*
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/maintenance?select=*
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/manufacturers?select=*
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/categories?select=*
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/taxes?select=*
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/orders?select=*
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/products?select=*&offset=0&limit=50
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/companies?select=*
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/products?select=*
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/maintenance?select=*
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/manufacturers?select=*
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/categories?select=*
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/taxes?select=*
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/products?select=*&offset=0&limit=50
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/products?select=*&offset=0&limit=50
+
+[1A[2K[firefox] ΓÇ║ e2e\notifications.spec.ts:10:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+Restored auth state from file
+
+[1A[2KSetting up Supabase mocks...
+
+[1A[2K>> GET http://localhost:9002/orders
+
+[1A[2K[chromium] ΓÇ║ e2e\notifications.spec.ts:10:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+BROWSER LOG: [Fast Refresh] rebuilding
+
+[1A[2K[webkit] ΓÇ║ e2e\notifications.spec.ts:10:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+BROWSER LOG: [Fast Refresh] rebuilding
+
+[1A[2K[chromium] ΓÇ║ e2e\notifications.spec.ts:10:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+BROWSER LOG: [Fast Refresh] done in 128ms
+
+[1A[2K[firefox] ΓÇ║ e2e\notifications.spec.ts:10:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+<< [33m200[39m http://localhost:9002/orders
+
+[1A[2K[webkit] ΓÇ║ e2e\notifications.spec.ts:10:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+BROWSER LOG: [Fast Refresh] done in 189ms
+
+[1A[2K[firefox] ΓÇ║ e2e\notifications.spec.ts:10:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+>> GET http://localhost:9002/_next/static/chunks/firebase-orginal_src_app_globals_31e9131b.css
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_099275f4._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_next_dist_compiled_react-dom_92424803._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_next_dist_compiled_react-server-dom-turbopack_fd66e9bc._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_next_dist_compiled_next-devtools_index_a78e6daf.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_next_dist_compiled_e793555b._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_next_dist_client_ce563615._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_next_dist_b5d32be2._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_%40swc_helpers_cjs_b4342a33._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/firebase-orginal_a0ff3932._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/turbopack-firebase-orginal_1df438e4._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_next_dist_e8d2e20c._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/firebase-orginal_src_app_favicon_ico_mjs_b3a5503f._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/firebase-orginal_src_7a0328b7._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/firebase-orginal_src_components_aa73e6bd._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/firebase-orginal_src_store_208195a7._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/firebase-orginal_src_app_5c70d10a._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/firebase-orginal_src_70e3500a._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_next_60f77ba3._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_lucide-react_dist_esm_icons_index_a0c80c48.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_lucide-react_dist_esm_icons_c9f298be._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_lucide-react_dist_esm_lucide-react_88c7da99.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_lucide-react_dist_esm_aadc553c._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_%40supabase_realtime-js_dist_module_bd33ecdc._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_%40supabase_storage-js_dist_module_f441eeb6._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_%40supabase_auth-js_dist_module_69c9005e._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_date-fns_1c402563._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_zod_v3_f983f72b._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_%40radix-ui_22600695._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_%40floating-ui_414d532e._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_4e339880._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/firebase-orginal_src_app_layout_tsx_d367f37a._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/firebase-orginal_src_e9b1c7eb._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_xlsx_xlsx_mjs_45381b09._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_%40dnd-kit_core_dist_core_esm_1ad8394a.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_3b4b0e9d._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/firebase-orginal_src_app_orders_page_tsx_67beaf9d._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/97dea_next_dist_client_components_builtin_global-error_d367f37a.js
+
+[1A[2K>> GET https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;500;600;700&display=swap
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/firebase-orginal_src_app_globals_31e9131b.css
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_099275f4._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_next_dist_compiled_react-dom_92424803._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_next_dist_compiled_react-server-dom-turbopack_fd66e9bc._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_next_dist_compiled_next-devtools_index_a78e6daf.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_next_dist_compiled_e793555b._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_next_dist_client_ce563615._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_next_dist_b5d32be2._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_%40swc_helpers_cjs_b4342a33._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/firebase-orginal_a0ff3932._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/firebase-orginal_src_app_favicon_ico_mjs_b3a5503f._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/turbopack-firebase-orginal_1df438e4._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_next_dist_e8d2e20c._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/firebase-orginal_src_7a0328b7._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/firebase-orginal_src_components_aa73e6bd._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/firebase-orginal_src_store_208195a7._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/firebase-orginal_src_app_5c70d10a._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/firebase-orginal_src_70e3500a._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_next_60f77ba3._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_lucide-react_dist_esm_icons_index_a0c80c48.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_lucide-react_dist_esm_icons_c9f298be._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_lucide-react_dist_esm_lucide-react_88c7da99.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_lucide-react_dist_esm_aadc553c._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_%40supabase_realtime-js_dist_module_bd33ecdc._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_%40supabase_storage-js_dist_module_f441eeb6._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_%40supabase_auth-js_dist_module_69c9005e._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_date-fns_1c402563._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_zod_v3_f983f72b._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_%40radix-ui_22600695._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_%40floating-ui_414d532e._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_4e339880._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/firebase-orginal_src_app_layout_tsx_d367f37a._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/firebase-orginal_src_e9b1c7eb._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_xlsx_xlsx_mjs_45381b09._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_%40dnd-kit_core_dist_core_esm_1ad8394a.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_3b4b0e9d._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/firebase-orginal_src_app_orders_page_tsx_67beaf9d._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/97dea_next_dist_client_components_builtin_global-error_d367f37a.js
+
+[1A[2K<< [33m200[39m https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;500;600;700&display=swap
+
+[1A[2K>> GET http://localhost:9002/favicon.ico?favicon.7ed73651.ico
+
+[1A[2K<< [33m200[39m http://localhost:9002/favicon.ico?favicon.7ed73651.ico
+
+[1A[2KBROWSER LOG: Download the React DevTools for a better development experience: https://react.dev/link/react-devtools
+
+[1A[2KBROWSER LOG: Server Requests Track
+
+[1A[2KBROWSER LOG: Server Components Track
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_c8c997ce._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_3f8af333._.js
+
+[1A[2K>> GET http://localhost:9002/_next/webpack-hmr?id=GeRx7Z4FIXA2nyxAcEdTF
+
+[1A[2K<< [33m101[39m http://localhost:9002/_next/webpack-hmr?id=GeRx7Z4FIXA2nyxAcEdTF
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_c8c997ce._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_3f8af333._.js
+
+[1A[2KBROWSER LOG: Blocking Track
+
+[1A[2KBROWSER LOG: Transition Track
+
+[1A[2KBROWSER LOG: Suspense Track
+
+[1A[2KBROWSER LOG: Idle Track
+
+[1A[2KBROWSER LOG: Blocked
+
+[1A[2KBROWSER LOG: [HMR] connected
+
+[1A[2K>> POST https://ebbigogxixgbajqijgpp.supabase.co/auth/v1/token?grant_type=refresh_token
+
+[1A[2KBROWSER LOG: Blocked
+
+[1A[2KBROWSER LOG: Blocked
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/auth/v1/token?grant_type=refresh_token
+
+[1A[2KBROWSER LOG: Blocked
+
+[1A[2KBROWSER LOG: Server Requests Track
+
+[1A[2KBROWSER LOG: Server Components Track
+
+[1A[2KBROWSER LOG: ΓÇïPreloads
+
+[1A[2KBROWSER LOG: ΓÇïHTTPAccessErrorFallback
+
+[1A[2KBROWSER LOG: ΓÇïNotFound
+
+[1A[2KBROWSER LOG: ΓÇïRootLayout
+
+[1A[2KBROWSER LOG: ΓÇïNext.MetadataOutlet
+
+[1A[2KBROWSER LOG: ΓÇïSkeleton
+
+[1A[2KBROWSER LOG: ΓÇïSkeleton
+
+[1A[2KBROWSER LOG: ΓÇïSkeleton
+
+[1A[2KBROWSER LOG: ΓÇïSkeleton
+
+[1A[2KBROWSER LOG: ΓÇïSkeleton
+
+[1A[2KBROWSER LOG: ΓÇïSkeleton
+
+[1A[2KBROWSER LOG: ΓÇïSkeleton
+
+[1A[2KBROWSER LOG: ΓÇïSkeleton
+
+[1A[2KBROWSER LOG: ΓÇïLoading
+
+[1A[2KBROWSER LOG: ΓÇïNonIndex
+
+[1A[2KBROWSER LOG: ΓÇïNext.Viewport
+
+[1A[2KBROWSER LOG: ΓÇïNext.Metadata
+
+[1A[2KBROWSER LOG: Blocked
+
+[1A[2KBROWSER LOG: Hydrated
+
+[1A[2KBROWSER LOG: SegmentTrieNode
+
+[1A[2KBROWSER LOG: ol
+
+[1A[2KBROWSER LOG: div
+
+[1A[2KBROWSER LOG: Commit
+
+[1A[2KBROWSER LOG: Root
+
+[1A[2KBROWSER LOG: ServerRoot
+
+[1A[2KBROWSER LOG: AppRouter
+
+[1A[2KBROWSER LOG: RootErrorBoundary
+
+[1A[2KBROWSER LOG: ErrorBoundary
+
+[1A[2KBROWSER LOG: ErrorBoundaryHandler
+
+[1A[2KBROWSER LOG: Router
+
+[1A[2KBROWSER LOG: HistoryUpdater
+
+[1A[2KBROWSER LOG: HistoryUpdater
+
+[1A[2KBROWSER LOG: RuntimeStyles
+
+[1A[2KBROWSER LOG: HotReload
+
+[1A[2KBROWSER LOG: AppDevOverlayErrorBoundary
+
+[1A[2KBROWSER LOG: ReplaySsrOnlyErrors
+
+[1A[2KBROWSER LOG: DevRootHTTPAccessFallbackBoundary
+
+[1A[2KBROWSER LOG: HTTPAccessFallbackBoundary
+
+[1A[2KBROWSER LOG: HTTPAccessFallbackErrorBoundary
+
+[1A[2KBROWSER LOG: RedirectBoundary
+
+[1A[2KBROWSER LOG: RedirectErrorBoundary
+
+[1A[2KBROWSER LOG: Head
+
+[1A[2KBROWSER LOG: __next_viewport_boundary__
+
+[1A[2KBROWSER LOG: __next_metadata_boundary__
+
+[1A[2KBROWSER LOG: __next_root_layout_boundary__
+
+[1A[2KBROWSER LOG: SegmentViewNode
+
+[1A[2KBROWSER LOG: SegmentTrieNode
+
+[1A[2KBROWSER LOG: ThemeProvider
+
+[1A[2KBROWSER LOG: z
+
+[1A[2KBROWSER LOG: O
+
+[1A[2KBROWSER LOG: AuthProvider
+
+[1A[2KBROWSER LOG: AppShell
+
+[1A[2KBROWSER LOG: LoaderCircle
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2KBROWSER LOG: AppShell
+
+[1A[2KBROWSER LOG: Toaster
+
+[1A[2KBROWSER LOG: ToastProvider
+
+[1A[2KBROWSER LOG: ToastCollectionProvider
+
+[1A[2KBROWSER LOG: ToastCollectionProviderProvider
+
+[1A[2KBROWSER LOG: ToastProviderProvider
+
+[1A[2KBROWSER LOG: ToastViewport
+
+[1A[2KBROWSER LOG: ToastViewport
+
+[1A[2KBROWSER LOG: DismissableLayerBranch
+
+[1A[2KBROWSER LOG: Primitive.div
+
+[1A[2KBROWSER LOG: ToastCollectionSlot
+
+[1A[2KBROWSER LOG: ToastCollectionSlot.Slot
+
+[1A[2KBROWSER LOG: ToastCollectionSlot.SlotClone
+
+[1A[2KBROWSER LOG: Primitive.ol
+
+[1A[2KBROWSER LOG: ToastViewport
+
+[1A[2KBROWSER LOG: O
+
+[1A[2KBROWSER LOG: AppRouterAnnouncer
+
+[1A[2KBROWSER LOG: HotReload
+
+[1A[2KBROWSER LOG: Remaining Effects
+
+[1A[2KBROWSER LOG: Blocking Track
+
+[1A[2KBROWSER LOG: Transition Track
+
+[1A[2KBROWSER LOG: Suspense Track
+
+[1A[2KBROWSER LOG: Idle Track
+
+[1A[2KBROWSER LOG: Render
+
+[1A[2KBROWSER LOG: ol
+
+[1A[2KBROWSER LOG: Commit
+
+[1A[2KBROWSER LOG: Waiting
+
+[1A[2KBROWSER LOG: O
+
+[1A[2KBROWSER LOG: AppShell
+
+[1A[2KBROWSER LOG: LoaderCircle
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2KBROWSER LOG: ToastProvider
+
+[1A[2KBROWSER LOG: ToastViewport
+
+[1A[2KBROWSER LOG: AppRouterAnnouncer
+
+[1A[2KBROWSER LOG: Remaining Effects
+
+[1A[2KBROWSER LOG: Blocking Track
+
+[1A[2KBROWSER LOG: Transition Track
+
+[1A[2KBROWSER LOG: Suspense Track
+
+[1A[2KBROWSER LOG: Idle Track
+
+[1A[2KBROWSER LOG: Render
+
+[1A[2KBROWSER LOG: Service Worker registration failed: Error
+
+[1A[2KBROWSER LOG: Blocking Track
+
+[1A[2KBROWSER LOG: Transition Track
+
+[1A[2KBROWSER LOG: Suspense Track
+
+[1A[2KBROWSER LOG: Idle Track
+
+[1A[2KBROWSER LOG: Render
+
+[1A[2K>> POST http://localhost:9002/__nextjs_original-stack-frames
+
+[1A[2KBROWSER LOG: Blocking Track
+
+[1A[2KBROWSER LOG: Transition Track
+
+[1A[2KBROWSER LOG: Suspense Track
+
+[1A[2KBROWSER LOG: Idle Track
+
+[1A[2K>> GET http://localhost:9002/__nextjs_font/geist-latin.woff2
+
+[1A[2K<< [33m200[39m http://localhost:9002/__nextjs_font/geist-latin.woff2
+
+[1A[2KBROWSER LOG: Render
+
+[1A[2KBROWSER LOG: a
+
+[1A[2KBROWSER LOG: a
+
+[1A[2KBROWSER LOG: Presence
+
+[1A[2KBROWSER LOG: Dialog
+
+[1A[2K[chromium] ΓÇ║ e2e\notifications.spec.ts:10:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+BROWSER LOG: [Fast Refresh] rebuilding
+
+[1A[2K[webkit] ΓÇ║ e2e\notifications.spec.ts:10:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+BROWSER LOG: [Fast Refresh] rebuilding
+
+[1A[2K[firefox] ΓÇ║ e2e\notifications.spec.ts:10:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+BROWSER LOG: AvatarImage
+
+[1A[2KBROWSER LOG: SegmentViewStateNode
+
+[1A[2KBROWSER LOG: Commit
+
+[1A[2KBROWSER LOG: AuthProvider
+
+[1A[2K[chromium] ΓÇ║ e2e\notifications.spec.ts:10:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+BROWSER LOG: [Fast Refresh] done in 149ms
+
+[1A[2K[webkit] ΓÇ║ e2e\notifications.spec.ts:10:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+BROWSER LOG: [Fast Refresh] done in 147ms
+
+[1A[2K[firefox] ΓÇ║ e2e\notifications.spec.ts:10:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order
+BROWSER LOG: AppShell
+
+[1A[2KBROWSER LOG: OfflineBanner
+
+[1A[2KBROWSER LOG: ToastContainer
+
+[1A[2KBROWSER LOG: SidebarProvider
+
+[1A[2KBROWSER LOG: TooltipProvider
+
+[1A[2KBROWSER LOG: TooltipProviderProvider
+
+[1A[2KBROWSER LOG: Sidebar
+
+[1A[2KBROWSER LOG: SidebarHeader
+
+[1A[2KBROWSER LOG: LinkComponent
+
+[1A[2KBROWSER LOG: logo
+
+[1A[2KBROWSER LOG: SidebarContent
+
+[1A[2KBROWSER LOG: MainNav
+
+[1A[2KBROWSER LOG: SidebarMenu
+
+[1A[2KBROWSER LOG: SidebarMenuItem
+
+[1A[2KBROWSER LOG: SidebarMenuButton
+
+[1A[2KBROWSER LOG: Slot.Slot
+
+[1A[2KBROWSER LOG: Slot.SlotClone
+
+[1A[2KBROWSER LOG: LinkComponent
+
+[1A[2KBROWSER LOG: LayoutDashboard
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2KBROWSER LOG: SidebarMenuItem
+
+[1A[2KBROWSER LOG: SidebarMenuButton
+
+[1A[2KBROWSER LOG: Slot.Slot
+
+[1A[2KBROWSER LOG: Slot.SlotClone
+
+[1A[2KBROWSER LOG: LinkComponent
+
+[1A[2KBROWSER LOG: ChartColumn
+
+[1A[2KBROWSER LOG: SidebarMenuSub
+
+[1A[2KBROWSER LOG: SidebarMenuSubItem
+
+[1A[2KBROWSER LOG: SidebarMenuSubButton
+
+[1A[2KBROWSER LOG: Slot.Slot
+
+[1A[2KBROWSER LOG: Slot.SlotClone
+
+[1A[2KBROWSER LOG: LinkComponent
+
+[1A[2KBROWSER LOG: CircleX
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2KBROWSER LOG: SidebarMenuSubItem
+
+[1A[2KBROWSER LOG: SidebarMenuSubButton
+
+[1A[2KBROWSER LOG: Slot.Slot
+
+[1A[2KBROWSER LOG: Slot.SlotClone
+
+[1A[2KBROWSER LOG: LinkComponent
+
+[1A[2KBROWSER LOG: Bell
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2KBROWSER LOG: SidebarMenuItem
+
+[1A[2KBROWSER LOG: SidebarMenuButton
+
+[1A[2KBROWSER LOG: Slot.Slot
+
+[1A[2KBROWSER LOG: Slot.SlotClone
+
+[1A[2KBROWSER LOG: LinkComponent
+
+[1A[2KBROWSER LOG: Building
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2KBROWSER LOG: SidebarMenuItem
+
+[1A[2KBROWSER LOG: SidebarMenuButton
+
+[1A[2KBROWSER LOG: Slot.Slot
+
+[1A[2KBROWSER LOG: Slot.SlotClone
+
+[1A[2KBROWSER LOG: LinkComponent
+
+[1A[2KBROWSER LOG: Package
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2KBROWSER LOG: SidebarMenuSub
+
+[1A[2KBROWSER LOG: SidebarMenuSubItem
+
+[1A[2KBROWSER LOG: SidebarMenuSubButton
+
+[1A[2KBROWSER LOG: Slot.Slot
+
+[1A[2KBROWSER LOG: Slot.SlotClone
+
+[1A[2KBROWSER LOG: LinkComponent
+
+[1A[2KBROWSER LOG: Tags
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2KBROWSER LOG: SidebarMenuItem
+
+[1A[2KBROWSER LOG: SidebarMenuButton
+
+[1A[2KBROWSER LOG: Slot.Slot
+
+[1A[2KBROWSER LOG: Slot.SlotClone
+
+[1A[2KBROWSER LOG: LinkComponent
+
+[1A[2KBROWSER LOG: ShoppingCart
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2KBROWSER LOG: SidebarMenuSub
+
+[1A[2KBROWSER LOG: SidebarMenuSubItem
+
+[1A[2KBROWSER LOG: SidebarMenuSubButton
+
+[1A[2KBROWSER LOG: Slot.Slot
+
+[1A[2KBROWSER LOG: Slot.SlotClone
+
+[1A[2KBROWSER LOG: LinkComponent
+
+[1A[2KBROWSER LOG: Map
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2KBROWSER LOG: SidebarMenuItem
+
+[1A[2KBROWSER LOG: SidebarMenuButton
+
+[1A[2KBROWSER LOG: Slot.Slot
+
+[1A[2KBROWSER LOG: Slot.SlotClone
+
+[1A[2KBROWSER LOG: LinkComponent
+
+[1A[2KBROWSER LOG: SidebarMenuItem
+
+[1A[2KBROWSER LOG: SidebarMenuButton
+
+[1A[2KBROWSER LOG: Slot.Slot
+
+[1A[2KBROWSER LOG: Slot.SlotClone
+
+[1A[2KBROWSER LOG: LinkComponent
+
+[1A[2KBROWSER LOG: Wrench
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2KBROWSER LOG: SidebarMenuSub
+
+[1A[2KBROWSER LOG: SidebarMenuSubItem
+
+[1A[2KBROWSER LOG: SidebarMenuSubButton
+
+[1A[2KBROWSER LOG: Slot.Slot
+
+[1A[2KBROWSER LOG: Slot.SlotClone
+
+[1A[2KBROWSER LOG: LinkComponent
+
+[1A[2KBROWSER LOG: Tags
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2KBROWSER LOG: SidebarMenuItem
+
+[1A[2KBROWSER LOG: SidebarMenuButton
+
+[1A[2KBROWSER LOG: Slot.Slot
+
+[1A[2KBROWSER LOG: Slot.SlotClone
+
+[1A[2KBROWSER LOG: LinkComponent
+
+[1A[2KBROWSER LOG: HardHat
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2KBROWSER LOG: SidebarMenuItem
+
+[1A[2KBROWSER LOG: SidebarMenuButton
+
+[1A[2KBROWSER LOG: Slot.Slot
+
+[1A[2KBROWSER LOG: Slot.SlotClone
+
+[1A[2KBROWSER LOG: LinkComponent
+
+[1A[2KBROWSER LOG: Phone
+
+[1A[2KBROWSER LOG: SidebarMenuItem
+
+[1A[2KBROWSER LOG: SidebarMenuButton
+
+[1A[2KBROWSER LOG: Slot.Slot
+
+[1A[2KBROWSER LOG: Slot.SlotClone
+
+[1A[2KBROWSER LOG: LinkComponent
+
+[1A[2KBROWSER LOG: Star
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2KBROWSER LOG: Separator
+
+[1A[2KBROWSER LOG: Separator
+
+[1A[2KBROWSER LOG: Primitive.div
+
+[1A[2KBROWSER LOG: SidebarMenu
+
+[1A[2KBROWSER LOG: SidebarMenuItem
+
+[1A[2KBROWSER LOG: SidebarMenuButton
+
+[1A[2KBROWSER LOG: Slot.Slot
+
+[1A[2KBROWSER LOG: Slot.SlotClone
+
+[1A[2KBROWSER LOG: LinkComponent
+
+[1A[2KBROWSER LOG: Settings
+
+[1A[2KBROWSER LOG: SidebarRail
+
+[1A[2KBROWSER LOG: SidebarInset
+
+[1A[2KBROWSER LOG: SidebarTrigger
+
+[1A[2KBROWSER LOG: Button
+
+[1A[2KBROWSER LOG: SidebarTrigger
+
+[1A[2KBROWSER LOG: Button
+
+[1A[2KBROWSER LOG: PanelLeft
+
+[1A[2KBROWSER LOG: SearchDialog
+
+[1A[2KBROWSER LOG: Dialog
+
+[1A[2KBROWSER LOG: DialogProvider
+
+[1A[2KBROWSER LOG: DialogTrigger
+
+[1A[2KBROWSER LOG: Primitive.button
+
+[1A[2KBROWSER LOG: Primitive.button.Slot
+
+[1A[2KBROWSER LOG: Primitive.button.SlotClone
+
+[1A[2KBROWSER LOG: Button
+
+[1A[2KBROWSER LOG: Search
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2KBROWSER LOG: DialogContent
+
+[1A[2KBROWSER LOG: DialogPortal
+
+[1A[2KBROWSER LOG: DialogPortalProvider
+
+[1A[2KBROWSER LOG: Presence
+
+[1A[2KBROWSER LOG: Presence
+
+[1A[2KBROWSER LOG: SyncStatusIndicator
+
+[1A[2KBROWSER LOG: TooltipProvider
+
+[1A[2KBROWSER LOG: TooltipProviderProvider
+
+[1A[2KBROWSER LOG: Tooltip
+
+[1A[2KBROWSER LOG: Popper
+
+[1A[2KBROWSER LOG: PopperProvider
+
+[1A[2KBROWSER LOG: TooltipProvider
+
+[1A[2KBROWSER LOG: TooltipTrigger
+
+[1A[2KBROWSER LOG: PopperAnchor
+
+[1A[2KBROWSER LOG: Primitive.div
+
+[1A[2KBROWSER LOG: Primitive.div.Slot
+
+[1A[2KBROWSER LOG: Primitive.div.SlotClone
+
+[1A[2KBROWSER LOG: Primitive.button
+
+[1A[2KBROWSER LOG: Primitive.button.Slot
+
+[1A[2KBROWSER LOG: Primitive.button.SlotClone
+
+[1A[2KBROWSER LOG: Wifi
+
+[1A[2KBROWSER LOG: PopperAnchor
+
+[1A[2KBROWSER LOG: TooltipContent
+
+[1A[2KBROWSER LOG: TooltipContent
+
+[1A[2KBROWSER LOG: Presence
+
+[1A[2KBROWSER LOG: PendingOperationsBadge
+
+[1A[2KBROWSER LOG: ConflictNotificationBadge
+
+[1A[2KBROWSER LOG: QuickAddMenu
+
+[1A[2KBROWSER LOG: DropdownMenu
+
+[1A[2KBROWSER LOG: DropdownMenuProvider
+
+[1A[2KBROWSER LOG: Menu
+
+[1A[2KBROWSER LOG: Popper
+
+[1A[2KBROWSER LOG: PopperProvider
+
+[1A[2KBROWSER LOG: MenuProvider
+
+[1A[2KBROWSER LOG: MenuProvider
+
+[1A[2KBROWSER LOG: DropdownMenuTrigger
+
+[1A[2KBROWSER LOG: MenuAnchor
+
+[1A[2KBROWSER LOG: PopperAnchor
+
+[1A[2KBROWSER LOG: Primitive.div
+
+[1A[2KBROWSER LOG: Primitive.div.Slot
+
+[1A[2KBROWSER LOG: Primitive.div.SlotClone
+
+[1A[2KBROWSER LOG: Primitive.button
+
+[1A[2KBROWSER LOG: Primitive.button.Slot
+
+[1A[2KBROWSER LOG: Primitive.button.SlotClone
+
+[1A[2KBROWSER LOG: Button
+
+[1A[2KBROWSER LOG: Plus
+
+[1A[2KBROWSER LOG: DropdownMenuContent
+
+[1A[2KBROWSER LOG: DropdownMenuPortal
+
+[1A[2KBROWSER LOG: MenuPortal
+
+[1A[2KBROWSER LOG: MenuPortalProvider
+
+[1A[2KBROWSER LOG: Presence
+
+[1A[2KBROWSER LOG: ThemeToggle
+
+[1A[2KBROWSER LOG: Button
+
+[1A[2KBROWSER LOG: Sun
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2KBROWSER LOG: Moon
+
+[1A[2KBROWSER LOG: NotificationCenter
+
+[1A[2KBROWSER LOG: ScheduleVisitForm
+
+[1A[2KBROWSER LOG: Dialog
+
+[1A[2KBROWSER LOG: DialogProvider
+
+[1A[2KBROWSER LOG: DialogContent
+
+[1A[2KBROWSER LOG: DialogPortal
+
+[1A[2KBROWSER LOG: DialogPortalProvider
+
+[1A[2KBROWSER LOG: Presence
+
+[1A[2KBROWSER LOG: Presence
+
+[1A[2KBROWSER LOG: Popover
+
+[1A[2KBROWSER LOG: Popper
+
+[1A[2KBROWSER LOG: PopperProvider
+
+[1A[2KBROWSER LOG: PopoverProvider
+
+[1A[2KBROWSER LOG: PopoverTrigger
+
+[1A[2KBROWSER LOG: PopperAnchor
+
+[1A[2KBROWSER LOG: Primitive.div
+
+[1A[2KBROWSER LOG: Primitive.div.Slot
+
+[1A[2KBROWSER LOG: Primitive.div.SlotClone
+
+[1A[2KBROWSER LOG: Primitive.button
+
+[1A[2KBROWSER LOG: Primitive.button.Slot
+
+[1A[2KBROWSER LOG: Primitive.button.SlotClone
+
+[1A[2KBROWSER LOG: Button
+
+[1A[2KBROWSER LOG: Bell
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2K<< [33m200[39m http://localhost:9002/__nextjs_original-stack-frames
+
+[1A[2KBROWSER LOG: PopoverContent
+
+[1A[2KBROWSER LOG: PopoverPortal
+
+[1A[2KBROWSER LOG: PopoverPortalProvider
+
+[1A[2KBROWSER LOG: Presence
+
+[1A[2KBROWSER LOG: UserNav
+
+[1A[2KBROWSER LOG: DropdownMenu
+
+[1A[2KBROWSER LOG: DropdownMenuProvider
+
+[1A[2KBROWSER LOG: Menu
+
+[1A[2KBROWSER LOG: Popper
+
+[1A[2KBROWSER LOG: PopperProvider
+
+[1A[2KBROWSER LOG: MenuProvider
+
+[1A[2KBROWSER LOG: MenuProvider
+
+[1A[2KBROWSER LOG: DropdownMenuTrigger
+
+[1A[2KBROWSER LOG: MenuAnchor
+
+[1A[2KBROWSER LOG: PopperAnchor
+
+[1A[2KBROWSER LOG: Primitive.div
+
+[1A[2KBROWSER LOG: Primitive.div.Slot
+
+[1A[2KBROWSER LOG: Primitive.div.SlotClone
+
+[1A[2KBROWSER LOG: Primitive.button
+
+[1A[2KBROWSER LOG: Primitive.button.Slot
+
+[1A[2KBROWSER LOG: Primitive.button.SlotClone
+
+[1A[2KBROWSER LOG: Button
+
+[1A[2KBROWSER LOG: Avatar
+
+[1A[2KBROWSER LOG: Avatar
+
+[1A[2KBROWSER LOG: AvatarProvider
+
+[1A[2KBROWSER LOG: Primitive.span
+
+[1A[2KBROWSER LOG: AvatarImage
+
+[1A[2KBROWSER LOG: AvatarImage
+
+[1A[2KBROWSER LOG: AvatarFallback
+
+[1A[2KBROWSER LOG: AvatarFallback
+
+[1A[2KBROWSER LOG: DropdownMenuContent
+
+[1A[2KBROWSER LOG: DropdownMenuPortal
+
+[1A[2KBROWSER LOG: MenuPortal
+
+[1A[2KBROWSER LOG: MenuPortalProvider
+
+[1A[2KBROWSER LOG: Presence
+
+[1A[2KBROWSER LOG: OuterLayoutRouter
+
+[1A[2KBROWSER LOG: SegmentStateProvider
+
+[1A[2KBROWSER LOG: RenderFromTemplateContext
+
+[1A[2KBROWSER LOG: ScrollAndFocusHandler
+
+[1A[2KBROWSER LOG: InnerScrollAndFocusHandler
+
+[1A[2KBROWSER LOG: ErrorBoundary
+
+[1A[2KBROWSER LOG: LoadingBoundary
+
+[1A[2KBROWSER LOG: HTTPAccessFallbackBoundary
+
+[1A[2KBROWSER LOG: HTTPAccessFallbackErrorBoundary
+
+[1A[2KBROWSER LOG: RedirectBoundary
+
+[1A[2KBROWSER LOG: RedirectErrorBoundary
+
+[1A[2KBROWSER LOG: InnerLayoutRouter
+
+[1A[2KBROWSER LOG: OuterLayoutRouter
+
+[1A[2KBROWSER LOG: SegmentStateProvider
+
+[1A[2KBROWSER LOG: RenderFromTemplateContext
+
+[1A[2KBROWSER LOG: ScrollAndFocusHandler
+
+[1A[2KBROWSER LOG: InnerScrollAndFocusHandler
+
+[1A[2KBROWSER LOG: ErrorBoundary
+
+[1A[2KBROWSER LOG: LoadingBoundary
+
+[1A[2KBROWSER LOG: HTTPAccessFallbackBoundary
+
+[1A[2KBROWSER LOG: RedirectBoundary
+
+[1A[2KBROWSER LOG: RedirectErrorBoundary
+
+[1A[2KBROWSER LOG: InnerLayoutRouter
+
+[1A[2KBROWSER LOG: SegmentViewNode
+
+[1A[2KBROWSER LOG: SegmentTrieNode
+
+[1A[2KBROWSER LOG: ClientPageRoot
+
+[1A[2KBROWSER LOG: OrdersPage
+
+[1A[2KBROWSER LOG: OrdersPageContent
+
+[1A[2KBROWSER LOG: Loading
+
+[1A[2KBROWSER LOG: Skeleton
+
+[1A[2KBROWSER LOG: Skeleton
+
+[1A[2KBROWSER LOG: Skeleton
+
+[1A[2KBROWSER LOG: Skeleton
+
+[1A[2KBROWSER LOG: Skeleton
+
+[1A[2KBROWSER LOG: Skeleton
+
+[1A[2KBROWSER LOG: OrdersPageContent
+
+[1A[2KBROWSER LOG: __next_outlet_boundary__
+
+[1A[2KBROWSER LOG: SegmentBoundaryTriggerNode
+
+[1A[2KBROWSER LOG: SegmentViewStateNode
+
+[1A[2KBROWSER LOG: SegmentViewStateNode
+
+[1A[2KBROWSER LOG: AppShell
+
+[1A[2KBROWSER LOG: Remaining Effects
+
+[1A[2KBROWSER LOG: Blocking Track
+
+[1A[2KBROWSER LOG: Transition Track
+
+[1A[2KBROWSER LOG: Suspense Track
+
+[1A[2KBROWSER LOG: Idle Track
+
+[1A[2KBROWSER LOG: Render
+
+[1A[2KBROWSER LOG: button
+
+[1A[2KBROWSER LOG: Commit
+
+[1A[2KBROWSER LOG: Waiting
+
+[1A[2KBROWSER LOG: AppShell
+
+[1A[2KBROWSER LOG: OfflineBanner
+
+[1A[2KBROWSER LOG: MainNav
+
+[1A[2KBROWSER LOG: Building
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2KBROWSER LOG: Tags
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2KBROWSER LOG: ShoppingCart
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2KBROWSER LOG: Wrench
+
+[1A[2KBROWSER LOG: Tags
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2KBROWSER LOG: HardHat
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2KBROWSER LOG: Star
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2KBROWSER LOG: Separator
+
+[1A[2KBROWSER LOG: Settings
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2KBROWSER LOG: SidebarRail
+
+[1A[2KBROWSER LOG: SidebarTrigger
+
+[1A[2KBROWSER LOG: PanelLeft
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2KBROWSER LOG: SidebarTrigger
+
+[1A[2KBROWSER LOG: PanelLeft
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2KBROWSER LOG: SearchDialog
+
+[1A[2KBROWSER LOG: SyncStatusIndicator
+
+[1A[2KBROWSER LOG: PendingOperationsBadge
+
+[1A[2KBROWSER LOG: ConflictNotificationBadge
+
+[1A[2KBROWSER LOG: PopperAnchor
+
+[1A[2KBROWSER LOG: ThemeToggle
+
+[1A[2KBROWSER LOG: Sun
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2KBROWSER LOG: Moon
+
+[1A[2KBROWSER LOG: NotificationCenter
+
+[1A[2KBROWSER LOG: ScheduleVisitForm
+
+[1A[2KBROWSER LOG: UserNav
+
+[1A[2KBROWSER LOG: AvatarImage
+
+[1A[2KBROWSER LOG: AvatarImage
+
+[1A[2KBROWSER LOG: AvatarFallback
+
+[1A[2KBROWSER LOG: OrdersPageContent
+
+[1A[2KBROWSER LOG: Loading
+
+[1A[2KBROWSER LOG: Skeleton
+
+[1A[2KBROWSER LOG: Skeleton
+
+[1A[2KBROWSER LOG: Skeleton
+
+[1A[2KBROWSER LOG: Skeleton
+
+[1A[2KBROWSER LOG: Skeleton
+
+[1A[2KBROWSER LOG: Skeleton
+
+[1A[2KBROWSER LOG: Remaining Effects
+
+[1A[2KBROWSER LOG: Blocking Track
+
+[1A[2KBROWSER LOG: Transition Track
+
+[1A[2KBROWSER LOG: Suspense Track
+
+[1A[2KBROWSER LOG: Idle Track
+
+[1A[2KBROWSER LOG: Render
+
+[1A[2KBROWSER LOG: Commit
+
+[1A[2KBROWSER LOG: Blocking Track
+
+[1A[2KBROWSER LOG: Transition Track
+
+[1A[2KBROWSER LOG: Suspense Track
+
+[1A[2KBROWSER LOG: Idle Track
+
+[1A[2KBROWSER LOG: Render
+
+[1A[2KBROWSER LOG: Waiting
+
+[1A[2KBROWSER LOG: Remaining Effects
+
+[1A[2KBROWSER LOG: Blocking Track
+
+[1A[2KBROWSER LOG: Transition Track
+
+[1A[2KBROWSER LOG: Suspense Track
+
+[1A[2KBROWSER LOG: Idle Track
+
+[1A[2KBROWSER LOG: Render
+
+[1A[2KBROWSER LOG: button
+
+[1A[2KBROWSER LOG: Commit
+
+[1A[2KBROWSER LOG: Waiting
+
+[1A[2KBROWSER LOG: AuthProvider
+
+[1A[2KBROWSER LOG: AppShell
+
+[1A[2KBROWSER LOG: OfflineBanner
+
+[1A[2KBROWSER LOG: MainNav
+
+[1A[2KBROWSER LOG: Building
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2KBROWSER LOG: ShoppingCart
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2KBROWSER LOG: Separator
+
+[1A[2KBROWSER LOG: SidebarRail
+
+[1A[2KBROWSER LOG: SidebarTrigger
+
+[1A[2KBROWSER LOG: SidebarTrigger
+
+[1A[2KBROWSER LOG: SearchDialog
+
+[1A[2KBROWSER LOG: SyncStatusIndicator
+
+[1A[2KBROWSER LOG: Wifi
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2KBROWSER LOG: PendingOperationsBadge
+
+[1A[2KBROWSER LOG: ConflictNotificationBadge
+
+[1A[2KBROWSER LOG: ThemeToggle
+
+[1A[2KBROWSER LOG: Sun
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2KBROWSER LOG: Moon
+
+[1A[2KBROWSER LOG: NotificationCenter
+
+[1A[2KBROWSER LOG: ScheduleVisitForm
+
+[1A[2KBROWSER LOG: UserNav
+
+[1A[2KBROWSER LOG: AvatarImage
+
+[1A[2KBROWSER LOG: AvatarImage
+
+[1A[2KBROWSER LOG: AvatarFallback
+
+[1A[2KBROWSER LOG: OrdersPageContent
+
+[1A[2KBROWSER LOG: Loading
+
+[1A[2KBROWSER LOG: Skeleton
+
+[1A[2KBROWSER LOG: Skeleton
+
+[1A[2KBROWSER LOG: AppShell
+
+[1A[2KBROWSER LOG: Remaining Effects
+
+[1A[2KBROWSER LOG: Blocking Track
+
+[1A[2KBROWSER LOG: Transition Track
+
+[1A[2KBROWSER LOG: Suspense Track
+
+[1A[2KBROWSER LOG: Idle Track
+
+[1A[2KBROWSER LOG: Render
+
+[1A[2KBROWSER LOG: button
+
+[1A[2KBROWSER LOG: Commit
+
+[1A[2KBROWSER LOG: Waiting
+
+[1A[2KBROWSER LOG: AppShell
+
+[1A[2KBROWSER LOG: OfflineBanner
+
+[1A[2KBROWSER LOG: MainNav
+
+[1A[2KBROWSER LOG: CircleX
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2KBROWSER LOG: Building
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2KBROWSER LOG: Tags
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2KBROWSER LOG: Tags
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2KBROWSER LOG: SidebarRail
+
+[1A[2KBROWSER LOG: SidebarTrigger
+
+[1A[2KBROWSER LOG: SidebarTrigger
+
+[1A[2KBROWSER LOG: PanelLeft
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2KBROWSER LOG: SearchDialog
+
+[1A[2KBROWSER LOG: SyncStatusIndicator
+
+[1A[2KBROWSER LOG: PendingOperationsBadge
+
+[1A[2KBROWSER LOG: ConflictNotificationBadge
+
+[1A[2KBROWSER LOG: Plus
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2KBROWSER LOG: ThemeToggle
+
+[1A[2KBROWSER LOG: NotificationCenter
+
+[1A[2KBROWSER LOG: ScheduleVisitForm
+
+[1A[2KBROWSER LOG: NotificationCenter
+
+[1A[2KBROWSER LOG: UserNav
+
+[1A[2KBROWSER LOG: AvatarImage
+
+[1A[2KBROWSER LOG: AvatarImage
+
+[1A[2KBROWSER LOG: AvatarFallback
+
+[1A[2KBROWSER LOG: AvatarFallback
+
+[1A[2KBROWSER LOG: Primitive.span
+
+[1A[2KBROWSER LOG: OrdersPageContent
+
+[1A[2KBROWSER LOG: Loading
+
+[1A[2KBROWSER LOG: Skeleton
+
+[1A[2KBROWSER LOG: Skeleton
+
+[1A[2KBROWSER LOG: Skeleton
+
+[1A[2KBROWSER LOG: Skeleton
+
+[1A[2KBROWSER LOG: Remaining Effects
+
+[1A[2KBROWSER LOG: Blocking Track
+
+[1A[2KBROWSER LOG: Transition Track
+
+[1A[2KBROWSER LOG: Suspense Track
+
+[1A[2KBROWSER LOG: Idle Track
+
+[1A[2KBROWSER LOG: Render
+
+[1A[2KBROWSER LOG: Commit
+
+[1A[2KBROWSER LOG: Blocking Track
+
+[1A[2KBROWSER LOG: Transition Track
+
+[1A[2KBROWSER LOG: Suspense Track
+
+[1A[2KBROWSER LOG: Idle Track
+
+[1A[2KBROWSER LOG: Event: success
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/firebase-orginal_src_lib_cache-manager_ts_b1594961._.js
+
+[1A[2K>> GET http://localhost:9002/_next/static/chunks/firebase-orginal_src_lib_cache-manager_ts_bb34e3e9._.js
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/firebase-orginal_src_lib_cache-manager_ts_b1594961._.js
+
+[1A[2KBROWSER LOG: Render
+
+[1A[2K<< [33m200[39m http://localhost:9002/_next/static/chunks/firebase-orginal_src_lib_cache-manager_ts_bb34e3e9._.js
+
+[1A[2KBROWSER LOG: button
+
+[1A[2KBROWSER LOG: button
+
+[1A[2KBROWSER LOG: Commit
+
+[1A[2KBROWSER LOG: Waiting
+
+[1A[2KBROWSER LOG: AppShell
+
+[1A[2KBROWSER LOG: OfflineBanner
+
+[1A[2KBROWSER LOG: MainNav
+
+[1A[2KBROWSER LOG: ChartColumn
+
+[1A[2KBROWSER LOG: Building
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2KBROWSER LOG: ShoppingCart
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2KBROWSER LOG: Map
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2KBROWSER LOG: CreditCard
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2KBROWSER LOG: Wrench
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2KBROWSER LOG: Tags
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2KBROWSER LOG: Phone
+
+[1A[2KBROWSER LOG: Separator
+
+[1A[2KBROWSER LOG: SidebarRail
+
+[1A[2KBROWSER LOG: SidebarTrigger
+
+[1A[2KBROWSER LOG: SidebarTrigger
+
+[1A[2KBROWSER LOG: SearchDialog
+
+[1A[2KBROWSER LOG: Search
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2KBROWSER LOG: SyncStatusIndicator
+
+[1A[2KBROWSER LOG: Wifi
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2KBROWSER LOG: PendingOperationsBadge
+
+[1A[2KBROWSER LOG: ConflictNotificationBadge
+
+[1A[2KBROWSER LOG: Plus
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2KBROWSER LOG: ThemeToggle
+
+[1A[2KBROWSER LOG: Sun
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2KBROWSER LOG: Moon
+
+[1A[2KBROWSER LOG: NotificationCenter
+
+[1A[2KBROWSER LOG: ScheduleVisitForm
+
+[1A[2KBROWSER LOG: Bell
+
+[1A[2KBROWSER LOG: UserNav
+
+[1A[2KBROWSER LOG: AvatarImage
+
+[1A[2KBROWSER LOG: AvatarImage
+
+[1A[2KBROWSER LOG: AvatarFallback
+
+[1A[2KBROWSER LOG: Remaining Effects
+
+[1A[2KBROWSER LOG: Blocking Track
+
+[1A[2KBROWSER LOG: Transition Track
+
+[1A[2KBROWSER LOG: Suspense Track
+
+[1A[2KBROWSER LOG: Idle Track
+
+[1A[2KBROWSER LOG: Blocking Track
+
+[1A[2KBROWSER LOG: Transition Track
+
+[1A[2KBROWSER LOG: Suspense Track
+
+[1A[2KBROWSER LOG: Idle Track
+
+[1A[2KBROWSER LOG: Prepared
+
+[1A[2KBROWSER LOG: Commit
+
+[1A[2KBROWSER LOG: Waiting for Paint
+
+[1A[2KBROWSER LOG: IconMark
+
+[1A[2KBROWSER LOG: Remaining Effects
+
+[1A[2KBROWSER LOG: Blocking Track
+
+[1A[2KBROWSER LOG: Transition Track
+
+[1A[2KBROWSER LOG: Suspense Track
+
+[1A[2KBROWSER LOG: Idle Track
+
+[1A[2KBROWSER LOG: Render
+
+[1A[2KBROWSER LOG: button
+
+[1A[2KBROWSER LOG: Commit
+
+[1A[2KBROWSER LOG: Waiting
+
+[1A[2KBROWSER LOG: AuthProvider
+
+[1A[2KBROWSER LOG: AppShell
+
+[1A[2KBROWSER LOG: OfflineBanner
+
+[1A[2KBROWSER LOG: MainNav
+
+[1A[2KBROWSER LOG: Tags
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2KBROWSER LOG: Wrench
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2KBROWSER LOG: HardHat
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2KBROWSER LOG: Separator
+
+[1A[2KBROWSER LOG: SidebarRail
+
+[1A[2KBROWSER LOG: SidebarTrigger
+
+[1A[2KBROWSER LOG: SidebarTrigger
+
+[1A[2KBROWSER LOG: SearchDialog
+
+[1A[2KBROWSER LOG: SyncStatusIndicator
+
+[1A[2KBROWSER LOG: Wifi
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2KBROWSER LOG: PendingOperationsBadge
+
+[1A[2KBROWSER LOG: ConflictNotificationBadge
+
+[1A[2KBROWSER LOG: ThemeToggle
+
+[1A[2KBROWSER LOG: NotificationCenter
+
+[1A[2KBROWSER LOG: ScheduleVisitForm
+
+[1A[2KBROWSER LOG: UserNav
+
+[1A[2KBROWSER LOG: AvatarImage
+
+[1A[2KBROWSER LOG: AvatarImage
+
+[1A[2KBROWSER LOG: AvatarFallback
+
+[1A[2KBROWSER LOG: OrdersPageContent
+
+[1A[2KBROWSER LOG: Loading
+
+[1A[2KBROWSER LOG: AppShell
+
+[1A[2KBROWSER LOG: Remaining Effects
+
+[1A[2KBROWSER LOG: Blocking Track
+
+[1A[2KBROWSER LOG: Transition Track
+
+[1A[2KBROWSER LOG: Suspense Track
+
+[1A[2KBROWSER LOG: Idle Track
+
+[1A[2KBROWSER LOG: Render
+
+[1A[2KBROWSER LOG: button
+
+[1A[2KBROWSER LOG: Commit
+
+[1A[2KBROWSER LOG: AppShell
+
+[1A[2KBROWSER LOG: OfflineBanner
+
+[1A[2KBROWSER LOG: MainNav
+
+[1A[2KBROWSER LOG: CircleX
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2KBROWSER LOG: Building
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2KBROWSER LOG: Separator
+
+[1A[2KBROWSER LOG: SidebarRail
+
+[1A[2KBROWSER LOG: SidebarTrigger
+
+[1A[2KBROWSER LOG: SidebarTrigger
+
+[1A[2KBROWSER LOG: SearchDialog
+
+[1A[2KBROWSER LOG: Search
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2KBROWSER LOG: SyncStatusIndicator
+
+[1A[2KBROWSER LOG: Wifi
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2KBROWSER LOG: PendingOperationsBadge
+
+[1A[2KBROWSER LOG: ConflictNotificationBadge
+
+[1A[2KBROWSER LOG: Plus
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2KBROWSER LOG: ThemeToggle
+
+[1A[2KBROWSER LOG: NotificationCenter
+
+[1A[2KBROWSER LOG: ScheduleVisitForm
+
+[1A[2KBROWSER LOG: UserNav
+
+[1A[2KBROWSER LOG: AvatarImage
+
+[1A[2KBROWSER LOG: AvatarImage
+
+[1A[2KBROWSER LOG: AvatarFallback
+
+[1A[2KBROWSER LOG: AvatarFallback
+
+[1A[2KBROWSER LOG: Primitive.span
+
+[1A[2KBROWSER LOG: OrdersPageContent
+
+[1A[2KBROWSER LOG: Loading
+
+[1A[2KBROWSER LOG: Skeleton
+
+[1A[2KBROWSER LOG: Skeleton
+
+[1A[2KBROWSER LOG: Skeleton
+
+[1A[2KBROWSER LOG: Skeleton
+
+[1A[2KBROWSER LOG: Remaining Effects
+
+[1A[2KBROWSER LOG: Blocking Track
+
+[1A[2KBROWSER LOG: Transition Track
+
+[1A[2KBROWSER LOG: Suspense Track
+
+[1A[2KBROWSER LOG: Idle Track
+
+[1A[2KBROWSER LOG: Render
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/notifications?select=*&userId=eq.test-user-id&order=createdAt.desc&limit=50
+
+[1A[2KIntercepted Supabase request: GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/notifications?select=*&userId=eq.test-user-id&order=createdAt.desc&limit=50
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/notifications?select=*&userId=eq.test-user-id&order=createdAt.desc&limit=50
+
+[1A[2KBROWSER LOG: Blocking Track
+
+[1A[2KBROWSER LOG: Transition Track
+
+[1A[2KBROWSER LOG: Suspense Track
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/orders?select=*&order=orderDate.desc&offset=0&limit=20
+
+[1A[2KIntercepted Supabase request: GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/orders?select=*&order=orderDate.desc&offset=0&limit=20
+
+[1A[2KBROWSER LOG: Idle Track
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/visits?select=*
+
+[1A[2KIntercepted Supabase request: GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/visits?select=*
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/orders?select=*&order=orderDate.desc&offset=0&limit=20
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/visits?select=*
+
+[1A[2KBROWSER LOG: Render
+
+[1A[2KBROWSER LOG: button
+
+[1A[2KBROWSER LOG: Commit
+
+[1A[2KBROWSER LOG: Waiting
+
+[1A[2KBROWSER LOG: AppShell
+
+[1A[2KBROWSER LOG: OfflineBanner
+
+[1A[2KBROWSER LOG: MainNav
+
+[1A[2KBROWSER LOG: ChartColumn
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2KBROWSER LOG: CircleX
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2KBROWSER LOG: Tags
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2KBROWSER LOG: Map
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2KBROWSER LOG: CreditCard
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2KBROWSER LOG: Separator
+
+[1A[2KBROWSER LOG: Separator
+
+[1A[2KBROWSER LOG: SidebarRail
+
+[1A[2KBROWSER LOG: SidebarTrigger
+
+[1A[2KBROWSER LOG: SidebarTrigger
+
+[1A[2KBROWSER LOG: SearchDialog
+
+[1A[2KBROWSER LOG: Search
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2KBROWSER LOG: SyncStatusIndicator
+
+[1A[2KBROWSER LOG: Wifi
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2KBROWSER LOG: PendingOperationsBadge
+
+[1A[2KBROWSER LOG: ConflictNotificationBadge
+
+[1A[2KBROWSER LOG: ThemeToggle
+
+[1A[2KBROWSER LOG: Sun
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2KBROWSER LOG: Moon
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2KBROWSER LOG: NotificationCenter
+
+[1A[2KBROWSER LOG: ScheduleVisitForm
+
+[1A[2KBROWSER LOG: UserNav
+
+[1A[2KBROWSER LOG: AvatarImage
+
+[1A[2KBROWSER LOG: AvatarImage
+
+[1A[2KBROWSER LOG: AvatarFallback
+
+[1A[2KBROWSER LOG: Remaining Effects
+
+[1A[2KBROWSER LOG: Blocking Track
+
+[1A[2KBROWSER LOG: Transition Track
+
+[1A[2KBROWSER LOG: Suspense Track
+
+[1A[2KBROWSER LOG: Idle Track
+
+[1A[2KBROWSER LOG: Commit
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/companies?select=*&name=not.like.%5BDELETED%5D%25
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/companies?select=*&name=not.like.%5BDELETED%5D%25
+
+[1A[2KBROWSER LOG: Blocking Track
+
+[1A[2KBROWSER LOG: Transition Track
+
+[1A[2KBROWSER LOG: Suspense Track
+
+[1A[2KBROWSER LOG: Idle Track
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/baristas?select=*
+
+[1A[2KIntercepted Supabase request: GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/baristas?select=*
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/feedback?select=*
+
+[1A[2KIntercepted Supabase request: GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/feedback?select=*
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/areas?select=*
+
+[1A[2KIntercepted Supabase request: GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/areas?select=*
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/baristas?select=*
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/feedback?select=*
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/areas?select=*
+
+[1A[2KBROWSER LOG: Render
+
+[1A[2KBROWSER LOG: button
+
+[1A[2KBROWSER LOG: button
+
+[1A[2KBROWSER LOG: Commit
+
+[1A[2KBROWSER LOG: AppShell
+
+[1A[2KBROWSER LOG: OfflineBanner
+
+[1A[2KBROWSER LOG: MainNav
+
+[1A[2KBROWSER LOG: CircleX
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2KBROWSER LOG: ShoppingCart
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2KBROWSER LOG: Map
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2KBROWSER LOG: Separator
+
+[1A[2KBROWSER LOG: Separator
+
+[1A[2KBROWSER LOG: SidebarRail
+
+[1A[2KBROWSER LOG: SidebarTrigger
+
+[1A[2KBROWSER LOG: PanelLeft
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2KBROWSER LOG: SidebarTrigger
+
+[1A[2KBROWSER LOG: SearchDialog
+
+[1A[2KBROWSER LOG: SyncStatusIndicator
+
+[1A[2KBROWSER LOG: Wifi
+
+[1A[2KBROWSER LOG: PendingOperationsBadge
+
+[1A[2KBROWSER LOG: ConflictNotificationBadge
+
+[1A[2KBROWSER LOG: Plus
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2KBROWSER LOG: ThemeToggle
+
+[1A[2KBROWSER LOG: NotificationCenter
+
+[1A[2KBROWSER LOG: ScheduleVisitForm
+
+[1A[2KBROWSER LOG: UserNav
+
+[1A[2KBROWSER LOG: AvatarImage
+
+[1A[2KBROWSER LOG: AvatarImage
+
+[1A[2KBROWSER LOG: AvatarFallback
+
+[1A[2KBROWSER LOG: OrdersPageContent
+
+[1A[2KBROWSER LOG: Loading
+
+[1A[2KBROWSER LOG: Remaining Effects
+
+[1A[2KBROWSER LOG: Blocking Track
+
+[1A[2KBROWSER LOG: Transition Track
+
+[1A[2KBROWSER LOG: Suspense Track
+
+[1A[2KBROWSER LOG: Idle Track
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/maintenance?select=*
+
+[1A[2KIntercepted Supabase request: GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/maintenance?select=*
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/maintenance?select=*
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/maintenanceEmployees?select=*
+
+[1A[2KIntercepted Supabase request: GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/maintenanceEmployees?select=*
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/cancellationReasons?select=*
+
+[1A[2KIntercepted Supabase request: GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/cancellationReasons?select=*
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/maintenanceEmployees?select=*
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/manufacturers?select=*
+
+[1A[2KIntercepted Supabase request: GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/manufacturers?select=*
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/categories?select=*
+
+[1A[2KIntercepted Supabase request: GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/categories?select=*
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/taxes?select=*
+
+[1A[2KIntercepted Supabase request: GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/taxes?select=*
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/orders?select=*&order=orderDate.desc&offset=0&limit=50
+
+[1A[2KIntercepted Supabase request: GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/orders?select=*&order=orderDate.desc&offset=0&limit=50
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/visits?select=*
+
+[1A[2KIntercepted Supabase request: GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/visits?select=*
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/companies?select=*&name=not.like.%5BDELETED%5D%25
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/cancellationReasons?select=*
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/baristas?select=*
+
+[1A[2KIntercepted Supabase request: GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/baristas?select=*
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/manufacturers?select=*
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/feedback?select=*
+
+[1A[2KIntercepted Supabase request: GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/feedback?select=*
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/areas?select=*
+
+[1A[2KIntercepted Supabase request: GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/areas?select=*
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/categories?select=*
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/maintenance?select=*
+
+[1A[2KIntercepted Supabase request: GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/maintenance?select=*
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/maintenanceEmployees?select=*
+
+[1A[2KIntercepted Supabase request: GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/maintenanceEmployees?select=*
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/cancellationReasons?select=*
+
+[1A[2KIntercepted Supabase request: GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/cancellationReasons?select=*
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/taxes?select=*
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/manufacturers?select=*
+
+[1A[2KIntercepted Supabase request: GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/manufacturers?select=*
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/categories?select=*
+
+[1A[2KIntercepted Supabase request: GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/categories?select=*
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/orders?select=*&order=orderDate.desc&offset=0&limit=50
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/taxes?select=*
+
+[1A[2KIntercepted Supabase request: GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/taxes?select=*
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/orders?select=*&order=orderDate.desc&offset=0&limit=50
+
+[1A[2KIntercepted Supabase request: GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/orders?select=*&order=orderDate.desc&offset=0&limit=50
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/visits?select=*
+
+[1A[2KIntercepted Supabase request: GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/visits?select=*
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/visits?select=*
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/companies?select=*&name=not.like.%5BDELETED%5D%25
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/companies?select=*&name=not.like.%5BDELETED%5D%25
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/baristas?select=*
+
+[1A[2KIntercepted Supabase request: GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/baristas?select=*
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/feedback?select=*
+
+[1A[2KIntercepted Supabase request: GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/feedback?select=*
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/areas?select=*
+
+[1A[2KIntercepted Supabase request: GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/areas?select=*
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/maintenance?select=*
+
+[1A[2KIntercepted Supabase request: GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/maintenance?select=*
+
+[1A[2KBROWSER LOG: Blocking Track
+
+[1A[2KBROWSER LOG: Transition Track
+
+[1A[2KBROWSER LOG: Suspense Track
+
+[1A[2KBROWSER LOG: Idle Track
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/baristas?select=*
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/maintenanceEmployees?select=*
+
+[1A[2KIntercepted Supabase request: GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/maintenanceEmployees?select=*
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/cancellationReasons?select=*
+
+[1A[2KIntercepted Supabase request: GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/cancellationReasons?select=*
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/manufacturers?select=*
+
+[1A[2KIntercepted Supabase request: GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/manufacturers?select=*
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/categories?select=*
+
+[1A[2KIntercepted Supabase request: GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/categories?select=*
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/taxes?select=*
+
+[1A[2KIntercepted Supabase request: GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/taxes?select=*
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/orders?select=*&order=orderDate.desc&offset=0&limit=50
+
+[1A[2KIntercepted Supabase request: GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/orders?select=*&order=orderDate.desc&offset=0&limit=50
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/orders?select=*
+
+[1A[2KIntercepted Supabase request: GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/orders?select=*
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/companies?select=*
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/feedback?select=*
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/products?select=*
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/maintenance?select=*
+
+[1A[2KIntercepted Supabase request: GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/maintenance?select=*
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/manufacturers?select=*
+
+[1A[2KIntercepted Supabase request: GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/manufacturers?select=*
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/categories?select=*
+
+[1A[2KIntercepted Supabase request: GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/categories?select=*
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/taxes?select=*
+
+[1A[2KIntercepted Supabase request: GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/taxes?select=*
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/orders?select=*
+
+[1A[2KIntercepted Supabase request: GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/orders?select=*
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/companies?select=*
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/products?select=*
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/maintenance?select=*
+
+[1A[2KIntercepted Supabase request: GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/maintenance?select=*
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/manufacturers?select=*
+
+[1A[2KIntercepted Supabase request: GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/manufacturers?select=*
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/categories?select=*
+
+[1A[2KIntercepted Supabase request: GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/categories?select=*
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/taxes?select=*
+
+[1A[2KIntercepted Supabase request: GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/taxes?select=*
+
+[1A[2KBROWSER LOG: Render
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/orders?select=*
+
+[1A[2KIntercepted Supabase request: GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/orders?select=*
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/areas?select=*
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/maintenance?select=*
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/maintenanceEmployees?select=*
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/companies?select=*
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/products?select=*
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/maintenance?select=*
+
+[1A[2KIntercepted Supabase request: GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/maintenance?select=*
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/manufacturers?select=*
+
+[1A[2KIntercepted Supabase request: GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/manufacturers?select=*
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/categories?select=*
+
+[1A[2KIntercepted Supabase request: GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/categories?select=*
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/taxes?select=*
+
+[1A[2KIntercepted Supabase request: GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/taxes?select=*
+
+[1A[2KBROWSER LOG: button
+
+[1A[2KBROWSER LOG: Commit
+
+[1A[2KBROWSER LOG: AppShell
+
+[1A[2KBROWSER LOG: OfflineBanner
+
+[1A[2KBROWSER LOG: logo
+
+[1A[2KBROWSER LOG: MainNav
+
+[1A[2KBROWSER LOG: ChartColumn
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2KBROWSER LOG: CircleX
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2KBROWSER LOG: Building
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2KBROWSER LOG: Tags
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2KBROWSER LOG: ShoppingCart
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2KBROWSER LOG: Map
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2KBROWSER LOG: HardHat
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2KBROWSER LOG: Separator
+
+[1A[2KBROWSER LOG: Separator
+
+[1A[2KBROWSER LOG: Settings
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2KBROWSER LOG: SidebarRail
+
+[1A[2KBROWSER LOG: SidebarTrigger
+
+[1A[2KBROWSER LOG: SidebarTrigger
+
+[1A[2KBROWSER LOG: SearchDialog
+
+[1A[2KBROWSER LOG: Search
+
+[1A[2KBROWSER LOG: SyncStatusIndicator
+
+[1A[2KBROWSER LOG: PendingOperationsBadge
+
+[1A[2KBROWSER LOG: ConflictNotificationBadge
+
+[1A[2KBROWSER LOG: ThemeToggle
+
+[1A[2KBROWSER LOG: Sun
+
+[1A[2KBROWSER LOG: Moon
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2KBROWSER LOG: NotificationCenter
+
+[1A[2KBROWSER LOG: ScheduleVisitForm
+
+[1A[2KBROWSER LOG: UserNav
+
+[1A[2KBROWSER LOG: AvatarImage
+
+[1A[2KBROWSER LOG: AvatarImage
+
+[1A[2KBROWSER LOG: AvatarFallback
+
+[1A[2KBROWSER LOG: AvatarFallback
+
+[1A[2KBROWSER LOG: OrdersPageContent
+
+[1A[2KBROWSER LOG: Loading
+
+[1A[2KBROWSER LOG: Skeleton
+
+[1A[2KBROWSER LOG: Skeleton
+
+[1A[2KBROWSER LOG: Skeleton
+
+[1A[2KBROWSER LOG: Skeleton
+
+[1A[2KBROWSER LOG: Skeleton
+
+[1A[2KBROWSER LOG: Skeleton
+
+[1A[2KBROWSER LOG: Remaining Effects
+
+[1A[2KBROWSER LOG: Blocking Track
+
+[1A[2KBROWSER LOG: Transition Track
+
+[1A[2KBROWSER LOG: Suspense Track
+
+[1A[2KBROWSER LOG: Idle Track
+
+[1A[2KBROWSER LOG: Render
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/products?select=*&offset=0&limit=50
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/cancellationReasons?select=*
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/manufacturers?select=*
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/categories?select=*
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/taxes?select=*
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/orders?select=*&order=orderDate.desc&offset=0&limit=50
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/visits?select=*
+
+[1A[2KBROWSER LOG: Blocking Track
+
+[1A[2KBROWSER LOG: Transition Track
+
+[1A[2KBROWSER LOG: Suspense Track
+
+[1A[2KBROWSER LOG: Idle Track
+
+[1A[2KBROWSER LOG: Render
+
+[1A[2KBROWSER LOG: button
+
+[1A[2KBROWSER LOG: Commit
+
+[1A[2KBROWSER LOG: AppShell
+
+[1A[2KBROWSER LOG: OfflineBanner
+
+[1A[2KBROWSER LOG: MainNav
+
+[1A[2KBROWSER LOG: LayoutDashboard
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2KBROWSER LOG: Building
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2KBROWSER LOG: HardHat
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2KBROWSER LOG: Separator
+
+[1A[2KBROWSER LOG: Settings
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2KBROWSER LOG: SidebarRail
+
+[1A[2KBROWSER LOG: SidebarTrigger
+
+[1A[2KBROWSER LOG: SidebarTrigger
+
+[1A[2KBROWSER LOG: PanelLeft
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2KBROWSER LOG: SearchDialog
+
+[1A[2KBROWSER LOG: SyncStatusIndicator
+
+[1A[2KBROWSER LOG: Wifi
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2KBROWSER LOG: PendingOperationsBadge
+
+[1A[2KBROWSER LOG: ConflictNotificationBadge
+
+[1A[2KBROWSER LOG: ThemeToggle
+
+[1A[2KBROWSER LOG: Sun
+
+[1A[2KBROWSER LOG: Moon
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2KBROWSER LOG: NotificationCenter
+
+[1A[2KBROWSER LOG: ScheduleVisitForm
+
+[1A[2KBROWSER LOG: Bell
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2KBROWSER LOG: UserNav
+
+[1A[2KBROWSER LOG: AvatarImage
+
+[1A[2KBROWSER LOG: AvatarImage
+
+[1A[2KBROWSER LOG: AvatarFallback
+
+[1A[2KBROWSER LOG: OrdersPageContent
+
+[1A[2KBROWSER LOG: Loading
+
+[1A[2KBROWSER LOG: Remaining Effects
+
+[1A[2KBROWSER LOG: Blocking Track
+
+[1A[2KBROWSER LOG: Transition Track
+
+[1A[2KBROWSER LOG: Suspense Track
+
+[1A[2KBROWSER LOG: Idle Track
+
+[1A[2KBROWSER LOG: Render
+
+[1A[2KBROWSER LOG: Commit
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/products?select=*&offset=0&limit=50
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/companies?select=*&name=not.like.%5BDELETED%5D%25
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/baristas?select=*
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/feedback?select=*
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/areas?select=*
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/maintenance?select=*
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/maintenanceEmployees?select=*
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/cancellationReasons?select=*
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/manufacturers?select=*
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/categories?select=*
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/taxes?select=*
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/orders?select=*&order=orderDate.desc&offset=0&limit=50
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/orders?select=*
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/companies?select=*
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/products?select=*
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/maintenance?select=*
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/manufacturers?select=*
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/categories?select=*
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/taxes?select=*
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/orders?select=*
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/companies?select=*
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/products?select=*
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/maintenance?select=*
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/manufacturers?select=*
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/categories?select=*
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/taxes?select=*
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/orders?select=*
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/companies?select=*
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/products?select=*
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/maintenance?select=*
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/manufacturers?select=*
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/categories?select=*
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/taxes?select=*
+
+[1A[2KBROWSER LOG: Blocking Track
+
+[1A[2KBROWSER LOG: Transition Track
+
+[1A[2KBROWSER LOG: Suspense Track
+
+[1A[2KBROWSER LOG: Idle Track
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/products?select=*&offset=0&limit=50
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/products?select=*&offset=0&limit=50
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/products?select=*&offset=0&limit=50
+
+[1A[2KBROWSER LOG: Render
+
+[1A[2KBROWSER LOG: button
+
+[1A[2KBROWSER LOG: Commit
+
+[1A[2KBROWSER LOG: AppShell
+
+[1A[2KBROWSER LOG: OfflineBanner
+
+[1A[2KBROWSER LOG: MainNav
+
+[1A[2KBROWSER LOG: LayoutDashboard
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2KBROWSER LOG: CircleX
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2KBROWSER LOG: HardHat
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2KBROWSER LOG: Separator
+
+[1A[2KBROWSER LOG: Separator
+
+[1A[2KBROWSER LOG: Primitive.div
+
+[1A[2KBROWSER LOG: SidebarRail
+
+[1A[2KBROWSER LOG: SidebarTrigger
+
+[1A[2KBROWSER LOG: SidebarTrigger
+
+[1A[2KBROWSER LOG: PanelLeft
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2KBROWSER LOG: SearchDialog
+
+[1A[2KBROWSER LOG: Search
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2KBROWSER LOG: SyncStatusIndicator
+
+[1A[2KBROWSER LOG: Wifi
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2KBROWSER LOG: PendingOperationsBadge
+
+[1A[2KBROWSER LOG: ConflictNotificationBadge
+
+[1A[2KBROWSER LOG: ThemeToggle
+
+[1A[2KBROWSER LOG: Sun
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2KBROWSER LOG: Moon
+
+[1A[2KBROWSER LOG: NotificationCenter
+
+[1A[2KBROWSER LOG: ScheduleVisitForm
+
+[1A[2K<< [33m200[39m https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/products?select=*&offset=0&limit=50
+
+[1A[2KBROWSER LOG: Bell
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2KBROWSER LOG: UserNav
+
+[1A[2KBROWSER LOG: AvatarImage
+
+[1A[2KBROWSER LOG: AvatarImage
+
+[1A[2KBROWSER LOG: AvatarFallback
+
+[1A[2KBROWSER LOG: OrdersPageContent
+
+[1A[2KBROWSER LOG: Loading
+
+[1A[2KBROWSER LOG: Remaining Effects
+
+[1A[2KBROWSER LOG: Blocking Track
+
+[1A[2KBROWSER LOG: Transition Track
+
+[1A[2KBROWSER LOG: Suspense Track
+
+[1A[2KBROWSER LOG: Idle Track
+
+[1A[2KBROWSER LOG: Render
+
+[1A[2KBROWSER LOG: Blocking Track
+
+[1A[2KBROWSER LOG: Transition Track
+
+[1A[2KBROWSER LOG: Suspense Track
+
+[1A[2KBROWSER LOG: Idle Track
+
+[1A[2K>> GET https://ebbigogxixgbajqijgpp.supabase.co/realtime/v1/websocket?apikey=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImViYmlnb2d4aXhnYmFqcWlqZ3BwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM1MDUzMjcsImV4cCI6MjA3OTA4MTMyN30.7-aynwes9ZntgVOYrI5MPSZ9R_l6UQ8sg79I3mFMwjc&vsn=1.0.0
+
+[1A[2K<< [33m101[39m https://ebbigogxixgbajqijgpp.supabase.co/realtime/v1/websocket?apikey=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImViYmlnb2d4aXhnYmFqcWlqZ3BwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM1MDUzMjcsImV4cCI6MjA3OTA4MTMyN30.7-aynwes9ZntgVOYrI5MPSZ9R_l6UQ8sg79I3mFMwjc&vsn=1.0.0
+
+[1A[2KBROWSER LOG: Render
+
+[1A[2KBROWSER LOG: button
+
+[1A[2KBROWSER LOG: Commit
+
+[1A[2KBROWSER LOG: AppShell
+
+[1A[2KBROWSER LOG: OfflineBanner
+
+[1A[2KBROWSER LOG: MainNav
+
+[1A[2KBROWSER LOG: ChartColumn
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2KBROWSER LOG: Building
+
+[1A[2KBROWSER LOG: Star
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2KBROWSER LOG: SidebarRail
+
+[1A[2KBROWSER LOG: SidebarTrigger
+
+[1A[2KBROWSER LOG: PanelLeft
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2KBROWSER LOG: SidebarTrigger
+
+[1A[2KBROWSER LOG: SearchDialog
+
+[1A[2KBROWSER LOG: SyncStatusIndicator
+
+[1A[2KBROWSER LOG: PendingOperationsBadge
+
+[1A[2KBROWSER LOG: ConflictNotificationBadge
+
+[1A[2KBROWSER LOG: ThemeToggle
+
+[1A[2KBROWSER LOG: NotificationCenter
+
+[1A[2KBROWSER LOG: ScheduleVisitForm
+
+[1A[2KBROWSER LOG: NotificationCenter
+
+[1A[2KBROWSER LOG: UserNav
+
+[1A[2KBROWSER LOG: AvatarImage
+
+[1A[2KBROWSER LOG: AvatarImage
+
+[1A[2KBROWSER LOG: AvatarFallback
+
+[1A[2KBROWSER LOG: OrdersPageContent
+
+[1A[2KBROWSER LOG: AlertDialog
+
+[1A[2KBROWSER LOG: Dialog
+
+[1A[2KBROWSER LOG: DialogProvider
+
+[1A[2KBROWSER LOG: AlertDialogContent
+
+[1A[2KBROWSER LOG: AlertDialogPortal
+
+[1A[2KBROWSER LOG: DialogPortal
+
+[1A[2KBROWSER LOG: DialogPortalProvider
+
+[1A[2KBROWSER LOG: Presence
+
+[1A[2KBROWSER LOG: Presence
+
+[1A[2KBROWSER LOG: AlertDialog
+
+[1A[2KBROWSER LOG: Dialog
+
+[1A[2KBROWSER LOG: DialogProvider
+
+[1A[2KBROWSER LOG: AlertDialogContent
+
+[1A[2KBROWSER LOG: AlertDialogPortal
+
+[1A[2KBROWSER LOG: DialogPortal
+
+[1A[2KBROWSER LOG: DialogPortalProvider
+
+[1A[2KBROWSER LOG: Presence
+
+[1A[2KBROWSER LOG: Presence
+
+[1A[2KBROWSER LOG: Dialog
+
+[1A[2KBROWSER LOG: CancellationDialog
+
+[1A[2KBROWSER LOG: Dialog
+
+[1A[2KBROWSER LOG: DialogProvider
+
+[1A[2KBROWSER LOG: DialogContent
+
+[1A[2KBROWSER LOG: DialogPortal
+
+[1A[2KBROWSER LOG: DialogPortalProvider
+
+[1A[2KBROWSER LOG: Presence
+
+[1A[2KBROWSER LOG: Presence
+
+[1A[2KBROWSER LOG: OrderActions
+
+[1A[2KBROWSER LOG: Button
+
+[1A[2KBROWSER LOG: DropdownMenu
+
+[1A[2KBROWSER LOG: DropdownMenuProvider
+
+[1A[2KBROWSER LOG: Menu
+
+[1A[2KBROWSER LOG: Popper
+
+[1A[2KBROWSER LOG: PopperProvider
+
+[1A[2KBROWSER LOG: MenuProvider
+
+[1A[2KBROWSER LOG: MenuProvider
+
+[1A[2KBROWSER LOG: DropdownMenuTrigger
+
+[1A[2KBROWSER LOG: MenuAnchor
+
+[1A[2KBROWSER LOG: PopperAnchor
+
+[1A[2KBROWSER LOG: Primitive.div
+
+[1A[2KBROWSER LOG: DropdownMenuContent
+
+[1A[2KBROWSER LOG: DropdownMenuPortal
+
+[1A[2KBROWSER LOG: MenuPortal
+
+[1A[2KBROWSER LOG: MenuPortalProvider
+
+[1A[2KBROWSER LOG: Presence
+
+[1A[2KBROWSER LOG: Search
+
+[1A[2KBROWSER LOG: Input
+
+[1A[2KBROWSER LOG: Button
+
+[1A[2KBROWSER LOG: DropdownMenu
+
+[1A[2KBROWSER LOG: DropdownMenuProvider
+
+[1A[2KBROWSER LOG: Menu
+
+[1A[2KBROWSER LOG: Popper
+
+[1A[2KBROWSER LOG: PopperProvider
+
+[1A[2KBROWSER LOG: MenuProvider
+
+[1A[2KBROWSER LOG: MenuProvider
+
+[1A[2KBROWSER LOG: DropdownMenuTrigger
+
+[1A[2KBROWSER LOG: MenuAnchor
+
+[1A[2KBROWSER LOG: PopperAnchor
+
+[1A[2KBROWSER LOG: Primitive.div
+
+[1A[2KBROWSER LOG: Primitive.div.Slot
+
+[1A[2KBROWSER LOG: Primitive.div.SlotClone
+
+[1A[2KBROWSER LOG: DropdownMenuContent
+
+[1A[2KBROWSER LOG: DropdownMenuPortal
+
+[1A[2KBROWSER LOG: MenuPortal
+
+[1A[2KBROWSER LOG: MenuPortalProvider
+
+[1A[2KBROWSER LOG: Presence
+
+[1A[2KBROWSER LOG: ToggleGroup
+
+[1A[2KBROWSER LOG: ToggleGroup
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2KBROWSER LOG: ToggleGroupProvider
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2KBROWSER LOG: ToggleGroupProvider
+
+[1A[2KBROWSER LOG: RovingFocusGroup
+
+[1A[2KBROWSER LOG: RovingFocusGroupCollectionProvider
+
+[1A[2KBROWSER LOG: RovingFocusGroupCollectionProviderProvider
+
+[1A[2KBROWSER LOG: RovingFocusGroupCollectionSlot
+
+[1A[2KBROWSER LOG: RovingFocusGroupCollectionSlot.Slot
+
+[1A[2KBROWSER LOG: RovingFocusGroupCollectionSlot.SlotClone
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2KBROWSER LOG: RovingFocusGroupProvider
+
+[1A[2KBROWSER LOG: Primitive.div
+
+[1A[2KBROWSER LOG: Primitive.div.Slot
+
+[1A[2KBROWSER LOG: Primitive.div.SlotClone
+
+[1A[2KBROWSER LOG: Primitive.div
+
+[1A[2KBROWSER LOG: ToggleGroupItem
+
+[1A[2KBROWSER LOG: ToggleGroupItem
+
+[1A[2KBROWSER LOG: RovingFocusGroupItem
+
+[1A[2KBROWSER LOG: RovingFocusGroupCollectionItemSlot
+
+[1A[2KBROWSER LOG: RovingFocusGroupCollectionItemSlot.Slot
+
+[1A[2KBROWSER LOG: RovingFocusGroupCollectionItemSlot.SlotClone
+
+[1A[2KBROWSER LOG: Primitive.span
+
+[1A[2KBROWSER LOG: Primitive.span.Slot
+
+[1A[2KBROWSER LOG: Primitive.span.SlotClone
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2KBROWSER LOG: Toggle
+
+[1A[2KBROWSER LOG: Primitive.button
+
+[1A[2KBROWSER LOG: List
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2KBROWSER LOG: ToggleGroupItem
+
+[1A[2KBROWSER LOG: ToggleGroupItem
+
+[1A[2KBROWSER LOG: RovingFocusGroupItem
+
+[1A[2KBROWSER LOG: RovingFocusGroupCollectionItemSlot
+
+[1A[2KBROWSER LOG: RovingFocusGroupCollectionItemSlot.Slot
+
+[1A[2KBROWSER LOG: RovingFocusGroupCollectionItemSlot.SlotClone
+
+[1A[2KBROWSER LOG: Primitive.span
+
+[1A[2KBROWSER LOG: Primitive.span.Slot
+
+[1A[2KBROWSER LOG: Primitive.span.SlotClone
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2KBROWSER LOG: Toggle
+
+[1A[2KBROWSER LOG: OrderForm
+
+[1A[2KBROWSER LOG: Dialog
+
+[1A[2KBROWSER LOG: DialogProvider
+
+[1A[2KBROWSER LOG: DialogContent
+
+[1A[2KBROWSER LOG: DialogPortal
+
+[1A[2KBROWSER LOG: DialogPortalProvider
+
+[1A[2KBROWSER LOG: Presence
+
+[1A[2KBROWSER LOG: Presence
+
+[1A[2KBROWSER LOG: CsvImporterDialog
+
+[1A[2KBROWSER LOG: Dialog
+
+[1A[2KBROWSER LOG: DialogProvider
+
+[1A[2KBROWSER LOG: DialogContent
+
+[1A[2KBROWSER LOG: DialogPortal
+
+[1A[2KBROWSER LOG: DialogPortalProvider
+
+[1A[2KBROWSER LOG: Presence
+
+[1A[2KBROWSER LOG: Presence
+
+[1A[2KBROWSER LOG: AdvancedSearchDialog
+
+[1A[2KBROWSER LOG: Dialog
+
+[1A[2KBROWSER LOG: DialogProvider
+
+[1A[2KBROWSER LOG: DialogContent
+
+[1A[2KBROWSER LOG: DialogPortal
+
+[1A[2KBROWSER LOG: DialogPortalProvider
+
+[1A[2KBROWSER LOG: Presence
+
+[1A[2KBROWSER LOG: Presence
+
+[1A[2KBROWSER LOG: OrderList
+
+[1A[2KBROWSER LOG: Card
+
+[1A[2KBROWSER LOG: CardContent
+
+[1A[2KBROWSER LOG: Table
+
+[1A[2KBROWSER LOG: TableHeader
+
+[1A[2KBROWSER LOG: TableRow
+
+[1A[2KBROWSER LOG: TableHead
+
+[1A[2KBROWSER LOG: Checkbox
+
+[1A[2KBROWSER LOG: Checkbox
+
+[1A[2KBROWSER LOG: CheckboxProvider
+
+[1A[2KBROWSER LOG: CheckboxProvider
+
+[1A[2KBROWSER LOG: CheckboxTrigger
+
+[1A[2KBROWSER LOG: Primitive.button
+
+[1A[2KBROWSER LOG: CheckboxIndicator
+
+[1A[2KBROWSER LOG: Presence
+
+[1A[2KBROWSER LOG: CheckboxBubbleInput
+
+[1A[2KBROWSER LOG: Primitive.input
+
+[1A[2KBROWSER LOG: TableHead
+
+[1A[2KBROWSER LOG: TableHead
+
+[1A[2KBROWSER LOG: TableHead
+
+[1A[2KBROWSER LOG: TableHead
+
+[1A[2KBROWSER LOG: TableHead
+
+[1A[2KBROWSER LOG: TableHead
+
+[1A[2KBROWSER LOG: TableHead
+
+[1A[2KBROWSER LOG: TableBody
+
+[1A[2KBROWSER LOG: Remaining Effects
+
+[1A[2KBROWSER LOG: Blocking Track
+
+[1A[2KBROWSER LOG: Transition Track
+
+[1A[2KBROWSER LOG: Suspense Track
+
+[1A[2KBROWSER LOG: Idle Track
+
+[1A[2KBROWSER LOG: Render
+
+[1A[2KBROWSER LOG: input
+
+[1A[2KBROWSER LOG: Commit
+
+[1A[2KBROWSER LOG: CancellationDialog
+
+[1A[2KBROWSER LOG: Popper
+
+[1A[2KBROWSER LOG: PopperAnchor
+
+[1A[2KBROWSER LOG: Primitive.div
+
+[1A[2KBROWSER LOG: Primitive.div.Slot
+
+[1A[2KBROWSER LOG: Primitive.div.SlotClone
+
+[1A[2KBROWSER LOG: Popper
+
+[1A[2KBROWSER LOG: PopperAnchor
+
+[1A[2KBROWSER LOG: Primitive.div
+
+[1A[2KBROWSER LOG: Primitive.div.Slot
+
+[1A[2KBROWSER LOG: Primitive.div.SlotClone
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2KBROWSER LOG: OrderForm
+
+[1A[2KBROWSER LOG: AdvancedSearchDialog
+
+[1A[2KBROWSER LOG: CheckboxProvider
+
+[1A[2KBROWSER LOG: CheckboxTrigger
+
+[1A[2KBROWSER LOG: Remaining Effects
+
+[1A[2KBROWSER LOG: Blocking Track
+
+[1A[2KBROWSER LOG: Transition Track
+
+[1A[2KBROWSER LOG: Suspense Track
+
+[1A[2KBROWSER LOG: Idle Track
+
+[1A[2KBROWSER LOG: Render
+
+[1A[2KBROWSER LOG: CheckboxProvider
+
+[1A[2KBROWSER LOG: CheckboxTrigger
+
+[1A[2KBROWSER LOG: CheckboxIndicator
+
+[1A[2KBROWSER LOG: Remaining Effects
+
+[1A[2KBROWSER LOG: Blocking Track
+
+[1A[2KBROWSER LOG: Transition Track
+
+[1A[2KBROWSER LOG: Suspense Track
+
+[1A[2KBROWSER LOG: Idle Track
+
+[1A[2KBROWSER LOG: Render
+
+[1A[2KBROWSER LOG: button
+
+[1A[2KBROWSER LOG: Commit
+
+[1A[2KBROWSER LOG: AppShell
+
+[1A[2KBROWSER LOG: OfflineBanner
+
+[1A[2KBROWSER LOG: MainNav
+
+[1A[2KBROWSER LOG: CircleX
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2KBROWSER LOG: Bell
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2KBROWSER LOG: Building
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2KBROWSER LOG: Package
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2KBROWSER LOG: Tags
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2KBROWSER LOG: Map
+
+[1A[2KBROWSER LOG: Separator
+
+[1A[2KBROWSER LOG: SidebarRail
+
+[1A[2KBROWSER LOG: SidebarTrigger
+
+[1A[2KBROWSER LOG: SidebarTrigger
+
+[1A[2KBROWSER LOG: PanelLeft
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2KBROWSER LOG: SearchDialog
+
+[1A[2KBROWSER LOG: Search
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2KBROWSER LOG: SyncStatusIndicator
+
+[1A[2KBROWSER LOG: PendingOperationsBadge
+
+[1A[2KBROWSER LOG: ConflictNotificationBadge
+
+[1A[2KBROWSER LOG: ThemeToggle
+
+[1A[2KBROWSER LOG: Sun
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2KBROWSER LOG: Moon
+
+[1A[2KBROWSER LOG: NotificationCenter
+
+[1A[2KBROWSER LOG: ScheduleVisitForm
+
+[1A[2KBROWSER LOG: UserNav
+
+[1A[2KBROWSER LOG: AvatarImage
+
+[1A[2KBROWSER LOG: AvatarImage
+
+[1A[2KBROWSER LOG: AvatarFallback
+
+[1A[2KBROWSER LOG: OrdersPageContent
+
+[1A[2KBROWSER LOG: Search
+
+[1A[2KBROWSER LOG: OrderForm
+
+[1A[2KBROWSER LOG: CsvImporterDialog
+
+[1A[2KBROWSER LOG: AdvancedSearchDialog
+
+[1A[2KBROWSER LOG: TableHead
+
+[1A[2KBROWSER LOG: TableHead
+
+[1A[2KBROWSER LOG: TableHead
+
+[1A[2KBROWSER LOG: TableHead
+
+[1A[2KBROWSER LOG: TableHead
+
+[1A[2KBROWSER LOG: TableHead
+
+[1A[2KBROWSER LOG: TableHead
+
+[1A[2KBROWSER LOG: TableCell
+
+[1A[2KBROWSER LOG: Remaining Effects
+
+[1A[2KBROWSER LOG: Blocking Track
+
+[1A[2KBROWSER LOG: Transition Track
+
+[1A[2KBROWSER LOG: Suspense Track
+
+[1A[2KBROWSER LOG: Idle Track
+
+[1A[2KBROWSER LOG: Blocking Track
+
+[1A[2KBROWSER LOG: Transition Track
+
+[1A[2KBROWSER LOG: Suspense Track
+
+[1A[2KBROWSER LOG: Idle Track
+
+[1A[2KBROWSER LOG: Render
+
+[1A[2KBROWSER LOG: button
+
+[1A[2KBROWSER LOG: Commit
+
+[1A[2KBROWSER LOG: Waiting
+
+[1A[2KBROWSER LOG: AppShell
+
+[1A[2KBROWSER LOG: OfflineBanner
+
+[1A[2KBROWSER LOG: MainNav
+
+[1A[2KBROWSER LOG: Separator
+
+[1A[2KBROWSER LOG: SidebarRail
+
+[1A[2KBROWSER LOG: SidebarTrigger
+
+[1A[2KBROWSER LOG: SidebarTrigger
+
+[1A[2KBROWSER LOG: SearchDialog
+
+[1A[2KBROWSER LOG: SyncStatusIndicator
+
+[1A[2KBROWSER LOG: PopperAnchor
+
+[1A[2KBROWSER LOG: PendingOperationsBadge
+
+[1A[2KBROWSER LOG: ConflictNotificationBadge
+
+[1A[2KBROWSER LOG: ThemeToggle
+
+[1A[2KBROWSER LOG: NotificationCenter
+
+[1A[2KBROWSER LOG: ScheduleVisitForm
+
+[1A[2KBROWSER LOG: UserNav
+
+[1A[2KBROWSER LOG: AvatarImage
+
+[1A[2KBROWSER LOG: AvatarImage
+
+[1A[2KBROWSER LOG: AvatarFallback
+
+[1A[2KBROWSER LOG: OrdersPageContent
+
+[1A[2KBROWSER LOG: CirclePlus
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2KBROWSER LOG: OrderForm
+
+[1A[2KBROWSER LOG: CsvImporterDialog
+
+[1A[2KBROWSER LOG: AdvancedSearchDialog
+
+[1A[2KBROWSER LOG: Remaining Effects
+
+[1A[2KBROWSER LOG: Blocking Track
+
+[1A[2KBROWSER LOG: Transition Track
+
+[1A[2KBROWSER LOG: Suspense Track
+
+[1A[2KBROWSER LOG: Idle Track
+
+[1A[2KBROWSER LOG: [JavaScript Error: "Cookie ΓÇ£__cf_bmΓÇ¥ has been rejected for invalid domain." {file: "https://ebbigogxixgbajqijgpp.supabase.co/realtime/v1/websocket?apikey=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImViYmlnb2d4aXhnYmFqcWlqZ3BwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM1MDUzMjcsImV4cCI6MjA3OTA4MTMyN30.7-aynwes9ZntgVOYrI5MPSZ9R_l6UQ8sg79I3mFMwjc&vsn=1.0.0" line: 0}]
+
+[1A[2KBROWSER LOG: Blocking Track
+
+[1A[2KBROWSER LOG: Transition Track
+
+[1A[2KBROWSER LOG: Suspense Track
+
+[1A[2KBROWSER LOG: Idle Track
+
+[1A[2KBROWSER LOG: Event: click
+
+[1A[2KBROWSER LOG: Render
+
+[1A[2KBROWSER LOG: Presence
+
+[1A[2KBROWSER LOG: Commit
+
+[1A[2KBROWSER LOG: OrdersPageContent
+
+[1A[2KBROWSER LOG: CirclePlus
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2KBROWSER LOG: List
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2KBROWSER LOG: CsvImporterDialog
+
+[1A[2KBROWSER LOG: AdvancedSearchDialog
+
+[1A[2KBROWSER LOG: TableHead
+
+[1A[2KBROWSER LOG: TableHead
+
+[1A[2KBROWSER LOG: TableHead
+
+[1A[2KBROWSER LOG: TableHead
+
+[1A[2KBROWSER LOG: TableHead
+
+[1A[2KBROWSER LOG: TableHead
+
+[1A[2KBROWSER LOG: TableHead
+
+[1A[2KBROWSER LOG: Remaining Effects
+
+[1A[2KBROWSER LOG: Blocking Track
+
+[1A[2KBROWSER LOG: Transition Track
+
+[1A[2KBROWSER LOG: Suspense Track
+
+[1A[2KBROWSER LOG: Idle Track
+
+[1A[2KBROWSER LOG: Render
+
+[1A[2KBROWSER LOG: Portal
+
+[1A[2KBROWSER LOG: Presence
+
+[1A[2KBROWSER LOG: Portal
+
+[1A[2KBROWSER LOG: Presence
+
+[1A[2KBROWSER LOG: Remaining Effects
+
+[1A[2KBROWSER LOG: Blocking Track
+
+[1A[2KBROWSER LOG: Transition Track
+
+[1A[2KBROWSER LOG: Suspense Track
+
+[1A[2KBROWSER LOG: Idle Track
+
+[1A[2KBROWSER LOG: Render
+
+[1A[2KBROWSER LOG: div
+
+[1A[2KBROWSER LOG: Commit
+
+[1A[2KBROWSER LOG: Waiting
+
+[1A[2KBROWSER LOG: Portal
+
+[1A[2KBROWSER LOG: Primitive.div
+
+[1A[2KBROWSER LOG: Primitive.div.Slot
+
+[1A[2KBROWSER LOG: Primitive.div.SlotClone
+
+[1A[2KBROWSER LOG: DialogOverlay
+
+[1A[2KBROWSER LOG: DialogOverlay
+
+[1A[2KBROWSER LOG: Presence
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2KBROWSER LOG: SideCar
+
+[1A[2KBROWSER LOG: RemoveScrollSideCar
+
+[1A[2KBROWSER LOG: RemoveScrollBar
+
+[1A[2KBROWSER LOG: Sheet
+
+[1A[2KBROWSER LOG: RemoveScrollSideCar
+
+[1A[2KBROWSER LOG: DialogOverlay.RemoveScroll.Slot
+
+[1A[2KBROWSER LOG: DialogOverlay.RemoveScroll.SlotClone
+
+[1A[2KBROWSER LOG: Primitive.div
+
+[1A[2KBROWSER LOG: Presence
+
+[1A[2KBROWSER LOG: Portal
+
+[1A[2KBROWSER LOG: Primitive.div
+
+[1A[2KBROWSER LOG: Primitive.div.Slot
+
+[1A[2KBROWSER LOG: Primitive.div.SlotClone
+
+[1A[2KBROWSER LOG: DialogContent
+
+[1A[2KBROWSER LOG: Presence
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2KBROWSER LOG: FocusScope
+
+[1A[2KBROWSER LOG: Primitive.div
+
+[1A[2KBROWSER LOG: Primitive.div.Slot
+
+[1A[2KBROWSER LOG: Primitive.div.SlotClone
+
+[1A[2KBROWSER LOG: DismissableLayer
+
+[1A[2KBROWSER LOG: Primitive.div
+
+[1A[2KBROWSER LOG: DialogHeader
+
+[1A[2KBROWSER LOG: Progress
+
+[1A[2KBROWSER LOG: Progress
+
+[1A[2KBROWSER LOG: FormProvider
+
+[1A[2KBROWSER LOG: Step1_ClientDetails
+
+[1A[2KBROWSER LOG: Controller
+
+[1A[2KBROWSER LOG: Checkbox
+
+[1A[2KBROWSER LOG: Checkbox
+
+[1A[2KBROWSER LOG: CheckboxProvider
+
+[1A[2KBROWSER LOG: CheckboxProvider
+
+[1A[2KBROWSER LOG: CheckboxTrigger
+
+[1A[2KBROWSER LOG: Primitive.button
+
+[1A[2KBROWSER LOG: CheckboxIndicator
+
+[1A[2KBROWSER LOG: Presence
+
+[1A[2KBROWSER LOG: CheckboxBubbleInput
+
+[1A[2KBROWSER LOG: Primitive.input
+
+[1A[2KBROWSER LOG: Label
+
+[1A[2KBROWSER LOG: Label
+
+[1A[2KBROWSER LOG: Primitive.label
+
+[1A[2KBROWSER LOG: Label
+
+[1A[2KBROWSER LOG: Controller
+
+[1A[2KBROWSER LOG: Popover
+
+[1A[2KBROWSER LOG: Popper
+
+[1A[2KBROWSER LOG: PopperProvider
+
+[1A[2KBROWSER LOG: PopoverProvider
+
+[1A[2KBROWSER LOG: PopoverTrigger
+
+[1A[2KBROWSER LOG: PopperAnchor
+
+[1A[2KBROWSER LOG: Primitive.div
+
+[1A[2KBROWSER LOG: Primitive.div.Slot
+
+[1A[2KBROWSER LOG: Primitive.div.SlotClone
+
+[1A[2KBROWSER LOG: Primitive.button
+
+[1A[2KBROWSER LOG: Primitive.button.Slot
+
+[1A[2KBROWSER LOG: Primitive.button.SlotClone
+
+[1A[2KBROWSER LOG: Button
+
+[1A[2KBROWSER LOG: ChevronsUpDown
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2KBROWSER LOG: PopoverContent
+
+[1A[2KBROWSER LOG: PopoverPortal
+
+[1A[2KBROWSER LOG: PopoverPortalProvider
+
+[1A[2KBROWSER LOG: Presence
+
+[1A[2KBROWSER LOG: Label
+
+[1A[2KBROWSER LOG: Controller
+
+[1A[2KBROWSER LOG: Select
+
+[1A[2KBROWSER LOG: Popper
+
+[1A[2KBROWSER LOG: PopperProvider
+
+[1A[2KBROWSER LOG: SelectProvider
+
+[1A[2KBROWSER LOG: SelectCollectionProvider
+
+[1A[2KBROWSER LOG: SelectCollectionProviderProvider
+
+[1A[2KBROWSER LOG: SelectProvider
+
+[1A[2KBROWSER LOG: SelectTrigger
+
+[1A[2KBROWSER LOG: SelectTrigger
+
+[1A[2KBROWSER LOG: PopperAnchor
+
+[1A[2KBROWSER LOG: Primitive.div
+
+[1A[2KBROWSER LOG: Primitive.div.Slot
+
+[1A[2KBROWSER LOG: Primitive.div.SlotClone
+
+[1A[2KBROWSER LOG: Primitive.button
+
+[1A[2KBROWSER LOG: SelectValue
+
+[1A[2KBROWSER LOG: SelectIcon
+
+[1A[2KBROWSER LOG: Primitive.span
+
+[1A[2KBROWSER LOG: Primitive.span.Slot
+
+[1A[2KBROWSER LOG: Primitive.span.SlotClone
+
+[1A[2KBROWSER LOG: ChevronDown
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2KBROWSER LOG: SelectContent
+
+[1A[2KBROWSER LOG: SelectBubbleInput
+
+[1A[2KBROWSER LOG: Primitive.select
+
+[1A[2KBROWSER LOG: Label
+
+[1A[2KBROWSER LOG: Controller
+
+[1A[2KBROWSER LOG: Select
+
+[1A[2KBROWSER LOG: Popper
+
+[1A[2KBROWSER LOG: PopperProvider
+
+[1A[2KBROWSER LOG: SelectProvider
+
+[1A[2KBROWSER LOG: SelectCollectionProvider
+
+[1A[2KBROWSER LOG: SelectCollectionProviderProvider
+
+[1A[2KBROWSER LOG: SelectProvider
+
+[1A[2KBROWSER LOG: SelectTrigger
+
+[1A[2KBROWSER LOG: SelectTrigger
+
+[1A[2KBROWSER LOG: PopperAnchor
+
+[1A[2KBROWSER LOG: Primitive.div
+
+[1A[2KBROWSER LOG: Primitive.div.Slot
+
+[1A[2KBROWSER LOG: Primitive.div.SlotClone
+
+[1A[2KBROWSER LOG: Primitive.button
+
+[1A[2KBROWSER LOG: SelectValue
+
+[1A[2KBROWSER LOG: SelectIcon
+
+[1A[2KBROWSER LOG: Primitive.span
+
+[1A[2KBROWSER LOG: Primitive.span.Slot
+
+[1A[2KBROWSER LOG: Primitive.span.SlotClone
+
+[1A[2KBROWSER LOG: ChevronDown
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2KBROWSER LOG: SelectContent
+
+[1A[2KBROWSER LOG: SelectBubbleInput
+
+[1A[2KBROWSER LOG: DialogFooter
+
+[1A[2KBROWSER LOG: Button
+
+[1A[2KBROWSER LOG: ArrowRight
+
+[1A[2KBROWSER LOG: DialogClose
+
+[1A[2KBROWSER LOG: TitleWarning
+
+[1A[2KBROWSER LOG: DescriptionWarning
+
+[1A[2KBROWSER LOG: ForwardRef
+
+[1A[2KBROWSER LOG: Remaining Effects
+
+[1A[2KBROWSER LOG: Blocking Track
+
+[1A[2KBROWSER LOG: Transition Track
+
+[1A[2KBROWSER LOG: Suspense Track
+
+[1A[2KBROWSER LOG: Idle Track
+
+[1A[2KBROWSER LOG: Render
+
+[1A[2KBROWSER LOG: div
+
+[1A[2KBROWSER LOG: div
+
+[1A[2KBROWSER LOG: Presence
+
+[1A[2KBROWSER LOG: CheckboxBubbleInput
+
+[1A[2KBROWSER LOG: Commit
+
+[1A[2KBROWSER LOG: Waiting
+
+[1A[2KBROWSER LOG: Presence
+
+[1A[2KBROWSER LOG: Portal
+
+[1A[2KBROWSER LOG: Primitive.div
+
+[1A[2KBROWSER LOG: Primitive.div.Slot
+
+[1A[2KBROWSER LOG: Primitive.div.SlotClone
+
+[1A[2KBROWSER LOG: Presence
+
+[1A[2KBROWSER LOG: Portal
+
+[1A[2KBROWSER LOG: Primitive.div
+
+[1A[2KBROWSER LOG: Primitive.div.Slot
+
+[1A[2KBROWSER LOG: Primitive.div.SlotClone
+
+[1A[2KBROWSER LOG: CheckboxProvider
+
+[1A[2KBROWSER LOG: CheckboxTrigger
+
+[1A[2KBROWSER LOG: CheckboxTrigger
+
+[1A[2KBROWSER LOG: CheckboxBubbleInput
+
+[1A[2KBROWSER LOG: Popper
+
+[1A[2KBROWSER LOG: PopperAnchor
+
+[1A[2KBROWSER LOG: Select
+
+[1A[2KBROWSER LOG: SelectProvider
+
+[1A[2KBROWSER LOG: SelectTrigger
+
+[1A[2KBROWSER LOG: Portal
+
+[1A[2KBROWSER LOG: Primitive.div
+
+[1A[2KBROWSER LOG: Primitive.div.Slot
+
+[1A[2KBROWSER LOG: Select
+
+[1A[2KBROWSER LOG: SelectProvider
+
+[1A[2KBROWSER LOG: SelectTrigger
+
+[1A[2KBROWSER LOG: Portal
+
+[1A[2KBROWSER LOG: Primitive.div
+
+[1A[2KBROWSER LOG: Primitive.div.Slot
+
+[1A[2KBROWSER LOG: Primitive.div.SlotClone
+
+[1A[2KBROWSER LOG: DismissableLayer
+
+[1A[2KBROWSER LOG: FocusScope
+
+[1A[2KBROWSER LOG: TitleWarning
+
+[1A[2KBROWSER LOG: DescriptionWarning
+
+[1A[2KBROWSER LOG: Remaining Effects
+
+[1A[2KBROWSER LOG: Blocking Track
+
+[1A[2KBROWSER LOG: Transition Track
+
+[1A[2KBROWSER LOG: Suspense Track
+
+[1A[2KBROWSER LOG: Idle Track
+
+[1A[2KBROWSER LOG: Render
+
+[1A[2KBROWSER LOG: div
+
+[1A[2KBROWSER LOG: Commit
+
+[1A[2KBROWSER LOG: Waiting
+
+[1A[2KBROWSER LOG: DismissableLayer
+
+[1A[2KBROWSER LOG: SelectContent
+
+[1A[2KBROWSER LOG: SelectContentProvider
+
+[1A[2KBROWSER LOG: SelectCollectionSlot
+
+[1A[2KBROWSER LOG: SelectCollectionSlot.Slot
+
+[1A[2KBROWSER LOG: SelectCollectionSlot.SlotClone
+
+[1A[2KBROWSER LOG: SelectScrollUpButton
+
+[1A[2KBROWSER LOG: SelectScrollUpButton
+
+[1A[2KBROWSER LOG: SelectViewport
+
+[1A[2KBROWSER LOG: SelectScrollDownButton
+
+[1A[2KBROWSER LOG: SelectContent
+
+[1A[2KBROWSER LOG: SelectContentProvider
+
+[1A[2KBROWSER LOG: SelectCollectionSlot
+
+[1A[2KBROWSER LOG: SelectCollectionSlot.Slot
+
+[1A[2KBROWSER LOG: SelectCollectionSlot.SlotClone
+
+[1A[2KBROWSER LOG: SelectScrollUpButton
+
+[1A[2KBROWSER LOG: SelectViewport
+
+[1A[2KBROWSER LOG: SelectCollectionSlot
+
+[1A[2KBROWSER LOG: SelectCollectionSlot.Slot
+
+[1A[2KBROWSER LOG: SelectCollectionSlot.SlotClone
+
+[1A[2KBROWSER LOG: Primitive.div
+
+[1A[2KBROWSER LOG: SelectItem
+
+[1A[2KBROWSER LOG: SelectItem
+
+[1A[2KBROWSER LOG: SelectItemProvider
+
+[1A[2KBROWSER LOG: SelectCollectionItemSlot
+
+[1A[2KBROWSER LOG: SelectCollectionItemSlot.Slot
+
+[1A[2KBROWSER LOG: SelectCollectionItemSlot.SlotClone
+
+[1A[2KBROWSER LOG: Primitive.div
+
+[1A[2KBROWSER LOG: SelectItemText
+
+[1A[2KBROWSER LOG: Primitive.span
+
+[1A[2KBROWSER LOG: SelectItem
+
+[1A[2KBROWSER LOG: SelectItem
+
+[1A[2KBROWSER LOG: SelectItemProvider
+
+[1A[2KBROWSER LOG: SelectCollectionItemSlot
+
+[1A[2KBROWSER LOG: SelectScrollDownButton
+
+[1A[2KBROWSER LOG: Remaining Effects
+
+[1A[2KBROWSER LOG: Blocking Track
+
+[1A[2KBROWSER LOG: Transition Track
+
+[1A[2KBROWSER LOG: Suspense Track
+
+[1A[2KBROWSER LOG: Idle Track
+
+[1A[2KBROWSER LOG: Render
+
+[1A[2KBROWSER LOG: span
+
+[1A[2KBROWSER LOG: Commit
+
+[1A[2KBROWSER LOG: Select
+
+[1A[2KBROWSER LOG: SelectProvider
+
+[1A[2KBROWSER LOG: SelectItem
+
+[1A[2KBROWSER LOG: SelectItemText
+
+[1A[2KBROWSER LOG: SelectItem
+
+[1A[2KBROWSER LOG: SelectBubbleInput
+
+[1A[2KBROWSER LOG: Primitive.select
+
+[1A[2KBROWSER LOG: Remaining Effects
+
+[1A[2KBROWSER LOG: Blocking Track
+
+[1A[2KBROWSER LOG: Transition Track
+
+[1A[2KBROWSER LOG: Suspense Track
+
+[1A[2KBROWSER LOG: Idle Track
+
+[1A[2KBROWSER LOG: Render
+
+[1A[2KBROWSER LOG: Commit
+
+[1A[2KBROWSER LOG: Blocking Track
+
+[1A[2KBROWSER LOG: Transition Track
+
+[1A[2KBROWSER LOG: Suspense Track
+
+[1A[2KBROWSER LOG: Idle Track
+
+[1A[2KBROWSER LOG: Commit
+
+[1A[2KBROWSER LOG: Blocking Track
+
+[1A[2KBROWSER LOG: Transition Track
+
+[1A[2KBROWSER LOG: Suspense Track
+
+[1A[2KBROWSER LOG: Idle Track
+
+[1A[2KBROWSER LOG: Event: animationend
+
+[1A[2KBROWSER LOG: Render
+
+[1A[2KBROWSER LOG: Commit
+
+[1A[2K  1) [webkit] ΓÇ║ e2e\notifications.spec.ts:10:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order 
+
+    [31mTest timeout of 30000ms exceeded.[39m
+
+    Error: locator.click: Test timeout of 30000ms exceeded.
+    Call log:
+    [2m  - waiting for getByRole('combobox', { name: 'Select client' })[22m
+
+
+      43 |     
+      44 |     // 3. Step 1: Client Details
+    > 45 |     await page.getByRole('combobox', { name: 'Select client' }).click();
+         |                                                                 ^
+      46 |     await page.getByRole('option', { name: 'Test Company' }).click();
+      47 |     await page.getByRole('button', { name: 'Next' }).click();
+      48 |     
+        at D:\My projects\firebase-orginal\e2e\notifications.spec.ts:45:65
+
+    Error Context: test-results\notifications-Notification-ea3ea-tion-for-a-high-value-order-webkit\error-context.md
+
+
+[1A[2K  2) [chromium] ΓÇ║ e2e\notifications.spec.ts:10:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order 
+
+    [31mTest timeout of 30000ms exceeded.[39m
+
+    Error: locator.click: Test timeout of 30000ms exceeded.
+    Call log:
+    [2m  - waiting for getByRole('combobox', { name: 'Select client' })[22m
+
+
+      43 |     
+      44 |     // 3. Step 1: Client Details
+    > 45 |     await page.getByRole('combobox', { name: 'Select client' }).click();
+         |                                                                 ^
+      46 |     await page.getByRole('option', { name: 'Test Company' }).click();
+      47 |     await page.getByRole('button', { name: 'Next' }).click();
+      48 |     
+        at D:\My projects\firebase-orginal\e2e\notifications.spec.ts:45:65
+
+    Error Context: test-results\notifications-Notification-ea3ea-tion-for-a-high-value-order-chromium\error-context.md
+
+
+[1A[2K  3) [firefox] ΓÇ║ e2e\notifications.spec.ts:10:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order 
+
+    [31mTest timeout of 30000ms exceeded.[39m
+
+    Error: locator.click: Test timeout of 30000ms exceeded.
+    Call log:
+    [2m  - waiting for getByRole('combobox', { name: 'Select client' })[22m
+
+
+      43 |     
+      44 |     // 3. Step 1: Client Details
+    > 45 |     await page.getByRole('combobox', { name: 'Select client' }).click();
+         |                                                                 ^
+      46 |     await page.getByRole('option', { name: 'Test Company' }).click();
+      47 |     await page.getByRole('button', { name: 'Next' }).click();
+      48 |     
+        at D:\My projects\firebase-orginal\e2e\notifications.spec.ts:45:65
+
+    Error Context: test-results\notifications-Notification-ea3ea-tion-for-a-high-value-order-firefox\error-context.md
+
+
+[1A[2K  3 failed
+    [chromium] ΓÇ║ e2e\notifications.spec.ts:10:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order 
+    [firefox] ΓÇ║ e2e\notifications.spec.ts:10:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order 
+    [webkit] ΓÇ║ e2e\notifications.spec.ts:10:3 ΓÇ║ Notification Delivery ΓÇ║ should generate a notification for a high value order 
+
+[36m  Serving HTML report at http://localhost:62885. Press Ctrl+C to quit.[39m

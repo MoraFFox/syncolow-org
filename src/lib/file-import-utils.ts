@@ -1,7 +1,9 @@
+
 import * as XLSX from 'xlsx';
 import Papa from 'papaparse';
 import { CsvRow } from './types';
 import { calculateTotal, calculateOrderTotals } from './pricing-calculator';
+import { supabase } from '@/lib/supabase';
 
 /**
  * Determines the file type based on the file extension
@@ -344,17 +346,10 @@ export function detectDuplicatesWithinFile(rows: CsvRow[]): { duplicateIndices: 
  * This function checks if the records in the import file already exist in the database
  */
 export async function detectDuplicatesAgainstDatabase(rows: CsvRow[]): Promise<{ duplicateIndices: number[]; existingRecords: CsvRow[] }> {
-  // Import necessary Firebase functions at the top of the function
-  const { db } = await import('./firebase');
-  const { collection, getDocs } = await import('firebase/firestore');
-  
   // Get all existing orders from the database
-  const ordersSnapshot = await getDocs(collection(db, 'orders'));
-  // We'll cast the data as any for now and check properties dynamically
-  const existingOrders: any[] = ordersSnapshot.docs.map(doc => ({
-    id: doc.id,
-    ...doc.data()
-  }));
+  const { data: orders } = await supabase.from('orders').select('*');
+  
+  const existingOrders: any[] = orders || [];
   
   const duplicateIndices: number[] = [];
   const existingRecords: CsvRow[] = [];

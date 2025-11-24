@@ -1,5 +1,7 @@
 import type { Notification } from './types';
 import { format } from 'date-fns';
+import { supabase } from '@/lib/supabase';
+import { logError } from '@/lib/error-logger';
 
 interface EmailTemplate {
   subject: string;
@@ -298,55 +300,65 @@ export class NotificationEmailService {
 }
 
 /**
- * Send email notification (placeholder - integrate with your email service)
- * Use SendGrid, AWS SES, or Firebase Email Extension
+ * Send email notification via Supabase Edge Function
  */
 export async function sendEmailNotification(
   to: string,
   notification: Notification
 ): Promise<void> {
-  const template = NotificationEmailService.generateEmailTemplate(notification);
+  try {
+    const template = NotificationEmailService.generateEmailTemplate(notification);
 
-  // TODO: Integrate with your email service
-  // Example with SendGrid:
-  /*
-  const sgMail = require('@sendgrid/mail');
-  sgMail.setApiKey(process.env.SENDGRID_API_KEY);
-  
-  await sgMail.send({
-    to,
-    from: 'notifications@synergyflow.com',
-    subject: template.subject,
-    text: template.text,
-    html: template.html,
-  });
-  */
+    const { error } = await supabase.functions.invoke('send-email', {
+      body: {
+        to,
+        subject: template.subject,
+        html: template.html,
+        text: template.text, // Include plain text version
+      },
+    });
 
-  // Example with Firebase Email Extension:
-  /*
-  await addDoc(collection(db, 'mail'), {
-    to,
-    message: {
-      subject: template.subject,
-      text: template.text,
-      html: template.html,
-    },
-  });
-  */
+    if (error) throw error;
 
-  console.log('Email notification prepared:', { to, subject: template.subject });
+    console.log('Email notification sent:', { to, subject: template.subject });
+  } catch (error: any) {
+    logError(error, {
+      component: 'NotificationEmailService',
+      action: 'sendEmailNotification',
+      data: { to, notificationId: notification.id }
+    });
+    // We don't re-throw here to prevent blocking the UI flow, just log the failure
+  }
 }
 
 /**
- * Send daily digest email
+ * Send daily digest email via Supabase Edge Function
  */
 export async function sendDailyDigest(
   to: string,
   notifications: Notification[]
 ): Promise<void> {
-  const template = NotificationEmailService.generateDailyDigest(notifications);
+  try {
+    const template = NotificationEmailService.generateDailyDigest(notifications);
 
-  // TODO: Integrate with your email service
-  console.log('Daily digest prepared:', { to, subject: template.subject, count: notifications.length });
+    const { error } = await supabase.functions.invoke('send-email', {
+      body: {
+        to,
+        subject: template.subject,
+        html: template.html,
+        text: template.text,
+      },
+    });
+
+    if (error) throw error;
+
+    console.log('Daily digest sent:', { to, subject: template.subject, count: notifications.length });
+  } catch (error: any) {
+    logError(error, {
+      component: 'NotificationEmailService',
+      action: 'sendDailyDigest',
+      data: { to, notificationCount: notifications.length }
+    });
+  }
 }
 

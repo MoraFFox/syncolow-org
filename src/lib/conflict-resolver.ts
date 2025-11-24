@@ -1,5 +1,5 @@
-import { db } from './firebase';
-import { doc, getDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
+
+import { supabase } from './supabase';
 
 export interface Conflict {
   id: string;
@@ -27,15 +27,17 @@ class ConflictResolver {
     localTimestamp: number
   ): Promise<Conflict | null> {
     try {
-      const docRef = doc(db, collection, documentId);
-      const docSnap = await getDoc(docRef);
+      const { data: serverData, error } = await supabase
+        .from(collection)
+        .select('*')
+        .eq('id', documentId)
+        .single();
 
-      if (!docSnap.exists()) {
-        return null; // No conflict, document doesn't exist
+      if (error || !serverData) {
+        return null; // No conflict, document doesn't exist or error
       }
 
-      const serverData = docSnap.data();
-      const serverTimestamp = serverData.updatedAt || serverData.createdAt || 0;
+      const serverTimestamp = serverData.updatedAt ? new Date(serverData.updatedAt).getTime() : (serverData.createdAt ? new Date(serverData.createdAt).getTime() : 0);
 
       // Check if server was modified after local change
       if (serverTimestamp > localTimestamp) {
@@ -109,11 +111,13 @@ class ConflictResolver {
     }
 
     // Update document with resolved data
-    const docRef = doc(db, conflict.collection, conflict.documentId);
-    await updateDoc(docRef, {
-      ...resolvedData,
-      updatedAt: serverTimestamp(),
-    });
+    await supabase
+        .from(conflict.collection)
+        .update({
+            ...resolvedData,
+            updatedAt: new Date().toISOString(),
+        })
+        .eq('id', conflict.documentId);
 
     return {
       ...conflict,
@@ -144,4 +148,3 @@ class ConflictResolver {
 }
 
 export const conflictResolver = new ConflictResolver();
-

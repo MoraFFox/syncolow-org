@@ -1,4 +1,7 @@
 
+"use client";
+
+import { Suspense } from "react";
 import { CompanyForm } from "@/app/clients/_components/company-form";
 import { ProductForm } from "@/app/products/_components/product-form";
 import { ImportRowError, Company, Product } from "@/lib/types";
@@ -6,7 +9,7 @@ import { useCompanyStore } from "@/store/use-company-store";
 import { useOrderStore } from "@/store/use-order-store";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Loader2 } from "lucide-react";
 
 interface ImportResolutionFormProps {
   errorToFix: ImportRowError;
@@ -97,24 +100,28 @@ export function ImportResolutionForm({
       return (
         <div className="p-1">
           {header}
-          <CompanyForm
-            company={errorToFix.resolution.suggestedData}
-            onSubmit={handleCompanySubmit}
-            isOpen={true} 
-            onOpenChange={() => {}}
-          />
+          <Suspense fallback={<div className="flex items-center justify-center p-8"><Loader2 className="h-8 w-8 animate-spin text-muted-foreground" /></div>}>
+            <CompanyForm
+              company={errorToFix.resolution.suggestedData}
+              onSubmit={handleCompanySubmit}
+              isOpen={true} 
+              onOpenChange={() => {}}
+            />
+          </Suspense>
         </div>
       );
     case "product":
       return (
         <div className="p-1">
           {header}
-          <ProductForm
-            product={errorToFix.resolution.suggestedData}
-            onSubmit={handleProductSubmit}
-            isOpen={true} 
-            onOpenChange={() => {}}
-          />
+          <Suspense fallback={<div className="flex items-center justify-center p-8"><Loader2 className="h-8 w-8 animate-spin text-muted-foreground" /></div>}>
+            <ProductForm
+              product={errorToFix.resolution.suggestedData}
+              onSubmit={handleProductSubmit}
+              isOpen={true} 
+              onOpenChange={() => {}}
+            />
+          </Suspense>
         </div>
       );
     default:

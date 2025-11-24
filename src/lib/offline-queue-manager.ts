@@ -1,5 +1,5 @@
-import { db } from './firebase';
-import { collection, addDoc, updateDoc, deleteDoc, doc } from 'firebase/firestore';
+
+import { supabase } from '@/lib/supabase';
 import { useOfflineQueueStore } from '@/store/use-offline-queue-store';
 import { QueuedOperation } from './indexeddb-storage';
 import { toast } from '@/hooks/use-toast';
@@ -89,11 +89,12 @@ class OfflineQueueManager {
   }
 
   private async processOperation(operation: QueuedOperation): Promise<void> {
-    const collectionRef = collection(db, operation.collection);
-
     switch (operation.operation) {
       case 'create':
-        await addDoc(collectionRef, operation.data);
+        const { error: createError } = await supabase
+            .from(operation.collection)
+            .insert(operation.data);
+        if (createError) throw createError;
         break;
 
       case 'update':
@@ -116,15 +117,23 @@ class OfflineQueueManager {
           throw new Error('Conflict detected - requires manual resolution');
         }
         
-        const updateRef = doc(db, operation.collection, operation.data.id);
         const { id, ...updateData } = operation.data;
-        await updateDoc(updateRef, updateData);
+        const { error: updateError } = await supabase
+            .from(operation.collection)
+            .update(updateData)
+            .eq('id', operation.data.id);
+            
+        if (updateError) throw updateError;
         break;
 
       case 'delete':
         if (!operation.docId) throw new Error('Delete operation requires docId');
-        const deleteRef = doc(db, operation.collection, operation.docId);
-        await deleteDoc(deleteRef);
+        const { error: deleteError } = await supabase
+            .from(operation.collection)
+            .delete()
+            .eq('id', operation.docId);
+            
+        if (deleteError) throw deleteError;
         break;
 
       default:
@@ -161,4 +170,3 @@ class OfflineQueueManager {
 }
 
 export const offlineQueueManager = new OfflineQueueManager();
-

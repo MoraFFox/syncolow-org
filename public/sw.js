@@ -12,7 +12,17 @@ const PRECACHE_URLS = [
 // Install - precache critical assets
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(PRECACHE_URLS))
+    caches.open(CACHE_NAME).then((cache) => {
+      // Try to cache each URL individually to avoid blocking on failed requests
+      return Promise.allSettled(
+        PRECACHE_URLS.map(url => 
+          cache.add(url).catch(err => {
+            console.warn(`Failed to cache ${url}:`, err);
+            return null;
+          })
+        )
+      );
+    })
   );
   self.skipWaiting();
 });

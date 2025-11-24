@@ -1,5 +1,4 @@
 
-
 "use client"
 import { useMemo, useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
@@ -30,6 +29,7 @@ import { CompanyForm } from '@/app/clients/_components/company-form';
 import Link from 'next/link';
 import { downloadInvoice } from '@/lib/pdf-invoice';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { supabase } from '@/lib/supabase';
 
 
 export default function OrderDetailsPage() {
@@ -58,12 +58,14 @@ export default function OrderDetailsPage() {
       
       setOrderLoading(true);
       try {
-        const { getDoc, doc } = await import('firebase/firestore');
-        const { db } = await import('@/lib/firebase');
-        const orderDoc = await getDoc(doc(db, 'orders', id));
+        const { data, error } = await supabase
+            .from('orders')
+            .select('*')
+            .eq('id', id)
+            .single();
         
-        if (orderDoc.exists()) {
-          setOrderData({ id: orderDoc.id, ...orderDoc.data() } as Order);
+        if (data) {
+          setOrderData(data as Order);
         } else {
           setOrderData(null);
         }
@@ -80,12 +82,12 @@ export default function OrderDetailsPage() {
   const order = orderData;
 
   const company = useMemo(() => {
-    if (!order || order.isPotentialClient) return undefined;
+    if (!order || order.isPotentialClient || !companies) return undefined;
     return companies.find(c => c.id === order.companyId);
   }, [order, companies]);
 
   const branch = useMemo(() => {
-    if (!order) return null;
+    if (!order || !companies) return null;
     return companies.find(c => c.id === order.branchId);
   }, [order, companies]);
 
@@ -166,11 +168,11 @@ export default function OrderDetailsPage() {
                                   <p className="font-semibold">{item.productName || product?.name || 'Unknown Product'}</p>
                                   <div className="flex justify-between items-center text-sm text-muted-foreground">
                                       <span>Quantity: {item.quantity}</span>
-                                      <span>@ ${item.price.toFixed(2)} each</span>
+                                      <span>@ ${(item.price || 0).toFixed(2)} each</span>
                                   </div>
                                    <Separator />
                                    <div className="flex justify-end items-center">
-                                       <p className="font-bold text-lg">${(item.price * item.quantity).toFixed(2)}</p>
+                                       <p className="font-bold text-lg">${((item.price || 0) * (item.quantity || 0)).toFixed(2)}</p>
                                    </div>
                               </CardContent>
                            </Card>
@@ -200,8 +202,8 @@ export default function OrderDetailsPage() {
                                   <div className="text-sm text-muted-foreground hidden md:block">{product?.description}</div>
                               </TableCell>
                               <TableCell className="text-center">{item.quantity}</TableCell>
-                              <TableCell className="text-right">${item.price.toFixed(2)}</TableCell>
-                              <TableCell className="text-right">${(item.price * item.quantity).toFixed(2)}</TableCell>
+                              <TableCell className="text-right">${(item.price || 0).toFixed(2)}</TableCell>
+                              <TableCell className="text-right">${((item.price || 0) * (item.quantity || 0)).toFixed(2)}</TableCell>
                           </TableRow>
                       )
                   })}
@@ -299,7 +301,7 @@ export default function OrderDetailsPage() {
                       <TooltipProvider>
                         <Tooltip>
                           <TooltipTrigger asChild>
-                            <div className="text-2xl font-bold cursor-help">${order.total.toFixed(2)}</div>
+                            <div className="text-2xl font-bold cursor-help">${(order.total || 0).toFixed(2)}</div>
                           </TooltipTrigger>
                           <TooltipContent side="left" className="max-w-xs">
                             <div className="space-y-2 text-sm">
@@ -317,18 +319,18 @@ export default function OrderDetailsPage() {
                               {(order.discountAmount ?? 0) > 0 && (
                                 <div className="flex justify-between">
                                   <span>Net Amount:</span>
-                                  <span>${(order.subtotal - (order.discountAmount ?? 0)).toFixed(2)}</span>
+                                  <span>${((order.subtotal || 0) - (order.discountAmount ?? 0)).toFixed(2)}</span>
                                 </div>
                               )}
-                              {order.totalTax > 0 && (
+                              {(order.totalTax || 0) > 0 && (
                                 <div className="flex justify-between">
                                   <span>Tax ({order.items[0]?.taxRate || 0}%):</span>
-                                  <span>+${order.totalTax.toFixed(2)}</span>
+                                  <span>+${(order.totalTax || 0).toFixed(2)}</span>
                                 </div>
                               )}
                               <div className="border-t pt-2 flex justify-between font-bold">
                                 <span>Total:</span>
-                                <span>${order.total.toFixed(2)}</span>
+                                <span>${(order.total || 0).toFixed(2)}</span>
                               </div>
                             </div>
                           </TooltipContent>

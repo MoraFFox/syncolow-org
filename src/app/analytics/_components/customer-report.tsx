@@ -24,9 +24,13 @@ interface CustomerReportProps {
     dateRange: { from: string; to: string };
 }
 
+import { useDrillDown } from '@/hooks/use-drilldown';
+import { DrillTarget } from '@/components/drilldown/drill-target';
+
 export function CustomerReport({ dateRange }: CustomerReportProps) {
     const { companies } = useCompanyStore();
     const { analyticsOrders } = useOrderStore();
+    const { goToDetail } = useDrillDown();
     const [sortConfig, setSortConfig] = useState<{ key: string; direction: 'asc' | 'desc' } | null>({ key: 'totalRevenue', direction: 'desc' });
     const [visibleCount, setVisibleCount] = useState(10);
     const [isLoadingMore, setIsLoadingMore] = useState(false);
@@ -151,21 +155,28 @@ export function CustomerReport({ dateRange }: CustomerReportProps) {
                         </TableHeader>
                         <TableBody>
                             {visibleCustomerAnalytics.map((client) => (
-                                <TableRow key={client.id}>
-                                    <TableCell className="font-medium">
-                                        <Link href={`/clients/${client.id}`} className="hover:underline">
+                                <DrillTarget 
+                                    key={client.id}
+                                    kind="company"
+                                    payload={{ id: client.id, name: client.name, status: client.paymentStatus }}
+                                    asChild
+                                >
+                                    <TableRow 
+                                        className="cursor-pointer hover:bg-muted/50"
+                                    >
+                                        <TableCell className="font-medium">
                                             {client.name}
-                                        </Link>
-                                    </TableCell>
-                                    <TableCell className="text-right">${client.totalRevenue.toFixed(2)}</TableCell>
-                                    <TableCell className="text-right">{client.totalOrders}</TableCell>
-                                    <TableCell className="text-right">
-                                        <span className="text-muted-foreground">${client.clv.toFixed(2)}</span>
-                                    </TableCell>
-                                    <TableCell className="text-right">
-                                        <Badge variant={getStatusVariant(client.paymentStatus)}>{client.paymentStatus}</Badge>
-                                    </TableCell>
-                                </TableRow>
+                                        </TableCell>
+                                        <TableCell className="text-right">${client.totalRevenue.toFixed(2)}</TableCell>
+                                        <TableCell className="text-right">{client.totalOrders}</TableCell>
+                                        <TableCell className="text-right">
+                                            <span className="text-muted-foreground">${client.clv.toFixed(2)}</span>
+                                        </TableCell>
+                                        <TableCell className="text-right">
+                                            <Badge variant={getStatusVariant(client.paymentStatus)}>{client.paymentStatus}</Badge>
+                                        </TableCell>
+                                    </TableRow>
+                                </DrillTarget>
                             ))}
                         </TableBody>
                     </Table>

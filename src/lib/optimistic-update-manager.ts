@@ -1,7 +1,7 @@
+
 /** @format */
 
-import { db } from './firebase';
-import { doc, updateDoc, addDoc, collection, deleteDoc } from 'firebase/firestore';
+import { supabase } from './supabase';
 import { addToOfflineQueue } from './indexeddb-storage';
 
 type Operation = 'create' | 'update' | 'delete';
@@ -38,10 +38,17 @@ export async function optimisticCreate<T extends Record<string, any>>(
   });
 
   try {
-    const docRef = await addDoc(collection(db, collectionName), data);
+    const { data: insertedData, error } = await supabase
+        .from(collectionName)
+        .insert(data)
+        .select()
+        .single();
+
+    if (error) throw error;
+
     pendingUpdates.delete(updateId);
-    onSuccess(docRef.id); // Update with real ID
-    return docRef.id;
+    onSuccess(insertedData.id); // Update with real ID
+    return insertedData.id;
   } catch (error) {
     if (!navigator.onLine) {
       await addToOfflineQueue({ id: tempId, operation: 'create', collection: collectionName, data, timestamp: Date.now(), retries: 0, priority: 1 });
@@ -76,7 +83,12 @@ export async function optimisticUpdate<T extends Record<string, any>>(
   });
 
   try {
-    await updateDoc(doc(db, collectionName, docId), updates as any);
+    const { error } = await supabase
+        .from(collectionName)
+        .update(updates)
+        .eq('id', docId);
+
+    if (error) throw error;
     pendingUpdates.delete(updateId);
   } catch (error) {
     if (!navigator.onLine) {
@@ -109,8 +121,12 @@ export async function optimisticDelete(
   });
 
   try {
-    const docRef = doc(db, collectionName, docId);
-    await deleteDoc(docRef);
+    const { error } = await supabase
+        .from(collectionName)
+        .delete()
+        .eq('id', docId);
+
+    if (error) throw error;
     pendingUpdates.delete(updateId);
   } catch (error) {
     if (!navigator.onLine) {
@@ -132,4 +148,3 @@ export function rollbackAll(): void {
 export function getPendingCount(): number {
   return pendingUpdates.size;
 }
-

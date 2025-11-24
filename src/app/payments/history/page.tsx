@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useState, useMemo, useEffect } from 'react';
@@ -15,6 +16,7 @@ import { ArrowLeft, Calendar as CalendarIcon, Download, Search, X } from 'lucide
 import { format } from 'date-fns';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
+import { supabase } from '@/lib/supabase';
 
 export default function PaymentHistoryPage() {
   const { companies } = useCompanyStore();
@@ -25,12 +27,13 @@ export default function PaymentHistoryPage() {
     const loadAllOrders = async () => {
       setLoading(true);
       try {
-        const { getDocs, collection, query, orderBy } = await import('firebase/firestore');
-        const { db } = await import('@/lib/firebase');
-        const q = query(collection(db, 'orders'), orderBy('orderDate', 'desc'));
-        const snapshot = await getDocs(q);
-        const orders = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        setAllOrders(orders);
+        const { data, error } = await supabase
+            .from('orders')
+            .select('*')
+            .order('orderDate', { ascending: false });
+            
+        if (error) throw error;
+        setAllOrders(data || []);
       } catch (e) {
         console.error('Error loading orders:', e);
       }
@@ -52,11 +55,6 @@ export default function PaymentHistoryPage() {
 
   const filteredOrders = useMemo(() => {
     let filtered = [...paidOrders];
-    
-    console.log('Total paid orders:', filtered.length);
-    if (filtered.length > 0) {
-      console.log('Sample paidDate values:', filtered.slice(0, 10).map(o => ({ id: o.id.slice(0,7), paidDate: o.paidDate })));
-    }
     
     if (companyFilter !== 'all') {
       filtered = filtered.filter(o => o.companyId === companyFilter);

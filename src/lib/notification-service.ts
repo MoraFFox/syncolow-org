@@ -1,5 +1,5 @@
-import { db } from './firebase';
-import { collection, addDoc, updateDoc, doc, query, where, onSnapshot, orderBy, limit, writeBatch, getDocs, Timestamp, deleteDoc } from 'firebase/firestore';
+
+import { supabase } from './supabase';
 import type { Notification } from './types';
 
 const NOTIFICATIONS_COLLECTION = 'notifications';
@@ -13,66 +13,96 @@ export class NotificationService {
     callback: (notifications: Notification[]) => void,
     limitCount: number = 50
   ) {
-    const q = query(
-      collection(db, NOTIFICATIONS_COLLECTION),
-      where('userId', '==', userId),
-      orderBy('createdAt', 'desc'),
-      limit(limitCount)
-    );
+    // Initial fetch
+    supabase
+      .from(NOTIFICATIONS_COLLECTION)
+      .select('*')
+      .eq('userId', userId)
+      .order('createdAt', { ascending: false })
+      .limit(limitCount)
+      .then(({ data }) => {
+        if (data) callback(data as Notification[]);
+      });
 
-    return onSnapshot(q, (snapshot) => {
-      const notifications = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data(),
-      })) as Notification[];
-      callback(notifications);
-    });
+    // Realtime subscription
+    const channel = supabase
+      .channel('public:notifications')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: NOTIFICATIONS_COLLECTION,
+          filter: `userId=eq.${userId}`,
+        },
+        (payload) => {
+          // Re-fetch notifications on any change to ensure correct order and limit
+          // Or we could optimistically update, but re-fetching is safer for now
+          supabase
+            .from(NOTIFICATIONS_COLLECTION)
+            .select('*')
+            .eq('userId', userId)
+            .order('createdAt', { ascending: false })
+            .limit(limitCount)
+            .then(({ data }) => {
+              if (data) callback(data as Notification[]);
+            });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }
 
   /**
    * Create a new notification
    */
   static async createNotification(notification: Omit<Notification, 'id'>): Promise<string> {
-    const docRef = await addDoc(collection(db, NOTIFICATIONS_COLLECTION), {
-      ...notification,
-      createdAt: notification.createdAt || new Date().toISOString(),
-    });
-    return docRef.id;
+    const { data, error } = await supabase
+      .from(NOTIFICATIONS_COLLECTION)
+      .insert({
+        ...notification,
+        createdAt: notification.createdAt || new Date().toISOString(),
+      })
+      .select()
+      .single();
+
+    if (error) throw error;
+    return (data as Notification).id;
   }
 
   /**
    * Bulk create notifications
    */
   static async createNotifications(notifications: Omit<Notification, 'id'>[]): Promise<void> {
-    const batch = writeBatch(db);
-    const collectionRef = collection(db, NOTIFICATIONS_COLLECTION);
+    const { error } = await supabase
+      .from(NOTIFICATIONS_COLLECTION)
+      .insert(
+        notifications.map(notification => ({
+          ...notification,
+          createdAt: notification.createdAt || new Date().toISOString(),
+        }))
+      );
 
-    notifications.forEach(notification => {
-      const docRef = doc(collectionRef);
-      batch.set(docRef, {
-        ...notification,
-        createdAt: notification.createdAt || new Date().toISOString(),
-      });
-    });
-
-    await batch.commit();
+    if (error) throw error;
   }
 
   /**
    * Mark notification as read
    */
   static async markAsRead(notificationId: string): Promise<void> {
-    try {
-      await updateDoc(doc(db, NOTIFICATIONS_COLLECTION, notificationId), {
-        isRead: true,
+    const { error } = await supabase
+      .from(NOTIFICATIONS_COLLECTION)
+      .update({
+        read: true,
         readAt: new Date().toISOString(),
-      });
-    } catch (error: any) {
-      if (error.code === 'not-found') {
-        console.warn(`Notification ${notificationId} not found, skipping update`);
-      } else {
-        throw error;
-      }
+      })
+      .eq('id', notificationId);
+
+    if (error) {
+        console.warn(`Error updating notification ${notificationId}:`, error);
     }
   }
 
@@ -80,40 +110,32 @@ export class NotificationService {
    * Mark all notifications as read for a user
    */
   static async markAllAsRead(userId: string): Promise<void> {
-    const q = query(
-      collection(db, NOTIFICATIONS_COLLECTION),
-      where('userId', '==', userId),
-      where('isRead', '==', false)
-    );
-
-    const snapshot = await getDocs(q);
-    const batch = writeBatch(db);
-
-    snapshot.docs.forEach(docSnapshot => {
-      batch.update(docSnapshot.ref, {
-        isRead: true,
+    const { error } = await supabase
+      .from(NOTIFICATIONS_COLLECTION)
+      .update({
+        read: true,
         readAt: new Date().toISOString(),
-      });
-    });
+      })
+      .eq('userId', userId)
+      .eq('read', false);
 
-    await batch.commit();
+    if (error) throw error;
   }
 
   /**
    * Snooze a notification
    */
   static async snoozeNotification(notificationId: string, snoozeUntil: Date): Promise<void> {
-    try {
-      await updateDoc(doc(db, NOTIFICATIONS_COLLECTION, notificationId), {
+    const { error } = await supabase
+      .from(NOTIFICATIONS_COLLECTION)
+      .update({
         snoozedUntil: snoozeUntil.toISOString(),
-        isRead: true,
-      });
-    } catch (error: any) {
-      if (error.code === 'not-found') {
-        console.warn(`Notification ${notificationId} not found, skipping snooze`);
-      } else {
-        throw error;
-      }
+        read: true,
+      })
+      .eq('id', notificationId);
+
+    if (error) {
+        console.warn(`Error snoozing notification ${notificationId}:`, error);
     }
   }
 
@@ -121,17 +143,16 @@ export class NotificationService {
    * Clear snooze from a notification
    */
   static async clearSnooze(notificationId: string): Promise<void> {
-    try {
-      await updateDoc(doc(db, NOTIFICATIONS_COLLECTION, notificationId), {
+    const { error } = await supabase
+      .from(NOTIFICATIONS_COLLECTION)
+      .update({
         snoozedUntil: null,
-        isRead: false,
-      });
-    } catch (error: any) {
-      if (error.code === 'not-found') {
-        console.warn(`Notification ${notificationId} not found, skipping clear snooze`);
-      } else {
-        throw error;
-      }
+        read: false,
+      })
+      .eq('id', notificationId);
+
+    if (error) {
+        console.warn(`Error clearing snooze for notification ${notificationId}:`, error);
     }
   }
 
@@ -139,7 +160,7 @@ export class NotificationService {
    * Delete a notification
    */
   static async deleteNotification(notificationId: string): Promise<void> {
-    await deleteDoc(doc(db, NOTIFICATIONS_COLLECTION, notificationId));
+    await supabase.from(NOTIFICATIONS_COLLECTION).delete().eq('id', notificationId);
   }
 
   /**
@@ -149,30 +170,23 @@ export class NotificationService {
     const cutoffDate = new Date();
     cutoffDate.setDate(cutoffDate.getDate() - daysOld);
 
-    const q = query(
-      collection(db, NOTIFICATIONS_COLLECTION),
-      where('userId', '==', userId),
-      where('createdAt', '<', cutoffDate.toISOString())
-    );
-
-    const snapshot = await getDocs(q);
-    const batch = writeBatch(db);
-
-    snapshot.docs.forEach(docSnapshot => {
-      batch.delete(docSnapshot.ref);
-    });
-
-    await batch.commit();
+    await supabase
+      .from(NOTIFICATIONS_COLLECTION)
+      .delete()
+      .eq('userId', userId)
+      .lt('createdAt', cutoffDate.toISOString());
   }
 
   /**
    * Record action taken on notification
    */
   static async recordAction(notificationId: string): Promise<void> {
-    await updateDoc(doc(db, NOTIFICATIONS_COLLECTION, notificationId), {
-      actionTakenAt: new Date().toISOString(),
-      isRead: true,
-    });
+    await supabase
+      .from(NOTIFICATIONS_COLLECTION)
+      .update({
+        actionTakenAt: new Date().toISOString(),
+        read: true,
+      })
+      .eq('id', notificationId);
   }
 }
-

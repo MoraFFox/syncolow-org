@@ -2,46 +2,17 @@
 
 import { create } from "zustand";
 import { produce } from "immer";
-import { db } from "@/lib/firebase";
-import {
-  collection,
-  getDocs,
-  addDoc,
-  doc,
-  updateDoc,
-  runTransaction,
-  deleteDoc,
-  writeBatch,
-  getDoc,
-  increment,
-  query,
-  where,
-  setDoc,
-  orderBy,
-  limit,
-  startAfter,
-  DocumentSnapshot,
-} from "firebase/firestore";
+import { supabase } from "@/lib/supabase";
 import type {
   Order,
-  OrderItem,
   Product,
   VisitCall,
   Notification,
-  NotificationType,
-  CancellationReason,
   Company,
-  Feedback,
-  MaintenanceVisit,
-  MaintenanceEmployee,
-  Barista,
-  DeliveryArea,
-  Manufacturer,
   Category,
   Tax,
 } from "@/lib/types";
 import { toast } from "@/hooks/use-toast";
-import { format, addDays, differenceInDays } from "date-fns";
 import { generateImage } from "@/ai/flows/generate-image";
 import { calculateOrderTotals } from "@/lib/pricing-calculator";
 import { useCompanyStore } from "./use-company-store";
@@ -94,11 +65,11 @@ interface AppState {
   notifications: Notification[];
   visits: VisitCall[];
   loading: boolean;
-  ordersLastDoc: DocumentSnapshot | null;
+  ordersOffset: number;
   ordersHasMore: boolean;
   ordersLoading: boolean;
   analyticsLoading: boolean;
-  productsLastDoc: DocumentSnapshot | null;
+  productsOffset: number;
   productsHasMore: boolean;
 
   fetchInitialData: () => Promise<void>;
@@ -209,103 +180,60 @@ export const useOrderStore = create<AppState>((set, get) => ({
   notifications: [],
   visits: [],
   loading: true,
-  ordersLastDoc: null,
+  ordersOffset: 0,
   ordersHasMore: true,
   ordersLoading: false,
   analyticsLoading: false,
-  productsLastDoc: null,
+  productsOffset: 0,
   productsHasMore: true,
 
   fetchInitialData: async () => {
-    if (!get().loading) set({ loading: true });
+    // Only set loading if we don't have data yet
+    const currentState = get();
+    const hasData = currentState.orders.length > 0 || currentState.products.length > 0;
+    
+    if (!hasData && !currentState.loading) {
+      set({ loading: true });
+    }
+
     try {
-      
-      // Fetch only essential data initially, products loaded on-demand
       const [
-        visitsSnapshot,
-        companiesSnapshot,
-        baristasSnapshot,
-        feedbackSnapshot,
-        areasSnapshot,
-        maintenanceSnapshot,
-        employeesSnapshot,
-        cancellationReasonsSnapshot,
-        manufacturersSnapshot,
-        categoriesSnapshot,
-        taxesSnapshot,
+        { data: visits },
+        { data: companies },
+        { data: baristas },
+        { data: feedback },
+        { data: areas },
+        { data: maintenanceVisits },
+        { data: maintenanceEmployees },
+        { data: cancellationReasons },
+        { data: manufacturers },
+        { data: categories },
+        { data: taxes },
       ] = await Promise.all([
-        getDocs(collection(db, "visits")),
-        getDocs(collection(db, "companies")),
-        getDocs(collection(db, "baristas")),
-        getDocs(collection(db, "feedback")),
-        getDocs(collection(db, "areas")),
-        getDocs(collection(db, "maintenance")),
-        getDocs(collection(db, "maintenanceEmployees")),
-        getDocs(collection(db, "cancellationReasons")),
-        getDocs(collection(db, "manufacturers")),
-        getDocs(collection(db, "categories")),
-        getDocs(collection(db, "taxes")),
+        supabase.from("visits").select("*"),
+        supabase.from("companies").select("*").not('name', 'like', '[DELETED]%'),
+        supabase.from("baristas").select("*"),
+        supabase.from("feedback").select("*"),
+        supabase.from("areas").select("*"),
+        supabase.from("maintenance").select("*"),
+        supabase.from("maintenanceEmployees").select("*"),
+        supabase.from("cancellationReasons").select("*"),
+        supabase.from("manufacturers").select("*"),
+        supabase.from("categories").select("*"),
+        supabase.from("taxes").select("*"),
       ]);
       
-      // Products loaded separately with limit
-      const productsSnapshot = await getDocs(
-        query(collection(db, "products"), limit(50))
-      );
+      const { data: products } = await supabase
+        .from("products")
+        .select("*")
+        .range(0, 49);
       
-      const products = productsSnapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      })) as Product[];
-      
-      const lastDoc = productsSnapshot.docs[productsSnapshot.docs.length - 1] || null;
-      
-      set({ productsLastDoc: lastDoc, productsHasMore: productsSnapshot.docs.length === 50 });
-      const visits = visitsSnapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      })) as VisitCall[];
-      const categories = categoriesSnapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      })) as Category[];
-      const taxes = taxesSnapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      })) as Tax[];
-      const companies = companiesSnapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      })) as Company[];
-      const baristas = baristasSnapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      })) as Barista[];
-      const feedback = feedbackSnapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      })) as Feedback[];
-      const areas = areasSnapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      })) as DeliveryArea[];
-      const maintenanceVisits = maintenanceSnapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      })) as MaintenanceVisit[];
-      const maintenanceEmployees = employeesSnapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      })) as MaintenanceEmployee[];
-      const cancellationReasons = cancellationReasonsSnapshot.docs.map(
-        (doc) => ({ id: doc.id, ...doc.data() })
-      ) as CancellationReason[];
-      const manufacturers = manufacturersSnapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      })) as Manufacturer[];
+      set({ 
+        productsOffset: 50, 
+        productsHasMore: (products?.length || 0) === 50 
+      });
 
-      // Group products by manufacturer for efficient lookup
-      const productsByManufacturer = products.reduce((acc, product) => {
+      const productsByManufacturer = (products || []).reduce((acc, product) => {
         const key = product.manufacturerId || "unassigned";
         if (!acc[key]) {
           acc[key] = [];
@@ -314,27 +242,26 @@ export const useOrderStore = create<AppState>((set, get) => ({
         return acc;
       }, {} as Record<string, Product[]>);
 
-      // Update all stores (orders loaded separately)
-      set({ products, visits, categories, taxes, loading: false });
+      set({ products: products || [], visits: visits || [], categories: categories || [], taxes: taxes || [], loading: false });
       useCompanyStore.setState({
-        companies,
-        baristas,
-        feedback,
-        areas,
+        companies: companies || [],
+        baristas: baristas || [],
+        feedback: feedback || [],
+        areas: areas || [],
         loading: false,
       });
       useMaintenanceStore.setState({
-        maintenanceVisits,
-        maintenanceEmployees,
-        cancellationReasons,
+        maintenanceVisits: maintenanceVisits || [],
+        maintenanceEmployees: maintenanceEmployees || [],
+        cancellationReasons: cancellationReasons || [],
         loading: false,
       });
       useManufacturerStore.setState({
-        manufacturers,
+        manufacturers: manufacturers || [],
         productsByManufacturer,
         loading: false,
       });
-    } catch (e) {
+    } catch {
       set({ loading: false });
       useCompanyStore.setState({ loading: false });
       useMaintenanceStore.setState({ loading: false });
@@ -348,26 +275,19 @@ export const useOrderStore = create<AppState>((set, get) => ({
   fetchOrders: async (limitCount) => {
     set({ ordersLoading: true });
     try {
-      const q = query(
-        collection(db, "orders"),
-        orderBy("orderDate", "desc"),
-        limit(limitCount)
-      );
-
-      const snapshot = await getDocs(q);
-      const orders = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      })) as Order[];
-      const lastDoc = snapshot.docs[snapshot.docs.length - 1] || null;
+      const { data: orders } = await supabase
+        .from("orders")
+        .select("*")
+        .order("orderDate", { ascending: false })
+        .range(0, limitCount - 1);
 
       set({
-        orders,
-        ordersLastDoc: lastDoc,
-        ordersHasMore: snapshot.docs.length === limitCount,
+        orders: orders || [],
+        ordersOffset: limitCount,
+        ordersHasMore: (orders?.length || 0) === limitCount,
         ordersLoading: false,
       });
-    } catch (e) {
+    } catch {
       set({ ordersLoading: false });
     }
   },
@@ -375,39 +295,29 @@ export const useOrderStore = create<AppState>((set, get) => ({
   fetchOrdersWithFilters: async (limitCount, filters) => {
     set({ ordersLoading: true });
     try {
-      const constraints: any[] = [];
+      let query = supabase.from("orders").select("*");
 
       if (filters.status && filters.status !== "All") {
-        constraints.push(where("status", "==", filters.status));
+        query = query.eq("status", filters.status);
       }
       if (filters.paymentStatus && filters.paymentStatus !== "All") {
-        constraints.push(
-          where("paymentStatus", "==", filters.paymentStatus)
-        );
+        query = query.eq("paymentStatus", filters.paymentStatus);
       }
       if (filters.companyId) {
-        constraints.push(where("companyId", "==", filters.companyId));
+        query = query.eq("companyId", filters.companyId);
       }
 
-      constraints.push(orderBy("orderDate", "desc"));
-      constraints.push(limit(limitCount));
-
-      const q = query(collection(db, "orders"), ...constraints);
-      const snapshot = await getDocs(q);
-      const orders = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      })) as Order[];
-      const lastDoc = snapshot.docs[snapshot.docs.length - 1] || null;
+      const { data: orders } = await query
+        .order("orderDate", { ascending: false })
+        .range(0, limitCount - 1);
 
       set({
-        orders,
-        ordersLastDoc: lastDoc,
-        ordersHasMore: snapshot.docs.length === limitCount,
+        orders: orders || [],
+        ordersOffset: limitCount,
+        ordersHasMore: (orders?.length || 0) === limitCount,
         ordersLoading: false,
       });
-    } catch (e) {
-      console.error("Error fetching orders with filters:", e);
+    } catch {
       set({ ordersLoading: false });
     }
   },
@@ -419,14 +329,10 @@ export const useOrderStore = create<AppState>((set, get) => ({
     }
 
     try {
-      const allSnapshot = await getDocs(collection(db, "orders"));
-      const allOrders = allSnapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      })) as Order[];
+      const { data: allOrders } = await supabase.from("orders").select("*");
 
       const searchLower = searchTerm.toLowerCase();
-      const filtered = allOrders.filter(order =>
+      const filtered = (allOrders || []).filter(order =>
         (order.companyName && order.companyName.toLowerCase().includes(searchLower)) ||
         (order.branchName && order.branchName.toLowerCase().includes(searchLower)) ||
         (order.id && order.id.toLowerCase().includes(searchLower)) ||
@@ -440,43 +346,35 @@ export const useOrderStore = create<AppState>((set, get) => ({
 
       set({
         orders: filtered,
-        ordersLastDoc: null,
+        ordersOffset: 0,
         ordersHasMore: false,
       });
-    } catch (e) {
-      console.error("Error searching orders:", e);
+    } catch {
+      // Error handled silently
     }
   },
 
   loadMoreOrders: async (limitCount) => {
-    const { ordersLastDoc, ordersHasMore } = get();
-    if (!ordersLastDoc || !ordersHasMore) return;
+    const { ordersOffset, ordersHasMore } = get();
+    if (!ordersHasMore) return;
 
     set({ ordersLoading: true });
     try {
-      const q = query(
-        collection(db, "orders"),
-        orderBy("orderDate", "desc"),
-        startAfter(ordersLastDoc),
-        limit(limitCount)
-      );
-
-      const snapshot = await getDocs(q);
-      const newOrders = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      })) as Order[];
-      const lastDoc = snapshot.docs[snapshot.docs.length - 1] || null;
+      const { data: newOrders } = await supabase
+        .from("orders")
+        .select("*")
+        .order("orderDate", { ascending: false })
+        .range(ordersOffset, ordersOffset + limitCount - 1);
 
       set(
         produce((state: AppState) => {
-          state.orders.push(...newOrders);
-          state.ordersLastDoc = lastDoc;
-          state.ordersHasMore = snapshot.docs.length === limitCount;
+          state.orders.push(...(newOrders || []));
+          state.ordersOffset = ordersOffset + limitCount;
+          state.ordersHasMore = (newOrders?.length || 0) === limitCount;
           state.ordersLoading = false;
         })
       );
-    } catch (e) {
+    } catch {
       set({ ordersLoading: false });
     }
   },
@@ -488,7 +386,6 @@ export const useOrderStore = create<AppState>((set, get) => ({
   },
 
   fetchOrdersByDateRange: async (from: string, to: string) => {
-    // Check cache first
     const cached = AnalyticsCache.get(from, to);
     if (cached) {
       set({ analyticsOrders: cached, analyticsLoading: false });
@@ -497,25 +394,17 @@ export const useOrderStore = create<AppState>((set, get) => ({
     
     set({ analyticsLoading: true });
     try {
-      const q = query(
-        collection(db, "orders"),
-        where("orderDate", ">=", from),
-        where("orderDate", "<=", to),
-        orderBy("orderDate", "desc")
-      );
+      const { data: analyticsOrders } = await supabase
+        .from("orders")
+        .select("*")
+        .gte("orderDate", from)
+        .lte("orderDate", to)
+        .order("orderDate", { ascending: false });
 
-      const snapshot = await getDocs(q);
-      const analyticsOrders = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      })) as Order[];
+      AnalyticsCache.set(from, to, analyticsOrders || []);
 
-      // Cache the result
-      AnalyticsCache.set(from, to, analyticsOrders);
-
-      set({ analyticsOrders, analyticsLoading: false });
-    } catch (e) {
-      console.error("Error fetching orders by date range:", e);
+      set({ analyticsOrders: analyticsOrders || [], analyticsLoading: false });
+    } catch {
       set({ analyticsLoading: false });
     }
   },
@@ -523,6 +412,22 @@ export const useOrderStore = create<AppState>((set, get) => ({
   setNotifications: (notifications: Notification[]) => set({ notifications }),
 
   updateOrderStatus: async (orderId, status, reason, notes) => {
+    // Update Supabase
+    const { data: currentOrder } = await supabase.from("orders").select("statusHistory").eq("id", orderId).single();
+    const currentHistory = currentOrder?.statusHistory || [];
+    const newHistory = [...(Array.isArray(currentHistory) ? currentHistory : []), { status, timestamp: new Date().toISOString() }];
+
+    const updateData: any = { 
+      status,
+      statusHistory: newHistory
+    };
+    if (reason) updateData.cancellationReason = reason;
+    if (notes) updateData.cancellationNotes = notes;
+
+    const { error } = await supabase.from("orders").update(updateData).eq("id", orderId);
+    if (error) throw error;
+
+    // Update Local State
     set(
       produce((state: AppState) => {
         const order = state.orders.find((o) => o.id === orderId);
@@ -530,29 +435,26 @@ export const useOrderStore = create<AppState>((set, get) => ({
           order.status = status;
           order.cancellationReason = reason;
           order.cancellationNotes = notes;
-          if (order.statusHistory) {
-            order.statusHistory.push({
-              status,
-              timestamp: new Date().toISOString(),
-            });
-          } else {
-            order.statusHistory = [
-              { status, timestamp: new Date().toISOString() },
-            ];
-          }
+          order.statusHistory = newHistory;
         }
       })
     );
+    
+    // Sync to search
+    const { data: updatedOrder } = await supabase.from("orders").select("*").eq("id", orderId).single();
+    if (updatedOrder) {
+        await syncOrderToSearch(updatedOrder as Order);
+    }
   },
 
   updateOrderPaymentStatus: async (orderId, paymentStatus) => {
-    await updateDoc(doc(db, "orders", orderId), { paymentStatus });
+    await supabase.from("orders").update({ paymentStatus }).eq("id", orderId);
     await get().refreshOrders();
     toast({ title: "Payment Status Updated" });
   },
 
   markOrderAsPaid: async (orderId, paidDate, reference, notes) => {
-    const updateData: any = {
+    const updateData: Record<string, unknown> = {
       paymentStatus: "Paid",
       isPaid: true,
       paidDate,
@@ -563,31 +465,25 @@ export const useOrderStore = create<AppState>((set, get) => ({
     if (reference) updateData.paymentReference = reference;
     if (notes) updateData.paymentNotes = notes;
 
-    await updateDoc(doc(db, "orders", orderId), updateData);
+    await supabase.from("orders").update(updateData).eq("id", orderId);
     await get().refreshOrders();
     await get().updatePaymentScores();
     toast({ title: "Payment Recorded" });
   },
 
   markBulkOrdersAsPaid: async (orderIds, paidDate, reference, notes) => {
-    const batch = writeBatch(db);
+    const updateData: Record<string, unknown> = {
+      paymentStatus: "Paid",
+      isPaid: true,
+      paidDate,
+      daysOverdue: 0,
+      paymentScore: 100,
+    };
 
-    orderIds.forEach((orderId) => {
-      const updateData: any = {
-        paymentStatus: "Paid",
-        isPaid: true,
-        paidDate,
-        daysOverdue: 0,
-        paymentScore: 100,
-      };
+    if (reference) updateData.paymentReference = reference;
+    if (notes) updateData.paymentNotes = notes;
 
-      if (reference) updateData.paymentReference = reference;
-      if (notes) updateData.paymentNotes = notes;
-
-      batch.update(doc(db, "orders", orderId), updateData);
-    });
-
-    await batch.commit();
+    await supabase.from("orders").update(updateData).in("id", orderIds);
     AnalyticsCache.clearAll();
     await get().refreshOrders();
     await get().updatePaymentScores();
@@ -598,30 +494,24 @@ export const useOrderStore = create<AppState>((set, get) => ({
   },
 
   markBulkCycleAsPaid: async (
-    cycleId,
+    _cycleId,
     orderIds,
     paidDate,
     reference,
     notes
   ) => {
-    const batch = writeBatch(db);
+    const updateData: Record<string, unknown> = {
+      paymentStatus: "Paid",
+      isPaid: true,
+      paidDate,
+      daysOverdue: 0,
+      paymentScore: 100,
+    };
 
-    orderIds.forEach((orderId) => {
-      const updateData: any = {
-        paymentStatus: "Paid",
-        isPaid: true,
-        paidDate,
-        daysOverdue: 0,
-        paymentScore: 100,
-      };
+    if (reference) updateData.paymentReference = reference;
+    if (notes) updateData.paymentNotes = notes;
 
-      if (reference) updateData.paymentReference = reference;
-      if (notes) updateData.paymentNotes = notes;
-
-      batch.update(doc(db, "orders", orderId), updateData);
-    });
-
-    await batch.commit();
+    await supabase.from("orders").update(updateData).in("id", orderIds);
     await get().refreshOrders();
     await get().updatePaymentScores();
     toast({
@@ -633,56 +523,46 @@ export const useOrderStore = create<AppState>((set, get) => ({
   updatePaymentScores: async () => {
     const { orders } = get();
     const { companies } = useCompanyStore.getState();
-    const batch = writeBatch(db);
 
-    // Update individual order scores
-    orders.forEach((order) => {
-      if (order.isPaid || order.paymentStatus === "Paid") return;
-
-      if (order.expectedPaymentDate) {
-        const daysOverdue = calculateDaysOverdue(order.expectedPaymentDate);
+    const orderUpdates = orders
+      .filter(order => !order.isPaid && order.paymentStatus !== "Paid" && order.expectedPaymentDate)
+      .map(order => {
+        const daysOverdue = calculateDaysOverdue(order.expectedPaymentDate!);
         const paymentScore = calculatePaymentScore(daysOverdue);
-
-        batch.update(doc(db, "orders", order.id), {
+        return {
+          id: order.id,
           daysOverdue,
           paymentScore,
           paymentStatus: daysOverdue > 7 ? "Overdue" : "Pending",
-        });
-      }
-    });
-
-    // Update company aggregate scores
-    companies.forEach((company: Company) => {
-      if (company.isBranch) return;
-
-      const companyOrders = orders.filter(
-        (o: Order) =>
-          o.companyId === company.id && !o.isPaid && o.paymentStatus !== "Paid"
-      );
-
-      const {
-        score,
-        status,
-        totalUnpaid,
-        totalOutstanding,
-        pendingBulkAmount,
-      } = calculateCompanyPaymentScore(companyOrders);
-
-      batch.update(doc(db, "companies", company.id), {
-        currentPaymentScore: score,
-        paymentStatus: status,
-        totalUnpaidOrders: totalUnpaid,
-        totalOutstandingAmount: totalOutstanding,
-        pendingBulkPaymentAmount: pendingBulkAmount,
+        };
       });
-    });
 
-    await batch.commit();
+    const companyUpdates = companies
+      .filter(company => !company.isBranch)
+      .map(company => {
+        const companyOrders = orders.filter(
+          o => o.companyId === company.id && !o.isPaid && o.paymentStatus !== "Paid"
+        );
+        const { score, status, totalUnpaid, totalOutstanding, pendingBulkAmount } = calculateCompanyPaymentScore(companyOrders);
+        return {
+          id: company.id,
+          currentPaymentScore: score,
+          paymentStatus: status,
+          totalUnpaidOrders: totalUnpaid,
+          totalOutstandingAmount: totalOutstanding,
+          pendingBulkPaymentAmount: pendingBulkAmount,
+        };
+      });
+
+    await Promise.all([
+      orderUpdates.length > 0 ? supabase.from("orders").upsert(orderUpdates) : Promise.resolve(),
+      companyUpdates.length > 0 ? supabase.from("companies").upsert(companyUpdates) : Promise.resolve(),
+    ]);
     await get().fetchInitialData();
   },
 
   deleteOrder: async (orderId: string) => {
-    await deleteDoc(doc(db, "orders", orderId));
+    await supabase.from("orders").delete().eq("id", orderId);
     await deleteOrderFromSearch(orderId);
     await get().refreshOrders();
     toast({
@@ -692,25 +572,13 @@ export const useOrderStore = create<AppState>((set, get) => ({
   },
 
   deleteAllOrders: async () => {
-    const ordersCollection = collection(db, "orders");
-    const ordersSnapshot = await getDocs(ordersCollection);
-
-    const BATCH_SIZE = 500;
-    const batches = [];
-
-    for (let i = 0; i < ordersSnapshot.docs.length; i += BATCH_SIZE) {
-      const batchDocs = ordersSnapshot.docs.slice(i, i + BATCH_SIZE);
-      const batch = writeBatch(db);
-
-      batchDocs.forEach((doc) => {
-        batch.delete(doc.ref);
-      });
-
-      batches.push(batch.commit());
-    }
-
-    await Promise.all(batches);
-    set({ orders: [], ordersLastDoc: null, ordersHasMore: false });
+    const { error } = await supabase
+      .from("orders")
+      .delete()
+      .neq("id", "00000000-0000-0000-0000-000000000000"); // Delete all rows
+    
+    if (error) throw error;
+    set({ orders: [], ordersOffset: 0, ordersHasMore: false });
     toast({
       title: "All Orders Deleted",
       description: "All orders have been removed from the database.",
@@ -738,8 +606,9 @@ export const useOrderStore = create<AppState>((set, get) => ({
       dataToSave.variantName = null;
     }
 
-    const docRef = await addDoc(collection(db, "products"), dataToSave);
-    const newProduct = { id: docRef.id, ...productData, imageUrl };
+    const { data: productResult, error } = await supabase.from("products").insert([dataToSave]).select().single();
+    if (error) throw error;
+    const newProduct = { ...productResult, imageUrl } as Product;
 
     // Update local state and cache
     set(
@@ -772,7 +641,7 @@ export const useOrderStore = create<AppState>((set, get) => ({
       dataToUpdate.sku = null;
     }
 
-    await updateDoc(doc(db, "products", productId), dataToUpdate);
+    await supabase.from("products").update(dataToUpdate).eq("id", productId);
     set(
       produce((state: AppState) => {
         const index = state.products.findIndex((p) => p.id === productId);
@@ -785,7 +654,7 @@ export const useOrderStore = create<AppState>((set, get) => ({
   },
 
   deleteProduct: async (productId: string) => {
-    await deleteDoc(doc(db, "products", productId));
+    await supabase.from("products").delete().eq("id", productId);
     set(
       produce((state: AppState) => {
         state.products = state.products.filter((p) => p.id !== productId);
@@ -795,13 +664,12 @@ export const useOrderStore = create<AppState>((set, get) => ({
   },
 
   deleteAllProducts: async () => {
-    const productsCollection = collection(db, "products");
-    const productsSnapshot = await getDocs(productsCollection);
-    const batch = writeBatch(db);
-    productsSnapshot.docs.forEach((doc) => {
-      batch.delete(doc.ref);
-    });
-    await batch.commit();
+    const { error } = await supabase
+      .from("products")
+      .delete()
+      .neq("id", "00000000-0000-0000-0000-000000000000"); // Delete all rows
+
+    if (error) throw error;
     set({ products: [] });
     productCache.clearProducts().catch(console.error);
     toast({
@@ -812,8 +680,9 @@ export const useOrderStore = create<AppState>((set, get) => ({
 
   // Category Actions
   addCategory: async (category) => {
-    const docRef = await addDoc(collection(db, "categories"), category);
-    const newCategory = { id: docRef.id, ...category };
+    const { data: categoryResult, error } = await supabase.from("categories").insert([category]).select().single();
+    if (error) throw error;
+    const newCategory = categoryResult as Category;
     set(
       produce((state) => {
         state.categories.push(newCategory);
@@ -822,7 +691,7 @@ export const useOrderStore = create<AppState>((set, get) => ({
     return newCategory;
   },
   updateCategory: async (categoryId, categoryData) => {
-    await updateDoc(doc(db, "categories", categoryId), categoryData);
+    await supabase.from("categories").update(categoryData).eq("id", categoryId);
     set(
       produce((state: AppState) => {
         const index = state.categories.findIndex(
@@ -838,7 +707,7 @@ export const useOrderStore = create<AppState>((set, get) => ({
     );
   },
   deleteCategory: async (categoryId) => {
-    await deleteDoc(doc(db, "categories", categoryId));
+    await supabase.from("categories").delete().eq("id", categoryId);
     set(
       produce((state: AppState) => {
         state.categories = state.categories.filter(
@@ -850,15 +719,16 @@ export const useOrderStore = create<AppState>((set, get) => ({
 
   // Tax Actions
   addTax: async (tax) => {
-    const docRef = await addDoc(collection(db, "taxes"), tax);
+    const { data: taxResult, error } = await supabase.from("taxes").insert([tax]).select().single();
+    if (error) throw error;
     set(
       produce((state: AppState) => {
-        state.taxes.push({ id: docRef.id, ...tax });
+        state.taxes.push(taxResult as Tax);
       })
     );
   },
   updateTax: async (taxId, taxData) => {
-    await updateDoc(doc(db, "taxes", taxId), taxData);
+    await supabase.from("taxes").update(taxData).eq("id", taxId);
     set(
       produce((state: AppState) => {
         const index = state.taxes.findIndex((t) => t.id === taxId);
@@ -869,7 +739,7 @@ export const useOrderStore = create<AppState>((set, get) => ({
     );
   },
   deleteTax: async (taxId) => {
-    await deleteDoc(doc(db, "taxes", taxId));
+    await supabase.from("taxes").delete().eq("id", taxId);
     set(
       produce((state: AppState) => {
         state.taxes = state.taxes.filter((t) => t.id !== taxId);
@@ -877,10 +747,10 @@ export const useOrderStore = create<AppState>((set, get) => ({
     );
   },
 
-  submitOrder: async (data: any) => {
+  submitOrder: async (data: Record<string, unknown>) => {
     const { isPotentialClient, temporaryCompanyName, branchId, ...orderCore } =
       data;
-    const { items, region } = orderCore;
+    const { items, region } = orderCore as { items: Array<Record<string, unknown>>; region: "A" | "B" | "Custom" };
 
     if (items.length === 0) {
       toast({ title: "Cannot submit an empty order.", variant: "destructive" });
@@ -888,10 +758,10 @@ export const useOrderStore = create<AppState>((set, get) => ({
     }
 
     // Calculate totals using the new pricing equation: Total = ((Quantity × Unit Price) - Discount) × 1.14
-    const calculatedTotals = calculateOrderTotals(items.map((item: any) => ({
-      quantity: item.quantity,
-      price: item.price,
-      discountValue: item.discountValue || 0,
+    const calculatedTotals = calculateOrderTotals(items.map((item: Record<string, unknown>) => ({
+      quantity: item.quantity as number,
+      price: item.price as number,
+      discountValue: (item.discountValue as number) || 0,
     })));
 
     const { subtotal, totalDiscount: discountAmount, taxAmount: totalTax, grandTotal } = calculatedTotals;
@@ -906,7 +776,7 @@ export const useOrderStore = create<AppState>((set, get) => ({
           .companies.find((c) => c.id === client.parentCompanyId)
       : client;
     const deliveryDate = calculateNextDeliveryDate(
-      client?.region || region,
+      (client?.region || region) as "A" | "B",
       orderDate
     );
     const expectedPaymentDate = parentCompany
@@ -918,7 +788,7 @@ export const useOrderStore = create<AppState>((set, get) => ({
         : undefined;
 
     // Sanitize items before submission
-    const sanitizedItems = items.map((item: any) => ({
+    const sanitizedItems = items.map((item: Record<string, unknown>) => ({
       productId: item.productId,
       productName: item.productName,
       quantity: item.quantity,
@@ -929,12 +799,12 @@ export const useOrderStore = create<AppState>((set, get) => ({
       discountValue: item.discountValue || null,
     }));
 
-    const newOrderPayload: any = {
-      companyId: client ? client.parentCompanyId || client.id : "",
+    const newOrderPayload: Record<string, unknown> = {
+      companyId: client ? client.parentCompanyId || client.id : null,
       branchId: !isPotentialClient ? branchId : null,
       orderDate: orderDate.toISOString(),
       deliveryDate: deliveryDate.toISOString(),
-      paymentDueDate: orderCore.paymentDueDate?.toISOString() || null,
+      paymentDueDate: (orderCore.paymentDueDate as Date | undefined)?.toISOString() || null,
       status: "Pending",
       paymentStatus: "Pending",
       items: sanitizedItems,
@@ -975,8 +845,9 @@ export const useOrderStore = create<AppState>((set, get) => ({
       newOrderPayload.branchName = temporaryCompanyName;
     }
 
-    const docRef = await addDoc(collection(db, "orders"), newOrderPayload);
-    const createdOrder = { id: docRef.id, ...newOrderPayload } as Order;
+    const { data: orderData, error } = await supabase.from("orders").insert([newOrderPayload]).select().single();
+    if (error) throw error;
+    const createdOrder = orderData as Order;
     await syncOrderToSearch(createdOrder);
     await get().refreshOrders();
     await get().updatePaymentScores();
@@ -997,7 +868,7 @@ export const useOrderStore = create<AppState>((set, get) => ({
       [{ ...companyData, name: `${companyData.name} - Main Branch` }]
     );
 
-    await updateDoc(doc(db, "orders", orderId), {
+    await supabase.from("orders").update({
       isPotentialClient: false,
       temporaryCompanyName: null,
       temporaryBranchName: null,
@@ -1005,7 +876,7 @@ export const useOrderStore = create<AppState>((set, get) => ({
       branchId: newCompany.id,
       companyName: newCompany.name,
       branchName: newCompany.name,
-    });
+    }).eq("id", orderId);
 
     await get().fetchInitialData();
     await get().fetchInitialData();
@@ -1018,17 +889,18 @@ export const useOrderStore = create<AppState>((set, get) => ({
 
   addVisit: async (visit) => {
     const newVisit = { ...visit, status: "Scheduled" as const };
-    const docRef = await addDoc(collection(db, "visits"), newVisit);
+    const { data: visitResult, error } = await supabase.from("visits").insert([newVisit]).select().single();
+    if (error) throw error;
     set(
       produce((state: AppState) => {
-        state.visits.push({ id: docRef.id, ...newVisit });
+        state.visits.push(visitResult as VisitCall);
       })
     );
     toast({ title: "Interaction Logged" });
   },
 
   updateVisit: async (visitId, visitData) => {
-    await updateDoc(doc(db, "visits", visitId), visitData);
+    await supabase.from("visits").update(visitData).eq("id", visitId);
     set(
       produce((state: AppState) => {
         const index = state.visits.findIndex((v) => v.id === visitId);
@@ -1041,7 +913,7 @@ export const useOrderStore = create<AppState>((set, get) => ({
   },
 
   deleteVisit: async (visitId: string) => {
-    await deleteDoc(doc(db, "visits", visitId));
+    await supabase.from("visits").delete().eq("id", visitId);
     set(
       produce((state: AppState) => {
         state.visits = state.visits.filter((v) => v.id !== visitId);
@@ -1062,10 +934,11 @@ export const useOrderStore = create<AppState>((set, get) => ({
       })
     );
     
-    // Persist to Firestore
     try {
-      const { NotificationService } = await import('@/lib/notification-service');
-      await NotificationService.markAsRead(notificationId);
+      await supabase.from("notifications").update({ 
+        read: true,
+        readAt: new Date().toISOString() 
+      }).eq("id", notificationId);
     } catch (e) {
       console.error('Failed to mark notification as read:', e);
     }
@@ -1094,10 +967,12 @@ export const useOrderStore = create<AppState>((set, get) => ({
       })
     );
     
-    // Persist to Firestore
     try {
-      const { NotificationService } = await import('@/lib/notification-service');
-      await NotificationService.snoozeNotification(notificationId, snoozeUntil);
+      await supabase.from("notifications").update({ 
+        snoozedUntil: snoozeUntil.toISOString(),
+        read: true,
+        readAt: new Date().toISOString()
+      }).eq("id", notificationId);
     } catch (e) {
       console.error('Failed to snooze notification:', e);
     }
@@ -1116,10 +991,12 @@ export const useOrderStore = create<AppState>((set, get) => ({
       })
     );
     
-    // Persist to Firestore
     try {
-      const { NotificationService } = await import('@/lib/notification-service');
-      await NotificationService.clearSnooze(notificationId);
+      await supabase.from("notifications").update({ 
+        snoozedUntil: null,
+        read: false,
+        readAt: null
+      }).eq("id", notificationId);
     } catch (e) {
       console.error('Failed to clear snooze:', e);
     }
@@ -1127,15 +1004,11 @@ export const useOrderStore = create<AppState>((set, get) => ({
 
   syncAllOrdersToSearch: async () => {
     try {
-      const snapshot = await getDocs(collection(db, "orders"));
-      const orders = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      })) as Order[];
-      await bulkSyncOrdersToSearch(orders);
+      const { data: orders } = await supabase.from("orders").select("*");
+      await bulkSyncOrdersToSearch(orders || []);
       toast({
         title: "Search Index Synced",
-        description: `${orders.length} orders synced to search collection.`,
+        description: `${orders?.length || 0} orders synced to search collection.`,
       });
     } catch (e) {
       console.error("Error syncing orders to search:", e);
@@ -1149,36 +1022,26 @@ export const useOrderStore = create<AppState>((set, get) => ({
 
   loadRemainingProducts: async () => {
     try {
-      const { productsLastDoc, productsHasMore } = get();
+      const { productsOffset, productsHasMore } = get();
       
-      if (!productsHasMore || !productsLastDoc) return;
+      if (!productsHasMore) return;
       
-      const q = query(
-        collection(db, "products"),
-        startAfter(productsLastDoc),
-        limit(50)
-      );
-      
-      const snapshot = await getDocs(q);
-      const newProducts = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      })) as Product[];
-      
-      const lastDoc = snapshot.docs[snapshot.docs.length - 1] || null;
+      const { data: newProducts } = await supabase
+        .from("products")
+        .select("*")
+        .range(productsOffset, productsOffset + 49);
       
       set(
         produce((state: AppState) => {
-          state.products.push(...newProducts);
-          state.productsLastDoc = lastDoc;
-          state.productsHasMore = snapshot.docs.length === 50;
+          state.products.push(...(newProducts || []));
+          state.productsOffset = productsOffset + 50;
+          state.productsHasMore = (newProducts?.length || 0) === 50;
         })
       );
       
-      // Update cache
       productCache.setProducts(get().products).catch(console.error);
-    } catch (e) {
-      console.error("Error loading remaining products:", e);
+    } catch {
+      // Error handled silently
     }
   },
 
@@ -1189,14 +1052,10 @@ export const useOrderStore = create<AppState>((set, get) => ({
     }
     
     try {
-      const allSnapshot = await getDocs(collection(db, "products"));
-      const allProducts = allSnapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      })) as Product[];
+      const { data: allProducts } = await supabase.from("products").select("*");
       
       const searchLower = searchTerm.toLowerCase();
-      const filtered = allProducts.filter(product =>
+      const filtered = (allProducts || []).filter(product =>
         (product.name && product.name.toLowerCase().includes(searchLower)) ||
         (product.variantName && product.variantName.toLowerCase().includes(searchLower)) ||
         (product.description && product.description.toLowerCase().includes(searchLower)) ||
@@ -1205,8 +1064,8 @@ export const useOrderStore = create<AppState>((set, get) => ({
       );
       
       set({ products: filtered });
-    } catch (e) {
-      console.error("Error searching products:", e);
+    } catch {
+      // Error handled silently
     }
   },
 
@@ -1218,32 +1077,24 @@ export const useOrderStore = create<AppState>((set, get) => ({
     
     set({ loading: true });
     try {
-      const q = query(
-        collection(db, "products"),
-        where("category", "==", category),
-        limit(100)
-      );
+      const { data: products } = await supabase
+        .from("products")
+        .select("*")
+        .eq("category", category)
+        .limit(100);
       
-      const snapshot = await getDocs(q);
-      const products = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      })) as Product[];
-      
-      set({ products, loading: false });
-    } catch (e) {
-      console.error("Error filtering products:", e);
+      set({ products: products || [], loading: false });
+    } catch {
       set({ loading: false });
     }
   },
 
-  subscribeToNotifications: (userId: string) => {
+  subscribeToNotifications: () => {
     return () => {}; // Placeholder - use notification store instead
   },
 
   syncNotificationsToFirestore: async (userId: string) => {
     const { notifications } = get();
-    const { NotificationService } = await import('@/lib/notification-service');
     
     const notificationsWithUser = notifications.map(n => ({
       ...n,
@@ -1251,9 +1102,9 @@ export const useOrderStore = create<AppState>((set, get) => ({
     }));
     
     try {
-      await NotificationService.createNotifications(notificationsWithUser);
+      await supabase.from("notifications").upsert(notificationsWithUser);
     } catch (e) {
-      console.error('Failed to sync notifications to Firestore:', e);
+      console.error('Failed to sync notifications:', e);
     }
   },
 }));

@@ -12,6 +12,7 @@ import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip } from 'recha
 import { format, subMonths, eachMonthOfInterval, startOfMonth, endOfMonth, isValid, parseISO } from 'date-fns';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import Link from 'next/link';
+import { DrillTarget } from '@/components/drilldown/drill-target';
 
 interface RevenueDeepDiveDialogProps {
   isOpen: boolean;
@@ -110,10 +111,12 @@ export function RevenueDeepDiveDialog({ isOpen, onOpenChange }: RevenueDeepDiveD
                                 <TableHeader><TableRow><TableHead>Client</TableHead><TableHead className="text-right">Revenue</TableHead></TableRow></TableHeader>
                                 <TableBody>
                                     {analytics.topClients.map(client => (
-                                        <TableRow key={client.id}>
-                                            <TableCell className="font-medium"><Link href={`/clients/${client.id}`} className="hover:underline">{client.name}</Link></TableCell>
-                                            <TableCell className="text-right">${client.revenue.toFixed(2)}</TableCell>
-                                        </TableRow>
+                                        <DrillTarget key={client.id} kind="company" payload={{ id: client.id }} asChild>
+                                            <TableRow className="cursor-pointer hover:bg-muted/50">
+                                                <TableCell className="font-medium">{client.name}</TableCell>
+                                                <TableCell className="text-right">${client.revenue.toFixed(2)}</TableCell>
+                                            </TableRow>
+                                        </DrillTarget>
                                     ))}
                                 </TableBody>
                             </Table>
@@ -128,10 +131,12 @@ export function RevenueDeepDiveDialog({ isOpen, onOpenChange }: RevenueDeepDiveD
                                 <TableHeader><TableRow><TableHead>Product</TableHead><TableHead className="text-right">Revenue</TableHead></TableRow></TableHeader>
                                 <TableBody>
                                     {analytics.topProducts.map(product => (
-                                        <TableRow key={product.id}>
-                                            <TableCell className="font-medium"><Link href={`/products/${product.id}`} className="hover:underline">{product.name}</Link></TableCell>
-                                            <TableCell className="text-right">${product.revenue.toFixed(2)}</TableCell>
-                                        </TableRow>
+                                        <DrillTarget key={product.id} kind="product" payload={{ id: product.id }} asChild>
+                                            <TableRow className="cursor-pointer hover:bg-muted/50">
+                                                <TableCell className="font-medium">{product.name}</TableCell>
+                                                <TableCell className="text-right">${product.revenue.toFixed(2)}</TableCell>
+                                            </TableRow>
+                                        </DrillTarget>
                                     ))}
                                 </TableBody>
                             </Table>

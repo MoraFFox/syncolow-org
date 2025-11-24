@@ -111,7 +111,7 @@ export function BranchSubForm({ index, control, register, errors, watch, setValu
                         name={`branches.${index}.maintenanceLocation` as any}
                         control={control}
                         render={({ field }) => (
-                            <Select onValueChange={field.onChange} value={field.value}>
+                            <Select onValueChange={field.onChange} value={field.value || ''}>
                                 <SelectTrigger>
                                     <SelectValue placeholder="Select maintenance location" />
                                 </SelectTrigger>
@@ -187,6 +187,9 @@ export function BranchSubForm({ index, control, register, errors, watch, setValu
                                             {...register(`branches.${index}.leaseMonthlyCost` as any, { valueAsNumber: true })}
                                             placeholder="e.g. 1000"
                                         />
+                                        {errors.branches?.[index]?.leaseMonthlyCost && (
+                                            <p className="text-sm text-destructive">{errors.branches[index]?.leaseMonthlyCost?.message}</p>
+                                        )}
                                     </div>
                                 )}
                             </>

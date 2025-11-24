@@ -1,34 +1,31 @@
-import { db } from '@/lib/firebase';
-import { collection, getDocs, writeBatch, doc } from 'firebase/firestore';
+
+import { supabase } from '@/lib/supabase';
 
 /**
  * Migration script to add default payment configuration to existing companies
  * Default: Transfer, Net 30
  */
 export async function migrateCompanyPaymentConfig() {
-  const companiesRef = collection(db, 'companies');
-  const snapshot = await getDocs(companiesRef);
+  const { data: companies } = await supabase.from('companies').select('*');
   
-  const batch = writeBatch(db);
+  if (!companies) return 0;
+
   let updateCount = 0;
 
-  snapshot.forEach((docSnapshot) => {
-    const data = docSnapshot.data();
-    
+  for (const company of companies) {
     // Only update if payment configuration doesn't exist
-    if (!data.paymentMethod) {
-      const companyRef = doc(db, 'companies', docSnapshot.id);
-      batch.update(companyRef, {
+    if (!company.paymentMethod) {
+      await supabase.from('companies').update({
         paymentMethod: 'transfer',
         paymentDueType: 'days_after_order',
         paymentDueDays: 30,
-      });
+      }).eq('id', company.id);
+      
       updateCount++;
     }
-  });
+  }
 
   if (updateCount > 0) {
-    await batch.commit();
     console.log(`✅ Migrated ${updateCount} companies with default payment configuration`);
   } else {
     console.log('✅ All companies already have payment configuration');
@@ -36,4 +33,3 @@ export async function migrateCompanyPaymentConfig() {
 
   return updateCount;
 }
-

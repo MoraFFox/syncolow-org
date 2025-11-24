@@ -30,56 +30,56 @@ import { Step1_CompanyDetails } from './_wizard-steps/Step1_CompanyDetails';
 
 const contactSchema = z.object({
   name: z.string().min(1, "Contact name is required."),
-  position: z.string().min(1, "Position is required."),
-  phoneNumbers: z.array(z.object({ number: z.string().min(1, "Phone number cannot be empty.") })),
+  position: z.string().optional(),
+  phoneNumbers: z.array(z.object({ number: z.string().optional() })).optional(),
 });
 
 const branchSchema = z.object({
-  id: z.string().optional(), // Important for editing
+  id: z.string().optional(),
   name: z.string().min(1, "Branch name is required."),
   email: z.string().email("Invalid email address.").optional().or(z.literal('')),
-  location: z.string().nullable().refine(val => val !== null, { message: "Branch location is required." }), // Allow null, but require it not to be null for validation
+  location: z.string().nullable().optional(),
   warehouseLocation: z.string().optional().nullable(),
   machineOwned: z.boolean().default(false),
   machineLeased: z.boolean().optional(),
-  leaseMonthlyCost: z.number().optional(),
+  leaseMonthlyCost: z.number().nullable().optional().or(z.nan().transform(() => null)),
   baristas: z.array(z.object({
     id: z.string().optional(),
-    name: z.string().min(1, "Barista name is required."),
-    phoneNumber: z.string().min(1, "Phone number is required."),
-    rating: z.number().min(1).max(5).optional(), // Rating can be optional
+    name: z.string().optional(),
+    phoneNumber: z.string().optional(),
+    rating: z.number().min(1).max(5).optional(),
     notes: z.string().optional(),
-  })).optional(),
-  contacts: z.array(contactSchema).optional(),
-  warehouseContacts: z.array(contactSchema).optional(),
-  region: z.enum(['A', 'B', 'Custom']).optional(),
+  })).optional().default([]),
+  contacts: z.array(contactSchema).optional().default([]),
+  warehouseContacts: z.array(contactSchema).optional().default([]),
+  region: z.enum(['A', 'B', 'Custom']).optional().default('A'),
   area: z.string().optional(),
-  performanceScore: z.number().optional(),
-  taxNumber: z.string().optional(),
-  maintenanceLocation: z.enum(['inside_cairo', 'outside_cairo', 'sahel']).optional(),
+  performanceScore: z.number().optional().default(0),
+  taxNumber: z.string().nullable().optional(),
+  maintenanceLocation: z.enum(['inside_cairo', 'outside_cairo', 'sahel']).nullable().optional(),
 });
 
 const companySchema = z.object({
   name: z.string().min(1, "Company name is required."),
-  taxNumber: z.string().optional(),
+  taxNumber: z.string().nullable().optional(),
   email: z.string().email("Invalid email address.").optional().or(z.literal('')),
   location: z.string().nullable().optional(),
-  area: z.string().optional(),
+  area: z.string().nullable().optional(),
   region: z.enum(['A', 'B', 'Custom']).optional(),
   contacts: z.array(contactSchema).optional(),
   branches: z.array(branchSchema).optional(),
   paymentMethod: z.enum(['transfer', 'check']).optional(),
   paymentDueType: z.enum(['immediate', 'days_after_order', 'monthly_date', 'bulk_schedule']).optional(),
-  paymentDueDays: z.number().optional(),
-  paymentDueDate: z.number().optional(),
+  paymentDueDays: z.number().nullable().optional(),
+  paymentDueDate: z.number().nullable().optional(),
   bulkPaymentSchedule: z.object({
     frequency: z.enum(['monthly', 'quarterly', 'semi-annually', 'annually', 'custom']).optional(),
     dayOfMonth: z.number().optional(),
     customDates: z.array(z.string()).optional(),
   }).optional(),
-  maintenanceLocation: z.enum(['inside_cairo', 'outside_cairo', 'sahel']).optional(),
+  maintenanceLocation: z.enum(['inside_cairo', 'outside_cairo', 'sahel']).nullable().optional(),
   machineLeased: z.boolean().optional(),
-  leaseMonthlyCost: z.number().optional(),
+  leaseMonthlyCost: z.number().nullable().optional().or(z.nan().transform(() => null)),
 });
 
 export type CompanyFormData = z.infer<typeof companySchema>;
@@ -196,6 +196,9 @@ function ProductFormContent({ company, onSubmit, onCancel, isEmbedded = false, i
         }
     });
 
+    console.log("Form Errors:", errors); // Debugging
+
+
     const { fields, append, remove, replace } = useFieldArray({
         control,
         name: "branches",
@@ -219,7 +222,19 @@ function ProductFormContent({ company, onSubmit, onCancel, isEmbedded = false, i
                     area: company.area,
                     region: company.region,
                     contacts: company.contacts || [],
-                    branches: existingBranches.map(b => ({ ...b, area: b.area, contacts: b.contacts || [], location: b.location || null })) as any,
+                    branches: existingBranches.map(b => ({ 
+                        ...b, 
+                        area: b.area, 
+                        contacts: b.contacts || [], 
+                        location: b.location || null,
+                        baristas: b.baristas || [],
+                        warehouseContacts: b.warehouseContacts || [],
+                        region: b.region || 'A',
+                        performanceScore: b.performanceScore || 0,
+                        machineOwned: b.machineOwned || false,
+                        machineLeased: b.machineLeased,
+                        leaseMonthlyCost: b.leaseMonthlyCost,
+                    })) as any,
                     paymentMethod: company.paymentMethod,
                     paymentDueType: company.paymentDueType,
                     paymentDueDays: company.paymentDueDays,
@@ -409,7 +424,7 @@ function ProductFormContent({ company, onSubmit, onCancel, isEmbedded = false, i
                             type="button" 
                             variant="outline" 
                             className="w-full"
-                            onClick={() => append({ name: '', email: '', location: '', machineOwned: false, contacts: [], warehouseContacts: [], baristas: [] } as any)}
+                            onClick={() => append({ name: '', email: '', location: null, machineOwned: false, contacts: [], warehouseContacts: [], baristas: [], region: 'A', performanceScore: 0 } as any)}
                         >
                             <PlusCircle className="mr-2 h-4 w-4" />
                             Add Branch
@@ -427,10 +442,27 @@ function ProductFormContent({ company, onSubmit, onCancel, isEmbedded = false, i
                       {errors.name && <li>• Company name: {errors.name.message}</li>}
                       {errors.email && <li>• Email: {errors.email.message}</li>}
                       {errors.location && <li>• Location: {errors.location.message}</li>}
-                      {errors.branches && Array.isArray(errors.branches) && errors.branches.map((branchError, idx) => 
-                        branchError && <li key={idx}>• Branch {idx + 1}: {branchError.name?.message || branchError.location?.message || 'has errors'}</li>
-                      )}
+                      {errors.branches && Array.isArray(errors.branches) && errors.branches.map((branchError, idx) => {
+                        if (!branchError) return null;
+                        const errorMessages = [];
+                        if (branchError.name?.message) errorMessages.push(branchError.name.message);
+                        if (branchError.location?.message) errorMessages.push(branchError.location.message);
+                        if (branchError.email?.message) errorMessages.push(branchError.email.message);
+                        if (branchError.leaseMonthlyCost?.message) errorMessages.push(`Lease Cost: ${branchError.leaseMonthlyCost.message}`);
+                        if (errorMessages.length === 0) errorMessages.push('has validation errors');
+                        return <li key={idx}>• Branch {idx + 1}: {errorMessages.join(', ')}</li>;
+                      })}
                       {errors.contacts && <li>• Check contact details for errors</li>}
+                      {errors.contacts && <li>• Check contact details for errors</li>}
+                      {/* Show all other errors dynamically */}
+                      {Object.entries(errors).map(([key, error]) => {
+                        if (['name', 'email', 'location', 'branches', 'contacts'].includes(key)) return null;
+                        return (
+                          <li key={key}>
+                            • {key}: {(error as any)?.message || 'Invalid value'}
+                          </li>
+                        );
+                      })}
                     </ul>
                   </div>
                 )}

@@ -6,9 +6,8 @@
 
 import { z } from 'genkit';
 import { ai } from '@/ai/genkit';
-import { collection, doc, getDocs, query, where, writeBatch } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
-import type { Product, Manufacturer } from '@/lib/types';
+import { supabase } from '@/lib/supabase';
+import type { Product } from '@/lib/types';
 
 // Define the input schema for a single product record in the import
 const ProductImportSchema = z.object({
@@ -34,7 +33,7 @@ const ImportProductsOutputSchema = z.object({
 });
 
 // Helper function to find or create a manufacturer
-async function findOrCreateManufacturer(name: string, batch: any, existingManufacturers: Map<string, string>): Promise<string> {
+async function findOrCreateManufacturer(name: string, existingManufacturers: Map<string, string>): Promise<string> {
     if (!name || name.trim() === '') return '';
     const lowerCaseName = name.trim().toLowerCase();
 
@@ -42,26 +41,38 @@ async function findOrCreateManufacturer(name: string, batch: any, existingManufa
         return existingManufacturers.get(lowerCaseName)!;
     }
 
-    // Double-check Firestore in case the cache is stale (though unlikely in a single flow run)
-    const manufacturersRef = collection(db, 'manufacturers');
-    const q = query(manufacturersRef, where("name", "==", name.trim()));
-    const querySnapshot = await getDocs(q);
+    // Double-check Supabase in case the cache is stale
+    const { data: existing } = await supabase
+        .from('manufacturers')
+        .select('id')
+        .eq('name', name.trim())
+        .single();
 
-    if (!querySnapshot.empty) {
-        const manufId = querySnapshot.docs[0].id;
-        existingManufacturers.set(lowerCaseName, manufId);
-        return manufId;
+    if (existing) {
+        existingManufacturers.set(lowerCaseName, existing.id);
+        return existing.id;
     } else {
-        const newManufacturerRef = doc(collection(db, 'manufacturers'));
-        batch.set(newManufacturerRef, {
+        const newManufacturer = {
             name: name.trim(),
             description: `Auto-generated manufacturer: ${name.trim()}`,
             color: '#cccccc', // Default color
             icon: '',
             tags: ['auto-generated']
-        });
-        existingManufacturers.set(lowerCaseName, newManufacturerRef.id);
-        return newManufacturerRef.id;
+        };
+        
+        const { data: created, error } = await supabase
+            .from('manufacturers')
+            .insert(newManufacturer)
+            .select('id')
+            .single();
+            
+        if (error || !created) {
+            console.error('Error creating manufacturer:', error);
+            return '';
+        }
+
+        existingManufacturers.set(lowerCaseName, created.id);
+        return created.id;
     }
 }
 
@@ -76,27 +87,27 @@ export const importProductsFlow = ai.defineFlow(
     let errorCount = 0;
     const errors: string[] = [];
     
-    const BATCH_SIZE = 499; // Firestore batch limit is 500 operations
+    const BATCH_SIZE = 100; // Supabase handles batches well, but keep it reasonable
 
     // Pre-fetch existing manufacturers to minimize reads inside the loop
-    const [manufacturersSnapshot, existingProductsSnapshot] = await Promise.all([
-        getDocs(collection(db, 'manufacturers')),
-        getDocs(collection(db, 'products')),
+    const [manufacturersResult, productsResult] = await Promise.all([
+        supabase.from('manufacturers').select('id, name'),
+        supabase.from('products').select('name, sku'),
     ]);
     
     const existingManufacturers = new Map(
-        manufacturersSnapshot.docs.map(doc => [doc.data().name.toLowerCase(), doc.id])
+        (manufacturersResult.data || []).map(m => [m.name.toLowerCase(), m.id])
     );
 
-    const existingProductNames = new Set(existingProductsSnapshot.docs.map(doc => doc.data().name.toLowerCase()));
-    const existingProductSkus = new Set(existingProductsSnapshot.docs.map(doc => doc.data().sku?.toLowerCase()).filter(Boolean));
+    const existingProductNames = new Set((productsResult.data || []).map(p => p.name.toLowerCase()));
+    const existingProductSkus = new Set((productsResult.data || []).map(p => p.sku?.toLowerCase()).filter(Boolean));
     const processedInThisBatch = new Set<string>();
 
     for (let i = 0; i < products.length; i += BATCH_SIZE) {
-        const batch = writeBatch(db);
         const chunk = products.slice(i, i + BATCH_SIZE);
         const currentChunkNames = new Set<string>();
         const currentChunkSkus = new Set<string>();
+        const productsToInsert: any[] = [];
 
         for (const [index, productData] of chunk.entries()) {
             const rowIndex = i + index + 1;
@@ -136,14 +147,14 @@ export const importProductsFlow = ai.defineFlow(
 
                 let manufacturerId = '';
                 if (productData.manufacturerName) {
-                    manufacturerId = await findOrCreateManufacturer(productData.manufacturerName, batch, existingManufacturers);
+                    manufacturerId = await findOrCreateManufacturer(productData.manufacturerName, existingManufacturers);
                 }
                 
                 const priceStr = String(productData.price ?? '0').replace(',', '.');
                 const price = parseFloat(priceStr);
                 const stock = parseInt(String(productData.stock ?? '0'), 10);
 
-                const newProduct: Omit<Product, 'id'> = {
+                const newProduct = {
                     name: productData.name,
                     description: productData.description || 'No description provided.',
                     price: isNaN(price) ? 0 : price,
@@ -158,8 +169,7 @@ export const importProductsFlow = ai.defineFlow(
                     updatedAt: new Date().toISOString(),
                 };
 
-                const productRef = doc(collection(db, 'products'));
-                batch.set(productRef, newProduct);
+                productsToInsert.push(newProduct);
 
                 // Add to sets for duplicate checking
                 currentChunkNames.add(productNameLower);
@@ -167,21 +177,21 @@ export const importProductsFlow = ai.defineFlow(
                 processedInThisBatch.add(productNameLower);
                 if(productSkuLower) processedInThisBatch.add(productSkuLower);
 
-                successCount++;
-
             } catch (error: any) {
                 errors.push(`Row ${rowIndex}: ${error.message}`);
                 errorCount++;
             }
         }
         
-        try {
-            await batch.commit();
-        } catch(batchError: any) {
-            const failedCount = chunk.length - successCount; // Only count those that were not already errored out
-            errorCount += failedCount;
-            successCount -= failedCount; // Adjust success count
-            errors.push(`A batch of up to ${chunk.length} products failed to import. Please check your data. Error: ${batchError.message}`);
+        if (productsToInsert.length > 0) {
+            const { error } = await supabase.from('products').insert(productsToInsert);
+            
+            if (error) {
+                errorCount += productsToInsert.length;
+                errors.push(`A batch of up to ${productsToInsert.length} products failed to import. Error: ${error.message}`);
+            } else {
+                successCount += productsToInsert.length;
+            }
         }
     }
 

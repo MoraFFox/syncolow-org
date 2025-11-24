@@ -25,6 +25,7 @@ export interface Company {
   deliveryDays?: number[];
   area?: string;
   createdAt: string; // ISO 8601 date string
+  status?: 'Active' | 'Inactive' | 'New'; // General business status
   contacts?: Contact[];
   taxNumber?: string;
   email?: string;
@@ -51,6 +52,8 @@ export interface Company {
   totalUnpaidOrders?: number;
   totalOutstandingAmount?: number;
   pendingBulkPaymentAmount?: number;
+  baristas?: Partial<Barista>[];
+  performanceScore?: number;
 }
 
 export interface Branch {

@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useMemo, useState, useEffect } from 'react';
@@ -6,8 +7,7 @@ import { ChartContainer, ChartTooltipContent } from '@/components/ui/chart';
 import { Bar, BarChart, XAxis, YAxis, Tooltip, Legend } from 'recharts';
 import { format, subYears, eachMonthOfInterval, startOfYear, endOfYear } from 'date-fns';
 import type { Order } from '@/lib/types';
-import { db } from '@/lib/firebase';
-import { collection, query, where, orderBy, getDocs } from 'firebase/firestore';
+import { supabase } from '@/lib/supabase';
 
 const chartConfig = {
   currentYear: { label: 'Current Year', color: 'hsl(var(--chart-1))' },
@@ -30,16 +30,16 @@ export function YearComparisonChart() {
         const fromISO = `${format(lastYearStart, 'yyyy-MM-dd')}T00:00:00.000Z`;
         const toISO = `${format(currentYearEnd, 'yyyy-MM-dd')}T23:59:59.999Z`;
         
-        const q = query(
-          collection(db, 'orders'),
-          where('orderDate', '>=', fromISO),
-          where('orderDate', '<=', toISO),
-          orderBy('orderDate', 'desc')
-        );
-        
-        const snapshot = await getDocs(q);
-        const orders = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Order[];
-        setYearOrders(orders);
+        const { data, error } = await supabase
+          .from('orders')
+          .select('*')
+          .gte('orderDate', fromISO)
+          .lte('orderDate', toISO)
+          .order('orderDate', { ascending: false });
+
+        if (error) throw error;
+
+        setYearOrders((data || []) as Order[]);
       } catch (e) {
         console.error('Error fetching year comparison data:', e);
       }

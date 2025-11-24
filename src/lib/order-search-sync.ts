@@ -1,5 +1,5 @@
-import { db } from './firebase';
-import { collection, doc, setDoc, deleteDoc, writeBatch } from 'firebase/firestore';
+
+import { supabase } from './supabase';
 import type { Order } from './types';
 
 export interface OrderSearchDoc {
@@ -27,23 +27,19 @@ export async function syncOrderToSearch(order: Order): Promise<void> {
     isPotentialClient: order.isPotentialClient || false,
   };
 
-  await setDoc(doc(db, 'orders_search', order.id), searchDoc);
+  await supabase.from('orders_search').upsert(searchDoc);
 }
 
 export async function deleteOrderFromSearch(orderId: string): Promise<void> {
-  await deleteDoc(doc(db, 'orders_search', orderId));
+  await supabase.from('orders_search').delete().eq('id', orderId);
 }
 
 export async function bulkSyncOrdersToSearch(orders: Order[]): Promise<void> {
-  const batches: any[] = [];
   const BATCH_SIZE = 500;
 
   for (let i = 0; i < orders.length; i += BATCH_SIZE) {
-    const batch = writeBatch(db);
     const batchOrders = orders.slice(i, i + BATCH_SIZE);
-
-    batchOrders.forEach(order => {
-      const searchDoc: OrderSearchDoc = {
+    const searchDocs: OrderSearchDoc[] = batchOrders.map(order => ({
         id: order.id,
         companyName: (order.companyName || order.temporaryCompanyName || '').toLowerCase(),
         companyId: order.companyId || '',
@@ -53,14 +49,11 @@ export async function bulkSyncOrdersToSearch(orders: Order[]): Promise<void> {
         orderDate: order.orderDate,
         total: order.total,
         isPotentialClient: order.isPotentialClient || false,
-      };
+    }));
 
-      batch.set(doc(db, 'orders_search', order.id), searchDoc);
-    });
-
-    batches.push(batch.commit());
+    const { error } = await supabase.from('orders_search').upsert(searchDocs);
+    if (error) {
+        console.error('Error in bulk sync to search:', error);
+    }
   }
-
-  await Promise.all(batches);
 }
-

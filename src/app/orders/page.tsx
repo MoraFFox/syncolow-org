@@ -171,8 +171,17 @@ function OrdersPageContent() {
   }
   
   const handleDeleteAllConfirm = async () => {
-    await deleteAllOrders();
-    setIsDeleteAllAlertOpen(false);
+    try {
+      await deleteAllOrders();
+    } catch (error) {
+      toast({
+        title: "Error Deleting Orders",
+        description: "Failed to delete all orders. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsDeleteAllAlertOpen(false);
+    }
   }
 
   const handleOpenCancelDialog = (order: Order) => {

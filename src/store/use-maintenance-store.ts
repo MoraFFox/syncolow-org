@@ -1,7 +1,6 @@
 
 import { create } from 'zustand';
-import { db } from '@/lib/firebase';
-import { collection, getDocs, addDoc, doc, updateDoc, writeBatch, query, where, getDoc, deleteDoc } from 'firebase/firestore';
+import { supabase } from '@/lib/supabase';
 import type { MaintenanceVisit, MaintenanceEmployee, CancellationReason } from '@/lib/types';
 import { toast } from '@/hooks/use-toast';
 import { parseISO, isValid, differenceInDays } from 'date-fns';
@@ -130,16 +129,16 @@ export const useMaintenanceStore = create<MaintenanceState>((set, get) => ({
   fetchInitialData: async () => {
     if (!get().loading) set({ loading: true });
     try {
-        const [maintenanceSnapshot, employeesSnapshot, cancellationReasonsSnapshot] = await Promise.all([
-            getDocs(collection(db, 'maintenance')),
-            getDocs(collection(db, 'maintenanceEmployees')),
-            getDocs(collection(db, 'cancellationReasons')),
-        ]);
-        const maintenanceVisits = maintenanceSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as MaintenanceVisit[];
-        const maintenanceEmployees = employeesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as MaintenanceEmployee[];
-        const cancellationReasons = cancellationReasonsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as CancellationReason[];
+        const { data: maintenanceVisits } = await supabase.from('maintenance').select('*');
+        const { data: maintenanceEmployees } = await supabase.from('maintenanceEmployees').select('*');
+        const { data: cancellationReasons } = await supabase.from('cancellationReasons').select('*');
 
-        set({ maintenanceVisits, maintenanceEmployees, cancellationReasons, loading: false });
+        set({ 
+            maintenanceVisits: (maintenanceVisits || []) as MaintenanceVisit[], 
+            maintenanceEmployees: (maintenanceEmployees || []) as MaintenanceEmployee[], 
+            cancellationReasons: (cancellationReasons || []) as CancellationReason[], 
+            loading: false 
+        });
     } catch (e) {
         console.error("Error fetching maintenance data:", e);
         set({ loading: false });
@@ -148,7 +147,7 @@ export const useMaintenanceStore = create<MaintenanceState>((set, get) => ({
 
   addMaintenanceVisit: async (visit) => {
     const visitWithStatus = { ...visit, status: 'Scheduled' as const };
-    await addDoc(collection(db, 'maintenance'), visitWithStatus);
+    await supabase.from('maintenance').insert(visitWithStatus);
     get().fetchInitialData();
     toast({ title: "Visit Scheduled"});
   },
@@ -161,7 +160,6 @@ export const useMaintenanceStore = create<MaintenanceState>((set, get) => ({
         return;
     }
 
-    const batch = writeBatch(db);
     let finalStatus: MaintenanceVisit['status'];
     
     // Auto-derive problemSolved from resolutionStatus
@@ -189,7 +187,7 @@ export const useMaintenanceStore = create<MaintenanceState>((set, get) => ({
       resolutionDate: visitData.resolutionDate || null,
     };
     
-    // Remove undefined values to prevent Firestore errors
+    // Remove undefined values
     Object.keys(cleanData).forEach(key => {
       if (cleanData[key as keyof MaintenanceVisit] === undefined) {
         delete cleanData[key as keyof MaintenanceVisit];
@@ -202,13 +200,10 @@ export const useMaintenanceStore = create<MaintenanceState>((set, get) => ({
         cleanData.services = [];
     }
 
-    const visitRef = doc(db, 'maintenance', visitId);
-    batch.update(visitRef, cleanData as { [x: string]: any; });
+    await supabase.from('maintenance').update(cleanData).eq('id', visitId);
 
     const rootVisitId = visitToUpdate.rootVisitId || visitToUpdate.id;
     
-    await batch.commit();
-
     // Show notification for significant delays
     if (visitData.isSignificantDelay) {
         toast({ 
@@ -219,28 +214,30 @@ export const useMaintenanceStore = create<MaintenanceState>((set, get) => ({
     }
 
     if (finalStatus === 'Completed' && rootVisitId) {
-        const rootVisitSnapshot = await getDoc(doc(db, 'maintenance', rootVisitId));
-        const rootVisit = {id: rootVisitSnapshot.id, ...rootVisitSnapshot.data()} as MaintenanceVisit;
-        const caseQuery = query(collection(db, "maintenance"), where("rootVisitId", "==", rootVisitId));
-        const caseSnapshot = await getDocs(caseQuery);
-        const childVisits = caseSnapshot.docs.map(d => ({ id: d.id, ...d.data() } as MaintenanceVisit));
-        const allCaseVisits = [rootVisit, ...childVisits];
+        const { data: rootVisitSnapshot } = await supabase.from('maintenance').select('*').eq('id', rootVisitId).single();
         
-        const totalVisits = allCaseVisits.length;
-        const totalCost = allCaseVisits.reduce((sum, v) => sum + (v.laborCost || 0) + (v.spareParts?.reduce((pSum, p) => pSum + (p.price || 0) * p.quantity, 0) || 0), 0);
-        
-        const getValidDate = (d: string | Date | null | undefined): Date | null => {
-            if (!d) return null;
-            const parsed = typeof d === 'string' ? parseISO(d) : d;
-            return isValid(parsed) ? parsed : null;
-        }
+        if (rootVisitSnapshot) {
+            const rootVisit = rootVisitSnapshot as MaintenanceVisit;
+            const { data: childVisits } = await supabase.from('maintenance').select('*').eq('rootVisitId', rootVisitId);
+            
+            const allCaseVisits = [rootVisit, ...(childVisits || []) as MaintenanceVisit[]];
+            
+            const totalVisits = allCaseVisits.length;
+            const totalCost = allCaseVisits.reduce((sum, v) => sum + (v.laborCost || 0) + (v.spareParts?.reduce((pSum, p) => pSum + (p.price || 0) * p.quantity, 0) || 0), 0);
+            
+            const getValidDate = (d: string | Date | null | undefined): Date | null => {
+                if (!d) return null;
+                const parsed = typeof d === 'string' ? parseISO(d) : d;
+                return isValid(parsed) ? parsed : null;
+            }
 
-        const rootDate = getValidDate(rootVisit.date);
-        const finalResolutionVisit = allCaseVisits.find(v => v.status === 'Completed' && v.resolutionDate);
-        const resolutionDate = finalResolutionVisit ? getValidDate(finalResolutionVisit.resolutionDate) : getValidDate(rootVisit.resolutionDate);
-        const resolutionTimeDays = (rootDate && resolutionDate) ? differenceInDays(resolutionDate, rootDate) : 0;
-        
-        await updateDoc(doc(db, 'maintenance', rootVisitId), { status: 'Completed', totalVisits, totalCost, resolutionTimeDays });
+            const rootDate = getValidDate(rootVisit.date);
+            const finalResolutionVisit = allCaseVisits.find(v => v.status === 'Completed' && v.resolutionDate);
+            const resolutionDate = finalResolutionVisit ? getValidDate(finalResolutionVisit.resolutionDate) : getValidDate(rootVisit.resolutionDate);
+            const resolutionTimeDays = (rootDate && resolutionDate) ? differenceInDays(resolutionDate, rootDate) : 0;
+            
+            await supabase.from('maintenance').update({ status: 'Completed', totalVisits, totalCost, resolutionTimeDays }).eq('id', rootVisitId);
+        }
     }
 
     await get().fetchInitialData();
@@ -251,45 +248,50 @@ export const useMaintenanceStore = create<MaintenanceState>((set, get) => ({
   },
 
   updateMaintenanceVisitStatus: async (visitId, status) => {
-    await updateDoc(doc(db, 'maintenance', visitId), { status });
+    await supabase.from('maintenance').update({ status }).eq('id', visitId);
     await get().fetchInitialData();
     toast({ title: "Visit Updated", description: `Visit status changed to ${status}.` });
   },
 
   deleteMaintenanceVisit: async (visitId: string) => {
-    const batch = writeBatch(db);
     const visitToDelete = get().maintenanceVisits.find(v => v.id === visitId);
 
     if (!visitToDelete) return;
     
-    batch.delete(doc(db, 'maintenance', visitId));
+    await supabase.from('maintenance').delete().eq('id', visitId);
 
     if (!visitToDelete.rootVisitId) {
-        const childVisits = get().maintenanceVisits.filter(v => v.rootVisitId === visitId);
-        childVisits.forEach(child => batch.delete(doc(db, 'maintenance', child.id)));
+        // Delete children
+        await supabase.from('maintenance').delete().eq('rootVisitId', visitId);
     }
 
-    await batch.commit();
     await get().fetchInitialData();
   },
 
   addMaintenanceEmployee: async (employee) => {
-    await addDoc(collection(db, 'maintenanceEmployees'), employee);
+    await supabase.from('maintenanceEmployees').insert(employee);
     await get().fetchInitialData();
     toast({ title: 'Crew Member Added'});
   },
   
   updateMaintenanceEmployee: async (employeeId, employeeData) => {
-    await updateDoc(doc(db, 'maintenanceEmployees', employeeId), employeeData);
+    await supabase.from('maintenanceEmployees').update(employeeData).eq('id', employeeId);
     await get().fetchInitialData();
     toast({ title: 'Crew Member Updated' });
   },
 
   addCancellationReason: async (reason) => {
     const newReason = { reason, createdAt: new Date().toISOString() };
-    const docRef = await addDoc(collection(db, 'cancellationReasons'), newReason);
+    const { data: insertedReason, error } = await supabase
+        .from('cancellationReasons')
+        .insert(newReason)
+        .select()
+        .single();
+        
+    if (error) throw error;
+
     set(produce((state: MaintenanceState) => {
-        state.cancellationReasons.push({ id: docRef.id, ...newReason });
+        state.cancellationReasons.push(insertedReason as CancellationReason);
     }));
   },
 
@@ -300,21 +302,22 @@ export const useMaintenanceStore = create<MaintenanceState>((set, get) => ({
     }
     
     try {
-      const allSnapshot = await getDocs(collection(db, "maintenance"));
-      const allVisits = allSnapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      })) as MaintenanceVisit[];
-      
       const searchLower = searchTerm.toLowerCase();
-      const filtered = allVisits.filter(visit =>
-        (visit.branchName && visit.branchName.toLowerCase().includes(searchLower)) ||
-        (visit.maintenanceNotes && visit.maintenanceNotes.toLowerCase().includes(searchLower)) ||
-        (visit.technicianName && visit.technicianName.toLowerCase().includes(searchLower)) ||
-        (visit.companyName && visit.companyName.toLowerCase().includes(searchLower))
-      );
+      // Supabase doesn't support OR across multiple columns easily with ilike in one go without RPC or complex syntax.
+      // But we can fetch all and filter client side as the original code did, OR use the `or` filter string.
+      // The original code fetched ALL and filtered client side.
+      // Let's stick to fetching all and filtering client side for now to match behavior and avoid complex query construction,
+      // unless the dataset is huge.
       
-      set({ maintenanceVisits: filtered });
+      // Actually, let's try to use Supabase `or` filter if possible.
+      // .or(`branchName.ilike.%${searchTerm}%,maintenanceNotes.ilike.%${searchTerm}%...`)
+      
+      const { data: allVisits } = await supabase
+        .from('maintenance')
+        .select('*')
+        .or(`branchName.ilike.%${searchTerm}%,maintenanceNotes.ilike.%${searchTerm}%,technicianName.ilike.%${searchTerm}%,companyName.ilike.%${searchTerm}%`);
+
+      set({ maintenanceVisits: (allVisits || []) as MaintenanceVisit[] });
     } catch (e) {
       console.error("Error searching maintenance visits:", e);
     }
@@ -456,4 +459,3 @@ export const useMaintenanceStore = create<MaintenanceState>((set, get) => ({
     set({ partsCatalog: { ...currentState.partsCatalog } });
   },
 }));
-

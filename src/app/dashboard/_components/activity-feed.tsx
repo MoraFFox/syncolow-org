@@ -12,6 +12,7 @@ import { formatRelative } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import type { Company, Order, Feedback } from '@/lib/types';
+import { DrillTarget } from '@/components/drilldown/drill-target';
 
 type ActivityType = 'New Order' | 'New Feedback' | 'New Client';
 
@@ -41,7 +42,9 @@ const ActivityDetails = ({ activity, companies }: { activity: Activity, companie
             const order = activity.data as Order;
             return (
                 <p className="text-sm">
-                    New order from <Link href={`/clients/${order.companyId}`} className="font-medium hover:underline">{order.companyName}</Link>.
+                    New order from <DrillTarget kind="company" payload={{ id: order.companyId, name: order.companyName }} asChild>
+                        <span className="font-medium hover:underline cursor-pointer text-primary">{order.companyName}</span>
+                    </DrillTarget>.
                 </p>
             )
         case 'New Feedback':

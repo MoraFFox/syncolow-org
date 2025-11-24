@@ -6,6 +6,8 @@ import Link from 'next/link';
 import { useRouter, useParams } from 'next/navigation';
 import { useOrderStore } from '@/store/use-order-store';
 import { useCompanyStore } from '@/store/use-company-store';
+import { supabase } from '@/lib/supabase';
+import { toast } from '@/hooks/use-toast';
 import Loading from '@/app/loading';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -24,7 +26,7 @@ export default function BranchDetailsPage() {
   const branchId = params.branchId as string;
   
   const { orders } = useOrderStore();
-  const { companies, baristas, feedback, loading, updateCompanyAndBranches } = useCompanyStore();
+  const { companies, baristas, feedback, loading } = useCompanyStore();
   const [isFormOpen, setIsFormOpen] = useState(false);
 
   const company = useMemo(() => companies.find(c => c.id === companyId && !c.isBranch), [companyId, companies]);
@@ -37,9 +39,34 @@ export default function BranchDetailsPage() {
 
 
   const handleFormSubmit = async (branchData: Partial<Company>) => {
-    if (branch) {
-      await updateCompanyAndBranches(companyId, {}, [branchData as any]);
+    if (!branch) return;
+    
+    try {
+      console.log('Updating branch with data:', branchData);
+      const { id, createdAt, isBranch, parentCompanyId, industry, currentPaymentScore, 
+        totalOutstandingAmount, totalUnpaidOrders, pendingBulkPaymentAmount, 
+        paymentStatus, deliveryDays, managerName, baristas, performanceScore, contacts, warehouseContacts, ...cleanData } = branchData as any;
+      
+      // Add back contacts if they exist
+      if (contacts) cleanData.contacts = contacts;
+      if (warehouseContacts) cleanData.warehouseContacts = warehouseContacts;
+      
+      console.log('Clean data to update:', cleanData);
+      const { error } = await supabase.from('companies').update(cleanData).eq('id', branch.id);
+      if (error) throw error;
+      
+      console.log('Update successful, refreshing companies');
+      // Refresh companies
+      const { data: allCompanies } = await supabase.from('companies').select('*');
+      if (allCompanies) {
+        useCompanyStore.setState({ companies: allCompanies as Company[] });
+      }
+      
+      toast({ title: 'Branch Updated', description: 'Branch details have been updated.' });
       setIsFormOpen(false);
+    } catch (error: any) {
+      console.error('Update error:', error);
+      toast({ title: 'Update Failed', description: error.message, variant: 'destructive' });
     }
   };
 
