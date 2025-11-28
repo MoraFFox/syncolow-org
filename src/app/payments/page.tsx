@@ -1,8 +1,9 @@
 "use client"
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useOrderStore } from '@/store/use-order-store';
 import { useCompanyStore } from '@/store/use-company-store';
+import { supabase } from '@/lib/supabase';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { DollarSign, AlertTriangle, Clock, CheckCircle2, History } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -15,8 +16,52 @@ import { PaymentHistoryDialog } from './_components/payment-history-dialog';
 import { exportToCSV } from '@/lib/export-utils';
 
 export default function PaymentsPage() {
-  const { orders, markBulkCycleAsPaid, markOrderAsPaid, markBulkOrdersAsPaid } = useOrderStore();
+  const { markBulkCycleAsPaid, markOrderAsPaid, markBulkOrdersAsPaid } = useOrderStore();
   const { companies } = useCompanyStore();
+  const [allOrders, setAllOrders] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  
+  useEffect(() => {
+    const loadAllOrders = async () => {
+      setLoading(true);
+      try {
+        let allData: any[] = [];
+        const seenIds = new Set<string>();
+        let from = 0;
+        const batchSize = 1000;
+        let hasMore = true;
+
+        while (hasMore) {
+          const { data, error } = await supabase
+            .from('orders')
+            .select('*')
+            .order('orderDate', { ascending: false })
+            .range(from, from + batchSize - 1);
+          
+          if (error) throw error;
+          
+          if (data && data.length > 0) {
+            const uniqueData = data.filter(order => {
+              if (seenIds.has(order.id)) return false;
+              seenIds.add(order.id);
+              return true;
+            });
+            allData = [...allData, ...uniqueData];
+            from += batchSize;
+            hasMore = data.length === batchSize;
+          } else {
+            hasMore = false;
+          }
+        }
+        
+        setAllOrders(allData);
+      } catch (e) {
+        console.error('Error loading orders:', e);
+      }
+      setLoading(false);
+    };
+    loadAllOrders();
+  }, []);
   
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'pending' | 'overdue'>('all');
@@ -29,7 +74,7 @@ export default function PaymentsPage() {
   const [selectedCompanyName, setSelectedCompanyName] = useState<string>('');
 
   const analytics = useMemo(() => {
-    const unpaidOrders = orders.filter(o => !o.isPaid && o.paymentStatus !== 'Paid');
+    const unpaidOrders = allOrders.filter(o => !o.isPaid && o.paymentStatus !== 'Paid');
     const overdueOrders = unpaidOrders.filter(o => (o.daysOverdue || 0) > 7);
     const dueThisWeek = unpaidOrders.filter(o => {
       if (!o.expectedPaymentDate) return false;
@@ -37,7 +82,7 @@ export default function PaymentsPage() {
       return daysUntilDue >= 0 && daysUntilDue <= 7;
     });
     
-    const paidOrders = orders.filter(o => o.isPaid || o.paymentStatus === 'Paid');
+    const paidOrders = allOrders.filter(o => o.isPaid || o.paymentStatus === 'Paid');
     
     return {
       totalOutstanding: unpaidOrders.reduce((sum, o) => sum + o.total, 0),
@@ -47,10 +92,10 @@ export default function PaymentsPage() {
       unpaidCount: unpaidOrders.length,
       overdueCount: overdueOrders.length,
     };
-  }, [orders]);
+  }, [allOrders]);
 
   const filteredOrders = useMemo(() => {
-    let filtered = orders.filter(o => !o.isPaid && o.paymentStatus !== 'Paid');
+    let filtered = allOrders.filter(o => !o.isPaid && o.paymentStatus !== 'Paid');
     
     if (statusFilter === 'overdue') {
       filtered = filtered.filter(o => (o.daysOverdue || 0) > 7);
@@ -71,7 +116,7 @@ export default function PaymentsPage() {
     }
     
     return filtered.sort((a, b) => (b.daysOverdue || 0) - (a.daysOverdue || 0));
-  }, [orders, statusFilter, companyFilter, searchTerm]);
+  }, [allOrders, statusFilter, companyFilter, searchTerm]);
 
   const handleMarkCycleAsPaid = async (cycleId: string, cycleOrders: any[], reference?: string, notes?: string) => {
     const orderIds = cycleOrders.map(o => o.id);
@@ -109,7 +154,7 @@ export default function PaymentsPage() {
   };
   
   const companyOrders = selectedCompanyId 
-    ? orders.filter(o => o.companyId === selectedCompanyId)
+    ? allOrders.filter(o => o.companyId === selectedCompanyId)
     : [];
 
   return (
@@ -207,10 +252,12 @@ export default function PaymentsPage() {
       />
 
       {/* Bulk Payment Cycles */}
-      <BulkPaymentCycles 
-        orders={orders} 
-        onMarkCycleAsPaid={handleMarkCycleAsPaid}
-      />
+      {!loading && (
+        <BulkPaymentCycles 
+          orders={allOrders} 
+          onMarkCycleAsPaid={handleMarkCycleAsPaid}
+        />
+      )}
 
       {/* Unpaid Invoices Table */}
       <UnpaidInvoicesTable

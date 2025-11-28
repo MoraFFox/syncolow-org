@@ -11,6 +11,7 @@ import type {
   Company,
   Category,
   Tax,
+  Return,
 } from "@/lib/types";
 import { toast } from "@/hooks/use-toast";
 import { generateImage } from "@/ai/flows/generate-image";
@@ -38,17 +39,19 @@ const calculateNextDeliveryDate = (
   orderDate: Date
 ): Date => {
   const deliveryDaysA = [0, 2, 4]; // Sunday, Tuesday, Thursday
-  const deliveryDaysB = [1, 3]; // Monday, Wednesday
+  const deliveryDaysB = [1, 3, 6]; // Monday, Wednesday, Saturday
   const deliveryDays = region === "A" ? deliveryDaysA : deliveryDaysB;
 
   let deliveryDate = new Date(orderDate);
-  deliveryDate.setHours(0, 0, 0, 0); // Reset time to start of the day
+  deliveryDate.setHours(0, 0, 0, 0);
 
-  // If the order is placed on a delivery day after 6 PM, start checking from the next day
-  if (deliveryDays.includes(orderDate.getDay()) && orderDate.getHours() >= 18) {
-    deliveryDate.setDate(deliveryDate.getDate() + 1);
+  // If today is a delivery day and it's before 4 PM, deliver today
+  if (deliveryDays.includes(orderDate.getDay()) && orderDate.getHours() < 16) {
+    return deliveryDate;
   }
 
+  // Otherwise, find the next delivery day
+  deliveryDate.setDate(deliveryDate.getDate() + 1);
   while (!deliveryDays.includes(deliveryDate.getDay())) {
     deliveryDate.setDate(deliveryDate.getDate() + 1);
   }
@@ -62,6 +65,7 @@ interface AppState {
   products: Product[];
   categories: Category[];
   taxes: Tax[];
+  returns: Return[];
   notifications: Notification[];
   visits: VisitCall[];
   loading: boolean;
@@ -71,6 +75,7 @@ interface AppState {
   analyticsLoading: boolean;
   productsOffset: number;
   productsHasMore: boolean;
+  currentFetchId: string | null;
 
   fetchInitialData: () => Promise<void>;
   fetchOrders: (limitCount: number) => Promise<void>;
@@ -159,6 +164,7 @@ interface AppState {
     visitId: string,
     visitData: Partial<VisitCall>
   ) => Promise<void>;
+  updateVisitStatus: (visitId: string, status: VisitCall["status"]) => Promise<void>;
   deleteVisit: (visitId: string) => Promise<void>;
 
   // Notification Actions
@@ -177,6 +183,7 @@ export const useOrderStore = create<AppState>((set, get) => ({
   products: [],
   categories: [],
   taxes: [],
+  returns: [],
   notifications: [],
   visits: [],
   loading: true,
@@ -209,6 +216,7 @@ export const useOrderStore = create<AppState>((set, get) => ({
         { data: manufacturers },
         { data: categories },
         { data: taxes },
+        { data: returns },
       ] = await Promise.all([
         supabase.from("visits").select("*"),
         supabase.from("companies").select("*").not('name', 'like', '[DELETED]%'),
@@ -221,6 +229,7 @@ export const useOrderStore = create<AppState>((set, get) => ({
         supabase.from("manufacturers").select("*"),
         supabase.from("categories").select("*"),
         supabase.from("taxes").select("*"),
+        supabase.from("returns").select("*"),
       ]);
       
       const { data: products } = await supabase
@@ -242,7 +251,7 @@ export const useOrderStore = create<AppState>((set, get) => ({
         return acc;
       }, {} as Record<string, Product[]>);
 
-      set({ products: products || [], visits: visits || [], categories: categories || [], taxes: taxes || [], loading: false });
+      set({ products: products || [], visits: visits || [], categories: categories || [], taxes: taxes || [], returns: returns || [], loading: false });
       useCompanyStore.setState({
         companies: companies || [],
         baristas: baristas || [],
@@ -368,7 +377,11 @@ export const useOrderStore = create<AppState>((set, get) => ({
 
       set(
         produce((state: AppState) => {
-          state.orders.push(...(newOrders || []));
+          // Deduplicate by checking if order ID already exists
+          const existingIds = new Set(state.orders.map(o => o.id));
+          const uniqueNewOrders = (newOrders || []).filter(order => !existingIds.has(order.id));
+          
+          state.orders.push(...uniqueNewOrders);
           state.ordersOffset = ordersOffset + limitCount;
           state.ordersHasMore = (newOrders?.length || 0) === limitCount;
           state.ordersLoading = false;
@@ -385,27 +398,87 @@ export const useOrderStore = create<AppState>((set, get) => ({
     await get().fetchOrders(limitCount);
   },
 
+  currentFetchId: null,
+
   fetchOrdersByDateRange: async (from: string, to: string) => {
+    // Generate a unique ID for this fetch operation
+    const fetchId = crypto.randomUUID();
+    set({ currentFetchId: fetchId, analyticsLoading: true });
+
     const cached = AnalyticsCache.get(from, to);
     if (cached) {
-      set({ analyticsOrders: cached, analyticsLoading: false });
+      // Check if this is still the current fetch
+      if (get().currentFetchId === fetchId) {
+        set({ analyticsOrders: cached, analyticsLoading: false });
+      }
       return;
     }
     
-    set({ analyticsLoading: true });
+    toast({
+      title: "Loading Analytics Data",
+      description: "Fetching all orders for the selected period...",
+    });
+
     try {
-      const { data: analyticsOrders } = await supabase
-        .from("orders")
-        .select("*")
-        .gte("orderDate", from)
-        .lte("orderDate", to)
-        .order("orderDate", { ascending: false });
+      let allOrders: Order[] = [];
+      let hasMore = true;
+      let page = 0;
+      const pageSize = 1000; // Match Supabase's default limit to ensure correct pagination
 
-      AnalyticsCache.set(from, to, analyticsOrders || []);
+      while (hasMore) {
+        // Abort if a new fetch has started
+        if (get().currentFetchId !== fetchId) {
+            console.log("Fetch aborted: " + fetchId);
+            return;
+        }
 
-      set({ analyticsOrders: analyticsOrders || [], analyticsLoading: false });
-    } catch {
-      set({ analyticsLoading: false });
+        const { data: orders, error } = await supabase
+          .from("orders")
+          .select("id, orderDate, total, grandTotal, status, paymentStatus, companyId, items, isPotentialClient, temporaryCompanyName, statusHistory, paidDate, expectedPaymentDate")
+          .gte("orderDate", from)
+          .lte("orderDate", to)
+          .order("orderDate", { ascending: false })
+          .range(page * pageSize, (page + 1) * pageSize - 1);
+
+        if (error) throw error;
+
+        if (orders && orders.length > 0) {
+          allOrders = [...allOrders, ...(orders as Order[])];
+          
+          // If we got fewer rows than requested, we've reached the end
+          if (orders.length < pageSize) {
+            hasMore = false;
+          } else {
+            page++;
+          }
+        } else {
+          hasMore = false;
+        }
+      }
+
+      // Final check before updating state
+      if (get().currentFetchId !== fetchId) return;
+
+      AnalyticsCache.set(from, to, allOrders);
+
+      set({ analyticsOrders: allOrders, analyticsLoading: false });
+      
+      toast({
+        title: "Analytics Data Loaded",
+        description: `Successfully loaded ${allOrders.length} orders.`,
+      });
+
+    } catch (error: any) {
+      // Only show error if this is still the current fetch
+      if (get().currentFetchId === fetchId) {
+        console.error("Error fetching analytics orders:", error);
+        set({ analyticsLoading: false });
+        toast({
+            variant: "destructive",
+            title: "Error Loading Data",
+            description: error.message || "Failed to fetch analytics data",
+        });
+      }
     }
   },
 
@@ -520,9 +593,8 @@ export const useOrderStore = create<AppState>((set, get) => ({
     });
   },
 
-  updatePaymentScores: async () => {
+  updatePaymentScores: async (companyId?: string) => {
     const { orders } = get();
-    const { companies } = useCompanyStore.getState();
 
     const orderUpdates = orders
       .filter(order => !order.isPaid && order.paymentStatus !== "Paid" && order.expectedPaymentDate)
@@ -537,34 +609,42 @@ export const useOrderStore = create<AppState>((set, get) => ({
         };
       });
 
-    const companyUpdates = companies
-      .filter(company => !company.isBranch)
-      .map(company => {
-        const companyOrders = orders.filter(
-          o => o.companyId === company.id && !o.isPaid && o.paymentStatus !== "Paid"
-        );
-        const { score, status, totalUnpaid, totalOutstanding, pendingBulkAmount } = calculateCompanyPaymentScore(companyOrders);
-        return {
-          id: company.id,
-          currentPaymentScore: score,
-          paymentStatus: status,
-          totalUnpaidOrders: totalUnpaid,
-          totalOutstandingAmount: totalOutstanding,
-          pendingBulkPaymentAmount: pendingBulkAmount,
-        };
-      });
+    if (orderUpdates.length > 0) {
+      await supabase.from("orders").upsert(orderUpdates);
+    }
 
-    await Promise.all([
-      orderUpdates.length > 0 ? supabase.from("orders").upsert(orderUpdates) : Promise.resolve(),
-      companyUpdates.length > 0 ? supabase.from("companies").upsert(companyUpdates) : Promise.resolve(),
-    ]);
+    // Update specific company if provided
+    if (companyId) {
+      const companyOrders = orders.filter(
+        o => o.companyId === companyId && !o.isPaid && o.paymentStatus !== "Paid"
+      );
+      const { score, status, totalUnpaid, totalOutstanding } = calculateCompanyPaymentScore(companyOrders);
+      
+      await supabase.from("companies").update({
+        currentPaymentScore: score,
+        paymentStatus: status,
+        totalUnpaidOrders: totalUnpaid,
+        totalOutstandingAmount: totalOutstanding,
+      }).eq("id", companyId);
+    }
+
     await get().fetchInitialData();
   },
 
   deleteOrder: async (orderId: string) => {
+    // Get order before deleting to update company score
+    const { data: order } = await supabase.from("orders").select("companyId").eq("id", orderId).single();
+    const companyId = order?.companyId;
+    
     await supabase.from("orders").delete().eq("id", orderId);
     await deleteOrderFromSearch(orderId);
     await get().refreshOrders();
+    
+    // Update company payment score if order had a company
+    if (companyId) {
+      await get().updatePaymentScores(companyId);
+    }
+    
     toast({
       title: "Order Deleted",
       description: "The order has been permanently removed.",
@@ -776,7 +856,7 @@ export const useOrderStore = create<AppState>((set, get) => ({
           .companies.find((c) => c.id === client.parentCompanyId)
       : client;
     const deliveryDate = calculateNextDeliveryDate(
-      (client?.region || region) as "A" | "B",
+      region as "A" | "B",
       orderDate
     );
     const expectedPaymentDate = parentCompany
@@ -850,7 +930,11 @@ export const useOrderStore = create<AppState>((set, get) => ({
     const createdOrder = orderData as Order;
     await syncOrderToSearch(createdOrder);
     await get().refreshOrders();
-    await get().updatePaymentScores();
+    
+    // Update payment scores for the specific company only
+    if (createdOrder.companyId) {
+      await get().updatePaymentScores(createdOrder.companyId);
+    }
 
     toast({
       title: "Order Created successfully!",
@@ -890,7 +974,7 @@ export const useOrderStore = create<AppState>((set, get) => ({
   addVisit: async (visit) => {
     const newVisit = { ...visit, status: "Scheduled" as const };
     const { data: visitResult, error } = await supabase.from("visits").insert([newVisit]).select().single();
-    if (error) throw error;
+    if (error) throw new Error(error.message);
     set(
       produce((state: AppState) => {
         state.visits.push(visitResult as VisitCall);
@@ -900,7 +984,8 @@ export const useOrderStore = create<AppState>((set, get) => ({
   },
 
   updateVisit: async (visitId, visitData) => {
-    await supabase.from("visits").update(visitData).eq("id", visitId);
+    const { error } = await supabase.from("visits").update(visitData).eq("id", visitId);
+    if (error) throw new Error(error.message);
     set(
       produce((state: AppState) => {
         const index = state.visits.findIndex((v) => v.id === visitId);
@@ -912,14 +997,16 @@ export const useOrderStore = create<AppState>((set, get) => ({
     toast({ title: "Interaction Updated" });
   },
 
-  deleteVisit: async (visitId: string) => {
-    await supabase.from("visits").delete().eq("id", visitId);
+  updateVisitStatus: async (visitId, status) => {
+    await supabase.from("visits").update({ status }).eq("id", visitId);
     set(
       produce((state: AppState) => {
-        state.visits = state.visits.filter((v) => v.id !== visitId);
+        const visit = state.visits.find((v) => v.id === visitId);
+        if (visit) {
+          visit.status = status;
+        }
       })
     );
-    toast({ title: "Interaction Deleted" });
   },
 
   markNotificationAsRead: async (notificationId: string) => {

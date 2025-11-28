@@ -1,4 +1,3 @@
-
 import { LatLngTuple } from "leaflet";
 
 class GeocodeService {
@@ -11,20 +10,20 @@ class GeocodeService {
         }
 
         try {
-            const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}`);
+            const response = await fetch(`/api/geo?address=${encodeURIComponent(address)}`);
             if (!response.ok) {
-                console.warn(`Geocoding API request for "${address}" failed with status: ${response.status}. This can happen due to rate limiting. The map marker may not appear.`);
+                console.warn(`Geocoding API request for "${address}" failed with status: ${response.status}.`);
                 return null;
             }
             const data = await response.json();
-            if (data && data.length > 0) {
-                const coords: LatLngTuple = [parseFloat(data[0].lat), parseFloat(data[0].lon)];
+            if (data && data.lat && data.lng) {
+                const coords: LatLngTuple = [data.lat, data.lng];
                 this.geocodeCache.set(address, coords);
                 return coords;
             }
             return null;
         } catch (error) {
-            console.warn(`A network error occurred during geocoding for address "${address}". The map marker may not appear.`, error);
+            console.warn(`A network error occurred during geocoding for address "${address}".`, error);
             return null;
         }
     }
@@ -36,20 +35,20 @@ class GeocodeService {
         }
 
         try {
-            const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`);
+            const response = await fetch(`/api/geo?lat=${lat}&lng=${lon}`);
              if (!response.ok) {
-                console.warn(`Reverse geocoding API request for "${lat},${lon}" failed with status: ${response.status}. The address may not be updated.`);
+                console.warn(`Reverse geocoding API request for "${lat},${lon}" failed with status: ${response.status}.`);
                 return null;
             }
             const data = await response.json();
-             if (data && data.display_name) {
-                const address = data.display_name;
+             if (data && data.formattedAddress) {
+                const address = data.formattedAddress;
                 this.reverseGeocodeCache.set(cacheKey, address);
                 return address;
             }
             return null;
         } catch(error) {
-            console.warn(`A network error occurred during reverse geocoding for "${lat},${lon}". The address may not be updated.`, error);
+            console.warn(`A network error occurred during reverse geocoding for "${lat},${lon}".`, error);
             return null;
         }
     }

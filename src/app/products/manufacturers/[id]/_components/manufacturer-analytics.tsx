@@ -1,38 +1,141 @@
 'use client';
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from 'recharts';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { Product, Manufacturer } from '@/lib/types';
+import { Product, Manufacturer, Order, Return } from '@/lib/types';
+import { format, subMonths, startOfMonth, endOfMonth, isWithinInterval, parseISO } from 'date-fns';
 
 interface ManufacturerAnalyticsProps {
   manufacturer: Manufacturer;
   products: Product[];
+  orders?: Order[];
+  returns?: Return[];
 }
 
 const COLORS = ['#3b82f6', '#10b981', '#8b5cf6', '#f59e0b', '#ef4444', '#06b6d4', '#8b5cf6'];
 
-const ManufacturerAnalytics: React.FC<ManufacturerAnalyticsProps> = ({ manufacturer, products }) => {
+const ManufacturerAnalytics: React.FC<ManufacturerAnalyticsProps> = ({ manufacturer, products, orders = [], returns = [] }) => {
   // Calculate analytics data
- const totalProducts = products.length;
-  const totalRevenue = products.reduce((sum, product) => {
-    const productRevenue = (product.price || 0) * (product.totalSold || 0);
-    return sum + productRevenue;
-  }, 0);
+  const totalProducts = products.length;
   const totalStock = products.reduce((sum, product) => sum + (product.stock || 0), 0);
-  const avgPrice = totalProducts > 0 ? totalRevenue / totalProducts : 0;
+  const totalStockValue = products.reduce((sum, p) => sum + ((p.price || 0) * (p.stock || 0)), 0);
+  
+  // Fix: Calculate average price correctly - sum of all prices divided by product count
+  const avgPrice = totalProducts > 0 
+    ? products.reduce((sum, product) => sum + (product.price || 0), 0) / totalProducts 
+    : 0;
+
+  // Filter orders that contain products from this manufacturer
+  const manufacturerOrders = useMemo(() => {
+    if (!orders || orders.length === 0) return [];
+    const productIds = new Set(products.map(p => p.id));
+    return orders.filter(order => 
+      order.items.some(item => productIds.has(item.productId))
+    );
+  }, [orders, products]);
+
+  // Calculate Sales & Revenue from Orders
+  const { totalRevenue, totalUnitsSold, productSales } = useMemo(() => {
+    let revenue = 0;
+    let unitsSold = 0;
+    const salesMap = new Map<string, { sold: number, revenue: number }>();
+
+    // Initialize map for all products to ensure they appear even with 0 sales
+    products.forEach(p => {
+      salesMap.set(p.id, { sold: 0, revenue: 0 });
+    });
+
+    const productIds = new Set(products.map(p => p.id));
+
+    manufacturerOrders.forEach(order => {
+      order.items.forEach(item => {
+        if (productIds.has(item.productId)) {
+          const itemRevenue = item.price * item.quantity;
+          revenue += itemRevenue;
+          unitsSold += item.quantity;
+
+          const current = salesMap.get(item.productId) || { sold: 0, revenue: 0 };
+          salesMap.set(item.productId, {
+            sold: current.sold + item.quantity,
+            revenue: current.revenue + itemRevenue
+          });
+        }
+      });
+    });
+
+    return { totalRevenue: revenue, totalUnitsSold: unitsSold, productSales: salesMap };
+  }, [manufacturerOrders, products]);
+
+  // Inventory Turnover Rate (Simplified: Units Sold / Average Inventory)
+  const inventoryTurnover = useMemo(() => {
+    if (totalStock === 0) return 0;
+    return totalUnitsSold / totalStock;
+  }, [totalUnitsSold, totalStock]);
+
+  // Return Rate
+  const returnRate = useMemo(() => {
+    if (manufacturerOrders.length === 0) return 0;
+    const manufacturerOrderIds = new Set(manufacturerOrders.map(o => o.id));
+    const returnedOrdersCount = returns.filter(r => manufacturerOrderIds.has(r.orderId)).length;
+    return (returnedOrdersCount / manufacturerOrders.length) * 100;
+  }, [manufacturerOrders, returns]);
+
+  // Sales Growth (MoM) - Last 6 Months
+  const salesGrowthData = useMemo(() => {
+    // If we have no orders, return empty data with correct months
+    const today = new Date();
+    const last6Months = Array.from({ length: 6 }, (_, i) => {
+      const date = subMonths(today, 5 - i);
+      return {
+        name: format(date, 'MMM yyyy'),
+        month: format(date, 'MMM yyyy'),
+        dateObj: date,
+        revenue: 0,
+        orderCount: 0
+      };
+    });
+
+    if (manufacturerOrders.length === 0) {
+        return last6Months.map(m => ({ name: m.name, revenue: 0, orders: 0 }));
+    }
+    
+    const productIds = new Set(products.map(p => p.id));
+
+    manufacturerOrders.forEach(order => {
+      const orderDate = parseISO(order.orderDate);
+      const monthData = last6Months.find(m => 
+        isWithinInterval(orderDate, { start: startOfMonth(m.dateObj), end: endOfMonth(m.dateObj) })
+      );
+
+      if (monthData) {
+        const orderRevenue = order.items
+          .filter(item => productIds.has(item.productId))
+          .reduce((sum, item) => sum + (item.price * item.quantity), 0);
+        monthData.revenue += orderRevenue;
+        monthData.orderCount += 1;
+      }
+    });
+
+    return last6Months.map(m => ({ name: m.name, revenue: m.revenue, orders: m.orderCount }));
+  }, [manufacturerOrders, products]);
 
   // Prepare data for top-selling products chart
- const topSellingProducts = [...products]
-    .sort((a, b) => (b.totalSold || 0) - (a.totalSold || 0))
-    .slice(0, 5)
-    .map(product => ({
-      name: product.name,
-      sold: product.totalSold || 0,
-      revenue: (product.price || 0) * (product.totalSold || 0),
-    }));
+  const topSellingProducts = useMemo(() => {
+    return [...products]
+      .map(product => {
+        const stats = productSales.get(product.id) || { sold: 0, revenue: 0 };
+        return {
+          name: product.name,
+          sold: stats.sold,
+          revenue: stats.revenue,
+        };
+      })
+      .sort((a, b) => b.sold - a.sold)
+      .slice(0, 5);
+  }, [products, productSales]);
 
   // Prepare data for stock level chart
   const stockLevelData = products.map(product => ({
@@ -52,6 +155,28 @@ const ManufacturerAnalytics: React.FC<ManufacturerAnalyticsProps> = ({ manufactu
     name,
     value,
   }));
+
+  // Top Customers
+  const topCustomers = useMemo(() => {
+    if (manufacturerOrders.length === 0) return [];
+    
+    const customerRevenue: Record<string, number> = {};
+    const productIds = new Set(products.map(p => p.id));
+
+    manufacturerOrders.forEach(order => {
+      const customerName = order.companyName || 'Unknown Client';
+      const orderRevenue = order.items
+        .filter(item => productIds.has(item.productId))
+        .reduce((sum, item) => sum + (item.price * item.quantity), 0);
+      
+      customerRevenue[customerName] = (customerRevenue[customerName] || 0) + orderRevenue;
+    });
+
+    return Object.entries(customerRevenue)
+      .map(([name, revenue]) => ({ name, revenue }))
+      .sort((a, b) => b.revenue - a.revenue)
+      .slice(0, 5);
+  }, [manufacturerOrders, products]);
 
   return (
     <div className="space-y-6">
@@ -102,6 +227,54 @@ const ManufacturerAnalytics: React.FC<ManufacturerAnalyticsProps> = ({ manufactu
             <div className="text-xs text-muted-foreground">
               Average price per product
             </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="pb-2">
+            <CardDescription>Inventory Turnover</CardDescription>
+            <CardTitle className="text-2xl">{inventoryTurnover.toFixed(1)}x</CardTitle>
+          </CardHeader>
+        </Card>
+
+        <Card>
+          <CardHeader className="pb-2">
+            <CardDescription>Return Rate</CardDescription>
+            <CardTitle className="text-2xl">{returnRate.toFixed(1)}%</CardTitle>
+          </CardHeader>
+        </Card>
+
+        <Card>
+          <CardHeader className="pb-2">
+            <CardDescription>Total Stock Value</CardDescription>
+            <CardTitle className="text-2xl">${totalStockValue.toFixed(2)}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-xs text-muted-foreground">
+              Value of current stock
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      <Separator />
+
+      {/* Sales Growth Chart */}
+      <div className="space-y-2">
+        <h3 className="text-lg font-semibold">Sales Growth (Last 6 Months)</h3>
+        <Card>
+          <CardContent className="p-4">
+            <ResponsiveContainer width="100%" height={300}>
+              <LineChart data={salesGrowthData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" />
+                <YAxis />
+                <Tooltip formatter={(value) => [`$${Number(value).toFixed(2)}`, 'Revenue']} />
+                <Legend />
+                <Line type="monotone" dataKey="revenue" stroke="#3b82f6" activeDot={{ r: 8 }} name="Revenue" />
+                <Line type="monotone" dataKey="orders" stroke="#10b981" activeDot={{ r: 8 }} name="Orders" />
+              </LineChart>
+            </ResponsiveContainer>
           </CardContent>
         </Card>
       </div>
@@ -173,7 +346,7 @@ const ManufacturerAnalytics: React.FC<ManufacturerAnalyticsProps> = ({ manufactu
                   cx="50%"
                   cy="50%"
                   labelLine={true}
-                  label={({ name, percent }) => `${name} ${(percent * 10).toFixed(0)}%`}
+                  label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
                   outerRadius={80}
                   fill="#884d8"
                   dataKey="value"
@@ -191,30 +364,21 @@ const ManufacturerAnalytics: React.FC<ManufacturerAnalyticsProps> = ({ manufactu
 
       <Separator />
 
-      {/* Manufacturer Details */}
+      {/* Top Customers */}
       <div className="space-y-2">
-        <h3 className="text-lg font-semibold">Manufacturer Details</h3>
+        <h3 className="text-lg font-semibold">Top Customers</h3>
         <Card>
           <CardContent className="p-4">
-            <div className="flex items-center space-x-4">
-              {manufacturer.icon && (
-                <div 
-                  className="w-16 h-16 rounded-lg flex items-center justify-center text-2xl"
-                  style={{ backgroundColor: manufacturer.color }}
-                >
-                  {manufacturer.icon}
-                </div>
-              )}
-              <div>
-                <h4 className="text-xl font-bold">{manufacturer.name}</h4>
-                <p className="text-muted-foreground">{manufacturer.description}</p>
-                <div className="mt-2 flex flex-wrap gap-2">
-                  {manufacturer.tags?.map((tag, index) => (
-                    <Badge key={index} variant="secondary">{tag}</Badge>
-                  ))}
-                </div>
-              </div>
-            </div>
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={topCustomers} layout="vertical" margin={{ top: 5, right: 30, left: 40, bottom: 5 }}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis type="number" />
+                <YAxis dataKey="name" type="category" width={150} />
+                <Tooltip formatter={(value) => [`$${Number(value).toFixed(2)}`, 'Revenue']} />
+                <Legend />
+                <Bar dataKey="revenue" name="Revenue" fill="#8b5cf6" radius={[0, 4, 4, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
           </CardContent>
         </Card>
       </div>

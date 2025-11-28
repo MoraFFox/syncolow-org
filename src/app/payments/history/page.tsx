@@ -27,13 +27,36 @@ export default function PaymentHistoryPage() {
     const loadAllOrders = async () => {
       setLoading(true);
       try {
-        const { data, error } = await supabase
+        let allData: any[] = [];
+        const seenIds = new Set<string>();
+        let from = 0;
+        const batchSize = 1000;
+        let hasMore = true;
+
+        while (hasMore) {
+          const { data, error } = await supabase
             .from('orders')
             .select('*')
-            .order('orderDate', { ascending: false });
-            
-        if (error) throw error;
-        setAllOrders(data || []);
+            .order('orderDate', { ascending: false })
+            .range(from, from + batchSize - 1);
+          
+          if (error) throw error;
+          
+          if (data && data.length > 0) {
+            const uniqueData = data.filter(order => {
+              if (seenIds.has(order.id)) return false;
+              seenIds.add(order.id);
+              return true;
+            });
+            allData = [...allData, ...uniqueData];
+            from += batchSize;
+            hasMore = data.length === batchSize;
+          } else {
+            hasMore = false;
+          }
+        }
+        
+        setAllOrders(allData);
       } catch (e) {
         console.error('Error loading orders:', e);
       }

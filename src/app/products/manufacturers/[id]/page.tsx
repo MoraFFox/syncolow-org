@@ -6,9 +6,11 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { useManufacturerStore } from '@/store/use-manufacturer-store';
+import { useOrderStore } from '@/store/use-order-store';
 import { useRouter } from 'next/navigation';
 import ManufacturerAnalytics from './_components/manufacturer-analytics';
 import ProductAssignment from './_components/product-assignment';
+import { subMonths } from 'date-fns';
 import Image from 'next/image';
 import {
   AlertDialog,
@@ -28,15 +30,27 @@ export default function ManufacturerDetailPage({ params }: { params: Promise<{ i
   const resolvedParams = React.use(params);
   const router = useRouter();
   const { manufacturers, productsByManufacturer, deleteManufacturer, deleteManufacturerAndProducts, loading, fetchManufacturersAndProducts } = useManufacturerStore();
+  const { analyticsOrders, returns, fetchOrdersByDateRange, analyticsLoading } = useOrderStore();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isDeleteWithProductsDialogOpen, setIsDeleteWithProductsDialogOpen] = useState(false);
+  const [isAnalyticsLoaded, setIsAnalyticsLoaded] = useState(false);
 
   useEffect(() => {
-    // Always fetch on component mount if data isn't already loaded to ensure freshness.
-    if (manufacturers.length === 0) {
-      fetchManufacturersAndProducts();
-    }
-  }, [fetchManufacturersAndProducts, manufacturers.length]);
+    // Always fetch manufacturers and ALL products to ensure we have complete data
+    fetchManufacturersAndProducts();
+  }, [fetchManufacturersAndProducts]);
+
+  useEffect(() => {
+    const loadAnalytics = async () => {
+      if (resolvedParams.id && !isAnalyticsLoaded && !analyticsLoading) {
+        const end = new Date();
+        const start = subMonths(end, 6);
+        await fetchOrdersByDateRange(start.toISOString(), end.toISOString());
+        setIsAnalyticsLoaded(true);
+      }
+    };
+    loadAnalytics();
+  }, [resolvedParams.id, isAnalyticsLoaded, analyticsLoading, fetchOrdersByDateRange]);
 
   const manufacturer = manufacturers.find(m => m.id === resolvedParams.id);
 
@@ -104,6 +118,9 @@ export default function ManufacturerDetailPage({ params }: { params: Promise<{ i
 
   const manufacturerProducts = productsByManufacturer[resolvedParams.id] || [];
   
+  // Safeguard: If name looks like a URL, use a fallback
+  const displayName = manufacturer.name?.startsWith('http') ? 'Unnamed Manufacturer' : manufacturer.name;
+  
   const handleEditClick = () => {
     router.push(`/products/manufacturers/${resolvedParams.id}/edit`);
   };
@@ -111,9 +128,9 @@ export default function ManufacturerDetailPage({ params }: { params: Promise<{ i
   return (
     <div className="container mx-auto py-10">
       <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="text-3xl font-bold">{manufacturer.name}</h1>
-          <p className="text-muted-foreground">{manufacturer.description}</p>
+        <div className="min-w-0 flex-1">
+          <h1 className="text-3xl font-bold truncate">{displayName}</h1>
+          <p className="text-muted-foreground line-clamp-2">{manufacturer.description}</p>
         </div>
         <div className="flex gap-2">
           <Button variant="outline" onClick={handleEditClick}>Edit Manufacturer</Button>
@@ -130,25 +147,28 @@ export default function ManufacturerDetailPage({ params }: { params: Promise<{ i
           <div className="flex items-start space-x-4">
             {manufacturer.icon && (
               <div className="flex-shrink-0">
-                <div className="w-16 h-16 rounded-lg overflow-hidden border border-gray-200 flex items-center justify-center">
+                <div className="w-16 h-16 rounded-lg overflow-hidden border border-gray-200 flex items-center justify-center bg-muted">
                   <Image 
                     src={manufacturer.icon} 
                     alt={`${manufacturer.name} icon`} 
                     width={64} 
                     height={64} 
                     className="object-contain"
+                    unoptimized
                   />
                 </div>
               </div>
             )}
-            <div>
-              <h3 className="text-lg font-semibold">{manufacturer.name}</h3>
-              <p className="text-sm text-muted-foreground">{manufacturer.description}</p>
-              {manufacturer.tags?.map((tag, index) => (
-                <Badge key={index} variant="secondary" className="mt-2 mr-2">
-                  {tag}
-                </Badge>
-              ))}
+            <div className="flex-1 min-w-0 overflow-hidden">
+              <h3 className="text-lg font-semibold truncate">{displayName}</h3>
+              <p className="text-sm text-muted-foreground line-clamp-2">{manufacturer.description}</p>
+              <div className="flex flex-wrap gap-2 mt-2">
+                {manufacturer.tags?.map((tag, index) => (
+                  <Badge key={index} variant="secondary">
+                    {tag}
+                  </Badge>
+                ))}
+              </div>
             </div>
           </div>
         </CardContent>
@@ -156,7 +176,12 @@ export default function ManufacturerDetailPage({ params }: { params: Promise<{ i
 
       <Separator className="my-6" />
       
-      <ManufacturerAnalytics manufacturer={manufacturer} products={manufacturerProducts} />
+      <ManufacturerAnalytics
+        manufacturer={manufacturer}
+        products={manufacturerProducts}
+        orders={analyticsOrders}
+        returns={returns}
+      />
       
       <Separator className="my-6" />
       

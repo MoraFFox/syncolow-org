@@ -1,17 +1,18 @@
 
 "use client";
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import { useOrderStore } from '@/store/use-order-store';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { PlusCircle, Edit, Trash2, Search, ArrowLeft } from 'lucide-react';
+import { PlusCircle, Edit, Trash2, Search, ArrowLeft, BarChart2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { toast } from '@/hooks/use-toast';
 import { Category } from '@/lib/types';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -181,8 +182,17 @@ export default function CategoriesPage() {
                         <TableBody>
                             {filteredCategories.map(category => (
                                 <TableRow key={category.id}>
-                                    <TableCell className="font-medium">{category.name}</TableCell>
+                                    <TableCell className="font-medium">
+                                        <Link href={`/products/categories/${category.id}`} className="hover:underline">
+                                            {category.name}
+                                        </Link>
+                                    </TableCell>
                                     <TableCell className="text-right">
+                                        <Button variant="ghost" size="icon" asChild>
+                                            <Link href={`/products/categories/${category.id}`}>
+                                                <BarChart2 className="h-4 w-4" />
+                                            </Link>
+                                        </Button>
                                         <Button variant="ghost" size="icon" onClick={() => handleOpenForm(category)}><Edit className="h-4 w-4" /></Button>
                                         <Button variant="ghost" size="icon" onClick={() => openDeleteDialog(category)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
                                     </TableCell>

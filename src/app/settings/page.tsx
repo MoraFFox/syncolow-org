@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ClearData } from "./_components/clear-data";
 import { NotificationSettings } from "./_components/notification-settings";
+import { Integrations } from "./_components/integrations";
 import { PaymentMigration } from "./_components/payment-migration";
 import { UpdatePaymentScores } from "./_components/update-payment-scores";
 import { SyncSearchCollection } from "./_components/sync-search-collection";
@@ -58,6 +59,8 @@ export default function SettingsPage() {
       </Card>
       
       <NotificationSettings />
+
+      <Integrations />
 
       <Card>
         <CardHeader>

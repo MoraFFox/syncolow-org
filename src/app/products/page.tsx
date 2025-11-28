@@ -12,12 +12,10 @@ import {
 import { useSearchParams } from "next/navigation";
 import { useDebouncedCallback } from "use-debounce";
 import Link from "next/link";
-import Image from "next/image";
 import {
   PlusCircle,
   Search,
   GitBranch,
-  Edit,
   Trash2,
   Upload,
   LayoutGrid,
@@ -32,15 +30,13 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useOrderStore } from "@/store/use-order-store";
-import { Product } from "@/lib/types";
-import { useSettingsStore } from "@/store/use-settings-store";
+import { Product, Category, Manufacturer } from "@/lib/types";
+
 import { ProductForm } from "./_components/product-form";
 import Loading from "../loading";
-import { cn } from "@/lib/utils";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -55,13 +51,13 @@ import { toast } from "@/hooks/use-toast";
 import { ProductImporterDialog } from "./_components/product-importer-dialog";
 import { PriceAuditDialog } from "@/components/price-audit-dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
+
 import { useManufacturerStore } from "@/store/use-manufacturer-store";
+import { ProductsOverview } from "./_components/products-overview";
+import { CategoryCard } from "./_components/category-card";
+import { ManufacturerCard } from "./_components/manufacturer-card";
+import { ProductGrid } from "./_components/product-grid";
+import { ArrowLeft } from "lucide-react";
 
 type AddProductData = Omit<Product, "id" | "imageUrl"> & { image?: File };
 
@@ -78,11 +74,11 @@ function ProductsPageContent() {
     deleteAllProducts,
     loading: productsLoading,
     loadRemainingProducts,
-    searchProducts,
+    categories,
   } = useOrderStore();
   const { manufacturers, loading: manufacturersLoading } =
     useManufacturerStore();
-  const { paginationLimit } = useSettingsStore();
+
   const observerRef = useRef<IntersectionObserver | null>(null);
   const loadMoreRef = useRef<HTMLDivElement>(null);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
@@ -93,15 +89,15 @@ function ProductsPageContent() {
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [isSearching, setIsSearching] = useState(false);
-  const [visibleCount, setVisibleCount] = useState(paginationLimit);
-  const [isAlertOpen, setIsAlertOpen] = useState(false);
-  const [productToDelete, setProductToDelete] = useState<Product | null>(null);
   const [isDeleteAllAlertOpen, setIsDeleteAllAlertOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState("category");
+  const [activeTab, setActiveTab] = useState("overview");
 
-  useEffect(() => {
-    setVisibleCount(paginationLimit);
-  }, [paginationLimit]);
+  const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
+  const [selectedManufacturer, setSelectedManufacturer] = useState<Manufacturer | null>(null);
+  const [productToDelete, setProductToDelete] = useState<Product | null>(null);
+  const [isAlertOpen, setIsAlertOpen] = useState(false);
+
+
 
   // Infinite scroll for loading remaining products
   const handleLoadMore = async () => {
@@ -192,6 +188,8 @@ function ProductsPageContent() {
     }, {} as Record<string, Product[]>);
   }, [filteredProducts, manufacturers]);
 
+
+
   const handleOpenForm = (product: Product | null) => {
     setEditingProduct(product);
     setIsFormOpen(true);
@@ -205,14 +203,10 @@ function ProductsPageContent() {
   const handleDeleteConfirm = async () => {
     if (productToDelete) {
       await deleteProduct(productToDelete.id);
-      toast({
-        title: "Product Deleted",
-        description: `"${productToDelete.name}" has been removed.`,
-        variant: "destructive",
-      });
+      setProductToDelete(null);
+      setIsAlertOpen(false);
+      toast({ title: "Product Deleted" });
     }
-    setIsAlertOpen(false);
-    setProductToDelete(null);
   };
 
   const handleDeleteAllConfirm = async () => {
@@ -240,88 +234,13 @@ function ProductsPageContent() {
     setEditingProduct(null);
   };
 
-  const renderProductList = (productsToRender: Product[]) => (
-    <div className='grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4'>
-      {productsToRender.map((product) => (
-        <Card
-          key={product.id}
-          className={cn(product.isVariant && "bg-muted/50 ml-4")}
-        >
-          <CardContent className='p-4 flex gap-4'>
-            <Image
-              src={product.imageUrl || "https://placehold.co/100x100.png"}
-              alt={product.name}
-              width={80}
-              height={80}
-              className='rounded-md object-cover'
-              data-ai-hint={product.hint}
-            />
-            <div className='flex-1 flex flex-col justify-between'>
-              <div>
-                <p className='font-semibold'>
-                  {product.name}{" "}
-                  {product.variantName && `- ${product.variantName}`}
-                </p>
-                <p className='text-sm text-muted-foreground'>
-                  $
-                  {typeof product.price === "number"
-                    ? product.price.toFixed(2)
-                    : "0.00"}
-                </p>
-                <p className='text-sm text-muted-foreground'>
-                  {product.stock} in stock
-                </p>
-              </div>
-              <div className='mt-2 flex items-center justify-end space-x-2'>
-                <Button variant='outline' size='sm' asChild>
-                  <Link href={`/products/${product.id}`}>View</Link>
-                </Button>
 
-                <Button
-                  variant='secondary'
-                  size='icon'
-                  className='h-9 w-9'
-                  onClick={() => handleOpenForm(product)}
-                >
-                  <Edit className='h-4 w-4' />
-                </Button>
-                <Button
-                  variant='destructive'
-                  size='icon'
-                  className='h-9 w-9'
-                  onClick={() => handleDeleteClick(product)}
-                >
-                  <Trash2 className='h-4 w-4' />
-                </Button>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      ))}
-    </div>
-  );
 
   if (loading) return <Loading />;
 
   return (
     <>
-      <AlertDialog open={isAlertOpen} onOpenChange={setIsAlertOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete the
-              product "{productToDelete?.name}".
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDeleteConfirm}>
-              Delete
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+
 
       <AlertDialog
         open={isDeleteAllAlertOpen}
@@ -342,6 +261,27 @@ function ProductsPageContent() {
               className='bg-destructive text-destructive-foreground hover:bg-destructive/90'
             >
               Delete All
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog open={isAlertOpen} onOpenChange={setIsAlertOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the
+              product.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteConfirm}
+              className='bg-destructive text-destructive-foreground hover:bg-destructive/90'
+            >
+              Delete
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -419,46 +359,101 @@ function ProductsPageContent() {
 
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList>
+            <TabsTrigger value='overview'>Overview</TabsTrigger>
             <TabsTrigger value='category'>By Category</TabsTrigger>
             <TabsTrigger value='manufacturer'>By Manufacturer</TabsTrigger>
           </TabsList>
+          <TabsContent value='overview' className='mt-4'>
+            <div className="space-y-8">
+              <div className="h-[600px] overflow-y-auto pr-2 border rounded-md p-4">
+                <ProductGrid 
+                  products={products} 
+                  onEdit={handleOpenForm}
+                  onDelete={handleDeleteClick}
+                  manufacturers={manufacturers}
+                />
+              </div>
+              
+              <div className="pt-4 border-t">
+                <h2 className="text-2xl font-bold mb-4">Analytics Overview</h2>
+                <ProductsOverview
+                  products={products}
+                  categories={categories}
+                  manufacturers={manufacturers}
+                />
+              </div>
+            </div>
+          </TabsContent>
           <TabsContent value='category' className='mt-4'>
-            <Accordion
-              type='multiple'
-              defaultValue={Object.keys(productsByCategory)}
-            >
-              {Object.entries(productsByCategory).map(
-                ([category, products]) => (
-                  <AccordionItem value={category} key={category}>
-                    <AccordionTrigger className='text-lg font-medium'>
-                      {category} ({products.length})
-                    </AccordionTrigger>
-                    <AccordionContent className='p-4'>
-                      {renderProductList(products)}
-                    </AccordionContent>
-                  </AccordionItem>
-                )
-              )}
-            </Accordion>
+            {selectedCategory ? (
+              <div className="space-y-4">
+                <div className="flex items-center gap-2">
+                  <Button variant="ghost" onClick={() => setSelectedCategory(null)}>
+                    <ArrowLeft className="h-4 w-4 mr-2" />
+                    Back to Categories
+                  </Button>
+                  <h2 className="text-xl font-bold">{selectedCategory.name}</h2>
+                </div>
+                <ProductGrid 
+                  products={productsByCategory[selectedCategory.name] || []} 
+                  onEdit={handleOpenForm}
+                  onDelete={handleDeleteClick}
+                />
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                {Object.entries(productsByCategory).map(([categoryName, categoryProducts]) => {
+                   const categoryObj = categories.find(c => c.name === categoryName) || { id: 'uncategorized', name: categoryName };
+                   return (
+                     <CategoryCard 
+                       key={categoryName} 
+                       category={categoryObj} 
+                       products={categoryProducts} 
+                       onClick={() => {
+                         console.log("Category clicked:", categoryObj);
+                         setSelectedCategory(categoryObj);
+                       }}
+                     />
+                   );
+                })}
+              </div>
+            )}
           </TabsContent>
           <TabsContent value='manufacturer' className='mt-4'>
-            <Accordion
-              type='multiple'
-              defaultValue={Object.keys(productsByManufacturer)}
-            >
-              {Object.entries(productsByManufacturer).map(
-                ([manufacturer, products]) => (
-                  <AccordionItem value={manufacturer} key={manufacturer}>
-                    <AccordionTrigger className='text-lg font-medium'>
-                      {manufacturer} ({products.length})
-                    </AccordionTrigger>
-                    <AccordionContent className='p-4'>
-                      {renderProductList(products)}
-                    </AccordionContent>
-                  </AccordionItem>
-                )
-              )}
-            </Accordion>
+             {selectedManufacturer ? (
+              <div className="space-y-4">
+                <div className="flex items-center gap-2">
+                  <Button variant="ghost" onClick={() => setSelectedManufacturer(null)}>
+                    <ArrowLeft className="h-4 w-4 mr-2" />
+                    Back to Manufacturers
+                  </Button>
+                  <h2 className="text-xl font-bold">{selectedManufacturer.name}</h2>
+                </div>
+                <ProductGrid 
+                  products={productsByManufacturer[selectedManufacturer.name] || []} 
+                  onEdit={handleOpenForm}
+                  onDelete={handleDeleteClick}
+                />
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                {Object.entries(productsByManufacturer).map(([manufacturerName, manufacturerProducts]) => {
+                   const manufacturerObj = manufacturers.find(m => m.name === manufacturerName) || { id: 'unknown', name: manufacturerName, icon: undefined };
+                   
+                   return (
+                     <ManufacturerCard 
+                       key={manufacturerName} 
+                       manufacturer={manufacturerObj} 
+                       products={manufacturerProducts} 
+                       onClick={() => {
+                         console.log("Manufacturer clicked:", manufacturerObj);
+                         setSelectedManufacturer(manufacturerObj);
+                       }}
+                     />
+                   );
+                })}
+              </div>
+            )}
           </TabsContent>
         </Tabs>
 

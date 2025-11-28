@@ -4,6 +4,7 @@
 import { useMemo, useState, useEffect } from "react";
 import { useOrderStore } from "@/store/use-order-store";
 import { useCompanyStore } from "@/store/use-company-store";
+import { useMaintenanceStore } from "@/store/use-maintenance-store";
 import { isToday } from "date-fns";
 import { LatLngTuple } from "leaflet";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -12,8 +13,7 @@ import { geocodeService } from "@/services/geocode-service";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import type { VisitCall } from '@/lib/types';
 
-import { Map } from '@/components/ui/map';
-import { ChangeView, MapTileLayer, MapMarkers, MapMarkerProps } from '@/components/ui/map-client';
+import { GoogleMapWrapper, Marker, InfoWindow, MarkerClusterer } from '@/components/ui/google-map-wrapper';
 
 
 interface VisitWithCoords {
@@ -23,14 +23,18 @@ interface VisitWithCoords {
     coords: LatLngTuple | null;
     outcome?: string;
     notes?: string;
+    type?: string;
 }
 
 export function TodayVisitsMap() {
     const { visits } = useOrderStore();
+    const { maintenanceVisits } = useMaintenanceStore();
     const { companies } = useCompanyStore();
     const [visitsWithCoords, setVisitsWithCoords] = useState<VisitWithCoords[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [selectedVisitId, setSelectedVisitId] = useState<string | null>(null);
+    const [mapCenter, setMapCenter] = useState<google.maps.LatLngLiteral>({ lat: 30.0444, lng: 31.2357 });
+    const [mapZoom, setMapZoom] = useState(8);
 
     useEffect(() => {
         if (!companies || companies.length === 0) {
@@ -38,24 +42,52 @@ export function TodayVisitsMap() {
             return;
         };
 
-        const todayClientVisits = visits.filter(v => v.type === 'Visit' && v.address && isToday(new Date(v.date)))
-                                     .map(v => ({ id: v.id, clientName: v.clientName || 'Custom', address: v.address!, outcome: v.outcome }));
+        const todayClientVisits = visits
+            .filter(v => v.type === 'Visit' && v.address && isToday(new Date(v.date)) && v.status !== 'Completed')
+            .map(v => ({ 
+                id: v.id, 
+                clientName: v.clientName || 'Custom', 
+                address: v.address!, 
+                outcome: v.outcome,
+                type: 'Visit',
+                date: v.date
+            }));
+
+        const todayMaintenanceVisits = maintenanceVisits
+            .filter(v => v.status === 'Scheduled' && v.date && isToday(new Date(v.date as string)))
+            .map(v => {
+                const entity = companies.find(c => c.id === v.branchId || c.id === v.companyId);
+                const address = entity?.location || entity?.warehouseLocation || '';
+                
+                return {
+                    id: v.id,
+                    clientName: v.branchName || v.companyName || 'Maintenance',
+                    address: address,
+                    outcome: v.maintenanceNotes,
+                    type: 'Maintenance',
+                    date: v.date as string
+                };
+            })
+            .filter(v => v.address);
+
+        const allVisits = [...todayClientVisits, ...todayMaintenanceVisits];
 
         const geocodeVisits = async () => {
-            if (todayClientVisits.length === 0) {
+            if (allVisits.length === 0) {
                 setVisitsWithCoords([]);
                 setIsLoading(false);
                 return;
             }
             setIsLoading(true);
             const geocoded = await Promise.all(
-                todayClientVisits.map(async v => {
+                allVisits.map(async v => {
                     const coords = await geocodeService.geocode(v.address);
                     return { ...v, coords };
                 })
             );
             setVisitsWithCoords(geocoded);
-            if (geocoded.length > 0 && !selectedVisitId) {
+            // Only auto-select on initial load, not when user closes InfoWindow
+            if (geocoded.length > 0 && selectedVisitId === null && visitsWithCoords.length === 0) {
                 const firstValidVisit = geocoded.find(v => v.coords);
                 if(firstValidVisit) setSelectedVisitId(firstValidVisit.id);
             }
@@ -64,24 +96,42 @@ export function TodayVisitsMap() {
 
         geocodeVisits();
 
-    }, [visits, companies, selectedVisitId]);
+    }, [visits, maintenanceVisits, companies]);
     
     const selectedVisit = useMemo(() => {
         return visitsWithCoords.find(v => v.id === selectedVisitId);
     }, [selectedVisitId, visitsWithCoords]);
     
-     const markers: MapMarkerProps[] = useMemo(() => {
+     const markers = useMemo(() => {
         return visitsWithCoords
             .filter((v): v is VisitWithCoords & { coords: LatLngTuple } => v.coords !== null)
             .map(v => ({
-                position: v.coords,
-                popupContent: `<strong>${v.clientName}</strong><br/>${v.address}`
+                id: v.id,
+                position: { lat: v.coords[0], lng: v.coords[1] },
+                content: `<strong>${v.clientName}</strong><br/>${v.address}`
             }));
     }, [visitsWithCoords]);
 
+    // Update map center and zoom when visit selection changes
+    useEffect(() => {
+        if (selectedVisitId && selectedVisit && selectedVisit.coords) {
+            // Visit selected: zoom in
+            setMapCenter({ lat: selectedVisit.coords[0], lng: selectedVisit.coords[1] });
+            setMapZoom(13);
+        } else if (!selectedVisitId && markers.length > 0) {
+            // Visit deselected: zoom out to show all visits
+            setMapCenter(markers[0].position);
+            setMapZoom(8);
+        }
+    }, [selectedVisitId, selectedVisit, markers]);
 
-    const center: LatLngTuple = selectedVisit?.coords || (markers.length > 0 ? markers[0].position as LatLngTuple : [30.0444, 31.2357]);
-    const zoom = selectedVisit ? 13 : 8;
+    // Set initial map position when visits load
+    useEffect(() => {
+        if (markers.length > 0 && mapCenter.lat === 30.0444 && mapCenter.lng === 31.2357) {
+            setMapCenter(markers[0].position);
+            setMapZoom(8);
+        }
+    }, [markers]);
 
 
     if (isLoading) {
@@ -96,16 +146,48 @@ export function TodayVisitsMap() {
             </CardHeader>
             <CardContent>
                 {markers.length > 0 ? (
-                    <Map
+                    <GoogleMapWrapper
                         className="h-[400px] w-full rounded-md overflow-hidden border"
-                        center={center}
-                        zoom={zoom}
-                        scrollWheelZoom={false}
+                        center={mapCenter}
+                        zoom={mapZoom}
                     >
-                        <ChangeView center={center} zoom={zoom} />
-                        <MapTileLayer />
-                        <MapMarkers markers={markers} />
-                    </Map>
+                        <MarkerClusterer>
+                            {(clusterer) => (
+                                <>
+                                    {markers.map((marker) => (
+                                        <Marker 
+                                            key={marker.id} 
+                                            position={marker.position} 
+                                            clusterer={clusterer}
+                                            onClick={() => setSelectedVisitId(marker.id)}
+                                        />
+                                    ))}
+                                </>
+                            )}
+                        </MarkerClusterer>
+                        
+                        {selectedVisit && selectedVisit.coords && (
+                            <InfoWindow 
+                                position={{ lat: selectedVisit.coords[0], lng: selectedVisit.coords[1] }}
+                                onCloseClick={() => setSelectedVisitId(null)}
+                            >
+                                <div className="p-2 max-w-[250px] text-black">
+                                    <div className="font-semibold mb-1">{selectedVisit.clientName}</div>
+                                    <div className="text-sm mb-2">{selectedVisit.address}</div>
+                                    <div className="flex flex-col gap-2">
+                                        <a 
+                                            href={`https://www.google.com/maps/dir/?api=1&destination=${selectedVisit.coords[0]},${selectedVisit.coords[1]}`}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="text-blue-600 hover:underline text-xs font-medium block"
+                                        >
+                                            Open in Google Maps
+                                        </a>
+                                    </div>
+                                </div>
+                            </InfoWindow>
+                        )}
+                    </GoogleMapWrapper>
                 ) : (
                     <div className="h-[400px] w-full rounded-md overflow-hidden border flex items-center justify-center text-muted-foreground">
                         No visits with locations scheduled for today.

@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useMemo, useRef, useEffect } from 'react';
+import { useMemo, useState } from 'react';
 import type { Company } from '@/lib/types';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { MapPin } from 'lucide-react';
@@ -9,9 +9,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { geocodeService } from '@/services/geocode-service';
 import { useAsync } from 'react-use';
 import { LatLngTuple } from 'leaflet';
-import { Map } from '@/components/ui/map';
-import { ChangeView, MapTileLayer, MapMarkers, MapMarkerProps } from '@/components/ui/map-client';
-
+import { GoogleMapWrapper, Marker, InfoWindow } from '@/components/ui/google-map-wrapper';
 
 interface LocationMapProps {
   company: Company;
@@ -24,7 +22,13 @@ interface LocationWithCoords {
     coords: LatLngTuple | null;
 }
 
+interface MapMarkerData {
+    position: google.maps.LatLngLiteral;
+    content: string;
+}
+
 export function LocationMap({ company, branches }: LocationMapProps) {
+  const [selectedMarker, setSelectedMarker] = useState<MapMarkerData | null>(null);
 
   const { value: locations, loading, error } = useAsync(async (): Promise<LocationWithCoords[]> => {
     const locationsToGeocode: { name: string, address: string }[] = [];
@@ -48,17 +52,17 @@ export function LocationMap({ company, branches }: LocationMapProps) {
   }, [company, branches]);
 
 
-  const markers: MapMarkerProps[] = useMemo(() => {
+  const markers: MapMarkerData[] = useMemo(() => {
     if (!locations) return [];
     return locations
         .filter((loc): loc is LocationWithCoords & { coords: LatLngTuple } => loc.coords !== null)
         .map(loc => ({
-            position: loc.coords,
-            popupContent: `<strong>${loc.name}</strong><br/>${loc.address}`
+            position: { lat: loc.coords[0], lng: loc.coords[1] },
+            content: `<strong>${loc.name}</strong><br/>${loc.address}`
         }));
   }, [locations]);
 
-  const center: LatLngTuple = markers.length > 0 ? markers[0].position as LatLngTuple : [30.0444, 31.2357];
+  const center: google.maps.LatLngLiteral = markers.length > 0 ? markers[0].position : { lat: 30.0444, lng: 31.2357 };
   const zoom = markers.length > 1 ? 5 : 10;
 
   return (
@@ -75,11 +79,23 @@ export function LocationMap({ company, branches }: LocationMapProps) {
            {loading && <Skeleton className="h-full w-full" />}
            {!loading && error && <div className="flex items-center justify-center h-full text-destructive">Error loading map data.</div>}
            {!loading && !error && markers.length > 0 && (
-             <Map key={`map-${company.id}`} center={center} zoom={zoom} scrollWheelZoom={false}>
-               <ChangeView center={center} zoom={zoom} />
-               <MapTileLayer />
-               <MapMarkers markers={markers} />
-             </Map>
+             <GoogleMapWrapper className="h-full w-full" center={center} zoom={zoom}>
+               {markers.map((marker, index) => (
+                 <Marker 
+                    key={index} 
+                    position={marker.position} 
+                    onClick={() => setSelectedMarker(marker)}
+                 />
+               ))}
+               {selectedMarker && (
+                 <InfoWindow 
+                    position={selectedMarker.position} 
+                    onCloseClick={() => setSelectedMarker(null)}
+                 >
+                   <div dangerouslySetInnerHTML={{ __html: selectedMarker.content }} />
+                 </InfoWindow>
+               )}
+             </GoogleMapWrapper>
            )}
            {!loading && !error && markers.length === 0 && (
              <div className="flex items-center justify-center h-full text-muted-foreground">No locations with valid addresses found.</div>

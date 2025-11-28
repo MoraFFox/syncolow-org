@@ -163,10 +163,8 @@ export async function importFlow({
     const errors: ImportRowError[] = [];
     const validOrders: (Omit<Order, 'id'> & { importHash: string })[] = [];
     
-    // Check for existing hashes to prevent duplicates
-    const hashes = rowsToImport.map(row => simpleHash(JSON.stringify(row)));
-    const existingOrders = await queryInBatches<Order>('orders', 'importHash', hashes);
-    const seenHashes = new Set(existingOrders.map(o => o.importHash));
+    // We'll check for duplicates after building complete orders
+    const seenHashes = new Set<string>();
     let skippedDuplicates = 0;
 
     // Group rows by Order ID (if available) or treat as single orders
@@ -343,7 +341,13 @@ export async function importFlow({
       }
     }
 
-    // Process Groups into Valid Orders
+    // Query existing orders to check for duplicates
+    // We need to process all orders first to get their final hashes
+    console.log(`[Import] Processing ${orderGroups.size} order groups`);
+
+    // PASS 1: Build all valid orders with their hashes
+    const candidateOrders: (Omit<Order, 'id'> & { importHash: string })[] = [];
+    
     for (const [key, group] of orderGroups) {
         let grandTotal = 0;
         let totalSubtotal = 0;
@@ -389,7 +393,7 @@ export async function importFlow({
         // If grandTotal < 0, it's a return.
         const isOverallReturn = grandTotal < 0;
         const finalStatus = isOverallReturn ? 'Cancelled' : 'Delivered';
-        const finalPaymentStatus = isOverallReturn ? 'Pending' : 'Paid';
+        const finalPaymentStatus = 'Paid'; // All imported orders marked as paid
 
         const orderData = {
             ...group,
@@ -404,7 +408,10 @@ export async function importFlow({
         };
         
         // Generate Hash for the WHOLE order
+        // IMPORTANT: Include the groupKey (order ID/invoice) to distinguish 
+        // between multiple identical orders on the same day from the same company
         const orderHash = simpleHash(JSON.stringify({
+            key: key, // This is the order ID/invoice number or standalone ID
             cid: orderData.companyId,
             date: orderData.orderDate,
             items: orderData.items.map((i: any) => i.productId + i.quantity),
@@ -412,16 +419,64 @@ export async function importFlow({
         }));
         
         orderData.importHash = orderHash;
+        candidateOrders.push(orderData);
+    }
+
+    console.log(`[Import] Built ${candidateOrders.length} candidate orders`);
+
+    // PASS 2: Query database for existing orders with these hashes
+    const candidateHashes = candidateOrders.map(o => o.importHash);
+    if (candidateHashes.length > 0) {
+        const existingOrders = await queryInBatches<Order>('orders', 'importHash', candidateHashes);
+        console.log(`[Import] Found ${existingOrders.length} existing orders in database`);
+        existingOrders.forEach(o => {
+            if (o.importHash) {
+                seenHashes.add(o.importHash);
+            }
+        });
+    }
+
+    // PASS 3: Filter out duplicates (database + within-file)
+    for (const orderData of candidateOrders) {
+        const orderHash = orderData.importHash;
         
         if (seenHashes.has(orderHash)) {
-            console.log('Skipping duplicate order group', key);
+            // Enhanced logging for duplicate detection
+            console.log('========== DUPLICATE DETECTED ==========');
+            console.log('Hash:', orderHash);
+            console.log('Company:', orderData.companyName);
+            console.log('Date:', orderData.orderDate);
+            console.log('Total:', orderData.total);
+            console.log('Items:', JSON.stringify(orderData.items, null, 2));
+            console.log('Full order data:', JSON.stringify({
+                companyId: orderData.companyId,
+                date: orderData.orderDate,
+                items: orderData.items.map((i: any) => ({ 
+                    productId: i.productId, 
+                    productName: i.productName,
+                    quantity: i.quantity,
+                    price: i.price
+                })),
+                total: orderData.total
+            }, null, 2));
+            console.log('=======================================');
             skippedDuplicates++;
             continue;
         }
+        
+        console.log('[NEW ORDER]', JSON.stringify({
+            hash: orderHash,
+            company: orderData.companyName,
+            date: orderData.orderDate,
+            itemCount: orderData.items.length,
+            total: orderData.total
+        }));
         seenHashes.add(orderHash);
         
         validOrders.push(orderData);
     }
+    
+    console.log(`[Import] After filtering: ${validOrders.length} unique orders, ${skippedDuplicates} duplicates skipped`);
 
     if (validOrders.length > 0 && errors.filter(e => e.blocking).length === 0) {
       console.log('Writing', validOrders.length, 'orders to Supabase');

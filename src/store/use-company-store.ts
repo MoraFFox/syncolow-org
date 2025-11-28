@@ -27,6 +27,7 @@ interface CompanyState {
   addArea: (area: Omit<DeliveryArea, 'id'>) => Promise<void>;
   updateArea: (areaId: string, areaData: Partial<Omit<DeliveryArea, 'id'>>) => Promise<void>;
   deleteArea: (areaId: string) => Promise<void>;
+  fetchRevenueStats: () => Promise<void>;
 }
 
 export const useCompanyStore = create<CompanyState>((set, get) => ({
@@ -130,7 +131,7 @@ export const useCompanyStore = create<CompanyState>((set, get) => ({
     // Refresh to get all data including branches (exclude deleted placeholders)
     const { data: allCompanies } = await supabase.from('companies').select('*').not('name', 'like', '[DELETED]%');
     if (allCompanies) {
-        set({ companies: allCompanies as Company[] });
+        set({ companies: allCompanies.map(c => ({ ...c, isBranch: !!c.parentCompanyId })) as Company[] });
     }
     
     return fullCompany;
@@ -182,7 +183,7 @@ export const useCompanyStore = create<CompanyState>((set, get) => ({
     // Update local state (exclude deleted placeholders)
     const { data: allCompanies } = await supabase.from('companies').select('*').not('name', 'like', '[DELETED]%');
     if (allCompanies) {
-        set({ companies: allCompanies as Company[] });
+        set({ companies: allCompanies.map(c => ({ ...c, isBranch: !!c.parentCompanyId })) as Company[] });
     }
     
     toast({ title: 'Company Updated', description: 'Company details have been updated.' });
@@ -263,7 +264,7 @@ export const useCompanyStore = create<CompanyState>((set, get) => ({
       // Refresh companies list (exclude deleted placeholders)
       const { data: allCompanies } = await supabase.from('companies').select('*').not('name', 'like', '[DELETED]%');
       if (allCompanies) {
-        set({ companies: allCompanies as Company[] });
+        set({ companies: allCompanies.map(c => ({ ...c, isBranch: !!c.parentCompanyId })) as Company[] });
       }
       
       const msg = forceCascade ? "Company and all related data removed." : reassignToCompanyId ? "Company deleted and data reassigned." : `Company deleted. Related data preserved under "[DELETED] ${companyToDelete.name}".`;
@@ -296,7 +297,7 @@ export const useCompanyStore = create<CompanyState>((set, get) => ({
     // Update local state (exclude deleted placeholders)
     const { data: allCompanies } = await supabase.from('companies').select('*').not('name', 'like', '[DELETED]%');
     if (allCompanies) {
-        set({ companies: allCompanies as Company[] });
+        set({ companies: allCompanies.map(c => ({ ...c, isBranch: !!c.parentCompanyId })) as Company[] });
     }
     
     toast({ title: "Merge Complete", description: "Companies have been successfully merged." });
@@ -348,7 +349,8 @@ export const useCompanyStore = create<CompanyState>((set, get) => ({
   },
 
   // Area Management
-  addArea: async (area) => {
+  // Area Management
+  addArea: async (area: Omit<DeliveryArea, 'id'>) => {
     const { data: insertedArea, error } = await supabase
         .from('areas')
         .insert(area)
@@ -362,7 +364,7 @@ export const useCompanyStore = create<CompanyState>((set, get) => ({
     }));
     toast({ title: 'Area Added' });
   },
-  updateArea: async (areaId, areaData) => {
+  updateArea: async (areaId: string, areaData: Partial<Omit<DeliveryArea, 'id'>>) => {
     await supabase.from('areas').update(areaData).eq('id', areaId);
     set(produce((state: CompanyState) => {
       const index = state.areas.findIndex((a: DeliveryArea) => a.id === areaId);
@@ -378,5 +380,64 @@ export const useCompanyStore = create<CompanyState>((set, get) => ({
       state.areas = state.areas.filter((a: DeliveryArea) => a.id !== areaId);
     }));
     toast({ title: 'Area Deleted', variant: 'destructive' });
+  },
+
+  fetchRevenueStats: async () => {
+    const twelveMonthsAgo = new Date();
+    twelveMonthsAgo.setFullYear(twelveMonthsAgo.getFullYear() - 1);
+    const fromDate = twelveMonthsAgo.toISOString();
+
+    try {
+        const revenueByCompany: Record<string, number> = {};
+        let hasMore = true;
+        let page = 0;
+        const pageSize = 1000;
+        let totalOrders = 0;
+
+        while (hasMore) {
+            const from = page * pageSize;
+            const to = from + pageSize - 1;
+
+            const { data: orders, error } = await supabase
+                .from('orders')
+                .select('companyId, grandTotal')
+                .gte('orderDate', fromDate)
+                .neq('status', 'Cancelled')
+                .range(from, to);
+
+            if (error) throw error;
+
+            if (!orders || orders.length === 0) {
+                hasMore = false;
+                break;
+            }
+
+            orders.forEach(order => {
+                if (order.companyId) {
+                    revenueByCompany[order.companyId] = (revenueByCompany[order.companyId] || 0) + (order.grandTotal || 0);
+                }
+            });
+
+            totalOrders += orders.length;
+            
+            // If we got fewer than pageSize, we've reached the end
+            if (orders.length < pageSize) {
+                hasMore = false;
+            } else {
+                page++;
+            }
+        }
+
+        console.log('[DEBUG] Revenue Stats - Total fetched orders:', totalOrders);
+        console.log('[DEBUG] Revenue Stats - Aggregated companies:', Object.keys(revenueByCompany).length);
+
+        set(produce((state: CompanyState) => {
+            state.companies.forEach(company => {
+                company.last12MonthsRevenue = revenueByCompany[company.id] || 0;
+            });
+        }));
+    } catch (error) {
+        console.error('Error fetching revenue stats:', error);
+    }
   },
 }));

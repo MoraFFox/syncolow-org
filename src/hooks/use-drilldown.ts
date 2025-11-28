@@ -2,6 +2,8 @@ import { useRouter } from 'next/navigation';
 import { useDrillDownStore } from '@/store/use-drilldown-store';
 import { DrillKind, DrillPayload, DrillMode } from '@/lib/drilldown-types';
 import { DRILL_REGISTRY } from '@/lib/drilldown-registry';
+import { drillAnalytics } from '@/lib/drill-analytics';
+import type { DrillHistoryItem } from '@/store/use-drilldown-store';
 
 export function useDrillDown() {
   const router = useRouter();
@@ -9,6 +11,7 @@ export function useDrillDown() {
     openDialog, 
     showPreview: showPreviewAction,
     hidePreview: hidePreviewAction,
+    pushHistory,
     kind, 
     payload, 
     isOpen,
@@ -17,6 +20,7 @@ export function useDrillDown() {
 
   const showPreview = (kind: DrillKind, payload: DrillPayload, coords?: { x: number; y: number }) => {
     showPreviewAction(kind, payload, coords);
+    drillAnalytics.track(kind, payload, 'preview');
   };
 
   const hidePreview = () => {
@@ -24,6 +28,8 @@ export function useDrillDown() {
   };
 
   const goToDetail = (kind: DrillKind, payload: DrillPayload = {}, mode: DrillMode = 'page') => {
+    drillAnalytics.track(kind, payload, mode === 'dialog' ? 'dialog' : 'navigate');
+    
     if (mode === 'dialog') {
       openDialog(kind, payload);
       return;
@@ -31,9 +37,15 @@ export function useDrillDown() {
 
     const registryEntry = DRILL_REGISTRY[kind];
     if (registryEntry) {
-      // Cast payload to any because DrillPayload is a union and getRoute expects specific kind
       const route = registryEntry.getRoute(payload as any);
       if (route) {
+        const historyItem: DrillHistoryItem = {
+          kind,
+          payload,
+          timestamp: Date.now(),
+          route
+        };
+        pushHistory(historyItem);
         router.push(route);
       } else {
         console.warn(`Page route not yet implemented for drill kind: ${kind}`);
@@ -44,6 +56,7 @@ export function useDrillDown() {
   };
 
   const openDetailDialog = (kind: DrillKind, payload: DrillPayload = {}) => {
+    drillAnalytics.track(kind, payload, 'dialog');
     openDialog(kind, payload);
   };
 

@@ -18,7 +18,9 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
 import { cn } from '@/lib/utils';
 import { Calendar } from '@/components/ui/calendar';
+
 import dynamic from 'next/dynamic';
+import { toast } from '@/hooks/use-toast';
 
 const LocationPickerDialog = dynamic(() => import('@/app/clients/[companyId]/_components/location-picker-dialog').then(mod => mod.LocationPickerDialog), { ssr: false });
 
@@ -128,14 +130,24 @@ export function VisitFormDialog({ isOpen, onOpenChange, visit, onSubmit, onDelet
     };
 
     const onFormSubmit = async (data: VisitFormData) => {
-        const submissionData = {
-            ...data,
-            date: data.date.toISOString(),
-            clientName: data.clientId === CUSTOM_CLIENT_ID ? data.customClientName || 'Custom Client' : companies.find(c => c.id === data.clientId)?.name,
-        };
+        try {
+            const { customClientName, ...visitData } = data;
+            const submissionData = {
+                ...visitData,
+                date: data.date.toISOString(),
+                clientName: data.clientId === CUSTOM_CLIENT_ID ? customClientName || 'Custom Client' : companies.find(c => c.id === data.clientId)?.name,
+            };
 
-        onSubmit(submissionData as Omit<VisitCall, 'id'>);
-        onOpenChange(false);
+            await onSubmit(submissionData as Omit<VisitCall, 'id'>);
+            onOpenChange(false);
+        } catch (error) {
+            console.error("Failed to submit visit:", error);
+            toast({
+                title: "Error",
+                description: error instanceof Error ? error.message : "Failed to save interaction",
+                variant: "destructive",
+            });
+        }
     };
     
     const handleOpenChange = (open: boolean) => {

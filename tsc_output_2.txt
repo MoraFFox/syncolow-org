@@ -1,0 +1,4 @@
+e2e/auth.spec.ts(3,58): error TS2339: Property 'login' does not exist on type 'PlaywrightTestArgs & PlaywrightTestOptions & { page: Page; } & PlaywrightWorkerArgs & PlaywrightWorkerOptions'.
+e2e/auth.spec.ts(16,49): error TS2339: Property 'login' does not exist on type 'PlaywrightTestArgs & PlaywrightTestOptions & { page: Page; } & PlaywrightWorkerArgs & PlaywrightWorkerOptions'.
+e2e/client-wizard.spec.ts(3,63): error TS2339: Property 'login' does not exist on type 'PlaywrightTestArgs & PlaywrightTestOptions & { page: Page; } & PlaywrightWorkerArgs & PlaywrightWorkerOptions'.
+e2e/order-lifecycle.spec.ts(4,71): error TS2339: Property 'login' does not exist on type 'PlaywrightTestArgs & PlaywrightTestOptions & { page: Page; } & PlaywrightWorkerArgs & PlaywrightWorkerOptions'.

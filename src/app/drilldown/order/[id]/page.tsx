@@ -9,6 +9,8 @@ import { useOrderStore } from '@/store/use-order-store';
 import { formatCurrency } from '@/lib/utils';
 import { DrillTarget } from '@/components/drilldown/drill-target';
 
+import { CalendarSyncButton } from '@/components/google-calendar/calendar-sync-button';
+
 export default function OrderDrillDownPage() {
   const router = useRouter();
   const params = useParams();
@@ -28,16 +30,19 @@ export default function OrderDrillDownPage() {
 
   return (
     <div className="container mx-auto p-6 space-y-6">
-      <div className="flex items-center gap-4">
-        <Button variant="ghost" size="icon" onClick={() => router.back()}>
-          <ArrowLeft className="h-4 w-4" />
-        </Button>
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight">Order #{order.id}</h1>
-          <p className="text-muted-foreground">
-            Transaction Details
-          </p>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-4">
+            <Button variant="ghost" size="icon" onClick={() => router.back()}>
+            <ArrowLeft className="h-4 w-4" />
+            </Button>
+            <div>
+            <h1 className="text-2xl font-bold tracking-tight">Order #{order.id}</h1>
+            <p className="text-muted-foreground">
+                Transaction Details
+            </p>
+            </div>
         </div>
+        <CalendarSyncButton order={order} />
       </div>
 
       <div className="grid gap-4 md:grid-cols-3">

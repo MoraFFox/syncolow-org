@@ -1,0 +1,10 @@
+e2e/auth.spec.ts(3,58): error TS2339: Property 'login' does not exist on type 'PlaywrightTestArgs & PlaywrightTestOptions & { page: Page; } & PlaywrightWorkerArgs & PlaywrightWorkerOptions'.
+e2e/auth.spec.ts(16,49): error TS2339: Property 'login' does not exist on type 'PlaywrightTestArgs & PlaywrightTestOptions & { page: Page; } & PlaywrightWorkerArgs & PlaywrightWorkerOptions'.
+e2e/client-wizard.spec.ts(3,63): error TS2339: Property 'login' does not exist on type 'PlaywrightTestArgs & PlaywrightTestOptions & { page: Page; } & PlaywrightWorkerArgs & PlaywrightWorkerOptions'.
+e2e/order-lifecycle.spec.ts(4,71): error TS2339: Property 'login' does not exist on type 'PlaywrightTestArgs & PlaywrightTestOptions & { page: Page; } & PlaywrightWorkerArgs & PlaywrightWorkerOptions'.
+src/app/orders/areas/page.tsx(18,20): error TS2339: Property 'addArea' does not exist on type 'CompanyState'.
+src/app/orders/areas/page.tsx(18,29): error TS2339: Property 'updateArea' does not exist on type 'CompanyState'.
+src/app/test-migration/_components/migration-tester.tsx(214,40): error TS2339: Property 'addArea' does not exist on type 'CompanyState'.
+src/store/use-company-store.ts(351,19): error TS7006: Parameter 'area' implicitly has an 'any' type.
+src/store/use-company-store.ts(365,22): error TS7006: Parameter 'areaId' implicitly has an 'any' type.
+src/store/use-company-store.ts(365,30): error TS7006: Parameter 'areaData' implicitly has an 'any' type.

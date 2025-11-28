@@ -54,6 +54,7 @@ export interface Company {
   pendingBulkPaymentAmount?: number;
   baristas?: Partial<Barista>[];
   performanceScore?: number;
+  last12MonthsRevenue?: number;
 }
 
 export interface Branch {

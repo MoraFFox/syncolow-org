@@ -1,22 +1,14 @@
 
 "use client";
 
-import { useState, useEffect, useCallback, memo } from 'react';
-import dynamic from 'next/dynamic';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { geocodeService } from '@/services/geocode-service';
 import { Skeleton } from '@/components/ui/skeleton';
-import { LatLngTuple } from 'leaflet';
-import { useDebouncedCallback } from 'use-debounce';
 import { Search } from 'lucide-react';
-
-const MapDisplay = dynamic(() => import('./map-display').then(mod => mod.MapDisplay), {
-    ssr: false,
-    loading: () => <Skeleton className="h-full w-full" />,
-});
-
+import { useJsApiLoader, Autocomplete, GoogleMap, Marker } from '@react-google-maps/api';
 
 interface LocationPickerDialogProps {
     isOpen: boolean;
@@ -25,26 +17,35 @@ interface LocationPickerDialogProps {
     onConfirm: (address: string) => void;
 }
 
+const libraries: ("places" | "geometry" | "drawing" | "visualization")[] = ["places"];
+const defaultCenter = { lat: 51.505, lng: -0.09 };
+
 export function LocationPickerDialog({ isOpen, onOpenChange, initialAddress, onConfirm }: LocationPickerDialogProps) {
-    const [searchTerm, setSearchTerm] = useState('');
-    const [position, setPosition] = useState<LatLngTuple | null>(null);
+    const [position, setPosition] = useState<google.maps.LatLngLiteral>(defaultCenter);
     const [selectedAddress, setSelectedAddress] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    
+    const [autocomplete, setAutocomplete] = useState<google.maps.places.Autocomplete | null>(null);
+    const mapRef = useRef<google.maps.Map | null>(null);
 
-    const defaultCenter: LatLngTuple = [51.505, -0.09];
+    const { isLoaded } = useJsApiLoader({
+        id: 'google-map-script',
+        googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || '',
+        libraries
+    });
 
     const initialize = useCallback(async () => {
         if (initialAddress) {
             setSelectedAddress(initialAddress);
-            setSearchTerm(initialAddress);
             setIsLoading(true);
             const coords = await geocodeService.geocode(initialAddress);
-            setPosition(coords || defaultCenter);
+            if (coords) {
+                setPosition({ lat: coords[0], lng: coords[1] });
+            }
             setIsLoading(false);
         } else {
             setPosition(defaultCenter);
             setSelectedAddress('');
-            setSearchTerm('');
         }
     }, [initialAddress]);
 
@@ -54,37 +55,42 @@ export function LocationPickerDialog({ isOpen, onOpenChange, initialAddress, onC
         }
     }, [isOpen, initialize]);
 
-    const handleMapClick = useDebouncedCallback(async (latlng: { lat: number, lng: number }) => {
-        setPosition([latlng.lat, latlng.lng]);
-        setIsLoading(true);
-        const address = await geocodeService.reverseGeocode(latlng.lat, latlng.lng);
-        if (address) {
-            setSelectedAddress(address);
-            setSearchTerm(address);
-        }
-        setIsLoading(false);
-    }, 300);
+    const onAutocompleteLoad = (autoC: google.maps.places.Autocomplete) => {
+        setAutocomplete(autoC);
+    };
 
-    const handleSearch = useDebouncedCallback(async (term: string) => {
-        if (term.length < 3) return;
-        setIsLoading(true);
-        const coords = await geocodeService.geocode(term);
-        if (coords) {
-            setPosition(coords);
-            const address = await geocodeService.reverseGeocode(coords[0], coords[1]);
+    const onPlaceChanged = () => {
+        if (autocomplete) {
+            const place = autocomplete.getPlace();
+            if (place.geometry && place.geometry.location) {
+                const lat = place.geometry.location.lat();
+                const lng = place.geometry.location.lng();
+                setPosition({ lat, lng });
+                setSelectedAddress(place.formatted_address || '');
+                mapRef.current?.panTo({ lat, lng });
+                mapRef.current?.setZoom(15);
+            }
+        }
+    };
+
+    const handleMapClick = async (e: google.maps.MapMouseEvent) => {
+        if (e.latLng) {
+            const lat = e.latLng.lat();
+            const lng = e.latLng.lng();
+            setPosition({ lat, lng });
+            setIsLoading(true);
+            const address = await geocodeService.reverseGeocode(lat, lng);
             if (address) {
                 setSelectedAddress(address);
             }
+            setIsLoading(false);
         }
-        setIsLoading(false);
-    }, 500);
+    };
 
     const handleConfirmClick = () => {
         onConfirm(selectedAddress);
         onOpenChange(false);
     }
-
-    const memoizedHandleMapClick = useCallback(handleMapClick, [handleMapClick]);
 
     return (
         <Dialog open={isOpen} onOpenChange={onOpenChange}>
@@ -97,20 +103,40 @@ export function LocationPickerDialog({ isOpen, onOpenChange, initialAddress, onC
                 </DialogHeader>
                 <div className="space-y-4">
                     <div className="relative">
-                        <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                        <Input
-                            placeholder="Search for an address..."
-                            value={searchTerm}
-                            onChange={(e) => {
-                                setSearchTerm(e.target.value);
-                                handleSearch(e.target.value);
-                            }}
-                            className="pl-8"
-                        />
+                        {isLoaded ? (
+                            <Autocomplete
+                                onLoad={onAutocompleteLoad}
+                                onPlaceChanged={onPlaceChanged}
+                            >
+                                <div className="relative">
+                                    <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground z-10" />
+                                    <Input
+                                        placeholder="Search for an address..."
+                                        defaultValue={selectedAddress}
+                                        onChange={(e) => setSelectedAddress(e.target.value)}
+                                        className="pl-8"
+                                    />
+                                </div>
+                            </Autocomplete>
+                        ) : (
+                            <Skeleton className="h-10 w-full" />
+                        )}
                     </div>
                     <div className="h-[300px] w-full rounded-md overflow-hidden border">
-                       {position ? (
-                         <MapDisplay position={position} handleMapClick={memoizedHandleMapClick} />
+                       {isLoaded ? (
+                         <GoogleMap
+                            mapContainerStyle={{ width: '100%', height: '100%' }}
+                            center={position}
+                            zoom={13}
+                            onClick={handleMapClick}
+                            onLoad={(map) => { mapRef.current = map; }}
+                            options={{
+                                streetViewControl: false,
+                                mapTypeControl: false,
+                            }}
+                         >
+                            <Marker position={position} />
+                         </GoogleMap>
                        ) : <Skeleton className="h-full w-full" />}
                     </div>
                     <div className="p-2 border rounded-md min-h-[40px]">

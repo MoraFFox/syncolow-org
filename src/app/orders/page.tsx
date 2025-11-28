@@ -314,6 +314,7 @@ function OrdersPageContent() {
         <>
             <OrderList
               orders={filteredOrders}
+              companies={companies}
               selectedRowKeys={selectedRowKeys}
               onRowSelectionChange={handleRowSelectionChange}
               onSelectAll={handleSelectAll}

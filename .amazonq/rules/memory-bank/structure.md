@@ -6,234 +6,275 @@
 ```
 firebase-orginal/
 ├── src/                    # Source code
-├── public/                 # Static assets
 ├── docs/                   # Comprehensive documentation
-├── .amazonq/              # Amazon Q AI rules and memory bank
-├── .next/                 # Next.js build output
-└── [config files]         # Project configuration
+├── public/                 # Static assets and service worker
+├── e2e/                    # End-to-end tests (Playwright)
+├── scripts/                # Utility scripts
+├── .amazonq/               # Amazon Q AI rules and memory bank
+└── Configuration files     # Next.js, TypeScript, Firebase, etc.
 ```
 
 ## Source Code Structure (`src/`)
 
-### Application Layer (`src/app/`)
-Next.js App Router structure with feature-based organization:
+### Application Routes (`src/app/`)
+Next.js 16 App Router structure with feature-based organization:
 
-- **analytics/** - Analytics dashboards and reporting
+- **analytics/** - Analytics dashboards and metrics visualization
 - **baristas/** - Barista/staff management
-- **clients/** - Client management with wizard-based forms
-  - `_components/` - Client-specific components
-  - `_wizard-steps/` - Multi-step form components
-- **dashboard/** - Main dashboard and overview
-- **feedback/** - Customer feedback management
-- **maintenance/** - Equipment maintenance scheduling
+- **clients/** - Client management with wizard forms and branch handling
+- **dashboard/** - Main dashboard with overview widgets
+- **drilldown/** - Deep-dive analytics system
+- **feedback/** - Customer feedback collection and management
+- **health/** - System health monitoring
+- **login/** - Authentication pages
+- **maintenance/** - Maintenance scheduling and tracking
 - **notifications/** - Notification center and preferences
-- **orders/** - Order processing and management
-  - `_components/` - Order-specific components including CSV importer
-- **payment-analytics/** - Payment insights and analytics
-- **payments/** - Payment tracking and management
-- **products/** - Product catalog management
-- **settings/** - User and system settings
-- **visits/** - Visit tracking and scheduling
-- **login/**, **register/**, **reset-password/** - Authentication flows
+- **orders/** - Order management and lifecycle
+- **payment-analytics/** - Payment tracking and analytics
+- **payments/** - Payment processing and history
+- **products/** - Product catalog and inventory
+- **profile/** - User profile management
+- **register/** - User registration
+- **reset-password/** - Password reset flow
+- **sentiment/** - Sentiment analysis dashboard
+- **settings/** - Application and user settings
+- **visits/** - Visit tracking and management
 
-### Component Layer (`src/components/`)
+Each route contains:
+- `page.tsx` - Main page component
+- `_components/` - Route-specific components (private)
+- `layout.tsx` - Route-specific layouts (when needed)
+
+### Components (`src/components/`)
 Reusable UI components organized by feature:
 
-- **ui/** - shadcn/ui base components (buttons, dialogs, forms, charts, etc.)
-- **layout/** - Layout components (sidebar, header, navigation)
-- **notifications/** - Notification-specific components
+- **ui/** - shadcn/ui components (Button, Dialog, Input, etc.)
+- **dialogs/** - Reusable dialog components
+- **drilldown/** - Drilldown system components
+- **layout/** - Layout components (Sidebar, Header, etc.)
+- **notifications/** - Notification-related components
 - **orders/** - Order-related components
 - **sentiment/** - Sentiment analysis components
 - **settings/** - Settings UI components
-- Root-level shared components (cards, dialogs, badges, etc.)
 
-### Business Logic Layer (`src/lib/`)
-Core utilities and services:
+### Core Libraries (`src/lib/`)
+Business logic, utilities, and services:
 
 **Notification System:**
-- `notification-service.ts` - Core notification management
-- `notification-analytics.ts` - Basic analytics
-- `notification-analytics-advanced.ts` - Advanced metrics
-- `notification-priority-scorer.ts` - AI priority scoring
-- `notification-insights.ts` - AI-powered insights
+- `notification-service.ts` - Core notification service
+- `notification-analytics.ts` - Analytics tracking
+- `notification-analytics-advanced.ts` - Advanced analytics
+- `notification-archive.ts` - Archival system
 - `notification-automation.ts` - Workflow automation
 - `notification-email-service.ts` - Email delivery
-- `notification-push-service.ts` - Push notification delivery
-- `notification-generator.ts` - Notification creation
-- `notification-archive.ts` - Archive management
-- `smart-notifications.ts` - Intelligent grouping
+- `notification-generator.ts` - Notification generation
+- `notification-insights.ts` - AI insights
+- `notification-priority-scorer.ts` - Priority calculation
+- `notification-push-service.ts` - Push notifications
+- `smart-notifications.ts` - Smart grouping
 
-**Offline & Sync:**
-- `offline-queue-manager.ts` - Offline operation queue
-- `optimistic-update-manager.ts` - Optimistic UI updates
-- `conflict-resolver.ts` - Conflict resolution logic
-- `indexeddb-storage.ts` - Local storage management
-- `service-worker-manager.ts` - Service worker integration
-
-**Data Management:**
-- `cache-manager.ts` - Multi-layer caching
-- `analytics-cache.ts` - Analytics data caching
-- `product-cache.ts` - Product data caching
-- `file-import-utils.ts` - CSV/file import utilities
-- `export-utils.ts` - Data export utilities
+**Core Utilities:**
+- `types.ts` - TypeScript type definitions
+- `utils.ts` - General utilities
+- `supabase.ts` - Firebase/Supabase client configuration
 
 **Business Logic:**
 - `payment-score.ts` - Payment scoring algorithm
-- `payment-warnings.ts` - Payment alert logic
-- `price-audit.ts` - Price validation
-- `pricing-calculator.ts` - Dynamic pricing
-- `performance-score.ts` - Performance metrics
+- `payment-warnings.ts` - Payment warning system
+- `price-audit.ts` - Price auditing
+- `pricing-calculator.ts` - Pricing calculations
 - `auto-status.ts` - Automatic status updates
-- `auto-tagging.ts` - AI-powered tagging
+- `auto-tagging.ts` - Automatic tagging
 
-**Search & Utilities:**
-- `search.ts` - Fuzzy search implementation
-- `advanced-search.ts` - Advanced search features
-- `order-search-sync.ts` - Search synchronization
-- `utils.ts` - General utilities
-- `types.ts` - TypeScript type definitions
+**Data Management:**
+- `cache-manager.ts` - Caching strategies
+- `analytics-cache.ts` - Analytics caching
+- `product-cache.ts` - Product caching
+- `indexeddb-storage.ts` - IndexedDB wrapper
+- `offline-queue-manager.ts` - Offline queue
+- `optimistic-update-manager.ts` - Optimistic updates
+- `conflict-resolver.ts` - Conflict resolution
+
+**Search & Export:**
+- `search.ts` - Search functionality
+- `advanced-search.ts` - Advanced search
+- `order-search-sync.ts` - Order search sync
+- `export-utils.ts` - Data export utilities
+- `file-import-utils.ts` - File import utilities
 
 **PDF Generation:**
-- `pdf-invoice.ts` - Invoice generation
-- `pdf-utils.ts` - PDF utilities with Arabic support
+- `pdf-invoice.ts` - Invoice PDF generation
+- `pdf-utils.ts` - PDF utilities
 
-**External Services:**
-- `supabase.ts` - Supabase client (legacy)
-- `error-logger.ts` - Error tracking
+**Analytics:**
+- `drilldown-types.ts` - Drilldown type definitions
+- `drilldown-registry.tsx` - Drilldown registry
+- `performance-score.ts` - Performance scoring
+
+**Error Handling:**
+- `error-logger.ts` - Error logging service
 
 ### State Management (`src/store/`)
 Zustand stores for global state:
 
-- `use-order-store.ts` - Order state management
-- `use-company-store.ts` - Client/company state
+- `use-company-store.ts` - Company/client state
+- `use-conflict-store.ts` - Conflict resolution state
+- `use-drilldown-store.ts` - Drilldown state
 - `use-maintenance-store.ts` - Maintenance state
-- `use-manufacturer-store.ts` - Manufacturer data
+- `use-manufacturer-store.ts` - Manufacturer state
 - `use-notification-store.ts` - Notification state
 - `use-offline-queue-store.ts` - Offline queue state
-- `use-conflict-store.ts` - Conflict resolution state
-- `use-settings-store.ts` - User settings state
+- `use-order-store.ts` - Order state
+- `use-settings-store.ts` - Settings state
 
 ### Custom Hooks (`src/hooks/`)
 Reusable React hooks:
 
 - `use-auth.tsx` - Authentication hook
-- `use-toast.ts` - Toast notification hook
-- `use-mobile.tsx` - Mobile detection
-- `use-online-status.ts` - Network status monitoring
-- `use-offline-queue.ts` - Offline queue management
-- `use-optimistic-mutation.ts` - Optimistic updates
 - `use-cached-data.ts` - Data caching hook
-- `use-service-worker.ts` - Service worker integration
-- `use-pull-to-refresh.ts` - Pull-to-refresh gesture
-- `use-swipe.ts` - Swipe gesture detection
+- `use-drilldown.ts` - Drilldown functionality
 - `use-keyboard-shortcuts.ts` - Keyboard shortcuts
+- `use-mobile.tsx` - Mobile detection
+- `use-offline-queue.ts` - Offline queue management
+- `use-online-status.ts` - Online/offline status
+- `use-optimistic-mutation.ts` - Optimistic updates
+- `use-pull-to-refresh.ts` - Pull-to-refresh gesture
+- `use-service-worker.ts` - Service worker integration
+- `use-swipe.ts` - Swipe gestures
+- `use-toast.ts` - Toast notifications
 - `use-toast-on-connection-change.ts` - Connection status toasts
 
-### AI Layer (`src/ai/`)
+### AI Integration (`src/ai/`)
 Genkit AI flows and configuration:
 
-- `flows/` - AI flow definitions
 - `genkit.ts` - Genkit configuration
 - `dev.ts` - Development server
+- `flows/` - AI flow definitions
 
 ### Services (`src/services/`)
 External service integrations:
 
-- `geocode-service.ts` - Geocoding API integration
-- `storage-service.ts` - File storage service
+- `geocode-service.ts` - Geocoding service
+- `storage-service.ts` - Storage service
 
-## Public Assets (`public/`)
+### Testing (`src/test/`)
+Test utilities and setup:
 
-- `images/` - Image assets (markers, icons)
-- `manifest.json` - PWA manifest
-- `sw.js` - Service worker
-- `offline.html` - Offline fallback page
-- Map marker assets for Leaflet integration
+- `setup.ts` - Test configuration
+- `fixtures/` - Test fixtures
+- `__tests__/` - Unit tests (co-located with source files)
 
-## Documentation (`docs/`)
+## Documentation Structure (`docs/`)
 
-Comprehensive project documentation:
-
-**Implementation Guides:**
+### Getting Started
 - `COMPLETE_IMPLEMENTATION.md` - Full system overview
-- `COMPLETE_FEATURES_LIST.md` - Feature inventory
-- `APPLICATION_OVERVIEW.md` - Application architecture
-
-**Notification System:**
-- `notification-system.md` - Phase 1: Real-time & persistence
-- `notification-phase2-ai-email.md` - Phase 2: AI & email
-- `PHASE3_SUMMARY.md` - Phase 3: Multi-channel & analytics
-- `notification-quick-reference.md` - Developer reference
-- `notification-migration-guide.md` - Migration instructions
-
-**Offline Mode:**
-- `OFFLINE_MODE_COMPLETE.md` - Complete offline implementation
-- `OFFLINE_MODE_PHASE1.md` through `OFFLINE_MODE_PHASE6.md` - Phase documentation
-
-**Deployment:**
-- `PRODUCTION_DEPLOYMENT.md` - Production deployment guide
-- `DEPLOYMENT_CHECKLIST.md` - Pre-deployment checklist
-- `deployment-steps.md` - Step-by-step deployment
-- `firestore-rules-notifications.md` - Firestore security rules
-
-**Performance:**
-- `performance-optimizations.md` - Optimization strategies
-- `performance-monitoring.md` - Monitoring setup
-- `OPTIMIZATION_COMPLETE.md` - Optimization summary
-
-**Project Management:**
+- `notification-quick-reference.md` - Developer quick reference
+- `PRODUCTION_DEPLOYMENT.md` - Deployment guide
 - `FINAL_HANDOFF.md` - Project completion summary
-- `IMPLEMENTATION_SUMMARY.md` - Implementation overview
 
-## Configuration Files
+### Feature Documentation
+- `notification-system.md` - Phase 1: Real-time & Persistence
+- `notification-phase2-ai-email.md` - Phase 2: AI & Email
+- `PHASE3_SUMMARY.md` - Phase 3: Multi-Channel & Analytics
+- `DRILLDOWN_SYSTEM.md` - Drilldown analytics
+- `OFFLINE_MODE_*.md` - Offline mode phases
 
-- `package.json` - Dependencies and scripts
-- `tsconfig.json` - TypeScript configuration (strict mode)
-- `next.config.js` - Next.js configuration
-- `tailwind.config.ts` - Tailwind CSS configuration
-- `components.json` - shadcn/ui configuration
-- `eslint.config.mjs` - ESLint rules
-- `postcss.config.mjs` - PostCSS configuration
-- `firebase.json` - Firebase configuration
-- `firestore.rules` - Firestore security rules
-- `firestore.indexes.json` - Firestore indexes
-- `.env.example` - Environment variable template
-- `Dockerfile` - Docker containerization
-- `apphosting.yaml` - Firebase App Hosting config
+### Reference
+- `notification-migration-guide.md` - Migration guide
+- `firestore-rules-notifications.md` - Firestore security rules
+- `DEPLOYMENT_CHECKLIST.md` - Deployment checklist
+- `APPLICATION_OVERVIEW.md` - Application overview
+- `COMPLETE_FEATURES_LIST.md` - Complete features list
 
 ## Architectural Patterns
 
-### Feature-Based Organization
-Each major feature (clients, orders, notifications) has:
-- Dedicated app route folder
-- Feature-specific components in `_components/`
-- Zustand store for state management
-- Utility functions in `lib/`
-- Custom hooks in `hooks/`
+### 1. Feature-Based Organization
+Routes and components organized by business feature, not technical layer. Each feature contains its own components, logic, and types.
 
-### Layered Architecture
-1. **Presentation Layer**: React components in `app/` and `components/`
-2. **Business Logic Layer**: Services and utilities in `lib/`
-3. **State Management Layer**: Zustand stores in `store/`
-4. **Data Layer**: Firebase/Firestore integration
-5. **AI Layer**: Genkit flows in `ai/`
+### 2. Separation of Concerns
+- **Presentation**: React components in `app/` and `components/`
+- **Business Logic**: Pure functions in `lib/`
+- **State Management**: Zustand stores in `store/`
+- **Side Effects**: Custom hooks in `hooks/`
 
-### Separation of Concerns
-- UI components are pure and reusable
-- Business logic is centralized in `lib/`
-- State management is isolated in stores
-- API calls are abstracted in service layers
-- Types are centralized in `lib/types.ts`
+### 3. Component Hierarchy
+```
+App Layout (layout.tsx)
+├── Route Pages (page.tsx)
+│   ├── Public Components (components/)
+│   └── Private Components (_components/)
+└── Shared UI (components/ui/)
+```
 
-### Offline-First Design
-- Local-first data with IndexedDB
-- Optimistic UI updates
-- Background synchronization
-- Conflict resolution
-- Service worker for caching
+### 4. Data Flow
+```
+User Action → Hook → Store → Service → Firebase
+                ↓
+            Component Update
+```
 
-### Component Composition
-- Small, single-purpose components
-- Composition over inheritance
-- Props-based configuration
-- Render props and hooks for logic reuse
+### 5. Offline-First Architecture
+```
+User Action → Optimistic Update → UI Update
+                ↓
+            Offline Queue → Background Sync → Firebase
+                ↓
+            Conflict Resolution (if needed)
+```
+
+## Key Relationships
+
+### Notification System Flow
+```
+Event Trigger → notification-generator.ts
+    ↓
+notification-priority-scorer.ts (AI scoring)
+    ↓
+notification-service.ts (persistence)
+    ↓
+Multi-channel delivery:
+├── In-app (use-notification-store.ts)
+├── Email (notification-email-service.ts)
+└── Push (notification-push-service.ts)
+    ↓
+notification-analytics.ts (tracking)
+```
+
+### Order Management Flow
+```
+Order Creation (orders/page.tsx)
+    ↓
+use-order-store.ts (state)
+    ↓
+Optimistic Update (use-optimistic-mutation.ts)
+    ↓
+Firebase Sync
+    ↓
+Notification Generation
+```
+
+### Offline Sync Flow
+```
+Offline Action → offline-queue-manager.ts
+    ↓
+IndexedDB Storage (indexeddb-storage.ts)
+    ↓
+Online Detection (use-online-status.ts)
+    ↓
+Background Sync (service-worker-manager.ts)
+    ↓
+Conflict Resolution (conflict-resolver.ts)
+```
+
+## Configuration Files
+
+- `next.config.js` - Next.js configuration
+- `tsconfig.json` - TypeScript configuration (strict mode)
+- `tailwind.config.ts` - Tailwind CSS configuration
+- `firebase.json` - Firebase configuration
+- `firestore.rules` - Firestore security rules
+- `firestore.indexes.json` - Firestore indexes
+- `vitest.config.ts` - Vitest test configuration
+- `playwright.config.ts` - Playwright E2E configuration
+- `eslint.config.mjs` - ESLint configuration
+- `components.json` - shadcn/ui configuration

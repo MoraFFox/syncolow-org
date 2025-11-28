@@ -30,16 +30,35 @@ export function YearComparisonChart() {
         const fromISO = `${format(lastYearStart, 'yyyy-MM-dd')}T00:00:00.000Z`;
         const toISO = `${format(currentYearEnd, 'yyyy-MM-dd')}T23:59:59.999Z`;
         
-        const { data, error } = await supabase
-          .from('orders')
-          .select('*')
-          .gte('orderDate', fromISO)
-          .lte('orderDate', toISO)
-          .order('orderDate', { ascending: false });
+        let allOrders: Order[] = [];
+        let hasMore = true;
+        let page = 0;
+        const pageSize = 1000;
 
-        if (error) throw error;
+        while (hasMore) {
+          const { data: chunk, error } = await supabase
+            .from('orders')
+            .select('id, orderDate, total, status')
+            .gte('orderDate', fromISO)
+            .lte('orderDate', toISO)
+            .order('orderDate', { ascending: false })
+            .range(page * pageSize, (page + 1) * pageSize - 1);
 
-        setYearOrders((data || []) as Order[]);
+          if (error) throw error;
+
+          if (chunk && chunk.length > 0) {
+            allOrders = [...allOrders, ...(chunk as unknown as Order[])];
+            if (chunk.length < pageSize) {
+              hasMore = false;
+            } else {
+              page++;
+            }
+          } else {
+            hasMore = false;
+          }
+        }
+
+        setYearOrders(allOrders);
       } catch (e) {
         console.error('Error fetching year comparison data:', e);
       }

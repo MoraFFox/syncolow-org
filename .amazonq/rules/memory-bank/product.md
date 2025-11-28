@@ -1,87 +1,92 @@
 # Product Overview
 
 ## Project Identity
-**SynergyFlow ERP** - An AI-powered enterprise resource planning system built for business operations management with a focus on coffee shop and retail operations.
+**SynergyFlow ERP** - An AI-powered enterprise resource planning system built with Next.js, designed for comprehensive business management with intelligent automation and real-time capabilities.
 
-## Purpose & Value Proposition
-SynergyFlow ERP is a comprehensive business management platform that combines traditional ERP functionality with modern AI capabilities to streamline operations, automate workflows, and provide intelligent insights. The system emphasizes real-time notifications, offline-first architecture, and multi-channel communication to ensure business continuity.
+## Core Value Proposition
+SynergyFlow ERP delivers an enterprise-grade business management platform that combines traditional ERP functionality with modern AI intelligence, real-time updates, and multi-channel communication. The system emphasizes automation, intelligent insights, and seamless user experience across all business operations.
 
 ## Key Features & Capabilities
 
-### Core Business Management
-- **Client Management**: Complete client lifecycle management with company profiles, contacts, branches, payment tracking, and maintenance scheduling
-- **Order Management**: Full order processing with CSV import, bulk operations, delivery scheduling, and status tracking
-- **Product Catalog**: Product management with inventory tracking, pricing, and categorization
-- **Payment Analytics**: Advanced payment tracking with scoring, warnings, and financial analytics
-- **Maintenance Scheduling**: Equipment maintenance tracking with location-based pricing and scheduling
+### 1. Enterprise Notification System (v3.0.0)
+- **17 notification types** covering all business operations (payment, inventory, client, order, maintenance, feedback)
+- **Multi-channel delivery**: In-app, email, and browser push notifications
+- **AI-powered intelligence**: Priority scoring, smart grouping, and automated insights
+- **Real-time updates** via Firestore subscriptions
+- **Analytics dashboard** with comprehensive metrics and engagement tracking
+- **Workflow automation** with conditional logic and pre-built rules
+- **User customization** for notification preferences per type
 
-### AI-Powered Intelligence
-- **Smart Notifications**: AI-driven notification system with 17+ notification types covering all business operations
-- **Priority Scoring**: Dynamic urgency calculation based on 8+ factors for intelligent notification prioritization
-- **Sentiment Analysis**: Automated feedback analysis with sentiment scoring and insights
-- **Auto-Tagging**: Intelligent categorization and tagging of business entities
-- **Predictive Analytics**: AI-powered insights for business trends and patterns
+### 2. Business Management Modules
+- **Client Management**: Complete client lifecycle with branch management, contact tracking, and payment history
+- **Order Management**: Order creation, tracking, status updates, and lifecycle management
+- **Product Catalog**: Product inventory, pricing, and availability management
+- **Maintenance Scheduling**: Equipment maintenance tracking and scheduling
+- **Payment Analytics**: Payment tracking, scoring, and financial analytics
+- **Feedback System**: Customer feedback collection with sentiment analysis
 
-### Notification System (v3.0.0)
-- **17 Notification Types**: Payment alerts, inventory warnings, client updates, order notifications, maintenance reminders, feedback alerts
-- **Multi-Channel Delivery**: In-app notifications, email notifications, browser push notifications
-- **Smart Grouping**: AI-powered notification grouping to reduce noise
-- **Analytics Dashboard**: Complete metrics, trends, and engagement tracking
-- **Workflow Automation**: Pre-built rules with conditional logic and automated actions
-- **Real-time Updates**: Instant synchronization via Firestore subscriptions
-- **User Preferences**: Customizable notification settings per type and channel
+### 3. Advanced Analytics
+- **Notification Analytics**: Delivery rates, engagement metrics, channel performance
+- **Payment Analytics**: Payment scores, trends, and client payment behavior
+- **Sentiment Analysis**: AI-powered feedback sentiment tracking
+- **Performance Monitoring**: System health and performance metrics
+- **Drilldown System**: Deep-dive analytics with interactive data exploration
 
-### Offline-First Architecture
-- **Offline Queue Management**: Operations continue seamlessly without internet connection
-- **Conflict Resolution**: Intelligent conflict detection and resolution for offline changes
-- **IndexedDB Storage**: Local data persistence with automatic synchronization
-- **Service Worker**: Background sync and caching for optimal performance
-- **Pull-to-Refresh**: Manual sync trigger for user-initiated updates
-- **Optimistic Updates**: Instant UI feedback with background synchronization
+### 4. Offline & Performance Features
+- **Offline mode**: Full offline functionality with sync queue
+- **Service worker**: Background sync and caching strategies
+- **Optimistic updates**: Instant UI feedback with background persistence
+- **Conflict resolution**: Intelligent handling of data conflicts
+- **Performance optimization**: Virtual scrolling, lazy loading, and caching
 
-### Advanced Search & Filtering
-- **Fuzzy Search**: Intelligent search across all entities using Fuse.js
-- **Advanced Filters**: Multi-criteria filtering with saved filter presets
-- **Real-time Search**: Instant results with debounced search
-- **Search Sync**: Synchronized search across offline and online modes
+### 5. AI Integration
+- **Genkit AI flows**: Google Generative AI integration for intelligent features
+- **Priority scoring**: Dynamic urgency calculation based on multiple factors
+- **Smart grouping**: Automatic notification grouping to reduce noise
+- **Sentiment analysis**: Automated feedback sentiment detection
+- **Predictive insights**: AI-powered business intelligence
 
-### Data Management
-- **CSV Import/Export**: Bulk data operations with validation and error handling
-- **PDF Generation**: Invoice and report generation with Arabic support
-- **File Management**: Document upload and storage with Firebase integration
-- **Data Caching**: Multi-layer caching for optimal performance
-
-### User Experience
-- **Responsive Design**: Mobile-first design with touch-optimized interactions
-- **Dark Mode**: Full theme support with system preference detection
-- **Keyboard Shortcuts**: Power user features for efficient navigation
-- **Virtual Scrolling**: Performance optimization for large datasets
-- **Toast Notifications**: User feedback for all operations
-
-## Target Users & Use Cases
+## Target Users
 
 ### Primary Users
-- **Business Owners**: Dashboard overview, financial analytics, client management
-- **Operations Managers**: Order processing, inventory management, maintenance scheduling
-- **Sales Teams**: Client relationship management, order creation, payment tracking
-- **Baristas/Field Staff**: Mobile-optimized order fulfillment and maintenance updates
-- **Administrators**: System configuration, user management, analytics
+- **Business Managers**: Dashboard overview, analytics, and decision-making tools
+- **Operations Staff**: Order management, client interactions, and daily operations
+- **Maintenance Teams**: Scheduling, tracking, and equipment management
+- **Finance Teams**: Payment tracking, analytics, and financial reporting
 
-### Key Use Cases
-1. **Daily Operations**: Process orders, track deliveries, manage inventory
-2. **Client Relations**: Maintain client profiles, track payment history, schedule maintenance
-3. **Financial Management**: Monitor payments, analyze revenue, track outstanding balances
-4. **Maintenance Operations**: Schedule equipment maintenance, track service history
-5. **Business Intelligence**: Analyze trends, monitor KPIs, generate reports
-6. **Offline Operations**: Continue working without internet, sync when connected
-7. **Multi-Channel Communication**: Receive alerts via app, email, and push notifications
+### User Roles
+- Administrators with full system access
+- Managers with analytics and oversight capabilities
+- Staff with operational access to specific modules
+- Clients with limited access to their data and orders
+
+## Use Cases
+
+### Daily Operations
+- Create and manage client orders with real-time updates
+- Track inventory and product availability
+- Schedule and manage maintenance activities
+- Monitor payment status and send reminders
+- Respond to customer feedback and track sentiment
+
+### Business Intelligence
+- Analyze notification engagement and effectiveness
+- Track payment trends and client payment behavior
+- Monitor system performance and health metrics
+- Generate reports and insights for decision-making
+- Identify patterns and opportunities through drilldown analytics
+
+### Automation & Efficiency
+- Automated notification delivery across multiple channels
+- AI-powered priority scoring for urgent items
+- Smart grouping to reduce notification fatigue
+- Workflow automation with conditional rules
+- Offline queue for seamless operation without connectivity
 
 ## Technical Highlights
-- **Next.js 16**: Modern React framework with App Router and Server Components
-- **TypeScript**: Full type safety with strict mode enabled
-- **Firebase/Firestore**: Real-time database with offline persistence
-- **Genkit AI**: Google's AI framework for intelligent features
-- **Zustand**: Lightweight state management
-- **shadcn/ui**: Modern, accessible component library
-- **Tailwind CSS**: Utility-first styling framework
-- **Vitest**: Fast unit testing framework
+- **Production-ready**: Comprehensive testing, documentation, and deployment guides
+- **Scalable architecture**: Firebase/Firestore backend with real-time capabilities
+- **Modern stack**: Next.js 16, React 18, TypeScript, Tailwind CSS
+- **Type-safe**: Strict TypeScript with Zod validation
+- **Tested**: Vitest unit tests and Playwright E2E tests
+- **Documented**: Extensive documentation in docs/ folder with guides and references

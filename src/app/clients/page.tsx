@@ -17,8 +17,13 @@ import { useOrderStore } from "@/store/use-order-store";
 
 type ListItem = Company & { depth: number; children?: ListItem[]; isBranch?: boolean };
 
+type SortConfig = {
+  key: keyof Company | 'paymentStatus' | 'last12MonthsRevenue';
+  direction: 'asc' | 'desc';
+};
+
 export default function CompaniesPage() {
-  const { companies, loading, deleteCompany, updateCompanyAndBranches, addCompanyAndRelatedData, mergeCompanies } = useCompanyStore();
+  const { companies, loading, deleteCompany, updateCompanyAndBranches, addCompanyAndRelatedData, mergeCompanies, fetchRevenueStats } = useCompanyStore();
   const { fetchInitialData } = useOrderStore();
   const { paginationLimit } = useSettingsStore();
   const [searchTerm, setSearchTerm] = useState("");
@@ -32,12 +37,16 @@ export default function CompaniesPage() {
   const [selectedCompany, setSelectedCompany] = useState<Company | null>(null);
   const [selectedBranch, setSelectedBranch] = useState<Company | null>(null);
   const [companyToDelete, setCompanyToDelete] = useState<Company | null>(null);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [isBulkDeleteAlertOpen, setIsBulkDeleteAlertOpen] = useState(false);
+  const [sortConfig, setSortConfig] = useState<SortConfig>({ key: 'last12MonthsRevenue', direction: 'desc' });
 
   const [visibleCount, setVisibleCount] = useState(paginationLimit);
   
   useEffect(() => {
     fetchInitialData();
-  }, [fetchInitialData]);
+    fetchRevenueStats();
+  }, [fetchInitialData, fetchRevenueStats]);
 
   useEffect(() => {
     setVisibleCount(paginationLimit);
@@ -58,32 +67,79 @@ export default function CompaniesPage() {
   }, [companies]);
 
   const filteredAndSortedItems = useMemo(() => {
-    let flatList: ListItem[] = [];
-    hierarchicalList.forEach(parent => {
-        flatList.push(parent);
-        if (parent.children) {
-            flatList.push(...parent.children);
+    const searchLower = searchTerm.toLowerCase();
+    
+    const matchesFilter = (item: ListItem) => {
+        if (!searchLower) return true;
+        const nameMatch = item.name.toLowerCase().includes(searchLower);
+        const industryMatch = !item.isBranch && item.industry?.toLowerCase().includes(searchLower);
+        // For branches, we also check parent name if we have access to it, but here item is standalone or has parentId
+        // In hierarchical view, we handle parent matching separately.
+        return nameMatch || industryMatch;
+    };
+
+    const sortFunction = (a: ListItem, b: ListItem) => {
+        const { key, direction } = sortConfig;
+        let aValue: any = a[key as keyof ListItem];
+        let bValue: any = b[key as keyof ListItem];
+
+        if (key === 'currentPaymentScore') {
+            aValue = a.currentPaymentScore ?? 0;
+            bValue = b.currentPaymentScore ?? 0;
+        } else if (key === 'last12MonthsRevenue') {
+            aValue = a.last12MonthsRevenue ?? 0;
+            bValue = b.last12MonthsRevenue ?? 0;
+        }
+        
+        if (typeof aValue === 'string' && typeof bValue === 'string') {
+            return direction === 'asc' ? aValue.localeCompare(bValue) : bValue.localeCompare(aValue);
+        }
+
+        if (aValue < bValue) return direction === 'asc' ? -1 : 1;
+        if (aValue > bValue) return direction === 'asc' ? 1 : -1;
+        return 0;
+    };
+
+    if (typeFilter === 'Branch') {
+        return companies
+            .filter(c => c.isBranch)
+            .map(b => ({ ...b, depth: 0 } as ListItem))
+            .filter(matchesFilter)
+            .sort(sortFunction);
+    }
+
+    if (typeFilter === 'Company') {
+        return companies
+            .filter(c => !c.isBranch)
+            .map(p => ({ ...p, depth: 0 } as ListItem))
+            .filter(matchesFilter)
+            .sort(sortFunction);
+    }
+
+    // Type Filter: All - Maintain Hierarchy
+    let result: ListItem[] = [];
+    
+    // Sort parents first
+    const sortedParents = [...hierarchicalList].sort(sortFunction);
+
+    sortedParents.forEach(parent => {
+        const parentMatches = matchesFilter(parent);
+        
+        // Filter and sort children
+        const matchingChildren = parent.children
+            ? parent.children.filter(matchesFilter).sort(sortFunction)
+            : [];
+            
+        // If search term exists, we show parent if it matches OR if it has matching children
+        // If no search term, we show everything
+        if (!searchLower || parentMatches || matchingChildren.length > 0) {
+            result.push(parent);
+            result.push(...matchingChildren);
         }
     });
 
-    return flatList.filter(item => {
-      const isBranch = item.isBranch;
-      const isParent = !item.isBranch;
-
-      if (typeFilter === 'Company' && isBranch) return false;
-      if (typeFilter === 'Branch' && isParent) return false;
-      
-      const searchLower = searchTerm.toLowerCase();
-      if (!searchLower) return true;
-
-      const nameMatch = item.name.toLowerCase().includes(searchLower);
-      const industryMatch = isParent && item.industry?.toLowerCase().includes(searchLower);
-      const parent = isBranch ? companies.find(c => c.id === item.parentCompanyId) : null;
-      const parentNameMatch = isBranch && parent?.name.toLowerCase().includes(searchLower);
-
-      return nameMatch || industryMatch || parentNameMatch;
-    });
-  }, [hierarchicalList, companies, searchTerm, typeFilter]);
+    return result;
+  }, [hierarchicalList, companies, searchTerm, typeFilter, sortConfig]);
 
   const visibleItems = useMemo(() => {
     return filteredAndSortedItems.slice(0, visibleCount);
@@ -132,6 +188,46 @@ export default function CompaniesPage() {
     setCompanyToDelete(null);
   };
 
+  const handleSelect = (id: string, checked: boolean) => {
+    const newSelected = new Set(selectedIds);
+    if (checked) {
+      newSelected.add(id);
+    } else {
+      newSelected.delete(id);
+    }
+    setSelectedIds(newSelected);
+  };
+
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      const allIds = visibleItems.map(item => item.id);
+      setSelectedIds(new Set(allIds));
+    } else {
+      setSelectedIds(new Set());
+    }
+  };
+
+  const handleBulkDelete = async () => {
+    // TODO: Implement actual bulk delete API if available, or loop through deletes
+    // For now, we'll loop through deletes or assume a bulk delete endpoint exists
+    // Since we only have deleteCompany, we'll use that for now.
+    // Ideally, we should add a bulk delete method to the store.
+    
+    // Optimistic UI update or sequential deletes
+    for (const id of selectedIds) {
+        await deleteCompany(id);
+    }
+    setSelectedIds(new Set());
+    setIsBulkDeleteAlertOpen(false);
+  };
+
+  const handleSort = (key: string) => {
+    setSortConfig(current => ({
+      key: key as any,
+      direction: current.key === key && current.direction === 'asc' ? 'desc' : 'asc',
+    }));
+  };
+
   return (
     <>
       <CompanyForm
@@ -163,6 +259,21 @@ export default function CompaniesPage() {
           </AlertDialogContent>
       </AlertDialog>
 
+      <AlertDialog open={isBulkDeleteAlertOpen} onOpenChange={setIsBulkDeleteAlertOpen}>
+          <AlertDialogContent>
+              <AlertDialogHeader>
+                  <AlertDialogTitle>Delete {selectedIds.size} items?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                      This will permanently delete the selected companies and branches. This action cannot be undone.
+                  </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction onClick={handleBulkDelete}>Delete All</AlertDialogAction>
+              </AlertDialogFooter>
+          </AlertDialogContent>
+      </AlertDialog>
+
       <div className="flex flex-col gap-8">
         <ClientActions 
             searchTerm={searchTerm}
@@ -178,7 +289,25 @@ export default function CompaniesPage() {
             allCompanies={companies}
             onEdit={openEditForm}
             onDelete={openDeleteDialog}
+            selectedIds={selectedIds}
+            onSelect={handleSelect}
+            onSelectAll={handleSelectAll}
+            sortConfig={sortConfig}
+            onSort={handleSort}
+            typeFilter={typeFilter}
         />
+
+        {selectedIds.size > 0 && (
+            <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-background border shadow-lg rounded-lg p-4 flex items-center gap-4 z-50 animate-in slide-in-from-bottom-5">
+                <span className="font-medium">{selectedIds.size} selected</span>
+                <Button variant="destructive" size="sm" onClick={() => setIsBulkDeleteAlertOpen(true)}>
+                    Delete Selected
+                </Button>
+                <Button variant="ghost" size="sm" onClick={() => setSelectedIds(new Set())}>
+                    Cancel
+                </Button>
+            </div>
+        )}
 
         {visibleCount < filteredAndSortedItems.length && (
           <div className="mt-4 flex justify-center">

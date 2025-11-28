@@ -2,24 +2,21 @@
 "use client"
 
 import { useMemo, useState, useEffect } from "react";
-import { LatLngTuple } from "leaflet";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import type { VisitCall } from "@/lib/types";
 import { geocodeService } from "@/services/geocode-service";
-import { Map } from '@/components/ui/map';
-import { ChangeView, MapTileLayer, MapMarkers, MapMarkerProps } from '@/components/ui/map-client';
-
+import { GoogleMapWrapper } from "@/components/ui/google-map-wrapper";
+import { Marker, InfoWindow } from "@react-google-maps/api";
 
 interface VisitsMapProps {
     visits: VisitCall[];
 }
 
 interface VisitWithCoords extends VisitCall {
-    coords: LatLngTuple | null;
+    coords: [number, number] | null;
 }
-
 
 export function VisitsMap({ visits }: VisitsMapProps) {
     const [selectedVisitId, setSelectedVisitId] = useState<string | null>(null);
@@ -56,12 +53,13 @@ export function VisitsMap({ visits }: VisitsMapProps) {
         geocodeVisits();
     }, [visits, selectedVisitId]);
 
-    const markers: MapMarkerProps[] = useMemo(() => {
+    const markers = useMemo(() => {
         return visitsWithCoords
-            .filter((v): v is VisitWithCoords & { coords: LatLngTuple } => v.coords !== null)
+            .filter((v): v is VisitWithCoords & { coords: [number, number] } => v.coords !== null)
             .map(v => ({
-                position: v.coords,
-                popupContent: `<strong>${v.clientName}</strong><br/>${v.outcome}`
+                id: v.id,
+                position: { lat: v.coords[0], lng: v.coords[1] },
+                visit: v
             }));
     }, [visitsWithCoords]);
 
@@ -69,7 +67,10 @@ export function VisitsMap({ visits }: VisitsMapProps) {
         return visitsWithCoords.find(v => v.id === selectedVisitId);
     }, [selectedVisitId, visitsWithCoords]);
 
-    const center: LatLngTuple = selectedVisit?.coords || (markers.length > 0 ? markers[0].position as LatLngTuple : [30.0444, 31.2357]);
+    const center = selectedVisit?.coords 
+        ? { lat: selectedVisit.coords[0], lng: selectedVisit.coords[1] } 
+        : (markers.length > 0 ? markers[0].position : { lat: 30.0444, lng: 31.2357 });
+    
     const zoom = selectedVisit ? 13 : 8;
 
     if (isLoading) {
@@ -83,11 +84,40 @@ export function VisitsMap({ visits }: VisitsMapProps) {
                 <CardDescription>Geographical overview of upcoming visits.</CardDescription>
             </CardHeader>
             <CardContent>
-                <Map center={center} zoom={zoom} scrollWheelZoom={false} className="h-[400px] w-full rounded-md border">
-                    <ChangeView center={center} zoom={zoom} />
-                    <MapTileLayer />
-                    <MapMarkers markers={markers} />
-                </Map>
+                <GoogleMapWrapper 
+                    center={center} 
+                    zoom={zoom} 
+                    className="h-[400px] w-full rounded-md border overflow-hidden"
+                >
+                    {markers.map((marker) => (
+                        <Marker 
+                            key={marker.id} 
+                            position={marker.position} 
+                            onClick={() => setSelectedVisitId(marker.id)}
+                        />
+                    ))}
+
+                    {selectedVisit && selectedVisit.coords && (
+                        <InfoWindow
+                            position={{ lat: selectedVisit.coords[0], lng: selectedVisit.coords[1] }}
+                            onCloseClick={() => setSelectedVisitId(null)}
+                        >
+                            <div className="p-2 max-w-[200px] text-black">
+                                <div className="font-semibold mb-1">{selectedVisit.clientName}</div>
+                                <div className="text-sm mb-2">{selectedVisit.outcome}</div>
+                                <a 
+                                    href={`https://www.google.com/maps/dir/?api=1&destination=${selectedVisit.coords[0]},${selectedVisit.coords[1]}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-blue-600 hover:underline text-xs font-medium block"
+                                >
+                                    Open in Google Maps
+                                </a>
+                            </div>
+                        </InfoWindow>
+                    )}
+                </GoogleMapWrapper>
+
                  {visitsWithCoords.filter(v => v.coords).length > 0 && (
                     <div className="mt-4">
                         <Select value={selectedVisitId || ''} onValueChange={setSelectedVisitId}>

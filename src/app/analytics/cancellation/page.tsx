@@ -1,8 +1,9 @@
 
 "use client";
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { useMaintenanceStore } from '@/store/use-maintenance-store';
 import { useOrderStore } from '@/store/use-order-store';
+import { supabase } from '@/lib/supabase';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { ChartContainer, ChartTooltipContent } from '@/components/ui/chart';
@@ -76,13 +77,34 @@ function ReasonManager() {
 
 export default function CancellationAnalysisPage() {
   const router = useRouter();
-  const { orders, deleteOrder } = useOrderStore();
+  const { deleteOrder } = useOrderStore();
   const { cancellationReasons } = useMaintenanceStore();
   const [orderToDelete, setOrderToDelete] = useState<string | null>(null);
+  const [allOrders, setAllOrders] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  
+  useEffect(() => {
+    const loadAllOrders = async () => {
+      setLoading(true);
+      try {
+        const { data, error } = await supabase
+          .from('orders')
+          .select('*')
+          .eq('status', 'Cancelled')
+          .order('orderDate', { ascending: false });
+        if (error) throw error;
+        setAllOrders(data || []);
+      } catch (e) {
+        console.error('Error loading orders:', e);
+      }
+      setLoading(false);
+    };
+    loadAllOrders();
+  }, []);
 
   const canceledOrders = useMemo(() => {
-    return orders.filter(order => order.status === 'Cancelled' && order.cancellationReason);
-  }, [orders]);
+    return allOrders.filter(order => order.cancellationReason);
+  }, [allOrders]);
 
   const analysis = useMemo(() => {
     if (canceledOrders.length === 0) {
@@ -96,7 +118,7 @@ export default function CancellationAnalysisPage() {
     }, {} as Record<string, number>);
 
     const topReasons = Object.entries(reasonCounts)
-      .map(([reason, count]) => ({
+      .map(([reason, count]: [string, number]) => ({
         reason,
         count,
         percentage: (count / canceledOrders.length) * 100,
@@ -182,7 +204,13 @@ export default function CancellationAnalysisPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {canceledOrders.map(order => (
+              {loading ? (
+                <TableRow>
+                  <TableCell colSpan={6} className="h-24 text-center">
+                    Loading canceled orders...
+                  </TableCell>
+                </TableRow>
+              ) : canceledOrders.map(order => (
                 <TableRow key={order.id}>
                   <TableCell>#{order.id.slice(0, 7)}</TableCell>
                   <TableCell>{order.companyName}</TableCell>

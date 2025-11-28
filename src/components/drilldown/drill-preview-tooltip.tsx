@@ -3,51 +3,66 @@
 import * as React from 'react';
 import { createPortal } from 'react-dom';
 import { useDrillDownStore } from '@/store/use-drilldown-store';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { DRILL_REGISTRY } from '@/lib/drilldown-registry';
+import { useDrillPreviewData } from '@/hooks/use-drill-preview-data';
+import { useToast } from '@/hooks/use-toast';
+import { DrillCard } from './drill-card';
+import { DrillContentRenderer } from './drill-content-renderer';
+import { DrillActions } from './drill-actions';
 
 export function DrillPreviewTooltip() {
-  const { preview } = useDrillDownStore();
+  const { preview, pinPreview, pinnedPreviews, hidePreview } = useDrillDownStore();
   const { isOpen, kind, payload, coords } = preview;
   const [mounted, setMounted] = React.useState(false);
+  const [pinProgress, setPinProgress] = React.useState(0);
+  const { toast } = useToast();
   
-  // Async preview state
-  const [asyncData, setAsyncData] = React.useState<any>(null);
-  const [isLoading, setIsLoading] = React.useState(false);
-  const [error, setError] = React.useState<Error | null>(null);
+  // Use React Query for cached async preview data
+  const { data: asyncData, isLoading, error } = useDrillPreviewData(kind, payload, isOpen);
 
   React.useEffect(() => {
     setMounted(true);
   }, []);
 
-  // Fetch async data when preview opens
+  // Auto-pin after 3 seconds with progress bar
   React.useEffect(() => {
-    if (!isOpen || !kind) {
-      setAsyncData(null);
-      setIsLoading(false);
-      setError(null);
+    if (!isOpen || !kind || !payload) {
+      setPinProgress(0);
       return;
     }
 
-    const registryEntry = DRILL_REGISTRY[kind];
-    if (registryEntry?.fetchPreviewData) {
-      setIsLoading(true);
-      setError(null);
+    let progress = 0;
+    const interval = setInterval(() => {
+      progress += 100 / 30; // 3000ms / 100ms intervals
+      setPinProgress(progress);
       
-      registryEntry.fetchPreviewData(payload as any)
-        .then((data) => {
-          setAsyncData(data);
-          setIsLoading(false);
-        })
-        .catch((err) => {
-          console.error('Failed to fetch preview data:', err);
-          setError(err);
-          setIsLoading(false);
-        });
-    }
-  }, [isOpen, kind, payload]);
+      if (progress >= 100) {
+        clearInterval(interval);
+        if (pinnedPreviews.length < 3) {
+          setTimeout(() => {
+            pinPreview(kind, payload);
+            hidePreview();
+            toast({ title: 'Preview pinned automatically' });
+          }, 0);
+        }
+      }
+    }, 100);
+
+    return () => {
+      clearInterval(interval);
+      setPinProgress(0);
+    };
+  }, [isOpen, kind, payload, pinPreview, pinnedPreviews.length, hidePreview, toast]);
 
   if (!mounted || !isOpen || !coords || !kind) return null;
+  
+  // Don't show tooltip if THIS SPECIFIC item is already pinned
+  const isCurrentItemPinned = pinnedPreviews.some(pinned => {
+    const pinnedId = (pinned.payload as any)?.id || (pinned.payload as any)?.value;
+    const currentId = (payload as any)?.id || (payload as any)?.value;
+    return pinned.kind === kind && pinnedId === currentId;
+  });
+  
+  if (isCurrentItemPinned) return null;
 
   // Calculate position with boundary detection
   const TOOLTIP_WIDTH = 288; // w-72
@@ -74,51 +89,35 @@ export function DrillPreviewTooltip() {
     pointerEvents: 'none', // Pass through clicks
   };
 
-  const renderContent = () => {
-    const registryEntry = DRILL_REGISTRY[kind];
-    if (!registryEntry) return <div className="text-sm text-muted-foreground">Click for details</div>;
-    
-    // Handle async preview states
-    if (registryEntry.fetchPreviewData) {
-      // Show loading state
-      if (isLoading && registryEntry.renderLoadingPreview) {
-        return registryEntry.renderLoadingPreview();
-      }
-      
-      // Show error state
-      if (error) {
-        return (
-          <div className="text-sm text-destructive">
-            Failed to load preview
-          </div>
-        );
-      }
-      
-      // Show async data if loaded
-      if (asyncData && registryEntry.renderAsyncPreview) {
-        return registryEntry.renderAsyncPreview(payload as any, asyncData);
-      }
-    }
-    
-    // Fall back to synchronous preview
-    return registryEntry.renderPreview(payload as any);
-  };
-
   return createPortal(
     <div style={style} className="animate-in fade-in zoom-in-95 duration-150">
-      <Card className="w-72 shadow-xl border-primary/20 bg-popover/95 backdrop-blur supports-[backdrop-filter]:bg-popover/80">
-        <CardHeader className="p-3 pb-2">
-          <CardTitle className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">
-            {kind} Insight
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="p-3 pt-0">
-          {renderContent()}
-          <div className="mt-2 pt-2 border-t text-[10px] text-muted-foreground text-center">
-            Click for full details
+      <DrillCard title={`${kind} Insight`}>
+        <DrillContentRenderer 
+          kind={kind} 
+          payload={payload!} 
+          isLoading={isLoading} 
+          error={error} 
+          asyncData={asyncData} 
+        />
+        
+        <DrillActions kind={kind} payload={payload!} />
+        
+        {/* Auto-pin progress bar */}
+        <div className="mt-2 pt-2 border-t space-y-1">
+          <div className="h-1 bg-muted rounded-full overflow-hidden">
+            <div 
+              className="h-full bg-primary transition-all duration-100 ease-linear"
+              style={{ width: `${pinProgress}%` }}
+            />
           </div>
-        </CardContent>
-      </Card>
+          <div className="text-[10px] text-muted-foreground text-center flex items-center justify-center gap-1">
+            {!isLoading && asyncData && (
+              <span className="inline-block w-1.5 h-1.5 rounded-full bg-green-500" title="Cached data" />
+            )}
+            {pinProgress < 100 ? 'Pinning in 3s...' : 'Click for full details'}
+          </div>
+        </div>
+      </DrillCard>
     </div>,
     document.body
   );

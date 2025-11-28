@@ -1,0 +1,331 @@
+12:55:20.982 XHRPOST
+https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/orders?columns="companyId","branchId","orderDate","deliveryDate","paymentDueDate","status","paymentStatus","items","subtotal","totalTax","discountType","discountValue","discountAmount","grandTotal","total","statusHistory","isPotentialClient","temporaryCompanyName","temporaryBranchName","area","isPaid","daysOverdue","paymentScore","expectedPaymentDate","companyName","branchName"&select=*
+[HTTP/2 201  887ms]
+
+12:55:21.002 XHROPTIONS
+https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/orders?columns="companyId","branchId","orderDate","deliveryDate","paymentDueDate","status","paymentStatus","items","subtotal","totalTax","discountType","discountValue","discountAmount","grandTotal","total","statusHistory","isPotentialClient","temporaryCompanyName","temporaryBranchName","area","isPaid","daysOverdue","paymentScore","expectedPaymentDate","companyName","branchName"&select=*
+[HTTP/2 200  57ms]
+
+12:55:21.994 XHRPOST
+https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/orders_search
+[HTTP/2 201  331ms]
+
+12:55:22.001 XHROPTIONS
+https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/orders_search
+[HTTP/2 200  66ms]
+
+12:55:23.160 XHRGET
+https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/orders?select=*&order=orderDate.desc&offset=0&limit=50
+[HTTP/1.1 200  0ms]
+
+12:55:23.345 XHRPOST
+https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/orders?columns="id","daysOverdue","paymentScore","paymentStatus"
+[HTTP/2 200  287ms]
+
+12:55:23.351 XHROPTIONS
+https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/orders?columns="id","daysOverdue","paymentScore","paymentStatus"
+[HTTP/2 200  63ms]
+
+12:55:23.727 XHRPATCH
+https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/companies?id=eq.7413f0a7-bd78-402b-9c7e-1f9b71fdbc3c
+[HTTP/2 204  286ms]
+
+12:55:23.735 XHROPTIONS
+https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/companies?id=eq.7413f0a7-bd78-402b-9c7e-1f9b71fdbc3c
+[HTTP/2 200  55ms]
+
+12:55:24.111 XHRPATCH
+https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/companies?id=eq.66e3cda0-d891-4ea4-a6c4-3de86c5a9ea2
+[HTTP/2 204  267ms]
+
+12:55:24.117 XHROPTIONS
+https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/companies?id=eq.66e3cda0-d891-4ea4-a6c4-3de86c5a9ea2
+[HTTP/2 200  58ms]
+
+12:55:24.477 XHRPATCH
+https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/companies?id=eq.8ee30849-80bd-4825-a0eb-7e29b313a9b7
+[HTTP/2 204  250ms]
+
+12:55:24.484 XHROPTIONS
+https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/companies?id=eq.8ee30849-80bd-4825-a0eb-7e29b313a9b7
+[HTTP/2 200  62ms]
+
+12:55:24.819 XHRPATCH
+https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/companies?id=eq.3e8cbdac-7130-464c-aabc-6f73613b92d1
+[HTTP/2 204  248ms]
+
+12:55:24.828 XHROPTIONS
+https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/companies?id=eq.3e8cbdac-7130-464c-aabc-6f73613b92d1
+[HTTP/2 200  61ms]
+
+12:55:25.162 XHRPATCH
+https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/companies?id=eq.68b04a07-7274-4a2b-a0be-b684fa41eddc
+[HTTP/2 204  227ms]
+
+12:55:25.172 XHROPTIONS
+https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/companies?id=eq.68b04a07-7274-4a2b-a0be-b684fa41eddc
+[HTTP/2 200  56ms]
+
+12:55:25.483 XHRPATCH
+https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/companies?id=eq.88ad3107-9550-4e9b-80b4-f7afb085a46e
+[HTTP/2 204  209ms]
+
+12:55:25.489 XHROPTIONS
+https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/companies?id=eq.88ad3107-9550-4e9b-80b4-f7afb085a46e
+[HTTP/2 200  57ms]
+
+12:55:25.778 XHRPATCH
+https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/companies?id=eq.e818d568-1fd7-4c94-be0b-7059daee7e1e
+[HTTP/2 204  201ms]
+
+12:55:25.785 XHROPTIONS
+https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/companies?id=eq.e818d568-1fd7-4c94-be0b-7059daee7e1e
+[HTTP/2 200  57ms]
+
+12:55:26.069 XHRPATCH
+https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/companies?id=eq.89b3be39-4e09-4e25-891e-081b112cd150
+[HTTP/2 204  147ms]
+
+12:55:26.079 XHROPTIONS
+https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/companies?id=eq.89b3be39-4e09-4e25-891e-081b112cd150
+[HTTP/2 200  57ms]
+
+12:55:26.304 XHRPATCH
+https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/companies?id=eq.07c3a968-f2df-4d7a-a5b9-ea08d47d907c
+[HTTP/2 204  104ms]
+
+12:55:26.312 XHROPTIONS
+https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/companies?id=eq.07c3a968-f2df-4d7a-a5b9-ea08d47d907c
+[HTTP/2 200  60ms]
+
+12:55:26.512 XHRPATCH
+https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/companies?id=eq.71c30d6e-c4b4-43f5-8ef4-7e9aef72b614
+[HTTP/2 204  198ms]
+
+12:55:26.518 XHROPTIONS
+https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/companies?id=eq.71c30d6e-c4b4-43f5-8ef4-7e9aef72b614
+[HTTP/2 200  54ms]
+
+12:55:26.795 XHRPATCH
+https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/companies?id=eq.3803b8a9-a2a4-4807-8878-65f54b213e61
+[HTTP/2 204  101ms]
+
+12:55:26.802 XHROPTIONS
+https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/companies?id=eq.3803b8a9-a2a4-4807-8878-65f54b213e61
+[HTTP/2 200  60ms]
+
+12:55:26.986 XHRPATCH
+https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/companies?id=eq.c6fe0f82-6bf6-43da-aa3c-854fc202f2e8
+[HTTP/2 204  194ms]
+
+12:55:26.995 XHROPTIONS
+https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/companies?id=eq.c6fe0f82-6bf6-43da-aa3c-854fc202f2e8
+[HTTP/2 200  58ms]
+
+12:55:27.279 XHRPATCH
+https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/companies?id=eq.b4b97def-31c1-4048-996c-73dfcb5ba9c7
+[HTTP/2 204  152ms]
+
+12:55:27.285 XHROPTIONS
+https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/companies?id=eq.b4b97def-31c1-4048-996c-73dfcb5ba9c7
+[HTTP/2 200  57ms]
+
+12:55:27.521 XHRPATCH
+https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/companies?id=eq.a3f8ab4d-6099-4ceb-b209-82c631f80924
+[HTTP/2 204  90ms]
+
+12:55:27.530 XHROPTIONS
+https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/companies?id=eq.a3f8ab4d-6099-4ceb-b209-82c631f80924
+[HTTP/2 200  64ms]
+
+12:55:27.708 XHRPATCH
+https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/companies?id=eq.833253fb-6a7c-45b1-8ed1-b35abb9516fe
+[HTTP/2 204  96ms]
+
+12:55:27.717 XHROPTIONS
+https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/companies?id=eq.833253fb-6a7c-45b1-8ed1-b35abb9516fe
+[HTTP/2 200  61ms]
+
+12:55:27.905 XHRPATCH
+https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/companies?id=eq.1a83293b-c11d-4408-92b7-58798996231a
+[HTTP/2 204  98ms]
+
+12:55:27.913 XHROPTIONS
+https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/companies?id=eq.1a83293b-c11d-4408-92b7-58798996231a
+[HTTP/2 200  59ms]
+
+12:55:28.104 XHRPATCH
+https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/companies?id=eq.e9f3e198-c2c5-4a1c-bb4c-4704e50b5d4e
+[HTTP/2 204  100ms]
+
+12:55:28.114 XHROPTIONS
+https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/companies?id=eq.e9f3e198-c2c5-4a1c-bb4c-4704e50b5d4e
+[HTTP/2 200  60ms]
+
+12:55:28.306 XHRPATCH
+https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/companies?id=eq.5c4d89a6-ec8d-4d8d-ab94-2db7bdd0dc89
+[HTTP/2 204  97ms]
+
+12:55:28.314 XHROPTIONS
+https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/companies?id=eq.5c4d89a6-ec8d-4d8d-ab94-2db7bdd0dc89
+[HTTP/2 200  55ms]
+
+12:55:28.498 XHRPATCH
+https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/companies?id=eq.cf6cc156-1dd3-4fb4-a288-80c882c19017
+[HTTP/2 204  95ms]
+
+12:55:28.506 XHROPTIONS
+https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/companies?id=eq.cf6cc156-1dd3-4fb4-a288-80c882c19017
+[HTTP/2 200  55ms]
+
+12:55:28.720 XHRPATCH
+https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/companies?id=eq.9fa7920b-c4ed-4984-ac5d-3529b17cba04
+[HTTP/2 204  101ms]
+
+12:55:28.733 XHROPTIONS
+https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/companies?id=eq.9fa7920b-c4ed-4984-ac5d-3529b17cba04
+[HTTP/2 200  60ms]
+
+12:55:28.953 XHRPATCH
+https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/companies?id=eq.544ca519-35bf-4edb-a4a9-3c28323e4ff6
+[HTTP/2 204  93ms]
+
+12:55:28.988 XHROPTIONS
+https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/companies?id=eq.544ca519-35bf-4edb-a4a9-3c28323e4ff6
+[HTTP/2 200  56ms]
+
+12:55:29.224 XHRPATCH
+https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/companies?id=eq.cf000bf1-180e-4879-8248-91da8d63b0a3
+[HTTP/2 204  91ms]
+
+12:55:29.238 XHROPTIONS
+https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/companies?id=eq.cf000bf1-180e-4879-8248-91da8d63b0a3
+[HTTP/2 200  55ms]
+
+12:55:29.415 XHRPATCH
+https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/companies?id=eq.91e9c198-d3e8-4156-805e-026ae4cfa08b
+[HTTP/2 204  103ms]
+
+12:55:29.423 XHROPTIONS
+https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/companies?id=eq.91e9c198-d3e8-4156-805e-026ae4cfa08b
+[HTTP/2 200  55ms]
+
+12:55:29.634 XHRPATCH
+https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/companies?id=eq.63ebd575-b7cc-4d87-8461-998de673f431
+[HTTP/2 204  103ms]
+
+12:55:29.657 XHROPTIONS
+https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/companies?id=eq.63ebd575-b7cc-4d87-8461-998de673f431
+[HTTP/2 200  63ms]
+
+12:55:29.878 XHRPATCH
+https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/companies?id=eq.ca88e59a-c213-4147-9a5d-1c1a597a84b0
+[HTTP/2 204  95ms]
+
+12:55:29.901 XHROPTIONS
+https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/companies?id=eq.ca88e59a-c213-4147-9a5d-1c1a597a84b0
+[HTTP/2 200  63ms]
+
+12:55:30.122 XHRPATCH
+https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/companies?id=eq.c67e1f03-e0f9-4e81-92c4-56f4bb829e70
+[HTTP/2 204  96ms]
+
+12:55:30.136 XHROPTIONS
+https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/companies?id=eq.c67e1f03-e0f9-4e81-92c4-56f4bb829e70
+[HTTP/2 200  57ms]
+
+12:55:30.332 XHRPATCH
+https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/companies?id=eq.5e8edc11-9202-4bdf-9a57-e009e0f26734
+[HTTP/2 204  109ms]
+
+12:55:30.340 XHROPTIONS
+https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/companies?id=eq.5e8edc11-9202-4bdf-9a57-e009e0f26734
+[HTTP/2 200  55ms]
+
+12:55:30.538 XHRPATCH
+https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/companies?id=eq.22f17ebf-2954-49b5-b514-d44b8efd3d56
+[HTTP/2 204  92ms]
+
+12:55:30.549 XHROPTIONS
+https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/companies?id=eq.22f17ebf-2954-49b5-b514-d44b8efd3d56
+[HTTP/2 200  59ms]
+
+12:55:30.724 XHRPATCH
+https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/companies?id=eq.da155233-7ddb-4733-a8f4-8cfd1aa37991
+[HTTP/2 204  98ms]
+
+12:55:30.732 XHROPTIONS
+https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/companies?id=eq.da155233-7ddb-4733-a8f4-8cfd1aa37991
+[HTTP/2 200  60ms]
+
+12:55:30.954 XHRPATCH
+https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/companies?id=eq.d1a3cda6-11ae-4b1e-b3d9-ed3e0f98f69b
+[HTTP/2 204  92ms]
+
+12:55:30.967 XHROPTIONS
+https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/companies?id=eq.d1a3cda6-11ae-4b1e-b3d9-ed3e0f98f69b
+[HTTP/2 200  55ms]
+
+12:55:31.175 XHRPATCH
+https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/companies?id=eq.5d824a1d-9f4a-4193-9de1-d601ca5f5586
+[HTTP/2 204  125ms]
+
+12:55:31.217 XHROPTIONS
+https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/companies?id=eq.5d824a1d-9f4a-4193-9de1-d601ca5f5586
+[HTTP/2 200  78ms]
+
+12:55:31.452 XHRPATCH
+https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/companies?id=eq.ce448d87-d6e5-4618-ba4d-9cf9db1e7b8f
+[HTTP/2 204  100ms]
+
+12:55:31.459 XHROPTIONS
+https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/companies?id=eq.ce448d87-d6e5-4618-ba4d-9cf9db1e7b8f
+[HTTP/2 200  59ms]
+
+12:55:31.656 XHRPATCH
+https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/companies?id=eq.fe0a792d-335d-44ef-9967-7c62bbe2be81
+[HTTP/2 204  98ms]
+
+12:55:31.667 XHROPTIONS
+https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/companies?id=eq.fe0a792d-335d-44ef-9967-7c62bbe2be81
+[HTTP/2 200  58ms]
+
+12:55:31.850 XHRPATCH
+https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/companies?id=eq.1e03f88a-cfcc-4a72-804e-be2f27a884fe
+[HTTP/2 204  93ms]
+
+12:55:31.856 XHROPTIONS
+https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/companies?id=eq.1e03f88a-cfcc-4a72-804e-be2f27a884fe
+[HTTP/2 200  70ms]
+
+12:55:32.050 XHRPATCH
+https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/companies?id=eq.24ce377e-ac3a-4421-8479-448e8321a79a
+[HTTP/2 204  98ms]
+
+12:55:32.056 XHROPTIONS
+https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/companies?id=eq.24ce377e-ac3a-4421-8479-448e8321a79a
+[HTTP/2 200  60ms]
+
+12:55:32.250 XHRPATCH
+https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/companies?id=eq.5c9aea34-8e1b-4212-9d73-70c674319d49
+[HTTP/2 204  106ms]
+
+12:55:32.257 XHROPTIONS
+https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/companies?id=eq.5c9aea34-8e1b-4212-9d73-70c674319d49
+[HTTP/2 200  57ms]
+
+12:55:32.457 XHRPATCH
+https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/companies?id=eq.1cc91751-0fac-4211-b66d-b44ff87181db
+[HTTP/2 204  103ms]
+
+12:55:32.468 XHROPTIONS
+https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/companies?id=eq.1cc91751-0fac-4211-b66d-b44ff87181db
+[HTTP/2 200  62ms]
+
+12:55:32.660 XHRPATCH
+https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/companies?id=eq.181bc690-7c04-4b25-93fd-85350ee0dce4
+
+12:55:32.673 XHROPTIONS
+https://ebbigogxixgbajqijgpp.supabase.co/rest/v1/companies?id=eq.181bc690-7c04-4b25-93fd-85350ee0dce4
+[HTTP/2 200  61ms]
+

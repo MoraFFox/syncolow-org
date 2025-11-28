@@ -43,6 +43,7 @@ import { SpeedDialFab } from './speed-dial-fab';
 import { useMaintenanceStore } from '@/store/use-maintenance-store';
 import { useCompanyStore } from '@/store/use-company-store';
 import { useSettingsStore } from '@/store/use-settings-store';
+import { useTasksSync } from '@/hooks/use-tasks-sync';
 import { generateNotifications } from '@/lib/notification-generator';
 import { ToastContainer } from '@/components/ui/toast-notification';
 import { OfflineBanner } from './offline-banner';
@@ -262,7 +263,6 @@ function useNotificationComputation(userId: string | undefined) {
         }
     }, [pathname, userId, autoMarkAsReadByPath]);
 
-    // Cleanup old notifications daily
     useEffect(() => {
         if (userId) {
             const interval = setInterval(() => {
@@ -294,6 +294,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const [isMoreMenuOpen, setIsMoreMenuOpen] = useState(false);
   
   const isPublicRoute = PUBLIC_ROUTES.some(route => pathname.startsWith(route));
+
+  // Background services
+  useTasksSync(true); // Enable background tasks sync
 
   useEffect(() => {
     if (!authLoading) {

@@ -246,9 +246,16 @@ export default function AnalyticsPage() {
     }, [analyticsOrders, products, companies, maintenanceVisits]);
     
     useEffect(() => {
-        const fromISO = `${dateRange.from}T00:00:00.000Z`;
-        const toISO = `${dateRange.to}T23:59:59.999Z`;
-        fetchOrdersByDateRange(fromISO, toISO);
+        // Fetch wider range to account for timezone differences
+        // The client-side filtering will handle the exact date range
+        const from = new Date(`${dateRange.from}T00:00:00`);
+        const to = new Date(`${dateRange.to}T23:59:59.999`);
+        
+        // Expand by 1 day on each side to account for timezone storage
+        from.setDate(from.getDate() - 1);
+        to.setDate(to.getDate() + 1);
+        
+        fetchOrdersByDateRange(from.toISOString(), to.toISOString());
     }, [dateRange, fetchOrdersByDateRange]);
     
     const handlePrint = () => {

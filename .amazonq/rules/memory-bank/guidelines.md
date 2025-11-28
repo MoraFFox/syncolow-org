@@ -2,512 +2,475 @@
 
 ## Code Quality Standards
 
-### File Headers
-- **Format Comment**: All files start with `/** @format */` comment (5/5 files)
-- Indicates code formatting standards are enforced project-wide
-
-### Strict Mode Directives
-- **"use client"**: Used in all client-side React components and hooks (4/5 files)
-- Required for Next.js App Router client components
-- Placed at the top of files after format comment
-
-### Import Organization
-- **Grouped imports** in logical order:
-  1. External libraries (React, third-party packages)
-  2. Internal utilities and types (`@/lib/*`, `@/components/*`)
-  3. Relative imports
-- **Type imports** use `type` keyword: `import type { Order, Product } from "@/lib/types"`
-- **Path aliases**: All internal imports use `@/*` alias pointing to `src/*`
+### File Organization
+- **"use client" directive**: Always place at the top of client components (first line)
+- **Import grouping**: Organize imports in logical order:
+  1. React and core libraries
+  2. Third-party UI libraries (Radix, Lucide icons)
+  3. Internal components (@/components/ui/*)
+  4. Internal utilities and services (@/lib/*, @/hooks/*)
+  5. Type imports (type keyword for type-only imports)
+- **No unused imports**: All imports must be used in the file
 
 ### Naming Conventions
-- **Files**: kebab-case for components (`csv-importer-dialog.tsx`, `use-toast.ts`)
-- **Components**: PascalCase (`CsvImporterDialog`, `ChartContainer`)
-- **Functions/Variables**: camelCase (`handleFileChange`, `runImport`, `fetchOrders`)
-- **Constants**: UPPER_SNAKE_CASE (`TOAST_LIMIT`, `INITIAL_SERVICES_CATALOG`, `CHUNK_SIZE`)
-- **Types/Interfaces**: PascalCase (`ImportStage`, `MaintenanceState`, `ChartConfig`)
-- **Private variables**: camelCase with descriptive names (`toastTimeouts`, `memoryState`)
+- **Components**: PascalCase (e.g., CsvImporterDialog, PriceRangeFilter)
+- **Files**: kebab-case for component files (e.g., csv-importer-dialog.tsx, price-range-filter.tsx)
+- **Hooks**: camelCase with "use" prefix (e.g., useToast, useCarousel, useMaintenanceStore)
+- **Store files**: kebab-case with "use-" prefix (e.g., use-maintenance-store.ts)
+- **Types/Interfaces**: PascalCase (e.g., MaintenanceState, PriceRangeFilterProps)
+- **Constants**: UPPER_SNAKE_CASE (e.g., TOAST_LIMIT, INITIAL_SERVICES_CATALOG)
+- **Variables/Functions**: camelCase (e.g., handleFileChange, fetchInitialData)
 
-### Code Structure Standards
-- **Consistent indentation**: 2 spaces (TypeScript/React standard)
-- **Line length**: Generally kept under 120 characters
-- **Semicolons**: Used consistently at end of statements
-- **Quotes**: Single quotes for strings, double quotes for JSX attributes
-- **Trailing commas**: Used in multi-line objects and arrays
+### TypeScript Standards
+- **Strict typing**: Always define explicit types for props, state, and function parameters
+- **Interface over type**: Use interface for component props (e.g., interface PriceRangeFilterProps)
+- **Type keyword**: Use type for unions, intersections, and complex types
+- **Optional parameters**: Use ? for optional props (e.g., className?: string)
+- **Type imports**: Use type keyword for type-only imports (e.g., import type { MaintenanceVisit })
+- **Generic types**: Properly type generic functions and hooks (e.g., create<MaintenanceState>)
+- **Avoid any**: Never use any type without explicit justification
+- **Null handling**: Explicitly handle null/undefined cases (e.g., || [], || null)
 
-## TypeScript Patterns
+## React Patterns
 
-### Type Safety
-- **Strict typing**: All function parameters and return types explicitly typed
-- **Type assertions**: Minimal use, only when necessary with proper casting
-- **Generic types**: Used extensively in Zustand stores and React components
-- **Union types**: For state machines and status enums (`ImportStage`, `MaintenanceVisit['status']`)
-- **Type guards**: Runtime type checking where needed
+### Component Structure
+1. **"use client" directive** (if client component)
+2. **Imports** (grouped logically)
+3. **Type definitions** (interfaces, types)
+4. **Constants** (outside component)
+5. **Component function**
+6. **Hooks** (at top of component)
+7. **State declarations**
+8. **Callbacks and handlers**
+9. **Effects**
+10. **Render logic**
+11. **Return JSX**
+12. **Display name** (for forwardRef components)
+13. **Exports**
 
-### Interface Definitions
+### Hook Usage
+- **Hook order**: Always call hooks in the same order at the top of components
+- **Custom hooks**: Extract reusable logic into custom hooks (e.g., useCarousel, useToast)
+- **useCallback**: Wrap event handlers and callbacks with useCallback for optimization
+  ```typescript
+  const handleFileChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    // handler logic
+  }, [dependencies]);
+  ```
+- **useMemo**: Use for expensive computations
+  ```typescript
+  const allErrorsResolved = useMemo(() => {
+    // computation logic
+  }, [errors, resolvedErrors]);
+  ```
+- **useEffect**: Use for side effects, always specify dependencies
+  ```typescript
+  useEffect(() => {
+    // effect logic
+    return () => {
+      // cleanup
+    };
+  }, [dependencies]);
+  ```
+
+### State Management
+- **useState**: For local component state
+  ```typescript
+  const [file, setFile] = useState<File | null>(null);
+  const [stage, setStage] = useState<ImportStage>('upload');
+  ```
+- **Zustand stores**: For global state with create pattern
+  ```typescript
+  export const useMaintenanceStore = create<MaintenanceState>((set, get) => ({
+    // state
+    maintenanceVisits: [],
+    loading: true,
+    // actions
+    fetchInitialData: async () => { /* ... */ },
+  }));
+  ```
+- **Immer integration**: Use produce for immutable updates in Zustand
+  ```typescript
+  set(produce((state: MaintenanceState) => {
+    state.problemsCatalog[category].push(problem);
+  }));
+  ```
+
+### Event Handlers
+- **Naming**: Prefix with "handle" (e.g., handleFileChange, handleSubmit)
+- **Type safety**: Always type event parameters
+  ```typescript
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFile = event.target.files?.[0];
+  };
+  ```
+- **Async handlers**: Use async/await pattern
+  ```typescript
+  const handleParseAndMap = useCallback(async () => {
+    try {
+      const data = await parseFile(file);
+      // process data
+    } catch (error: any) {
+      toast({ title: 'Error', description: error.message });
+    }
+  }, [file]);
+  ```
+
+## Component Patterns
+
+### Props Interface Pattern
 ```typescript
-// State interfaces define complete store shape
-interface MaintenanceState {
-  maintenanceVisits: MaintenanceVisit[];
-  loading: boolean;
-  fetchInitialData: () => Promise<void>;
-  addMaintenanceVisit: (visit: Omit<MaintenanceVisit, 'id'>) => Promise<void>;
-}
-
-// Props interfaces for components
-interface CsvImporterDialogProps {
+interface ComponentNameProps {
+  // Required props first
   isOpen: boolean;
   onOpenChange: (isOpen: boolean) => void;
   entityType: ImportableEntityType;
+  // Optional props with defaults
+  fileType?: 'csv' | 'excel';
+  className?: string;
+}
+
+export function ComponentName({
+  isOpen,
+  onOpenChange,
+  entityType,
+  fileType = 'csv', // default value
+  className = ''
+}: ComponentNameProps) {
+  // component logic
 }
 ```
 
-### Type Utilities
-- **Omit<T, K>**: Remove properties from types (`Omit<Product, "id">`)
-- **Partial<T>**: Make all properties optional (`Partial<MaintenanceVisit>`)
-- **Record<K, V>**: Create object types (`Record<string, unknown>`)
-- **as const**: Create readonly literal types for constants
-
-## State Management Patterns
-
-### Zustand Store Structure
+### ForwardRef Pattern
 ```typescript
-// Standard Zustand store pattern (5/5 stores follow this)
-export const useOrderStore = create<AppState>((set, get) => ({
-  // State properties
-  orders: [],
-  loading: true,
-  
-  // Actions that modify state
-  fetchOrders: async (limitCount) => {
-    set({ ordersLoading: true });
-    // ... async logic
-    set({ orders: data, ordersLoading: false });
-  },
-  
-  // Actions using Immer for immutable updates
-  updateOrderStatus: async (orderId, status) => {
-    set(
-      produce((state: AppState) => {
-        const order = state.orders.find((o) => o.id === orderId);
-        if (order) {
-          order.status = status;
-        }
-      })
-    );
+const ComponentName = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement> & CustomProps
+>(({ className, children, ...props }, ref) => {
+  // component logic
+  return (
+    <div ref={ref} className={cn("base-classes", className)} {...props}>
+      {children}
+    </div>
+  );
+});
+ComponentName.displayName = "ComponentName";
+```
+
+### Context Pattern
+```typescript
+const ComponentContext = React.createContext<ContextProps | null>(null);
+
+function useComponent() {
+  const context = React.useContext(ComponentContext);
+  if (!context) {
+    throw new Error("useComponent must be used within a <Component />");
   }
-}));
-```
-
-### Immer Integration
-- **produce()**: Used for complex nested state updates (100% of mutation operations)
-- **Immutability**: Never mutate state directly, always use `set()` or `produce()`
-- **Type safety**: State type passed to produce for full type checking
-
-### State Access Patterns
-```typescript
-// Get current state within store
-const { orders } = get();
-
-// Access other stores
-const { companies } = useCompanyStore.getState();
-
-// Set state directly
-set({ loading: false });
-
-// Set state with function
-set(produce((state) => { /* mutations */ }));
-```
-
-## React Component Patterns
-
-### Component Structure
-```typescript
-// 1. Type definitions
-interface ComponentProps {
-  // props
-}
-
-// 2. Component definition with forwardRef if needed
-export function Component({ prop1, prop2 }: ComponentProps) {
-  // 3. Hooks (in order: state, refs, context, custom hooks)
-  const [state, setState] = useState();
-  const ref = useRef();
-  const { data } = useStore();
-  
-  // 4. Derived state and memoization
-  const computed = useMemo(() => {}, [deps]);
-  
-  // 5. Effects
-  useEffect(() => {}, [deps]);
-  
-  // 6. Event handlers
-  const handleClick = useCallback(() => {}, [deps]);
-  
-  // 7. Render helpers
-  const renderContent = () => {};
-  
-  // 8. Return JSX
-  return <div>...</div>;
+  return context;
 }
 ```
 
-### Hook Usage Patterns
-- **useState**: For local component state
-- **useCallback**: Memoize event handlers and callbacks (used extensively)
-- **useMemo**: Memoize expensive computations
-- **useEffect**: Side effects, subscriptions, cleanup
-- **Custom hooks**: Extract reusable logic (use-toast, use-auth, use-online-status)
+## Styling Patterns
 
-### Conditional Rendering
+### Tailwind CSS Usage
+- **cn utility**: Always use cn() from @/lib/utils for conditional classes
+  ```typescript
+  className={cn(
+    "base-classes",
+    condition && "conditional-classes",
+    className // allow prop override
+  )}
+  ```
+- **Responsive design**: Use responsive prefixes (sm:, md:, lg:)
+  ```typescript
+  className="grid grid-cols-1 md:grid-cols-2 gap-4"
+  ```
+- **Dark mode**: Use dark: prefix for dark mode styles
+  ```typescript
+  className="bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+  ```
+
+### Component Composition
+- **Spread props**: Always spread remaining props with {...props}
+- **Children prop**: Accept and render children when appropriate
+- **Ref forwarding**: Use forwardRef for components that need ref access
+
+## Data Fetching & API Patterns
+
+### Supabase Integration
 ```typescript
-// Early returns for loading/error states
-if (stage === 'mapping') {
-  return <ColumnMappingStep />;
-}
+// Fetch data
+const { data, error } = await supabase
+  .from('table_name')
+  .select('*')
+  .eq('column', value);
 
-// Ternary for inline conditions
-{isLoading ? <Loader /> : <Content />}
+// Insert data
+await supabase.from('table_name').insert(data);
 
-// Logical AND for conditional display
-{error && <ErrorMessage />}
+// Update data
+await supabase.from('table_name').update(data).eq('id', id);
 
-// Switch-like pattern with multiple conditions
-const renderContent = () => {
-  if (stage === 'upload') return <UploadUI />;
-  if (stage === 'parsing') return <ParsingUI />;
-  return <DefaultUI />;
-};
+// Delete data
+await supabase.from('table_name').delete().eq('id', id);
 ```
-
-## Async Patterns
 
 ### Error Handling
-```typescript
-// Try-catch with user feedback
-try {
-  const result = await importFlow({ entityType, data });
-  toast({ title: 'Success' });
-} catch (error: any) {
+- **Try-catch blocks**: Wrap async operations
+  ```typescript
+  try {
+    const result = await asyncOperation();
+    // success handling
+  } catch (error: any) {
+    console.error("Error:", error);
+    toast({ title: 'Error', description: error.message, variant: 'destructive' });
+  }
+  ```
+- **Toast notifications**: Use toast for user feedback
+  ```typescript
   toast({ 
-    title: 'Error', 
+    title: "Success", 
+    description: "Operation completed successfully" 
+  });
+  
+  toast({ 
+    title: "Error", 
     description: error.message, 
     variant: 'destructive' 
   });
-}
-
-// Silent error handling for non-critical operations
-try {
-  await syncToCache();
-} catch {
-  // Error handled silently or logged
-}
-```
-
-### Promise Patterns
-```typescript
-// Parallel execution with Promise.all
-await Promise.all([
-  supabase.from('orders').upsert(orderUpdates),
-  supabase.from('companies').upsert(companyUpdates)
-]);
-
-// Sequential async operations
-const data = await parseFile(file);
-const validated = await validateData(data);
-await importData(validated);
-```
+  ```
 
 ### Loading States
 ```typescript
-// Set loading before async operation
-set({ ordersLoading: true });
-try {
-  const data = await fetchData();
-  set({ orders: data, ordersLoading: false });
-} catch {
-  set({ ordersLoading: false });
-}
+const [loading, setLoading] = useState(false);
+
+const fetchData = async () => {
+  setLoading(true);
+  try {
+    const data = await fetchFromAPI();
+    // process data
+  } finally {
+    setLoading(false);
+  }
+};
 ```
 
-## Data Fetching Patterns
+## State Update Patterns
 
-### Supabase Query Patterns
+### Immutable Updates
 ```typescript
-// Basic select
-const { data } = await supabase.from('orders').select('*');
+// Array updates
+setItems(prev => [...prev, newItem]); // add
+setItems(prev => prev.filter(item => item.id !== id)); // remove
+setItems(prev => prev.map(item => item.id === id ? updated : item)); // update
 
-// With filters
-const { data } = await supabase
-  .from('orders')
-  .select('*')
-  .eq('status', 'Pending')
-  .gte('orderDate', from)
-  .lte('orderDate', to);
+// Object updates
+setState(prev => ({ ...prev, key: value }));
 
-// With ordering and pagination
-const { data } = await supabase
-  .from('orders')
-  .select('*')
-  .order('orderDate', { ascending: false })
-  .range(0, 49);
-
-// Insert with return
-const { data, error } = await supabase
-  .from('products')
-  .insert([productData])
-  .select()
-  .single();
-
-// Update
-await supabase
-  .from('orders')
-  .update({ status: 'Completed' })
-  .eq('id', orderId);
-
-// Delete
-await supabase
-  .from('orders')
-  .delete()
-  .eq('id', orderId);
+// Set updates
+setSet(prev => new Set(prev).add(value));
+setSet(prev => {
+  const newSet = new Set(prev);
+  newSet.delete(value);
+  return newSet;
+});
 ```
 
-### Caching Strategy
+### Zustand Store Updates
 ```typescript
-// Check cache before fetching
-const cached = AnalyticsCache.get(from, to);
-if (cached) {
-  set({ analyticsOrders: cached });
-  return;
-}
+// Direct set
+set({ loading: false, data: newData });
 
-// Fetch and cache
-const { data } = await supabase.from('orders').select('*');
-AnalyticsCache.set(from, to, data);
-set({ analyticsOrders: data });
+// Functional update
+set(state => ({ ...state, count: state.count + 1 }));
+
+// Immer produce
+set(produce((state: StateType) => {
+  state.nested.property = value;
+  state.array.push(item);
+}));
+
+// Get current state
+const currentState = get();
 ```
 
-## UI Component Patterns
+## Form Handling
 
-### shadcn/ui Integration
+### React Hook Form Pattern
 ```typescript
-// Import from @/components/ui
-import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogHeader } from '@/components/ui/dialog';
+import { useForm, Controller } from 'react-hook-form';
 
-// Use with consistent props
-<Button 
-  variant="default" 
-  size="sm" 
-  onClick={handleClick}
-  disabled={isLoading}
->
-  {isLoading ? <Loader2 className="animate-spin" /> : 'Submit'}
-</Button>
-```
+const { register, control, handleSubmit, formState: { errors } } = useForm<FormData>();
 
-### Icon Usage (Lucide React)
-```typescript
-// Import specific icons
-import { FileUp, Loader2, CheckCircle, AlertTriangle } from 'lucide-react';
+// Register input
+<Input {...register('fieldName')} />
 
-// Use with consistent sizing
-<FileUp className="h-4 w-4 mr-2" />
-<Loader2 className="h-12 w-12 animate-spin text-primary" />
-```
-
-### Styling Patterns
-```typescript
-// Use cn() utility for conditional classes
-import { cn } from '@/lib/utils';
-
-<div className={cn(
-  "base-classes",
-  condition && "conditional-classes",
-  variant === 'primary' && "variant-classes",
-  className // Allow prop override
-)} />
-```
-
-### Form Patterns
-```typescript
-// React Hook Form with Controller for custom inputs
+// Controller for custom components
 <Controller
-  name="region"
+  name="fieldName"
   control={control}
   render={({ field }) => (
-    <Select
-      onValueChange={field.onChange}
-      defaultValue={field.value}
-    >
-      <SelectTrigger>
-        <SelectValue placeholder="Select" />
-      </SelectTrigger>
-      <SelectContent>
-        <SelectItem value="A">Option A</SelectItem>
-      </SelectContent>
+    <Select onValueChange={field.onChange} value={field.value}>
+      {/* options */}
     </Select>
   )}
 />
 
-// Register for native inputs
-<Input {...register("name")} />
-{errors.name && <p className="text-destructive">{errors.name.message}</p>}
+// Error display
+{errors.fieldName && (
+  <p className="text-sm text-destructive">{errors.fieldName.message}</p>
+)}
 ```
 
-## Performance Patterns
-
-### Chunked Processing
-```typescript
-// Process large datasets in chunks
-const CHUNK_SIZE = 500;
-for (let i = 0; i < data.length; i += CHUNK_SIZE) {
-  const chunk = data.slice(i, i + CHUNK_SIZE);
-  await processChunk(chunk);
-  setProgress(Math.round((i / data.length) * 100));
-}
-```
-
-### Pagination
-```typescript
-// Offset-based pagination
-const { data } = await supabase
-  .from('orders')
-  .select('*')
-  .range(offset, offset + limit - 1);
-
-set({
-  orders: [...existingOrders, ...data],
-  offset: offset + limit,
-  hasMore: data.length === limit
-});
-```
+## Performance Optimization
 
 ### Memoization
+- **React.memo**: Wrap components that receive same props frequently
+- **useCallback**: Memoize callbacks passed to child components
+- **useMemo**: Memoize expensive computations
+
+### Conditional Rendering
 ```typescript
-// Memoize expensive computations
-const allErrorsResolved = useMemo(() => {
-  const blockingErrorIndexes = new Set(errors.filter(e => e.blocking).map(e => e.rowIndex));
-  return Array.from(blockingErrorIndexes).every(index => resolvedErrors.has(index));
-}, [errors, resolvedErrors]);
+// Preferred: Early return
+if (!data) return null;
+
+// Conditional rendering
+{condition && <Component />}
+{condition ? <ComponentA /> : <ComponentB />}
+
+// Null coalescing
+{data?.property || 'default'}
 ```
 
-## User Feedback Patterns
+## Testing Patterns
 
-### Toast Notifications
+### Component Testing
+- Test files co-located with source: `__tests__/` folder or `.test.ts` suffix
+- Use Vitest for unit tests
+- Use Playwright for E2E tests
+
+## Documentation Standards
+
+### JSDoc Comments
 ```typescript
-// Success toast
-toast({ 
-  title: 'Order Created',
-  description: 'Order has been placed successfully'
-});
-
-// Error toast
-toast({ 
-  title: 'Error',
-  description: error.message,
-  variant: 'destructive'
-});
-
-// With duration
-toast({ 
-  title: 'Warning',
-  duration: 5000
-});
+/**
+ * Brief description of the function
+ * 
+ * @param param1 - Description of param1
+ * @param param2 - Description of param2
+ * @returns Description of return value
+ * 
+ * @example
+ * const result = functionName(value1, value2);
+ */
 ```
 
-### Progress Indicators
-```typescript
-// Progress state
-const [importProgress, setImportProgress] = useState(0);
-const [importStageDetails, setImportStageDetails] = useState('');
-
-// Update during operation
-setImportProgress(Math.round((current / total) * 100));
-setImportStageDetails(`Processing ${current} of ${total}...`);
-
-// Display
-<Progress value={importProgress} />
-<p className="text-xs text-muted-foreground">{importStageDetails}</p>
-```
+### Inline Comments
+- Explain "why", not "what"
+- Use for complex logic or non-obvious decisions
+- Keep comments concise and up-to-date
 
 ## Common Utilities
 
+### cn() - Class Name Utility
+```typescript
+import { cn } from "@/lib/utils";
+
+className={cn(
+  "base-classes",
+  condition && "conditional-classes",
+  variant === "primary" && "primary-classes",
+  className // prop override
+)}
+```
+
 ### Date Handling
 ```typescript
-// date-fns for date operations
-import { parseISO, isValid, differenceInDays } from 'date-fns';
+import { parseISO, isValid, differenceInDays, format } from 'date-fns';
 
 const date = parseISO(dateString);
 if (isValid(date)) {
-  const days = differenceInDays(new Date(), date);
+  const formatted = format(date, 'yyyy-MM-dd');
 }
 ```
 
-### Data Sanitization
+## Accessibility
+
+### ARIA Attributes
 ```typescript
-// Remove undefined values before database operations
-const cleanData = { ...data };
-Object.keys(cleanData).forEach(key => {
-  if (cleanData[key] === undefined) {
-    delete cleanData[key];
-  }
-});
+<div
+  role="region"
+  aria-roledescription="carousel"
+  aria-label="Descriptive label"
+>
+  {/* content */}
+</div>
 ```
 
-### Search Implementation
+### Semantic HTML
+- Use semantic elements (button, nav, main, article, etc.)
+- Provide sr-only text for screen readers
+  ```typescript
+  <span className="sr-only">Descriptive text</span>
+  ```
+
+## File Structure Best Practices
+
+### Component Files
+- One component per file (except small related sub-components)
+- Co-locate types and interfaces with component
+- Export component as named export or default based on usage
+
+### Store Files
+- One store per domain (e.g., use-maintenance-store.ts)
+- Include all related actions in the store
+- Use TypeScript interfaces for state shape
+
+### Utility Files
+- Group related utilities together
+- Export individual functions
+- Include JSDoc comments for public APIs
+
+## Error Prevention
+
+### Type Guards
 ```typescript
-// Client-side search with lowercase comparison
-const searchLower = searchTerm.toLowerCase();
-const filtered = items.filter(item =>
-  (item.name && item.name.toLowerCase().includes(searchLower)) ||
-  (item.description && item.description.toLowerCase().includes(searchLower))
-);
+if (typeof value === 'string') {
+  // TypeScript knows value is string here
+}
+
+if (Array.isArray(value)) {
+  // TypeScript knows value is array here
+}
 ```
 
-## Best Practices Summary
+### Null Checks
+```typescript
+// Optional chaining
+const value = object?.property?.nested;
 
-### DO:
-- ✅ Use TypeScript strict mode with explicit types
-- ✅ Use Immer's produce() for nested state updates
-- ✅ Implement proper error handling with user feedback
-- ✅ Use async/await for asynchronous operations
-- ✅ Memoize expensive computations and callbacks
-- ✅ Provide loading states for async operations
-- ✅ Use path aliases (@/*) for imports
-- ✅ Follow consistent naming conventions
-- ✅ Use "use client" directive for client components
-- ✅ Implement proper cleanup in useEffect
-- ✅ Use toast notifications for user feedback
-- ✅ Cache frequently accessed data
-- ✅ Process large datasets in chunks
-- ✅ Validate and sanitize data before operations
+// Nullish coalescing
+const result = value ?? defaultValue;
 
-### DON'T:
-- ❌ Mutate state directly (always use set() or produce())
-- ❌ Use `any` type without justification
-- ❌ Ignore error handling in async operations
-- ❌ Forget to set loading states back to false
-- ❌ Use inline styles (use Tailwind classes)
-- ❌ Create deeply nested component structures
-- ❌ Forget cleanup functions in useEffect
-- ❌ Use magic numbers (define constants)
-- ❌ Leave console.log statements in production code
-- ❌ Skip type definitions for function parameters
-- ❌ Use var (always use const/let)
-- ❌ Forget to handle edge cases (null, undefined, empty arrays)
+// Array safety
+const items = data || [];
+```
+
+### Validation
+- Use Zod for runtime validation
+- Validate user input before processing
+- Check API responses for expected structure
 
 ## Code Review Checklist
 
 Before committing code, ensure:
-1. ✅ All TypeScript errors resolved
-2. ✅ ESLint warnings addressed
-3. ✅ Proper error handling implemented
-4. ✅ Loading states managed correctly
-5. ✅ User feedback provided (toasts, progress)
-6. ✅ Types explicitly defined
-7. ✅ Imports organized and using path aliases
-8. ✅ No unused variables or imports
-9. ✅ Consistent naming conventions followed
-10. ✅ Comments added for complex logic
-11. ✅ Proper cleanup in effects
-12. ✅ Accessibility attributes included
+- ✅ No TypeScript errors or warnings
+- ✅ ESLint passes with no errors
+- ✅ All imports are used
+- ✅ Proper error handling in place
+- ✅ Loading states handled
+- ✅ User feedback via toast notifications
+- ✅ Responsive design implemented
+- ✅ Accessibility attributes added
+- ✅ Comments explain complex logic
+- ✅ Tests written for new functionality

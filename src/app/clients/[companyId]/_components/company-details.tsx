@@ -1,16 +1,18 @@
 
 "use client";
 
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useOrderStore } from '@/store/use-order-store';
 import { useCompanyStore } from '@/store/use-company-store';
+import { supabase } from '@/lib/supabase';
+import type { Order } from '@/lib/types';
 import Loading from '@/app/loading';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, PlusCircle, Edit, GitMerge, Building } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
-import type { Branch, Company, Barista, Order, Product } from '@/lib/types';
+import type { Branch, Company, Barista, Product } from '@/lib/types';
 import { CompanyForm } from '../../_components/company-form';
 import { MergeCompaniesDialog } from '../../_components/merge-companies-dialog';
 import { CompanyOverview } from './company-overview';
@@ -27,8 +29,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 export default function CompanyDetails({ companyId }: { companyId: string }) {
   const router = useRouter();
 
-  const { orders, products, loading: orderLoading } = useOrderStore();
+  const { products, loading: orderLoading } = useOrderStore();
   const { companies, loading: companyLoading, updateCompanyAndBranches, mergeCompanies } = useCompanyStore();
+  
+  const [companyOrders, setCompanyOrders] = useState<Order[]>([]);
+  const [ordersLoading, setOrdersLoading] = useState(true);
   
   const [isCompanyFormOpen, setIsCompanyFormOpen] = useState(false);
   const [isMergeDialogOpen, setIsMergeDialogOpen] = useState(false);
@@ -48,12 +53,30 @@ export default function CompanyDetails({ companyId }: { companyId: string }) {
       return [company, ...companyBranches];
   }, [company, companyBranches]);
 
-  const companyOrders = useMemo(() => {
-    if (!company) return [];
-    const branchIds = companyBranches.map(b => b.id);
-    return orders.filter(o => o.companyId === company.id || (o.branchId && branchIds.includes(o.branchId)))
-                 .sort((a,b) => new Date(b.orderDate).getTime() - new Date(a.orderDate).getTime());
-  }, [orders, company, companyBranches]);
+  // Fetch all orders for this company from the database
+  useEffect(() => {
+    if (!company) return;
+    
+    const fetchOrders = async () => {
+      setOrdersLoading(true);
+      try {
+        const { data } = await supabase
+          .from('orders')
+          .select('*')
+          .eq('companyId', company.id)
+          .order('orderDate', { ascending: false });
+        
+        setCompanyOrders((data as Order[]) || []);
+      } catch (error) {
+        console.error('Error fetching company orders:', error);
+        setCompanyOrders([]);
+      } finally {
+        setOrdersLoading(false);
+      }
+    };
+    
+    fetchOrders();
+  }, [company]);
 
   const handleCompanyFormSubmit = async (companyData: Omit<Company, 'id' | 'isBranch' | 'parentCompanyId'>, branchesData?: (Omit<Partial<Branch>, 'baristas'> & { baristas?: Partial<Barista>[] })[]) => {
     if (company) {
@@ -62,7 +85,7 @@ export default function CompanyDetails({ companyId }: { companyId: string }) {
     }
   };
 
-  if (orderLoading || companyLoading || !company) return <Loading />;
+  if (orderLoading || companyLoading || ordersLoading || !company) return <Loading />;
   
   return (
     <>

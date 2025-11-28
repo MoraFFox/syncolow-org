@@ -17,11 +17,12 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
 import { MoreHorizontal, XCircle } from 'lucide-react';
 import { format } from 'date-fns';
-import type { Order } from '@/lib/types';
+import type { Order, Company } from '@/lib/types';
 import { useRouter } from 'next/navigation';
 
 interface OrderListProps {
   orders: Order[];
+  companies: Company[];
   selectedRowKeys: Set<string>;
   onRowSelectionChange: (id: string, isSelected: boolean) => void;
   onSelectAll: (isSelected: boolean) => void;
@@ -57,6 +58,7 @@ const formatCurrency = (amount: number) => {
 
 export function OrderList({
   orders,
+  companies,
   selectedRowKeys,
   onRowSelectionChange,
   onSelectAll,
@@ -67,6 +69,16 @@ export function OrderList({
   const router = useRouter();
   const orderStatuses: Order['status'][] = ['Pending', 'Processing', 'Shipped', 'Delivered'];
 
+  // Resolve company name from companyId as source of truth
+  const getCompanyName = (order: Order): string => {
+    if (order.isPotentialClient) {
+      return order.temporaryCompanyName || 'Unknown Client';
+    }
+    
+    const company = companies.find(c => c.id === order.companyId);
+    return company?.name || order.companyName || 'Unknown Client';
+  };
+
   const renderMobileView = () => (
      <div className="grid grid-cols-1 gap-4 md:hidden">
       {orders.map((order) => (
@@ -75,7 +87,7 @@ export function OrderList({
             <div className="flex justify-between items-start">
               <Link href={`/orders/${order.id}`} className="flex-1">
                 <div className="flex items-center gap-2">
-                  <p className="font-semibold">{order.companyName || order.temporaryCompanyName || 'Unknown Client'}</p>
+                  <p className="font-semibold">{getCompanyName(order)}</p>
                   {order.isPotentialClient && <Badge variant="outline">Potential</Badge>}
                 </div>
                 <p className="text-sm text-muted-foreground">#{order.id.slice(0, 7)}</p>
@@ -174,7 +186,7 @@ export function OrderList({
                   <TableCell className="font-medium cursor-pointer" onClick={() => router.push(`/orders/${order.id}`)}>#{order.id.slice(0, 7)}</TableCell>
                   <TableCell className="cursor-pointer" onClick={() => router.push(`/orders/${order.id}`)}>
                     <div className="flex items-center gap-2">
-                      <span>{order.companyName || order.temporaryCompanyName || 'Unknown Client'}</span>
+                      <span>{getCompanyName(order)}</span>
                       {order.isPotentialClient && <Badge variant="outline">Potential</Badge>}
                     </div>
                   </TableCell>
