@@ -120,8 +120,9 @@ export const tasksSyncService = {
   },
 
   async syncAll(visits: any[], maintenanceVisits: any[]) {
-    const connected = await this.checkConnectionStatus();
-    if (!connected) return { success: false, error: 'Not connected' };
+    // We assume the caller has checked connection status or we handle errors gracefully
+    // const connected = await this.checkConnectionStatus(); 
+    // if (!connected) return { success: false, error: 'Not connected' };
 
     let syncedCount = 0;
     const completedVisits: string[] = [];

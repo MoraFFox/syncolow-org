@@ -31,8 +31,10 @@ import {
   deleteOrderFromSearch,
   bulkSyncOrdersToSearch,
 } from "@/lib/order-search-sync";
-import { AnalyticsCache } from "@/lib/analytics-cache";
-import { productCache } from "@/lib/product-cache";
+// import { AnalyticsCache } from "@/lib/analytics-cache";
+// import { productCache } from "@/lib/product-cache";
+import { universalCache } from "@/lib/cache/universal-cache";
+import { CacheKeyFactory } from "@/lib/cache/key-factory";
 
 const calculateNextDeliveryDate = (
   region: "A" | "B",
@@ -193,6 +195,7 @@ export const useOrderStore = create<AppState>((set, get) => ({
   analyticsLoading: false,
   productsOffset: 0,
   productsHasMore: true,
+  deleteVisit: async () => {},
 
   fetchInitialData: async () => {
     // Only set loading if we don't have data yet
@@ -205,37 +208,92 @@ export const useOrderStore = create<AppState>((set, get) => ({
 
     try {
       const [
-        { data: visits },
-        { data: companies },
-        { data: baristas },
-        { data: feedback },
-        { data: areas },
-        { data: maintenanceVisits },
-        { data: maintenanceEmployees },
-        { data: cancellationReasons },
-        { data: manufacturers },
-        { data: categories },
-        { data: taxes },
-        { data: returns },
+        visits,
+        companies,
+        baristas,
+        feedback,
+        areas,
+        maintenanceVisits,
+        maintenanceEmployees,
+        cancellationReasons,
+        manufacturers,
+        categories,
+        taxes,
+        returns,
       ] = await Promise.all([
-        supabase.from("visits").select("*"),
-        supabase.from("companies").select("*").not('name', 'like', '[DELETED]%'),
-        supabase.from("baristas").select("*"),
-        supabase.from("feedback").select("*"),
-        supabase.from("areas").select("*"),
-        supabase.from("maintenance").select("*"),
-        supabase.from("maintenanceEmployees").select("*"),
-        supabase.from("cancellationReasons").select("*"),
-        supabase.from("manufacturers").select("*"),
-        supabase.from("categories").select("*"),
-        supabase.from("taxes").select("*"),
-        supabase.from("returns").select("*"),
+        universalCache.get(CacheKeyFactory.list('visits'), async () => {
+          const { data, error } = await supabase.from("visits").select("*");
+          if (error) throw error;
+          return data;
+        }),
+        universalCache.get(CacheKeyFactory.list('companies'), async () => {
+          const { data, error } = await supabase.from("companies").select("*").not('name', 'like', '[DELETED]%');
+          if (error) throw error;
+          return data;
+        }),
+        universalCache.get(CacheKeyFactory.list('baristas'), async () => {
+          const { data, error } = await supabase.from("baristas").select("*");
+          if (error) throw error;
+          return data;
+        }),
+        universalCache.get(CacheKeyFactory.list('feedback'), async () => {
+          const { data, error } = await supabase.from("feedback").select("*");
+          if (error) throw error;
+          return data;
+        }),
+        universalCache.get(CacheKeyFactory.list('areas'), async () => {
+          const { data, error } = await supabase.from("areas").select("*");
+          if (error) throw error;
+          return data;
+        }),
+        universalCache.get(CacheKeyFactory.list('maintenance'), async () => {
+          const { data, error } = await supabase.from("maintenance").select("*");
+          if (error) throw error;
+          return data;
+        }),
+        universalCache.get(CacheKeyFactory.list('maintenanceEmployees'), async () => {
+          const { data, error } = await supabase.from("maintenanceEmployees").select("*");
+          if (error) throw error;
+          return data;
+        }),
+        universalCache.get(CacheKeyFactory.list('cancellationReasons'), async () => {
+          const { data, error } = await supabase.from("cancellationReasons").select("*");
+          if (error) throw error;
+          return data;
+        }),
+        universalCache.get(CacheKeyFactory.list('manufacturers'), async () => {
+          const { data, error } = await supabase.from("manufacturers").select("*");
+          if (error) throw error;
+          return data;
+        }),
+        universalCache.get(CacheKeyFactory.list('categories'), async () => {
+          const { data, error } = await supabase.from("categories").select("*");
+          if (error) throw error;
+          return data;
+        }),
+        universalCache.get(CacheKeyFactory.list('taxes'), async () => {
+          const { data, error } = await supabase.from("taxes").select("*");
+          if (error) throw error;
+          return data;
+        }),
+        universalCache.get(CacheKeyFactory.list('returns'), async () => {
+          const { data, error } = await supabase.from("returns").select("*");
+          if (error) throw error;
+          return data;
+        }),
       ]);
       
-      const { data: products } = await supabase
-        .from("products")
-        .select("*")
-        .range(0, 49);
+      const products = await universalCache.get(
+        CacheKeyFactory.list('products', { limit: 50, offset: 0 }), 
+        async () => {
+          const { data, error } = await supabase
+            .from("products")
+            .select("*")
+            .range(0, 49);
+          if (error) throw error;
+          return data;
+        }
+      );
       
       set({ 
         productsOffset: 50, 
@@ -284,11 +342,18 @@ export const useOrderStore = create<AppState>((set, get) => ({
   fetchOrders: async (limitCount) => {
     set({ ordersLoading: true });
     try {
-      const { data: orders } = await supabase
-        .from("orders")
-        .select("*")
-        .order("orderDate", { ascending: false })
-        .range(0, limitCount - 1);
+      const orders = await universalCache.get(
+        CacheKeyFactory.list('orders', { limit: limitCount }),
+        async () => {
+          const { data, error } = await supabase
+            .from("orders")
+            .select("*")
+            .order("orderDate", { ascending: false })
+            .range(0, limitCount - 1);
+          if (error) throw error;
+          return data;
+        }
+      );
 
       set({
         orders: orders || [],
@@ -304,21 +369,29 @@ export const useOrderStore = create<AppState>((set, get) => ({
   fetchOrdersWithFilters: async (limitCount, filters) => {
     set({ ordersLoading: true });
     try {
-      let query = supabase.from("orders").select("*");
+      const orders = await universalCache.get(
+        CacheKeyFactory.list('orders', { limit: limitCount, ...filters }),
+        async () => {
+          let query = supabase.from("orders").select("*");
 
-      if (filters.status && filters.status !== "All") {
-        query = query.eq("status", filters.status);
-      }
-      if (filters.paymentStatus && filters.paymentStatus !== "All") {
-        query = query.eq("paymentStatus", filters.paymentStatus);
-      }
-      if (filters.companyId) {
-        query = query.eq("companyId", filters.companyId);
-      }
+          if (filters.status && filters.status !== "All") {
+            query = query.eq("status", filters.status);
+          }
+          if (filters.paymentStatus && filters.paymentStatus !== "All") {
+            query = query.eq("paymentStatus", filters.paymentStatus);
+          }
+          if (filters.companyId) {
+            query = query.eq("companyId", filters.companyId);
+          }
 
-      const { data: orders } = await query
-        .order("orderDate", { ascending: false })
-        .range(0, limitCount - 1);
+          const { data, error } = await query
+            .order("orderDate", { ascending: false })
+            .range(0, limitCount - 1);
+          
+          if (error) throw error;
+          return data;
+        }
+      );
 
       set({
         orders: orders || [],
@@ -394,7 +467,8 @@ export const useOrderStore = create<AppState>((set, get) => ({
 
   refreshOrders: async () => {
     const limitCount = get().orders.length || 20;
-    AnalyticsCache.clearAll();
+    // AnalyticsCache.clearAll();
+    await universalCache.invalidate(['app', 'list', 'orders'] as any);
     await get().fetchOrders(limitCount);
   },
 
@@ -405,61 +479,48 @@ export const useOrderStore = create<AppState>((set, get) => ({
     const fetchId = crypto.randomUUID();
     set({ currentFetchId: fetchId, analyticsLoading: true });
 
-    const cached = AnalyticsCache.get(from, to);
-    if (cached) {
-      // Check if this is still the current fetch
-      if (get().currentFetchId === fetchId) {
-        set({ analyticsOrders: cached, analyticsLoading: false });
-      }
-      return;
-    }
-    
     toast({
       title: "Loading Analytics Data",
       description: "Fetching all orders for the selected period...",
     });
 
     try {
-      let allOrders: Order[] = [];
-      let hasMore = true;
-      let page = 0;
-      const pageSize = 1000; // Match Supabase's default limit to ensure correct pagination
+      const allOrders = await universalCache.get(
+        CacheKeyFactory.list('orders', { from, to, type: 'analytics' }),
+        async () => {
+          let allOrders: Order[] = [];
+          let hasMore = true;
+          let page = 0;
+          const pageSize = 1000;
 
-      while (hasMore) {
-        // Abort if a new fetch has started
-        if (get().currentFetchId !== fetchId) {
-            console.log("Fetch aborted: " + fetchId);
-            return;
-        }
+          while (hasMore) {
+            // Check for abort
+            if (get().currentFetchId !== fetchId) throw new Error("Fetch aborted");
 
-        const { data: orders, error } = await supabase
-          .from("orders")
-          .select("id, orderDate, total, grandTotal, status, paymentStatus, companyId, items, isPotentialClient, temporaryCompanyName, statusHistory, paidDate, expectedPaymentDate")
-          .gte("orderDate", from)
-          .lte("orderDate", to)
-          .order("orderDate", { ascending: false })
-          .range(page * pageSize, (page + 1) * pageSize - 1);
+            const { data: orders, error } = await supabase
+              .from("orders")
+              .select("id, orderDate, total, grandTotal, status, paymentStatus, companyId, items, isPotentialClient, temporaryCompanyName, statusHistory, paidDate, expectedPaymentDate")
+              .gte("orderDate", from)
+              .lte("orderDate", to)
+              .order("orderDate", { ascending: false })
+              .range(page * pageSize, (page + 1) * pageSize - 1);
 
-        if (error) throw error;
+            if (error) throw error;
 
-        if (orders && orders.length > 0) {
-          allOrders = [...allOrders, ...(orders as Order[])];
-          
-          // If we got fewer rows than requested, we've reached the end
-          if (orders.length < pageSize) {
-            hasMore = false;
-          } else {
-            page++;
+            if (orders && orders.length > 0) {
+              allOrders = [...allOrders, ...(orders as Order[])];
+              if (orders.length < pageSize) hasMore = false;
+              else page++;
+            } else {
+              hasMore = false;
+            }
           }
-        } else {
-          hasMore = false;
+          return allOrders;
         }
-      }
+      );
 
       // Final check before updating state
       if (get().currentFetchId !== fetchId) return;
-
-      AnalyticsCache.set(from, to, allOrders);
 
       set({ analyticsOrders: allOrders, analyticsLoading: false });
       
@@ -469,8 +530,7 @@ export const useOrderStore = create<AppState>((set, get) => ({
       });
 
     } catch (error: any) {
-      // Only show error if this is still the current fetch
-      if (get().currentFetchId === fetchId) {
+      if (get().currentFetchId === fetchId && error.message !== "Fetch aborted") {
         console.error("Error fetching analytics orders:", error);
         set({ analyticsLoading: false });
         toast({
@@ -518,6 +578,9 @@ export const useOrderStore = create<AppState>((set, get) => ({
     if (updatedOrder) {
         await syncOrderToSearch(updatedOrder as Order);
     }
+    
+    // Invalidate cache
+    await universalCache.invalidate(['app', 'list', 'orders'] as any);
   },
 
   updateOrderPaymentStatus: async (orderId, paymentStatus) => {
@@ -557,7 +620,8 @@ export const useOrderStore = create<AppState>((set, get) => ({
     if (notes) updateData.paymentNotes = notes;
 
     await supabase.from("orders").update(updateData).in("id", orderIds);
-    AnalyticsCache.clearAll();
+    // AnalyticsCache.clearAll();
+    await universalCache.invalidate(['app', 'list', 'orders'] as any);
     await get().refreshOrders();
     await get().updatePaymentScores();
     toast({
@@ -645,6 +709,9 @@ export const useOrderStore = create<AppState>((set, get) => ({
       await get().updatePaymentScores(companyId);
     }
     
+    // Invalidate cache
+    await universalCache.invalidate(['app', 'list', 'orders'] as any);
+    
     toast({
       title: "Order Deleted",
       description: "The order has been permanently removed.",
@@ -696,7 +763,7 @@ export const useOrderStore = create<AppState>((set, get) => ({
         state.products.push(newProduct);
       })
     );
-    productCache.setProducts(get().products).catch(console.error);
+    // productCache.setProducts(get().products).catch(console.error);
 
     toast({
       title: "Product Added",
@@ -730,7 +797,7 @@ export const useOrderStore = create<AppState>((set, get) => ({
         }
       })
     );
-    productCache.setProducts(get().products).catch(console.error);
+    // productCache.setProducts(get().products).catch(console.error);
   },
 
   deleteProduct: async (productId: string) => {
@@ -740,7 +807,7 @@ export const useOrderStore = create<AppState>((set, get) => ({
         state.products = state.products.filter((p) => p.id !== productId);
       })
     );
-    productCache.setProducts(get().products).catch(console.error);
+    // productCache.setProducts(get().products).catch(console.error);
   },
 
   deleteAllProducts: async () => {
@@ -751,7 +818,7 @@ export const useOrderStore = create<AppState>((set, get) => ({
 
     if (error) throw error;
     set({ products: [] });
-    productCache.clearProducts().catch(console.error);
+    // productCache.clearProducts().catch(console.error);
     toast({
       title: "All Products Deleted",
       description: "All products have been removed from the database.",
@@ -935,6 +1002,9 @@ export const useOrderStore = create<AppState>((set, get) => ({
     if (createdOrder.companyId) {
       await get().updatePaymentScores(createdOrder.companyId);
     }
+
+    // Invalidate cache
+    await universalCache.invalidate(['app', 'list', 'orders'] as any);
 
     toast({
       title: "Order Created successfully!",
@@ -1126,7 +1196,7 @@ export const useOrderStore = create<AppState>((set, get) => ({
         })
       );
       
-      productCache.setProducts(get().products).catch(console.error);
+      // productCache.setProducts(get().products).catch(console.error);
     } catch {
       // Error handled silently
     }

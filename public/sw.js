@@ -1,71 +1,81 @@
 /** @format */
 
-const CACHE_NAME = 'synergyflow-v1';
-const RUNTIME_CACHE = 'runtime-v1';
+importScripts('https://storage.googleapis.com/workbox-cdn/releases/7.0.0/workbox-sw.js');
 
-const PRECACHE_URLS = [
-  '/',
-  '/offline',
-  '/manifest.json',
-];
+if (workbox) {
+  console.log(`Workbox is loaded`);
 
-// Install - precache critical assets
-self.addEventListener('install', (event) => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      // Try to cache each URL individually to avoid blocking on failed requests
-      return Promise.allSettled(
-        PRECACHE_URLS.map(url => 
-          cache.add(url).catch(err => {
-            console.warn(`Failed to cache ${url}:`, err);
-            return null;
-          })
-        )
-      );
+  // 1. Static Assets (CacheFirst)
+  // Images, Styles, Scripts, Fonts
+  workbox.routing.registerRoute(
+    ({request}) => ['image', 'style', 'script', 'font'].includes(request.destination),
+    new workbox.strategies.CacheFirst({
+      cacheName: 'static-assets',
+      plugins: [
+        new workbox.expiration.ExpirationPlugin({
+          maxEntries: 60,
+          maxAgeSeconds: 30 * 24 * 60 * 60, // 30 Days
+        }),
+      ],
     })
   );
-  self.skipWaiting();
-});
 
-// Activate - cleanup old caches
-self.addEventListener('activate', (event) => {
-  event.waitUntil(
-    caches.keys().then((cacheNames) =>
-      Promise.all(
-        cacheNames
-          .filter((name) => name !== CACHE_NAME && name !== RUNTIME_CACHE)
-          .map((name) => caches.delete(name))
-      )
-    )
+  // 2. API Reads (Supabase) - NetworkFirst
+  // We use NetworkFirst to ensure fresh data, but fallback to cache if offline.
+  // This complements the in-memory (L1) and IndexedDB (L2) caches by providing a network-level fallback.
+  workbox.routing.registerRoute(
+    ({url}) => url.hostname.includes('supabase.co'),
+    new workbox.strategies.NetworkFirst({
+      cacheName: 'api-cache',
+      networkTimeoutSeconds: 3,
+      plugins: [
+        new workbox.expiration.ExpirationPlugin({
+          maxEntries: 50,
+          maxAgeSeconds: 24 * 60 * 60, // 24 Hours
+        }),
+        new workbox.cacheableResponse.CacheableResponsePlugin({
+          statuses: [0, 200],
+        }),
+      ],
+    })
   );
-  self.clients.claim();
-});
 
-// Fetch - network first, fallback to cache
-self.addEventListener('fetch', (event) => {
-  if (event.request.method !== 'GET') return;
+  // 3. Offline Queue (Legacy Support)
+  // We keep the existing sync handler for compatibility with OfflineQueueManager
+  self.addEventListener('sync', (event) => {
+    if (event.tag === 'sync-offline-queue') {
+      event.waitUntil(syncOfflineQueue());
+    }
+  });
 
-  event.respondWith(
-    fetch(event.request)
-      .then((response) => {
-        if (response.status === 200) {
-          const responseClone = response.clone();
-          caches.open(RUNTIME_CACHE).then((cache) => {
-            cache.put(event.request, responseClone);
-          });
-        }
-        return response;
+  // 4. Push Notifications
+  self.addEventListener('push', (event) => {
+    const data = event.data?.json() || {};
+    
+    event.waitUntil(
+      self.registration.showNotification(data.title || 'SynergyFlow', {
+        body: data.message || 'New notification',
+        icon: '/icon-192.png',
+        badge: '/badge-72.png',
+        tag: data.id || 'default',
+        data: data,
       })
-      .catch(() => caches.match(event.request).then((cached) => cached || caches.match('/offline')))
-  );
-});
+    );
+  });
 
-// Background sync for offline queue
-self.addEventListener('sync', (event) => {
-  if (event.tag === 'sync-offline-queue') {
-    event.waitUntil(syncOfflineQueue());
-  }
-});
+  self.addEventListener('notificationclick', (event) => {
+    event.notification.close();
+    
+    event.waitUntil(
+      clients.openWindow(event.notification.data?.link || '/')
+    );
+  });
+
+} else {
+  console.log(`Workbox failed to load`);
+}
+
+// --- Legacy Helper Functions ---
 
 async function syncOfflineQueue() {
   const db = await openIndexedDB();
@@ -118,26 +128,3 @@ async function processQueueItem(item) {
   
   if (!response.ok) throw new Error('Sync failed');
 }
-
-// Push notifications
-self.addEventListener('push', (event) => {
-  const data = event.data?.json() || {};
-  
-  event.waitUntil(
-    self.registration.showNotification(data.title || 'SynergyFlow', {
-      body: data.message || 'New notification',
-      icon: '/icon-192.png',
-      badge: '/badge-72.png',
-      tag: data.id || 'default',
-      data: data,
-    })
-  );
-});
-
-self.addEventListener('notificationclick', (event) => {
-  event.notification.close();
-  
-  event.waitUntil(
-    clients.openWindow(event.notification.data?.link || '/')
-  );
-});

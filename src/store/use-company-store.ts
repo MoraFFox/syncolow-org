@@ -5,6 +5,8 @@ import { supabase } from '@/lib/supabase';
 import type { Company, Branch, Barista, MaintenanceVisit, Feedback, DeliveryArea } from '@/lib/types';
 import { toast } from '@/hooks/use-toast';
 import { logError, logSupabaseError, logDebug } from '@/lib/error-logger';
+import { universalCache } from '@/lib/cache/universal-cache';
+import { CacheKeyFactory } from '@/lib/cache/key-factory';
 
 interface CompanyState {
   companies: Company[];
@@ -187,6 +189,7 @@ export const useCompanyStore = create<CompanyState>((set, get) => ({
     }
     
     toast({ title: 'Company Updated', description: 'Company details have been updated.' });
+    await universalCache.invalidate(['app', 'list', 'companies'] as any);
   },
 
   deleteCompany: async (companyId: string, forceCascade: boolean = false, reassignToCompanyId?: string) => {
@@ -272,10 +275,11 @@ export const useCompanyStore = create<CompanyState>((set, get) => ({
     } catch (error: any) {
       toast({ 
         title: "Delete Failed", 
-        description: error.message || 'Failed to delete company',
+        description: error?.message || 'Failed to delete company',
         variant: 'destructive'
       });
     }
+    await universalCache.invalidate(['app', 'list', 'companies'] as any);
   },
 
   mergeCompanies: async (parentCompanyIdOrName, childCompanyIds) => {
@@ -388,48 +392,51 @@ export const useCompanyStore = create<CompanyState>((set, get) => ({
     const fromDate = twelveMonthsAgo.toISOString();
 
     try {
-        const revenueByCompany: Record<string, number> = {};
-        let hasMore = true;
-        let page = 0;
-        const pageSize = 1000;
-        let totalOrders = 0;
+        const revenueByCompany = await universalCache.get(
+            CacheKeyFactory.list('orders', { type: 'revenue_stats', from: fromDate }),
+            async () => {
+                const revenueMap: Record<string, number> = {};
+                let hasMore = true;
+                let page = 0;
+                const pageSize = 1000;
+                let totalOrders = 0;
 
-        while (hasMore) {
-            const from = page * pageSize;
-            const to = from + pageSize - 1;
+                while (hasMore) {
+                    const from = page * pageSize;
+                    const to = from + pageSize - 1;
 
-            const { data: orders, error } = await supabase
-                .from('orders')
-                .select('companyId, grandTotal')
-                .gte('orderDate', fromDate)
-                .neq('status', 'Cancelled')
-                .range(from, to);
+                    const { data: orders, error } = await supabase
+                        .from('orders')
+                        .select('companyId, grandTotal')
+                        .gte('orderDate', fromDate)
+                        .neq('status', 'Cancelled')
+                        .range(from, to);
 
-            if (error) throw error;
+                    if (error) throw error;
 
-            if (!orders || orders.length === 0) {
-                hasMore = false;
-                break;
-            }
+                    if (!orders || orders.length === 0) {
+                        hasMore = false;
+                        break;
+                    }
 
-            orders.forEach(order => {
-                if (order.companyId) {
-                    revenueByCompany[order.companyId] = (revenueByCompany[order.companyId] || 0) + (order.grandTotal || 0);
+                    orders.forEach(order => {
+                        if (order.companyId) {
+                            revenueMap[order.companyId] = (revenueMap[order.companyId] || 0) + (order.grandTotal || 0);
+                        }
+                    });
+
+                    totalOrders += orders.length;
+                    
+                    if (orders.length < pageSize) {
+                        hasMore = false;
+                    } else {
+                        page++;
+                    }
                 }
-            });
-
-            totalOrders += orders.length;
-            
-            // If we got fewer than pageSize, we've reached the end
-            if (orders.length < pageSize) {
-                hasMore = false;
-            } else {
-                page++;
+                console.log('[DEBUG] Revenue Stats - Total fetched orders:', totalOrders);
+                return revenueMap;
             }
-        }
-
-        console.log('[DEBUG] Revenue Stats - Total fetched orders:', totalOrders);
-        console.log('[DEBUG] Revenue Stats - Aggregated companies:', Object.keys(revenueByCompany).length);
+        );
 
         set(produce((state: CompanyState) => {
             state.companies.forEach(company => {

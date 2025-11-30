@@ -5,6 +5,8 @@ import type { MaintenanceVisit, MaintenanceEmployee, CancellationReason } from '
 import { toast } from '@/hooks/use-toast';
 import { parseISO, isValid, differenceInDays } from 'date-fns';
 import { produce } from 'immer';
+import { universalCache } from '@/lib/cache/universal-cache';
+import { CacheKeyFactory } from '@/lib/cache/key-factory';
 
 const INITIAL_SERVICES_CATALOG: { [category: string]: { [service: string]: number } } = {
   "دورات تنظيف (Cleaning Cycles)": {
@@ -129,14 +131,25 @@ export const useMaintenanceStore = create<MaintenanceState>((set, get) => ({
   fetchInitialData: async () => {
     if (!get().loading) set({ loading: true });
     try {
-        const { data: maintenanceVisits } = await supabase.from('maintenance').select('*');
-        const { data: maintenanceEmployees } = await supabase.from('maintenanceEmployees').select('*');
-        const { data: cancellationReasons } = await supabase.from('cancellationReasons').select('*');
+        const [maintenanceVisits, maintenanceEmployees, cancellationReasons] = await Promise.all([
+            universalCache.get(
+                CacheKeyFactory.list('maintenance'),
+                () => supabase.from('maintenance').select('*').then(({ data }) => data || [])
+            ),
+            universalCache.get(
+                CacheKeyFactory.list('maintenanceEmployees'),
+                () => supabase.from('maintenanceEmployees').select('*').then(({ data }) => data || [])
+            ),
+            universalCache.get(
+                CacheKeyFactory.list('cancellationReasons'),
+                () => supabase.from('cancellationReasons').select('*').then(({ data }) => data || [])
+            )
+        ]);
 
         set({ 
-            maintenanceVisits: (maintenanceVisits || []) as MaintenanceVisit[], 
-            maintenanceEmployees: (maintenanceEmployees || []) as MaintenanceEmployee[], 
-            cancellationReasons: (cancellationReasons || []) as CancellationReason[], 
+            maintenanceVisits: maintenanceVisits as MaintenanceVisit[], 
+            maintenanceEmployees: maintenanceEmployees as MaintenanceEmployee[], 
+            cancellationReasons: cancellationReasons as CancellationReason[], 
             loading: false 
         });
     } catch (e) {
@@ -148,6 +161,7 @@ export const useMaintenanceStore = create<MaintenanceState>((set, get) => ({
   addMaintenanceVisit: async (visit) => {
     const visitWithStatus = { ...visit, status: 'Scheduled' as const };
     await supabase.from('maintenance').insert(visitWithStatus);
+    await universalCache.invalidate(CacheKeyFactory.list('maintenance'));
     get().fetchInitialData();
     toast({ title: "Visit Scheduled"});
   },
@@ -201,6 +215,7 @@ export const useMaintenanceStore = create<MaintenanceState>((set, get) => ({
     }
 
     await supabase.from('maintenance').update(cleanData).eq('id', visitId);
+    await universalCache.invalidate(CacheKeyFactory.list('maintenance'));
 
     const rootVisitId = visitToUpdate.rootVisitId || visitToUpdate.id;
     
@@ -249,6 +264,7 @@ export const useMaintenanceStore = create<MaintenanceState>((set, get) => ({
 
   updateMaintenanceVisitStatus: async (visitId, status) => {
     await supabase.from('maintenance').update({ status }).eq('id', visitId);
+    await universalCache.invalidate(CacheKeyFactory.list('maintenance'));
     await get().fetchInitialData();
     toast({ title: "Visit Updated", description: `Visit status changed to ${status}.` });
   },
@@ -264,18 +280,21 @@ export const useMaintenanceStore = create<MaintenanceState>((set, get) => ({
         // Delete children
         await supabase.from('maintenance').delete().eq('rootVisitId', visitId);
     }
+    await universalCache.invalidate(CacheKeyFactory.list('maintenance'));
 
     await get().fetchInitialData();
   },
 
   addMaintenanceEmployee: async (employee) => {
     await supabase.from('maintenanceEmployees').insert(employee);
+    await universalCache.invalidate(CacheKeyFactory.list('maintenanceEmployees'));
     await get().fetchInitialData();
     toast({ title: 'Crew Member Added'});
   },
   
   updateMaintenanceEmployee: async (employeeId, employeeData) => {
     await supabase.from('maintenanceEmployees').update(employeeData).eq('id', employeeId);
+    await universalCache.invalidate(CacheKeyFactory.list('maintenanceEmployees'));
     await get().fetchInitialData();
     toast({ title: 'Crew Member Updated' });
   },
@@ -293,6 +312,7 @@ export const useMaintenanceStore = create<MaintenanceState>((set, get) => ({
     set(produce((state: MaintenanceState) => {
         state.cancellationReasons.push(insertedReason as CancellationReason);
     }));
+    await universalCache.invalidate(CacheKeyFactory.list('cancellationReasons'));
   },
 
   searchMaintenanceVisits: async (searchTerm: string) => {

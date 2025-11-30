@@ -315,9 +315,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         fetchOrders(50);
         
         // Preload cache in background
-        import('@/lib/cache-manager').then(({ cacheManager }) => {
-          cacheManager.preloadAll().catch(console.error);
-        });
+        // import('@/lib/cache-manager').then(({ cacheManager }) => {
+        //   cacheManager.preloadAll().catch(console.error);
+        // });
     }
   }, [user, fetchInitialData, fetchOrders]);
   
