@@ -50,16 +50,13 @@ const EventCard = ({ event }: { event: AgendaItem }) => {
           <div className='flex-1'>
             <div className='flex justify-between items-start'>
               <p className='font-semibold'>{event.clientName}</p>
-              {event.type === "Maintenance" &&
-                (event.data as MaintenanceVisit).visitType ===
-                  "customer_request" && (
-                  <Badge variant='outline'>Client Request</Badge>
-                )}
+              {event.type === "Maintenance" && (event.data as MaintenanceVisit).visitType === "customer_request" && (
+                <Badge variant='outline'>Client Request</Badge>
+              )}
             </div>
             <p className='text-sm text-muted-foreground truncate'>
               {event.type === "Maintenance"
-                ? (event.data as MaintenanceVisit).maintenanceNotes ||
-                  "No details available"
+                ? (event.data as MaintenanceVisit).maintenanceNotes || "No details available"
                 : (event.data as VisitCall).outcome || "No details available"}
             </p>
             {event.type !== "Maintenance" && (

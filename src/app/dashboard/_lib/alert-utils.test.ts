@@ -1,23 +1,11 @@
-/** @format */
-
 import { describe, it, expect } from "vitest";
-import {
-  calculateAlertPriority,
-  sortAlertsByPriority,
-  toAlertItems,
-} from "./alert-utils";
+import { calculateAlertPriority, sortAlertsByPriority, toAlertItems } from "./alert-utils";
 
 describe("alert-utils", () => {
   it("calculates priority for low stock", () => {
-    expect(
-      calculateAlertPriority("Low Stock", { id: "p1", name: "X", stock: 3 })
-    ).toBe("high");
-    expect(
-      calculateAlertPriority("Low Stock", { id: "p2", name: "Y", stock: 8 })
-    ).toBe("medium");
-    expect(
-      calculateAlertPriority("Low Stock", { id: "p3", name: "Z", stock: 12 })
-    ).toBe("low");
+    expect(calculateAlertPriority("Low Stock", { id: "p1", name: "X", stock: 3 })).toBe("high");
+    expect(calculateAlertPriority("Low Stock", { id: "p2", name: "Y", stock: 8 })).toBe("medium");
+    expect(calculateAlertPriority("Low Stock", { id: "p3", name: "Z", stock: 12 })).toBe("low");
   });
 
   it("sorts alerts by priority", () => {

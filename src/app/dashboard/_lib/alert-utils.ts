@@ -3,10 +3,7 @@
 import { AlertTriangle, Package, UserX, Calendar } from "lucide-react";
 import type { AlertItem, AlertPriority, AlertType, AlertData } from "./types";
 
-export function calculateAlertPriority(
-  type: AlertType,
-  data: AlertData
-): AlertPriority {
+export function calculateAlertPriority(type: AlertType, data: AlertData): AlertPriority {
   if (type === "Overdue Payment") {
     const o = data as Extract<AlertData, { overdueDays?: number }>;
     const days = typeof o?.overdueDays === "number" ? o.overdueDays : 0;
@@ -51,20 +48,11 @@ export function getAlertIcon(type: AlertType) {
   }
 }
 
-export function formatAlertMessage(alert: {
-  type: AlertType;
-  data: AlertData;
-}) {
-  if (alert.type === "Low Stock")
-    return `Stock level is low (${
-      (alert.data as Extract<AlertData, { stock: number }>).stock
-    }).`;
+export function formatAlertMessage(alert: { type: AlertType; data: AlertData }) {
+  if (alert.type === "Low Stock") return `Stock level is low (${(alert.data as Extract<AlertData, { stock: number }>).stock}).`;
   if (alert.type === "Tomorrow Delivery") return "Scheduled for tomorrow.";
   if (alert.type === "Inactive Client") return "Has been inactive for a while.";
-  if (alert.type === "Overdue Payment")
-    return `Payment for ${
-      (alert.data as Extract<AlertData, { companyName: string }>).companyName
-    } is overdue.`;
+  if (alert.type === "Overdue Payment") return `Payment for ${(alert.data as Extract<AlertData, { companyName: string }>).companyName} is overdue.`;
   return "";
 }
 

@@ -1,5 +1,3 @@
-/** @format */
-
 export type AlertPriority = "critical" | "high" | "medium" | "low";
 
 export type AlertType =
@@ -10,19 +8,11 @@ export type AlertType =
 
 import type { Order, Product, Company } from "@/lib/types";
 
-export type OverdueOrder = Pick<Order, "id" | "companyName"> & {
-  overdueDays?: number;
-};
+export type OverdueOrder = Pick<Order, "id" | "companyName"> & { overdueDays?: number };
 export type LowStockProduct = Pick<Product, "id" | "name" | "stock">;
 export type TomorrowDeliveryOrder = Pick<Order, "id" | "deliveryDate">;
-export type InactiveCompany = Pick<Company, "id" | "name"> & {
-  lastOrderDate?: string;
-};
-export type AlertData =
-  | OverdueOrder
-  | LowStockProduct
-  | TomorrowDeliveryOrder
-  | InactiveCompany;
+export type InactiveCompany = Pick<Company, "id" | "name"> & { lastOrderDate?: string };
+export type AlertData = OverdueOrder | LowStockProduct | TomorrowDeliveryOrder | InactiveCompany;
 
 export interface AlertItem {
   type: AlertType;
