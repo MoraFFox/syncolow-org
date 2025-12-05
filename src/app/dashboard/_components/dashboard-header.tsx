@@ -1,17 +1,16 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Button } from "@/components/ui/button";
-import { RefreshCw } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { RefreshIndicator } from "./refresh-indicator";
 
 interface DashboardHeaderProps {
   onRefresh: () => void;
   isRefreshing: boolean;
   userName?: string;
+  lastUpdated?: Date;
 }
 
-export function DashboardHeader({ onRefresh, isRefreshing, userName = "User" }: DashboardHeaderProps) {
+export function DashboardHeader({ onRefresh, isRefreshing, userName = "User", lastUpdated }: DashboardHeaderProps) {
   const [greeting, setGreeting] = useState("Good morning");
 
   useEffect(() => {
@@ -24,7 +23,7 @@ export function DashboardHeader({ onRefresh, isRefreshing, userName = "User" }: 
   return (
     <div className="flex items-center justify-between gap-4 flex-wrap">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">
+        <h1 className="text-4xl font-bold tracking-tight">
           {greeting}, {userName}
         </h1>
         <p className="text-muted-foreground mt-1">
@@ -32,16 +31,7 @@ export function DashboardHeader({ onRefresh, isRefreshing, userName = "User" }: 
         </p>
       </div>
       <div>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={onRefresh}
-          disabled={isRefreshing}
-          className={cn("gap-2", isRefreshing && "opacity-80")}
-        >
-          <RefreshCw className={cn("h-4 w-4", isRefreshing && "animate-spin")} />
-          {isRefreshing ? "Refreshing..." : "Refresh Data"}
-        </Button>
+        <RefreshIndicator lastUpdated={lastUpdated} onRefresh={onRefresh} isRefreshing={isRefreshing} compact />
       </div>
     </div>
   );

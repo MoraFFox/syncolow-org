@@ -4,7 +4,7 @@
 
 import { Car, Wrench } from "lucide-react";
 import Link from "next/link";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { ScrollIndicator } from "./scroll-indicator";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -12,6 +12,10 @@ import { DrillTarget } from "@/components/drilldown/drill-target";
 import { useTodayAgenda } from "../_hooks/use-dashboard-data";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { AgendaItem } from "../_lib/dashboard-api";
+import type { MaintenanceVisit, VisitCall } from "@/lib/types";
+import { SectionCard } from "./section-card";
+import { EmptyState } from "./empty-state";
+import { DASHBOARD_CONFIG } from "../_lib/dashboard-config";
 
 const EventCard = ({ event }: { event: AgendaItem }) => {
   const EventIcon = ({ type }: { type: string }) => {
@@ -47,17 +51,16 @@ const EventCard = ({ event }: { event: AgendaItem }) => {
             <div className='flex justify-between items-start'>
               <p className='font-semibold'>{event.clientName}</p>
               {event.type === "Maintenance" &&
-                // @ts-ignore - data is MaintenanceVisit
-                event.data.visitType === "customer_request" && (
+                (event.data as MaintenanceVisit).visitType ===
+                  "customer_request" && (
                   <Badge variant='outline'>Client Request</Badge>
                 )}
             </div>
             <p className='text-sm text-muted-foreground truncate'>
               {event.type === "Maintenance"
-                ? // @ts-ignore
-                  event.data.maintenanceNotes || "No details available"
-                : // @ts-ignore
-                  event.data.outcome || "No details available"}
+                ? (event.data as MaintenanceVisit).maintenanceNotes ||
+                  "No details available"
+                : (event.data as VisitCall).outcome || "No details available"}
             </p>
             {event.type !== "Maintenance" && (
               <div className='mt-2'>
@@ -80,10 +83,8 @@ const EventCard = ({ event }: { event: AgendaItem }) => {
         kind='maintenance'
         payload={{
           id: event.data.id,
-          // @ts-ignore
-          branchName: event.data.branchName,
-          // @ts-ignore
-          companyName: event.data.companyName,
+          branchName: (event.data as MaintenanceVisit).branchName,
+          companyName: (event.data as MaintenanceVisit).companyName,
         }}
         asChild
       >
@@ -97,9 +98,13 @@ const EventCard = ({ event }: { event: AgendaItem }) => {
 export function TodayAgenda() {
   const { data: todayEvents, isLoading } = useTodayAgenda();
 
-  if (isLoading) {
-    return (
-      <ScrollArea className='h-[400px] w-full'>
+  return (
+    <SectionCard
+      title="Today's Agenda"
+      description='Visits and maintenance scheduled for today.'
+      loading={isLoading}
+    >
+      {isLoading ? (
         <div className='space-y-3'>
           {[1, 2, 3].map((i) => (
             <Card key={i}>
@@ -115,29 +120,24 @@ export function TodayAgenda() {
             </Card>
           ))}
         </div>
-      </ScrollArea>
-    );
-  }
-
-  return (
-    <ScrollArea className='h-[400px] w-full'>
-      <div className='space-y-3'>
-        {todayEvents && todayEvents.length > 0 ? (
-          todayEvents.map((event, index) => (
-            <EventCard key={index} event={event} />
-          ))
-        ) : (
-          <div className='flex flex-col items-center justify-center h-full text-center text-gray-500 dark:text-gray-400 rounded-lg border-2 border-dashed py-10'>
-            <Wrench className='h-12 w-12 mb-4 text-gray-300 dark:text-gray-600' />
-            <p className='font-semibold'>
-              No visits or maintenance scheduled for today.
-            </p>
-            <p className='text-sm'>
-              Your agenda is clear. Enjoy the quiet day!
-            </p>
+      ) : (
+        <ScrollIndicator
+          height={DASHBOARD_CONFIG.SCROLL_AREA_HEIGHTS.todayAgenda}
+        >
+          <div className='space-y-3 pr-4'>
+            {todayEvents && todayEvents.length > 0 ? (
+              todayEvents.map((event, index) => (
+                <EventCard key={index} event={event} />
+              ))
+            ) : (
+              <EmptyState
+                title='No visits or maintenance scheduled for today'
+                description='Your agenda is clear. Enjoy the quiet day!'
+              />
+            )}
           </div>
-        )}
-      </div>
-    </ScrollArea>
+        </ScrollIndicator>
+      )}
+    </SectionCard>
   );
 }

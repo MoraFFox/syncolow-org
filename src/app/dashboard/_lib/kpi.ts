@@ -43,3 +43,20 @@ export function computeKpis(
     lowStock,
   };
 }
+
+export function computeTrend(current: number, previous: number): number {
+  if (previous === 0) return current === 0 ? 0 : 100;
+  return ((current - previous) / previous) * 100;
+}
+
+export function buildSparkline(series: number[], maxPoints = 20): number[] {
+  if (series.length <= maxPoints) return series;
+  const factor = Math.ceil(series.length / maxPoints);
+  const compact: number[] = [];
+  for (let i = 0; i < series.length; i += factor) {
+    const slice = series.slice(i, i + factor);
+    const avg = slice.reduce((a, b) => a + b, 0) / slice.length;
+    compact.push(Number(avg.toFixed(2)));
+  }
+  return compact;
+}

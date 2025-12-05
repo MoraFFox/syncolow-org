@@ -22,10 +22,10 @@ import {
   CardContent,
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { Button } from "@/components/ui/button";
+// Removed unused Button import
 import { Wrench, Truck, AlertTriangle, Package } from "lucide-react";
+import { ErrorBoundary } from "./_components/error-boundary";
 //
-
 
 const TodayVisitsMap = dynamic(
   () =>
@@ -37,8 +37,14 @@ const TodayVisitsMap = dynamic(
 );
 
 export default function DashboardPage() {
-  const { data: kpis, isLoading, refetch, isRefetching } = useDashboardMetrics();
+  const {
+    data: kpis,
+    isLoading,
+    refetch,
+    isRefetching,
+  } = useDashboardMetrics();
   const { user } = useAuth();
+  const [lastUpdated, setLastUpdated] = useState<Date | undefined>(undefined);
 
   const defaultKpis = {
     scheduledMaintenanceToday: 0,
@@ -49,49 +55,54 @@ export default function DashboardPage() {
 
   const metrics = kpis || defaultKpis;
 
+  useEffect(() => {
+    if (!isLoading && kpis) setLastUpdated(new Date());
+  }, [isLoading, kpis]);
+
   return (
     <div className='flex flex-col gap-8'>
-      <DashboardHeader 
-        onRefresh={refetch} 
-        isRefreshing={isRefetching} 
-        userName={user?.displayName || "User"} 
+      <DashboardHeader
+        onRefresh={refetch}
+        isRefreshing={isRefetching}
+        userName={user?.displayName || "User"}
+        lastUpdated={lastUpdated}
       />
 
       <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4'>
-        <Link href="/maintenance">
+        <Link href='/maintenance'>
           <KpiCard
-            title="Scheduled Maintenance Today"
+            title='Scheduled Maintenance Today'
             value={metrics.scheduledMaintenanceToday}
             icon={Wrench}
             loading={isLoading}
-            variant="info"
+            variant='info'
           />
         </Link>
-        <Link href="/orders?status=Pending">
+        <Link href='/orders?status=Pending'>
           <KpiCard
-            title="Deliveries Today"
+            title='Deliveries Today'
             value={metrics.deliveriesToday}
             icon={Truck}
             loading={isLoading}
-            variant="success"
+            variant='success'
           />
         </Link>
-        <Link href="/orders?paymentStatus=Overdue">
+        <Link href='/orders?paymentStatus=Overdue'>
           <KpiCard
-            title="Overdue Payments"
+            title='Overdue Payments'
             value={metrics.overduePayments}
             icon={AlertTriangle}
             loading={isLoading}
-            variant="destructive"
+            variant='destructive'
           />
         </Link>
-        <Link href="/products?stock=low">
+        <Link href='/products?stock=low'>
           <KpiCard
-            title="Low Stock Items"
+            title='Low Stock Items'
             value={metrics.lowStock}
             icon={Package}
             loading={isLoading}
-            variant="warning"
+            variant='warning'
           />
         </Link>
       </div>
@@ -106,12 +117,18 @@ export default function DashboardPage() {
               </CardDescription>
             </CardHeader>
             <CardContent className='space-y-6'>
-              <TodayAgenda />
+              <ErrorBoundary>
+                <TodayAgenda />
+              </ErrorBoundary>
               <Separator />
-              <TodayOrderLog />
+              <ErrorBoundary>
+                <TodayOrderLog />
+              </ErrorBoundary>
             </CardContent>
           </Card>
-          <TodayVisitsMap />
+          <ErrorBoundary>
+            <TodayVisitsMap />
+          </ErrorBoundary>
         </div>
         <div className='lg:col-span-1 space-y-8'>
           <Card>
@@ -122,11 +139,17 @@ export default function DashboardPage() {
               </CardDescription>
             </CardHeader>
             <CardContent className='space-y-4'>
-              <Alerts />
+              <ErrorBoundary>
+                <Alerts />
+              </ErrorBoundary>
               <Separator />
-              <ActivityFeed />
+              <ErrorBoundary>
+                <ActivityFeed />
+              </ErrorBoundary>
               <Separator />
-              <WeeklyLookahead />
+              <ErrorBoundary>
+                <WeeklyLookahead />
+              </ErrorBoundary>
             </CardContent>
           </Card>
         </div>
