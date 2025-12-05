@@ -43,3 +43,11 @@ next-env.d.ts
 synergyflow-pvqrj-firebase-adminsdk-fbsvc-278af49f7d.json
 synergyflow-pvqrj-firebase-adminsdk-fbsvc-278af49f7d.json
 synergyflow-pvqrj-firebase-adminsdk-fbsvc-278af49f7d.json
+
+# dot folders
+.amazonq
+docs
+chat-history
+e2e
+indexing
+logs
