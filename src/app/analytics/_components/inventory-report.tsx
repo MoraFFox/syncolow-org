@@ -18,7 +18,6 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import Image from "next/image";
 import { Loader2 } from 'lucide-react';
 
@@ -26,12 +25,10 @@ interface InventoryReportProps {
     dateRange: { from: string; to: string };
 }
 
-import { useDrillDown } from '@/hooks/use-drilldown';
 import { DrillTarget } from '@/components/drilldown/drill-target';
 
 export function InventoryReport({ dateRange }: InventoryReportProps) {
     const { products, analyticsOrders } = useOrderStore();
-    const { goToDetail } = useDrillDown();
     const [searchTerm, setSearchTerm] = useState('');
     const [sortConfig, setSortConfig] = useState<{ key: string; direction: 'asc' | 'desc' } | null>(null);
     const [visibleCount, setVisibleCount] = useState(10);
@@ -141,6 +138,7 @@ export function InventoryReport({ dateRange }: InventoryReportProps) {
                   {visibleInventoryData.map((product) => (
                     <Card key={product.id}>
                       <CardContent className="p-4 flex gap-4">
+                        <DrillTarget kind="product" payload={{ id: product.id, name: product.name, stock: product.stock }} asChild>
                         <Image
                           src={product.imageUrl || "https://placehold.co/100x100.png"}
                           alt={product.name}
@@ -149,9 +147,12 @@ export function InventoryReport({ dateRange }: InventoryReportProps) {
                           className="rounded-md object-cover"
                           data-ai-hint={product.hint}
                         />
+                        </DrillTarget>
                         <div className="flex-1 flex flex-col justify-between">
                           <div>
-                            <p className="font-semibold">{product.name}</p>
+                            <DrillTarget kind="product" payload={{ id: product.id, name: product.name, stock: product.stock }} asChild>
+                                <p className="font-semibold cursor-pointer">{product.name}</p>
+                            </DrillTarget>
                             <Badge variant="destructive">{product.stock} in stock</Badge>
                           </div>
                           <div className="mt-2 flex">

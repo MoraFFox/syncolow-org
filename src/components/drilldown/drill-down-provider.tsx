@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { useDrillDownStore } from '@/store/use-drilldown-store';
 import { ComparePanel } from './compare-panel';
 import { PinnedPreview } from './pinned-preview';
+import { GlobalDrillListener } from './global-drill-listener';
 
 export function DrillDownProvider() {
   const { pinnedPreviews, unpinPreview, loadPinnedPreviews } = useDrillDownStore();
@@ -14,6 +15,7 @@ export function DrillDownProvider() {
 
   return (
     <>
+      <GlobalDrillListener />
       <ComparePanel />
       {pinnedPreviews.map((pinned) => (
         <PinnedPreview

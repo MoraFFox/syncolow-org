@@ -8,6 +8,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { DrillTarget } from '@/components/drilldown/drill-target';
 import { Calendar } from '@/components/ui/calendar';
 import type { MaintenanceVisit } from '@/lib/types';
 import { format, isSameDay, startOfMonth, endOfMonth, isWithinInterval, isFuture, isToday, parseISO } from 'date-fns';
@@ -138,7 +139,9 @@ export function MaintenanceCalendar({ visits, onEditVisit, onUpdateStatus, onDel
                          <div key={visit.id} className="p-3 rounded-lg border bg-card text-card-foreground shadow-sm">
                            <div className="flex justify-between items-start">
                               <div>
-                                <p className="font-semibold">{visit.branchName}</p>
+                                <DrillTarget kind="branch" payload={{ id: visit.branchId, name: visit.branchName, companyId: visit.companyId }} asChild>
+                                    <p className="font-semibold cursor-pointer hover:underline">{visit.branchName}</p>
+                                </DrillTarget>
                                 <p className="text-xs text-muted-foreground">{visit.date ? format(parseISO(visit.date as string), 'p') : ''}</p>
                               </div>
                                <Badge variant={visit.status === 'Completed' ? 'default' : visit.status === 'Cancelled' ? 'destructive' : 'secondary'}>{visit.status}</Badge>

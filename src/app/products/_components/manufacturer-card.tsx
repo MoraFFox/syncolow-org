@@ -3,6 +3,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Manufacturer, Product } from "@/lib/types";
 import { Package, DollarSign } from "lucide-react";
+import { DrillTarget } from '@/components/drilldown/drill-target';
 
 import Image from "next/image";
 
@@ -38,7 +39,20 @@ export function ManufacturerCard({ manufacturer, products, onClick }: Manufactur
                 <span className="text-lg font-bold text-primary">{manufacturer.name.charAt(0)}</span>
             </div>
           )}
-          <CardTitle className="text-lg font-bold truncate">{manufacturer.name}</CardTitle>
+          <DrillTarget 
+            kind="manufacturer" 
+            payload={{ 
+              id: manufacturer.id, 
+              name: manufacturer.name, 
+              icon: manufacturer.icon,
+              productCount: products.length 
+            }} 
+            asChild
+          >
+            <CardTitle className="text-lg font-bold truncate cursor-pointer hover:underline">
+              {manufacturer.name}
+            </CardTitle>
+          </DrillTarget>
         </CardHeader>
         <CardContent>
           <div className="flex flex-col gap-2">

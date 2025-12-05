@@ -4,6 +4,7 @@ import { supabase } from '@/lib/supabase';
 import { Manufacturer, Product } from '@/lib/types';
 import { storageService } from '@/services/storage-service';
 import { logError, logSupabaseError } from '@/lib/error-logger';
+import { drilldownCacheInvalidator } from '@/lib/cache/drilldown-cache-invalidator';
 
 interface ManufacturerState {
   manufacturers: Manufacturer[];
@@ -122,6 +123,12 @@ export const useManufacturerStore = create<ManufacturerState & ManufacturerActio
         m.id === id ? { ...m, ...updateData } as Manufacturer : m
       ),
     }));
+    
+    try {
+      drilldownCacheInvalidator.invalidateAllPreviews('product');
+    } catch (e) {
+      console.error('Failed to invalidate drilldown cache:', e);
+    }
   },
 
   deleteManufacturer: async (id: string) => {
@@ -131,6 +138,12 @@ export const useManufacturerStore = create<ManufacturerState & ManufacturerActio
       set((state) => ({
         manufacturers: state.manufacturers.filter((m) => m.id !== id),
       }));
+      
+      try {
+        drilldownCacheInvalidator.invalidateAllPreviews('product');
+      } catch (e) {
+        console.error('Failed to invalidate drilldown cache:', e);
+      }
     } catch (error: any) {
       logError(error, {
         component: 'useManufacturerStore',

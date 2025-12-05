@@ -107,7 +107,7 @@ export function useTasksSync(enableBackgroundSync = false) {
                 variant: "destructive"
             });
         }
-      } else if (result.error === 'Not connected') {
+      } else if ('error' in result && result.error === 'Not connected') {
           setIsConnected(false);
       }
     } catch (error) {

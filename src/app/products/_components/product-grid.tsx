@@ -9,6 +9,7 @@ import { Product } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
 import { Manufacturer } from "@/lib/types";
+import { DrillTarget } from "@/components/drilldown/drill-target";
 
 interface ProductGridProps {
   products: Product[];
@@ -52,10 +53,12 @@ export function ProductGrid({ products, onEdit, onDelete, manufacturers }: Produ
               />
               <div className='flex-1 flex flex-col justify-between'>
                 <div>
-                  <p className='font-semibold'>
-                    {product.name}{" "}
-                    {product.variantName && `- ${product.variantName}`}
-                  </p>
+                   <DrillTarget kind="product" payload={{ id: product.id, name: product.name, price: product.price, stock: product.stock }} asChild>
+                    <p className='font-semibold cursor-pointer'>
+                      {product.name}{" "}
+                      {product.variantName && `- ${product.variantName}`}
+                    </p>
+                  </DrillTarget>
                   <p className='text-sm text-muted-foreground'>
                     $
                     {typeof product.price === "number"
@@ -73,10 +76,12 @@ export function ProductGrid({ products, onEdit, onDelete, manufacturers }: Produ
                           {product.category}
                         </span>
                       )}
-                      {manufacturerName && (
-                        <span className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-primary/10 text-primary hover:bg-primary/20">
-                          {manufacturerName}
-                        </span>
+                      {manufacturerName && product.manufacturerId && (
+                        <DrillTarget kind="company" payload={{ id: product.manufacturerId, name: manufacturerName }} asChild>
+                          <span className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-primary/10 text-primary hover:bg-primary/20 cursor-pointer">
+                            {manufacturerName}
+                          </span>
+                        </DrillTarget>
                       )}
                     </div>
                   )}

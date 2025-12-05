@@ -66,7 +66,7 @@ export default function OrderDrillDownPage() {
           <CardContent>
             <DrillTarget 
               kind="company" 
-              payload={{ name: order.companyName || order.branchName }} // Ideally ID
+              payload={{ id: order.companyId, name: order.companyName || order.branchName }} // Ideally ID
               className="text-2xl font-bold hover:underline cursor-pointer"
             >
               {order.companyName || order.branchName}

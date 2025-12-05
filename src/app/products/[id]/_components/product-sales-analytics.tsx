@@ -22,6 +22,7 @@ import {
 import type { Product } from '@/lib/types';
 import { format, subMonths, differenceInMonths } from 'date-fns';
 import Link from 'next/link';
+import { DrillTarget } from '@/components/drilldown/drill-target';
 
 interface ProductSalesAnalyticsProps {
     product: Product;
@@ -189,12 +190,12 @@ export function ProductSalesAnalytics({ product }: ProductSalesAnalyticsProps) {
                     <CardContent>
                         <div className="space-y-3 md:hidden">
                             {analytics.topClients.map(client => (
-                                <Link key={client.id} href={`/clients/${client.id}`}>
-                                    <div className="p-3 border rounded-md hover:bg-muted flex justify-between items-center">
-                                        <p className="font-medium">{client.name}</p>
-                                        <p className="text-sm font-bold">{client.quantity} units</p>
-                                    </div>
-                                </Link>
+                                <div key={client.id} className="p-3 border rounded-md hover:bg-muted flex justify-between items-center">
+                                    <DrillTarget kind="company" payload={{ id: client.id, name: client.name }} asChild>
+                                        <Link href={`/clients/${client.id}`} className="font-medium hover:underline">{client.name}</Link>
+                                    </DrillTarget>
+                                    <p className="text-sm font-bold">{client.quantity} units</p>
+                                </div>
                             ))}
                             {analytics.topClients.length === 0 && <p className="text-center text-sm text-muted-foreground py-4">No purchases yet.</p>}
                         </div>
@@ -208,8 +209,12 @@ export function ProductSalesAnalytics({ product }: ProductSalesAnalyticsProps) {
                                 </TableHeader>
                                  <TableBody>
                                     {analytics.topClients.map(client => (
-                                        <TableRow key={client.id} className="cursor-pointer" onClick={() => window.location.href = `/clients/${client.id}`}>
-                                            <TableCell className="font-medium">{client.name}</TableCell>
+                                        <TableRow key={client.id}>
+                                            <TableCell>
+                                                <DrillTarget kind="company" payload={{ id: client.id, name: client.name }} asChild>
+                                                    <Link href={`/clients/${client.id}`} className="font-medium hover:underline">{client.name}</Link>
+                                                </DrillTarget>
+                                            </TableCell>
                                             <TableCell className="text-right">{client.quantity}</TableCell>
                                         </TableRow>
                                     ))}
@@ -227,15 +232,15 @@ export function ProductSalesAnalytics({ product }: ProductSalesAnalyticsProps) {
                     <CardContent>
                          <div className="space-y-3 md:hidden">
                             {analytics.recentProductOrders.map(order => (
-                                <Link key={order.id} href={`/orders/${order.id}`}>
-                                    <div className="p-3 border rounded-md hover:bg-muted">
-                                        <div className="flex justify-between items-center">
-                                            <p className="font-semibold">#{order.id.slice(0, 7)}</p>
-                                            <p className="text-sm">{order.items.find(i => i.productId === product.id)?.quantity} units</p>
-                                        </div>
-                                        <p className="text-sm text-muted-foreground">{format(new Date(order.orderDate), 'PPP')}</p>
+                                <div key={order.id} className="p-3 border rounded-md hover:bg-muted">
+                                    <div className="flex justify-between items-center">
+                                        <DrillTarget kind="order" payload={{ id: order.id }} asChild>
+                                            <Link href={`/orders/${order.id}`} className="font-semibold hover:underline">#{order.id.slice(0, 7)}</Link>
+                                        </DrillTarget>
+                                        <p className="text-sm">{order.items.find(i => i.productId === product.id)?.quantity} units</p>
                                     </div>
-                                </Link>
+                                    <p className="text-sm text-muted-foreground">{format(new Date(order.orderDate), 'PPP')}</p>
+                                </div>
                             ))}
                             {analytics.recentProductOrders.length === 0 && <p className="text-center text-sm text-muted-foreground py-4">No recent orders.</p>}
                         </div>
@@ -250,8 +255,12 @@ export function ProductSalesAnalytics({ product }: ProductSalesAnalyticsProps) {
                                 </TableHeader>
                                 <TableBody>
                                     {analytics.recentProductOrders.map(order => (
-                                         <TableRow key={order.id} className="cursor-pointer" onClick={() => window.location.href = `/orders/${order.id}`}>
-                                            <TableCell className="font-medium">#{order.id.slice(0, 7)}</TableCell>
+                                         <TableRow key={order.id}>
+                                            <TableCell>
+                                                <DrillTarget kind="order" payload={{ id: order.id }} asChild>
+                                                    <Link href={`/orders/${order.id}`} className="font-medium hover:underline">#{order.id.slice(0, 7)}</Link>
+                                                </DrillTarget>
+                                            </TableCell>
                                             <TableCell>{format(new Date(order.orderDate), 'PPP')}</TableCell>
                                             <TableCell className="text-right">{order.items.find(i => i.productId === product.id)?.quantity}</TableCell>
                                         </TableRow>

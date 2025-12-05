@@ -9,8 +9,8 @@ import { CheckCircle2, ExternalLink, FileText, History } from 'lucide-react';
 import { format } from 'date-fns';
 import { PaymentScoreBadge } from '@/components/payment-score-badge';
 import type { Order, Company } from '@/lib/types';
-import Link from 'next/link';
 import { downloadInvoice } from '@/lib/pdf-invoice';
+import { DrillTarget } from '@/components/drilldown/drill-target';
 
 interface UnpaidInvoicesTableProps {
   orders: Order[];
@@ -106,12 +106,18 @@ export function UnpaidInvoicesTable({
                         />
                       </TableCell>
                       <TableCell className="font-mono text-sm">
-                        <Link href={`/orders?filter=${order.id}`} className="hover:underline flex items-center gap-1">
-                          #{order.id.substring(0, 8)}
-                          <ExternalLink className="h-3 w-3" />
-                        </Link>
+                        <DrillTarget kind="order" payload={{ id: order.id }} asChild>
+                          <span className="hover:underline flex items-center gap-1 cursor-pointer">
+                            #{order.id.substring(0, 8)}
+                            <ExternalLink className="h-3 w-3" />
+                          </span>
+                        </DrillTarget>
                       </TableCell>
-                      <TableCell className="font-medium">{order.companyName}</TableCell>
+                      <TableCell className="font-medium">
+                        <DrillTarget kind="company" payload={{ id: order.companyId, name: order.companyName }} asChild>
+                          <span className="cursor-pointer hover:underline">{order.companyName}</span>
+                        </DrillTarget>
+                      </TableCell>
                       <TableCell>{format(new Date(order.orderDate), 'MMM dd, yyyy')}</TableCell>
                       <TableCell>
                         {order.expectedPaymentDate ? (

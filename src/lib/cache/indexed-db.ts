@@ -43,10 +43,11 @@ export class IndexedDBStorage {
   async set(key: CacheKey, entry: CacheEntry): Promise<void> {
     if (!this.dbPromise) return;
     const db = await this.dbPromise;
+    const serializedKey = this.serializeKey(key);
     await db.put(STORE_NAME, {
       ...entry,
-      key: this.serializeKey(key),
-    });
+      key: serializedKey,
+    } as any);
     
     // Trigger eviction check (fire and forget)
     this.prune().catch(console.error);

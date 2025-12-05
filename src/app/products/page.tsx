@@ -7,29 +7,18 @@ import {
   useEffect,
   Suspense,
   useRef,
-  useCallback,
 } from "react";
-import { useSearchParams } from "next/navigation";
+
 import { useDebouncedCallback } from "use-debounce";
 import Link from "next/link";
 import {
   PlusCircle,
   Search,
-  GitBranch,
   Trash2,
   Upload,
-  LayoutGrid,
-  List,
   Tags,
 } from "lucide-react";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useOrderStore } from "@/store/use-order-store";
@@ -49,7 +38,6 @@ import {
 } from "@/components/ui/alert-dialog";
 import { toast } from "@/hooks/use-toast";
 import { ProductImporterDialog } from "./_components/product-importer-dialog";
-import { PriceAuditDialog } from "@/components/price-audit-dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import { useManufacturerStore } from "@/store/use-manufacturer-store";
@@ -58,12 +46,11 @@ import { CategoryCard } from "./_components/category-card";
 import { ManufacturerCard } from "./_components/manufacturer-card";
 import { ProductGrid } from "./_components/product-grid";
 import { ArrowLeft } from "lucide-react";
+import { DrillTarget } from '@/components/drilldown/drill-target';
 
 type AddProductData = Omit<Product, "id" | "imageUrl"> & { image?: File };
 
-interface ProductListItem extends Product {
-  depth: number;
-}
+
 
 function ProductsPageContent() {
   const {
@@ -79,7 +66,7 @@ function ProductsPageContent() {
   const { manufacturers, loading: manufacturersLoading } =
     useManufacturerStore();
 
-  const observerRef = useRef<IntersectionObserver | null>(null);
+
   const loadMoreRef = useRef<HTMLDivElement>(null);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [hasLoadedAll, setHasLoadedAll] = useState(false);
@@ -212,7 +199,7 @@ function ProductsPageContent() {
   const handleDeleteAllConfirm = async () => {
     try {
       await deleteAllProducts();
-    } catch (error) {
+    } catch (err) {
       toast({
         title: "Error Deleting Products",
         description: "Failed to delete all products. Please try again.",
@@ -405,15 +392,24 @@ function ProductsPageContent() {
                 {Object.entries(productsByCategory).map(([categoryName, categoryProducts]) => {
                    const categoryObj = categories.find(c => c.name === categoryName) || { id: 'uncategorized', name: categoryName };
                    return (
-                     <CategoryCard 
-                       key={categoryName} 
-                       category={categoryObj} 
-                       products={categoryProducts} 
-                       onClick={() => {
-                         console.log("Category clicked:", categoryObj);
-                         setSelectedCategory(categoryObj);
+                     <DrillTarget 
+                       key={categoryName}
+                       kind="category" 
+                       payload={{ 
+                         id: categoryObj.id, 
+                         name: categoryObj.name,
+                         productCount: categoryProducts.length 
                        }}
-                     />
+                     >
+                       <CategoryCard 
+                         category={categoryObj} 
+                         products={categoryProducts} 
+                         onClick={() => {
+                           console.log("Category clicked:", categoryObj);
+                           setSelectedCategory(categoryObj);
+                         }}
+                       />
+                     </DrillTarget>
                    );
                 })}
               </div>
@@ -441,15 +437,25 @@ function ProductsPageContent() {
                    const manufacturerObj = manufacturers.find(m => m.name === manufacturerName) || { id: 'unknown', name: manufacturerName, icon: undefined };
                    
                    return (
-                     <ManufacturerCard 
-                       key={manufacturerName} 
-                       manufacturer={manufacturerObj} 
-                       products={manufacturerProducts} 
-                       onClick={() => {
-                         console.log("Manufacturer clicked:", manufacturerObj);
-                         setSelectedManufacturer(manufacturerObj);
+                     <DrillTarget 
+                       key={manufacturerName}
+                       kind="manufacturer" 
+                       payload={{ 
+                         id: manufacturerObj.id, 
+                         name: manufacturerObj.name,
+                         icon: manufacturerObj.icon,
+                         productCount: manufacturerProducts.length 
                        }}
-                     />
+                     >
+                       <ManufacturerCard 
+                         manufacturer={manufacturerObj} 
+                         products={manufacturerProducts} 
+                         onClick={() => {
+                           console.log("Manufacturer clicked:", manufacturerObj);
+                           setSelectedManufacturer(manufacturerObj);
+                         }}
+                       />
+                     </DrillTarget>
                    );
                 })}
               </div>

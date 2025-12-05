@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { DollarSign, AlertTriangle, TrendingDown, Users } from 'lucide-react';
 import { PaymentScoreBadge } from '@/components/payment-score-badge';
 import { BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { DrillTarget } from '@/components/drilldown/drill-target';
 
 export default function PaymentAnalyticsPage() {
   const { orders } = useOrderStore();
@@ -234,7 +235,8 @@ export default function PaymentAnalyticsPage() {
                   </tr>
                 ) : (
                   analytics.delinquentClients.map((client) => (
-                    <tr key={client.id} className="border-b hover:bg-muted/50">
+                    <DrillTarget key={client.id} kind="company" payload={{ id: client.id, name: client.name, status: client.status }} asChild>
+                    <tr className="border-b hover:bg-muted/50 cursor-pointer">
                       <td className="py-3 px-4 font-medium">{client.name}</td>
                       <td className="py-3 px-4">
                         <PaymentScoreBadge score={client.score} status={client.status} />
@@ -247,6 +249,7 @@ export default function PaymentAnalyticsPage() {
                         {client.paymentTerms}
                       </td>
                     </tr>
+                    </DrillTarget>
                   ))
                 )}
               </tbody>

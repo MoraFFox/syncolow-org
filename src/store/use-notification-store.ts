@@ -3,6 +3,7 @@
 import { create } from "zustand";
 import type { Notification } from "@/lib/types";
 import { NotificationService } from "@/lib/notification-service";
+import { findDuplicateNotifications } from '@/lib/smart-notifications';
 
 interface NotificationState {
   notifications: Notification[];
@@ -121,7 +122,6 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
   },
 
   mergeDuplicates: () => {
-    const { findDuplicateNotifications } = require('@/lib/smart-notifications');
     const { notifications } = get();
     
     const duplicates = findDuplicateNotifications(notifications);
@@ -138,4 +138,3 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
     }
   },
 }));
-

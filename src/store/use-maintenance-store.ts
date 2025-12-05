@@ -7,6 +7,7 @@ import { parseISO, isValid, differenceInDays } from 'date-fns';
 import { produce } from 'immer';
 import { universalCache } from '@/lib/cache/universal-cache';
 import { CacheKeyFactory } from '@/lib/cache/key-factory';
+import { drilldownCacheInvalidator } from '@/lib/cache/drilldown-cache-invalidator';
 
 const INITIAL_SERVICES_CATALOG: { [category: string]: { [service: string]: number } } = {
   "دورات تنظيف (Cleaning Cycles)": {
@@ -131,20 +132,27 @@ export const useMaintenanceStore = create<MaintenanceState>((set, get) => ({
   fetchInitialData: async () => {
     if (!get().loading) set({ loading: true });
     try {
-        const [maintenanceVisits, maintenanceEmployees, cancellationReasons] = await Promise.all([
-            universalCache.get(
-                CacheKeyFactory.list('maintenance'),
-                () => supabase.from('maintenance').select('*').then(({ data }) => data || [])
-            ),
-            universalCache.get(
-                CacheKeyFactory.list('maintenanceEmployees'),
-                () => supabase.from('maintenanceEmployees').select('*').then(({ data }) => data || [])
-            ),
-            universalCache.get(
-                CacheKeyFactory.list('cancellationReasons'),
-                () => supabase.from('cancellationReasons').select('*').then(({ data }) => data || [])
-            )
-        ]);
+        const maintenanceVisits = await universalCache.get(
+            CacheKeyFactory.list('maintenance'),
+            async () => {
+                const { data } = await supabase.from('maintenance').select('*');
+                return data || [];
+            }
+        );
+        const maintenanceEmployees = await universalCache.get(
+            CacheKeyFactory.list('maintenanceEmployees'),
+            async () => {
+                const { data } = await supabase.from('maintenanceEmployees').select('*');
+                return data || [];
+            }
+        );
+        const cancellationReasons = await universalCache.get(
+            CacheKeyFactory.list('cancellationReasons'),
+            async () => {
+                const { data } = await supabase.from('cancellationReasons').select('*');
+                return data || [];
+            }
+        );
 
         set({ 
             maintenanceVisits: maintenanceVisits as MaintenanceVisit[], 
@@ -257,6 +265,17 @@ export const useMaintenanceStore = create<MaintenanceState>((set, get) => ({
 
     await get().fetchInitialData();
     console.log('useMaintenanceStore - updateMaintenanceVisit completed');
+    
+    // Invalidate drilldown preview
+    try {
+      drilldownCacheInvalidator.invalidateRelatedPreviews('maintenance', visitId, {
+        companyId: visitToUpdate.companyId,
+        branchId: visitToUpdate.branchId,
+        baristaId: visitToUpdate.baristaId
+      });
+    } catch (e) {
+      console.error('Failed to invalidate drilldown cache:', e);
+    }
 
     toast({ title: "Visit Outcome Logged" });
     return get().maintenanceVisits.find(v => v.id === visitId);
@@ -281,6 +300,17 @@ export const useMaintenanceStore = create<MaintenanceState>((set, get) => ({
         await supabase.from('maintenance').delete().eq('rootVisitId', visitId);
     }
     await universalCache.invalidate(CacheKeyFactory.list('maintenance'));
+    
+    // Invalidate drilldown preview
+    try {
+      drilldownCacheInvalidator.invalidateRelatedPreviews('maintenance', visitId, {
+        companyId: visitToDelete.companyId,
+        branchId: visitToDelete.branchId,
+        baristaId: visitToDelete.baristaId
+      });
+    } catch (e) {
+      console.error('Failed to invalidate drilldown cache:', e);
+    }
 
     await get().fetchInitialData();
   },
@@ -322,7 +352,7 @@ export const useMaintenanceStore = create<MaintenanceState>((set, get) => ({
     }
     
     try {
-      const searchLower = searchTerm.toLowerCase();
+
       // Supabase doesn't support OR across multiple columns easily with ilike in one go without RPC or complex syntax.
       // But we can fetch all and filter client side as the original code did, OR use the `or` filter string.
       // The original code fetched ALL and filtered client side.

@@ -1,5 +1,3 @@
-
-
 "use client";
 
 import { useMemo, useState, ChangeEvent, useEffect } from 'react';
@@ -24,6 +22,7 @@ import { ProductSalesAnalytics } from './_components/product-sales-analytics';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import Link from 'next/link';
 import { PriceAuditDialog } from '@/components/price-audit-dialog';
+import { DrillTarget } from '@/components/drilldown/drill-target';
 
 const productSchema = z.object({
   name: z.string().min(1, "Product name is required."),
@@ -308,7 +307,11 @@ export default function ProductDetailsPage() {
                             <TableBody>
                                 {productVariants.map((variant) => (
                                 <TableRow key={variant.id}>
-                                    <TableCell className="font-medium">{variant.variantName}</TableCell>
+                                    <TableCell className="font-medium">
+                                        <DrillTarget kind="product" payload={{ id: variant.id, name: variant.variantName || variant.name }} asChild>
+                                            <span className="cursor-pointer hover:underline">{variant.variantName}</span>
+                                        </DrillTarget>
+                                    </TableCell>
                                     <TableCell>{variant.sku}</TableCell>
                                     <TableCell className="text-right">${variant.price.toFixed(2)}</TableCell>
                                     <TableCell className="text-right">{variant.stock}</TableCell>

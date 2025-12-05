@@ -5,10 +5,12 @@ import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
 import { AuthProvider } from '@/hooks/use-auth';
 import { AppShell } from '@/components/layout/app-shell';
-import { ThemeProvider } from '@/components/theme-provider';
 import { DrillPreviewTooltip } from '@/components/drilldown/drill-preview-tooltip';
 import { DrillDialogWrapper } from '@/components/drilldown/drill-dialog-wrapper';
 import { DrillDownProvider } from '@/components/drilldown/drill-down-provider';
+import { DrilldownSettingsInitializer } from '@/components/drilldown/drilldown-settings-initializer';
+import { DrillPeekModal } from '@/components/drilldown/drill-peek-modal';
+import { DrilldownSearch } from '@/components/drilldown/drilldown-search';
 import { Providers } from '@/components/providers';
 import { cn } from '@/lib/utils';
 
@@ -36,7 +38,10 @@ export default function RootLayout({
             <AppShell>{children}</AppShell>
             <DrillPreviewTooltip />
             <DrillDialogWrapper />
+            <DrillPeekModal />
             <DrillDownProvider />
+            <DrilldownSettingsInitializer />
+            <DrilldownSearch />
           </AuthProvider>
           <Toaster />
         </Providers>

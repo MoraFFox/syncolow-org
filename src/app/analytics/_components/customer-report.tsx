@@ -24,13 +24,11 @@ interface CustomerReportProps {
     dateRange: { from: string; to: string };
 }
 
-import { useDrillDown } from '@/hooks/use-drilldown';
 import { DrillTarget } from '@/components/drilldown/drill-target';
 
 export function CustomerReport({ dateRange }: CustomerReportProps) {
     const { companies } = useCompanyStore();
     const { analyticsOrders } = useOrderStore();
-    const { goToDetail } = useDrillDown();
     const [sortConfig, setSortConfig] = useState<{ key: string; direction: 'asc' | 'desc' } | null>({ key: 'totalRevenue', direction: 'desc' });
     const [visibleCount, setVisibleCount] = useState(10);
     const [isLoadingMore, setIsLoadingMore] = useState(false);
@@ -122,22 +120,24 @@ export function CustomerReport({ dateRange }: CustomerReportProps) {
                 {/* Mobile View */}
                  <div className="grid grid-cols-1 gap-4 md:hidden">
                     {visibleCustomerAnalytics.map(client => (
-                        <Link key={client.id} href={`/clients/${client.id}`}>
-                            <Card>
-                                <CardContent className="p-4 flex flex-col gap-2">
-                                    <div className="flex justify-between items-start">
-                                        <p className="font-semibold">{client.name}</p>
-                                        <Badge variant={getStatusVariant(client.paymentStatus)}>{client.paymentStatus}</Badge>
-                                    </div>
-                                    <div className="flex justify-between items-end">
-                                        <div>
-                                            <p className="text-sm text-muted-foreground">{client.totalOrders} Orders • CLV: ${client.clv.toFixed(2)}</p>
-                                            <p className="text-lg font-bold">${client.totalRevenue.toFixed(2)}</p>
+                        <DrillTarget key={client.id} kind="company" payload={{ id: client.id, name: client.name, status: client.paymentStatus }} asChild>
+                            <Link href={`/clients/${client.id}`}>
+                                <Card>
+                                    <CardContent className="p-4 flex flex-col gap-2">
+                                        <div className="flex justify-between items-start">
+                                            <p className="font-semibold">{client.name}</p>
+                                            <Badge variant={getStatusVariant(client.paymentStatus)}>{client.paymentStatus}</Badge>
                                         </div>
-                                    </div>
-                                </CardContent>
-                            </Card>
-                        </Link>
+                                        <div className="flex justify-between items-end">
+                                            <div>
+                                                <p className="text-sm text-muted-foreground">{client.totalOrders} Orders • CLV: ${client.clv.toFixed(2)}</p>
+                                                <p className="text-lg font-bold">${client.totalRevenue.toFixed(2)}</p>
+                                            </div>
+                                        </div>
+                                    </CardContent>
+                                </Card>
+                            </Link>
+                        </DrillTarget>
                     ))}
                  </div>
                  

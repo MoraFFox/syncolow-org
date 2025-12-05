@@ -2,30 +2,31 @@
 "use client";
 
 import { useMemo, useState, ForwardRefExoticComponent, RefAttributes, useEffect } from 'react';
-import { isToday, isYesterday, isThisWeek, formatRelative, formatDistanceToNow, addHours, addDays } from 'date-fns';
+import { isToday, isYesterday, isThisWeek, formatRelative, addHours, addDays } from 'date-fns';
 import { useNotificationStore } from '@/store/use-notification-store';
 import { useMaintenanceStore } from '@/store/use-maintenance-store';
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Bell, CheckCheck, ShoppingCart, Wrench, Clock, X, LucideProps, Archive, Filter, Search, Sparkles, TrendingUp, Lightbulb } from 'lucide-react';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Bell, CheckCheck, Wrench, Clock, X, LucideProps, Filter, Search, Sparkles, TrendingUp, Lightbulb } from 'lucide-react';
 import * as LucideIcons from 'lucide-react';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import type { Product, Notification, NotificationActionType } from '@/lib/types';
+import type { Notification } from '@/lib/types';
 import { ScheduleVisitForm } from '../maintenance/_components/schedule-visit-form';
 import { useRouter } from 'next/navigation';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuCheckboxItem, DropdownMenuLabel, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { generateNotificationSummary, suggestActions } from '@/lib/notification-priority-scorer';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+
 import { Checkbox } from '@/components/ui/checkbox';
 import { AIInsightsPanel } from '@/components/notifications/ai-insights-panel';
 import { generateInsights } from '@/lib/notification-insights';
 import { Skeleton } from '@/components/ui/skeleton';
+import { DrillTarget } from '@/components/drilldown/drill-target';
 
 type LucideIcon = ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>;
 
@@ -40,7 +41,7 @@ export default function NotificationsPage() {
   const [priorityFilter, setPriorityFilter] = useState<string[]>([]);
   const [selectedNotifications, setSelectedNotifications] = useState<Set<string>>(new Set());
   const [isSelectionMode, setIsSelectionMode] = useState(false);
-  const [aiSummary, setAiSummary] = useState<string>('');
+
   const [selectedNotificationActions, setSelectedNotificationActions] = useState<{ [key: string]: string[] }>({});
   const [showAIInsights, setShowAIInsights] = useState(true);
 
@@ -170,7 +171,7 @@ export default function NotificationsPage() {
   useEffect(() => {
     if (filteredNotifications.length > 0 && showAIInsights) {
       const summary = generateNotificationSummary(filteredNotifications);
-      setAiSummary(summary);
+      generateNotificationSummary(filteredNotifications);
     }
   }, [filteredNotifications, showAIInsights]);
 
@@ -597,7 +598,17 @@ export default function NotificationsPage() {
                                 <AccordionItem value={notification.id} className="border-b-0">
                                   <AccordionTrigger className="p-0 hover:no-underline">
                                     <div className="text-left">
-                                      <p className="font-semibold">{notification.title}</p>
+                                      {notification.metadata?.entityType === 'order' && notification.metadata?.entityId ? (
+                                        <DrillTarget kind="order" payload={{ id: notification.metadata.entityId, total: 0 }} asChild>
+                                          <p className="font-semibold cursor-pointer hover:underline">{notification.title}</p>
+                                        </DrillTarget>
+                                      ) : notification.metadata?.entityType === 'client' && notification.metadata?.entityId ? (
+                                        <DrillTarget kind="company" payload={{ id: notification.metadata.entityId, name: notification.title }} asChild>
+                                          <p className="font-semibold cursor-pointer hover:underline">{notification.title}</p>
+                                        </DrillTarget>
+                                      ) : (
+                                        <p className="font-semibold">{notification.title}</p>
+                                      )}
                                       <p className="text-sm text-muted-foreground">{notification.message}</p>
                                     </div>
                                   </AccordionTrigger>
@@ -618,7 +629,17 @@ export default function NotificationsPage() {
                                 <div>
                                   <div className="flex justify-between items-start">
                                     <div className="flex-1 min-w-0">
-                                      <p className="font-semibold">{notification.title}</p>
+                                      {notification.metadata?.entityType === 'order' && notification.metadata?.entityId ? (
+                                        <DrillTarget kind="order" payload={{ id: notification.metadata.entityId, total: 0 }} asChild>
+                                          <p className="font-semibold cursor-pointer hover:underline">{notification.title}</p>
+                                        </DrillTarget>
+                                      ) : notification.metadata?.entityType === 'client' && notification.metadata?.entityId ? (
+                                        <DrillTarget kind="company" payload={{ id: notification.metadata.entityId, name: notification.title }} asChild>
+                                          <p className="font-semibold cursor-pointer hover:underline">{notification.title}</p>
+                                        </DrillTarget>
+                                      ) : (
+                                        <p className="font-semibold">{notification.title}</p>
+                                      )}
                                       <p className="text-sm text-muted-foreground truncate">{notification.message}</p>
                                     </div>
                                     <div className="ml-4 flex-shrink-0">

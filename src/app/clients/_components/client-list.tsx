@@ -17,6 +17,7 @@ import type { Company } from '@/lib/types';
 import { cn } from '@/lib/utils';
 import { PaymentScoreBadge } from '@/components/payment-score-badge';
 import { Checkbox } from '@/components/ui/checkbox';
+import { DrillTarget } from '@/components/drilldown/drill-target';
 
 interface ListItem extends Company {
   depth: number;
@@ -65,14 +66,14 @@ export function ClientList({ items, allCompanies, onEdit, onDelete, selectedIds,
             </DropdownMenu>
         );
 
-        return { isParent, parentName, viewLink, dropdownMenu };
+        return { isParent, parentName, dropdownMenu };
     };
 
     // Mobile-first card view
     const renderMobileView = () => (
         <div className="grid grid-cols-1 gap-4 md:hidden">
             {items.length > 0 ? items.map(item => {
-                const { isParent, parentName, viewLink, dropdownMenu } = renderItemContent(item);
+                const { isParent, parentName, dropdownMenu } = renderItemContent(item);
                 return (
                     <Card key={item.id}>
                         <CardContent className="p-4 flex flex-col gap-2">
@@ -82,12 +83,14 @@ export function ClientList({ items, allCompanies, onEdit, onDelete, selectedIds,
                                         checked={selectedIds.has(item.id)}
                                         onCheckedChange={(checked) => onSelect(item.id, checked as boolean)}
                                     />
-                                    <Link href={viewLink} className="flex-1">
+                                    <div className="flex-1">
                                         <div className="flex items-center gap-2">
                                             {isParent ? <Building className="h-4 w-4 text-muted-foreground" /> : <GitBranch className="h-4 w-4 text-muted-foreground" />}
-                                            <p className="font-semibold">{item.name}</p>
+                                            <DrillTarget kind="company" payload={{ id: item.id, name: item.name }} asChild>
+                                                <p className="font-semibold cursor-pointer">{item.name}</p>
+                                            </DrillTarget>
                                         </div>
-                                    </Link>
+                                    </div>
                                 </div>
                                 <div className="-mr-2 -mt-2">
                                     {dropdownMenu}
@@ -96,7 +99,11 @@ export function ClientList({ items, allCompanies, onEdit, onDelete, selectedIds,
                             {isParent && item.industry ? (
                                 <p className="text-sm text-muted-foreground">{item.industry}</p>
                             ) : (
-                                <p className="text-sm text-muted-foreground">Branch of {parentName}</p>
+                                <p className="text-sm text-muted-foreground">Branch of {item.parentCompanyId ? (
+                                    <DrillTarget kind="company" payload={{ id: item.parentCompanyId, name: parentName }} asChild>
+                                        <span className="cursor-pointer hover:underline">{parentName}</span>
+                                    </DrillTarget>
+                                ) : parentName}</p>
                             )}
                         </CardContent>
                     </Card>
@@ -166,7 +173,9 @@ export function ClientList({ items, allCompanies, onEdit, onDelete, selectedIds,
                                 <TableCell className="font-medium">
                                     <div style={{ paddingLeft: `${item.depth * 1.5}rem` }} className="flex items-center gap-2">
                                         {!isParent && <GitBranch className="h-4 w-4 text-muted-foreground ml-2" />}
-                                        <span className={cn(isParent && "font-bold")}>{item.name}</span>
+                                        <DrillTarget kind="company" payload={{ id: item.id, name: item.name }} asChild>
+                                            <span className={cn(isParent && "font-bold", "cursor-pointer")}>{item.name}</span>
+                                        </DrillTarget>
                                     </div>
                                 </TableCell>
                                 <TableCell>
@@ -181,7 +190,13 @@ export function ClientList({ items, allCompanies, onEdit, onDelete, selectedIds,
                                             <PaymentScoreBadge score={item.currentPaymentScore} status={item.paymentStatus} />
                                         ) : null
                                     ) : (
-                                        <span className="text-muted-foreground">{parentName}</span>
+                                        <span className="text-muted-foreground">
+                                            {item.parentCompanyId ? (
+                                                <DrillTarget kind="company" payload={{ id: item.parentCompanyId, name: parentName }} asChild>
+                                                    <span className="cursor-pointer hover:underline">{parentName}</span>
+                                                </DrillTarget>
+                                            ) : parentName}
+                                        </span>
                                     )}
                                 </TableCell>
                                 <TableCell className="text-right font-mono">

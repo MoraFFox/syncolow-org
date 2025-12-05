@@ -1,58 +1,58 @@
-import { render, fireEvent, screen } from '@testing-library/react'
+import { render, screen } from '@testing-library/react'
 import { DrillTarget } from '../drill-target'
-import { useDrillDown } from '@/hooks/use-drilldown'
-import { vi, describe, it, expect } from 'vitest'
-
-// Mock useDrillDown
-const goToDetailMock = vi.fn()
-const showPreviewMock = vi.fn()
-const hidePreviewMock = vi.fn()
-
-vi.mock('@/hooks/use-drilldown', () => ({
-  useDrillDown: () => ({
-    goToDetail: goToDetailMock,
-    showPreview: showPreviewMock,
-    hidePreview: hidePreviewMock,
-  }),
-}))
+import { describe, it, expect } from 'vitest'
 
 describe('DrillTarget', () => {
-  it('renders children', () => {
+  it('renders children with correct data attributes', () => {
     render(
       <DrillTarget kind="revenue" payload={{ value: '100' }}>
         <div>Click me</div>
       </DrillTarget>
     )
-    expect(screen.getByText('Click me')).toBeInTheDocument()
+    
+    const element = screen.getByText('Click me').closest('.drill-target')
+    expect(element).toBeInTheDocument()
+    expect(element).toHaveAttribute('data-drill-kind', 'revenue')
+    expect(element).toHaveAttribute('data-drill-payload', '{"value":"100"}')
   })
 
-  it('calls goToDetail on click', () => {
+  it('renders with correct variant class', () => {
     render(
-      <DrillTarget kind="revenue" payload={{ value: '100' }}>
+      <DrillTarget kind="revenue" payload={{ value: '100' }} variant="primary">
         <div>Click me</div>
       </DrillTarget>
     )
-    fireEvent.click(screen.getByText('Click me'))
-    expect(goToDetailMock).toHaveBeenCalledWith('revenue', { value: '100' }, undefined)
+    
+    const element = screen.getByText('Click me').closest('.drill-target')
+    expect(element).toHaveClass('drill-target-primary')
   })
 
-  it('calls showPreview on mouse enter', () => {
+  it('handles disabled state', () => {
     render(
-      <DrillTarget kind="revenue" payload={{ value: '100' }}>
-        <div>Hover me</div>
+      <DrillTarget kind="revenue" payload={{ value: '100' }} disabled>
+        <div>Click me</div>
       </DrillTarget>
     )
-    fireEvent.mouseEnter(screen.getByText('Hover me'))
-    expect(showPreviewMock).toHaveBeenCalledWith('revenue', { value: '100' }, expect.anything())
+    
+    const element = screen.getByText('Click me').closest('.drill-target')
+    expect(element).toHaveAttribute('data-drill-disabled')
+    expect(element).toHaveAttribute('aria-disabled', 'true')
   })
 
-  it('calls hidePreview on mouse leave', () => {
+  it('renders accessibility attributes', () => {
     render(
-      <DrillTarget kind="revenue" payload={{ value: '100' }}>
-        <div>Hover me</div>
+      <DrillTarget 
+        kind="revenue" 
+        payload={{ value: '100' }} 
+        ariaLabel="Custom Label"
+      >
+        <div>Click me</div>
       </DrillTarget>
     )
-    fireEvent.mouseLeave(screen.getByText('Hover me'))
-    expect(hidePreviewMock).toHaveBeenCalled()
+    
+    const element = screen.getByText('Click me').closest('.drill-target')
+    expect(element).toHaveAttribute('role', 'button')
+    expect(element).toHaveAttribute('aria-label', 'Custom Label')
+    expect(element).toHaveAttribute('tabindex', '0')
   })
 })

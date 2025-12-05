@@ -63,7 +63,6 @@ test.describe('Drill-Down System', () => {
 
       if (url.includes('/orders') && !url.includes('select=')) {
            // Mock for Dashboard Orders List
-           // Use local date to ensure isToday() matches in the browser
            const d = new Date();
            const today = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
            
@@ -92,22 +91,14 @@ test.describe('Drill-Down System', () => {
   });
 
   test('should show order preview on hover', async ({ page }) => {
-    // Wait for the dashboard to load
     await page.waitForSelector('text=Today\'s Delivery Log');
-
-    // Find an order link (DrillTarget)
     const orderLink = page.locator('text=Order #').first();
     await expect(orderLink).toBeVisible();
-
-    // Hover to trigger preview
     await orderLink.hover();
 
-    // Check for tooltip
     const tooltip = page.locator('.bg-popover');
     await expect(tooltip).toBeVisible();
     await expect(tooltip).toContainText('Order Insight');
-    
-    // Wait for async data (mocked)
     await expect(tooltip).toContainText('Processing');
     await expect(tooltip).toContainText('Paid');
   });
@@ -115,10 +106,8 @@ test.describe('Drill-Down System', () => {
   test('should show company preview on hover', async ({ page }) => {
      await page.waitForSelector('text=Today\'s Delivery Log');
      
-     // Find a company link
-     const companyLink = page.locator('text=for Test Company').first(); // Assuming "Test Company" is in the log from mocks
+     const companyLink = page.locator('text=for Test Company').first();
      if (await companyLink.count() === 0) {
-         // If not found in log, try finding any company link or skip if no data
          console.log('No company link found in log, skipping specific check');
          return;
      }
@@ -131,3 +120,148 @@ test.describe('Drill-Down System', () => {
      await expect(tooltip).toContainText('Active');
   });
 });
+
+test.describe('Drilldown Settings', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/settings');
+  });
+
+  test('should toggle quiet mode', async ({ page }) => {
+    // Find drilldown settings card
+    const settingsCard = page.locator('[data-testid="drilldown-settings-card"]');
+    await expect(settingsCard).toBeVisible();
+
+    // Find quiet mode toggle
+    const quietModeSection = settingsCard.locator('text=Quiet Mode').locator('..');
+    const toggle = quietModeSection.locator('button[role="switch"]');
+    
+    // Get initial state
+    const initialChecked = await toggle.getAttribute('data-state');
+    
+    // Click to toggle
+    await toggle.click();
+    
+    // Verify state changed
+    const newChecked = await toggle.getAttribute('data-state');
+    expect(newChecked).not.toBe(initialChecked);
+  });
+
+  test('should change preview size', async ({ page }) => {
+    const settingsCard = page.locator('[data-testid="drilldown-settings-card"]');
+    
+    // Find preview size dropdown
+    const previewSizeSection = settingsCard.locator('text=Preview Size').locator('..');
+    const trigger = previewSizeSection.locator('button[role="combobox"]');
+    await trigger.click();
+
+    // Select expanded
+    await page.locator('text=Expanded (full details)').click();
+    
+    // Verify selection
+    await expect(trigger).toContainText('Expanded');
+  });
+
+  test('should adjust hover delay slider', async ({ page }) => {
+    const settingsCard = page.locator('[data-testid="drilldown-settings-card"]');
+    
+    // Find hover delay section
+    const delaySection = settingsCard.locator('text=Hover Delay').first().locator('..');
+    const slider = delaySection.locator('[role="slider"]');
+    
+    // Get initial value
+    const initialValue = await slider.getAttribute('aria-valuenow');
+    
+    // Drag slider to right
+    const box = await slider.boundingBox();
+    if (box) {
+      await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+      await page.mouse.down();
+      await page.mouse.move(box.x + box.width + 50, box.y + box.height / 2);
+      await page.mouse.up();
+    }
+    
+    // Value should have changed
+    const newValue = await slider.getAttribute('aria-valuenow');
+    expect(Number(newValue)).toBeGreaterThan(Number(initialValue));
+  });
+});
+
+test.describe('Global Drilldown Search', () => {
+  test('should open search with Cmd+K', async ({ page }) => {
+    await page.goto('/dashboard');
+    
+    // Press Cmd+K (or Ctrl+K on Windows)
+    await page.keyboard.press('Control+k');
+    
+    // Search dialog should appear
+    const searchDialog = page.locator('text=Search entities...');
+    await expect(searchDialog).toBeVisible();
+  });
+
+  test('should close search with Escape', async ({ page }) => {
+    await page.goto('/dashboard');
+    
+    await page.keyboard.press('Control+k');
+    const searchInput = page.locator('input[placeholder="Search entities..."]');
+    await expect(searchInput).toBeVisible();
+    
+    await page.keyboard.press('Escape');
+    await expect(searchInput).not.toBeVisible();
+  });
+
+  test('should filter results when typing', async ({ page }) => {
+    await page.goto('/dashboard');
+    await page.keyboard.press('Control+k');
+    
+    const searchInput = page.locator('input[placeholder="Search entities..."]');
+    await searchInput.fill('order');
+    
+    // Should show filtered results or no results message
+    const dialog = page.locator('[role="dialog"]');
+    await expect(dialog).toBeVisible();
+  });
+});
+
+test.describe('Drilldown Navigation', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/*supabase.co/rest/v1/**', async route => {
+      const url = route.request().url();
+      
+      if (url.includes('/orders')) {
+        const d = new Date();
+        const today = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+        
+        await route.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify([{
+            id: 'ord_test123',
+            companyId: 'comp_1',
+            companyName: 'Test Co',
+            deliveryDate: today,
+            status: 'Processing',
+            grandTotal: 250.00
+          }])
+        });
+        return;
+      }
+      
+      await route.continue();
+    });
+  });
+
+  test('should navigate to detail page on click', async ({ page }) => {
+    await page.goto('/dashboard');
+    await page.waitForSelector('text=Today\'s Delivery Log');
+    
+    const orderLink = page.locator('text=Order #').first();
+    if (await orderLink.count() > 0) {
+      await orderLink.click();
+      
+      // Should navigate to drilldown page
+      await page.waitForURL(/\/drilldown\/order\//);
+      expect(page.url()).toContain('/drilldown/order/');
+    }
+  });
+});
+

@@ -8,6 +8,7 @@ import { MoreHorizontal, Calendar, Phone, Car } from "lucide-react";
 import { format } from "date-fns";
 import type { VisitCall } from "@/lib/types";
 import { cn } from "@/lib/utils";
+import { DrillTarget } from "@/components/drilldown/drill-target";
 
 interface TaskItemProps {
     task: VisitCall & { isOverdue?: boolean };
@@ -27,7 +28,9 @@ export function TaskItem({ task, onEdit, onComplete, onPostpone, className }: Ta
                 className="mt-1"
             />
             <div className="flex-1">
-                <label htmlFor={`task-${task.id}`} className="font-medium cursor-pointer">{task.clientName}</label>
+                <DrillTarget kind="company" payload={{ id: task.clientId, name: task.clientName }} asChild>
+                    <label htmlFor={`task-${task.id}`} className="font-medium cursor-pointer hover:underline">{task.clientName}</label>
+                </DrillTarget>
                 <p className="text-sm text-muted-foreground">{task.outcome}</p>
                 <div className="flex items-center gap-4 text-xs text-muted-foreground mt-1">
                     <div className="flex items-center gap-1">

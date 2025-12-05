@@ -12,6 +12,7 @@ import Link from 'next/link';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { toast } from '@/hooks/use-toast';
 import { Category } from '@/lib/types';
+import { DrillTarget } from '@/components/drilldown/drill-target';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -183,9 +184,11 @@ export default function CategoriesPage() {
                             {filteredCategories.map(category => (
                                 <TableRow key={category.id}>
                                     <TableCell className="font-medium">
-                                        <Link href={`/products/categories/${category.id}`} className="hover:underline">
-                                            {category.name}
-                                        </Link>
+                                        <DrillTarget kind="category" payload={{ id: category.id, name: category.name }} asChild>
+                                            <Link href={`/products/categories/${category.id}`} className="hover:underline">
+                                                {category.name}
+                                            </Link>
+                                        </DrillTarget>
                                     </TableCell>
                                     <TableCell className="text-right">
                                         <Button variant="ghost" size="icon" asChild>

@@ -2,7 +2,8 @@
 
 import { useOfflineQueueStore } from '@/store/use-offline-queue-store';
 import { offlineQueueManager } from '@/lib/offline-queue-manager';
-import { cacheManager } from '@/lib/cache-manager';
+import { idbStorage } from '@/lib/cache/indexed-db';
+import { queryClient } from '@/lib/query-client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -44,7 +45,10 @@ export default function SyncPage() {
   const handleClearCache = async () => {
     setIsClearingCache(true);
     try {
-      await cacheManager.invalidateAll();
+      // Clear React Query cache (memory)
+      queryClient.clear();
+      // Clear IndexedDB cache (persistence)
+      await idbStorage.clear();
       toast({
         title: 'Cache Cleared',
         description: 'All cached data has been removed. Data will be fetched fresh.',
@@ -62,10 +66,11 @@ export default function SyncPage() {
 
   const handleRefreshCache = async () => {
     try {
-      await cacheManager.preloadAll();
+      // Invalidate all queries to trigger refetch on next access
+      await queryClient.invalidateQueries();
       toast({
         title: 'Cache Refreshed',
-        description: 'All data has been refreshed from the server.',
+        description: 'All data will be refreshed from the server on next access.',
       });
     } catch (error: any) {
       toast({

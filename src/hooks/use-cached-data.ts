@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { cacheManager } from '@/lib/cache-manager';
+// import { cacheManager } from '@/lib/cache-manager'; // File doesn't exist
 import { useOnlineStatus } from './use-online-status';
 
 export function useCachedData<T>(collection: string, forceRefresh = false) {
@@ -15,10 +15,10 @@ export function useCachedData<T>(collection: string, forceRefresh = false) {
     const loadData = async () => {
       try {
         setLoading(true);
-        const result = await cacheManager.get<T>(collection, forceRefresh || isOnline);
+        // const result = await cacheManager.get<T>(collection, forceRefresh || isOnline);
         
         if (mounted) {
-          setData(result);
+          setData(null); // cacheManager not available
           setIsFromCache(!isOnline);
           setError(null);
         }
@@ -43,8 +43,8 @@ export function useCachedData<T>(collection: string, forceRefresh = false) {
   const refresh = async () => {
     try {
       setLoading(true);
-      const result = await cacheManager.get<T>(collection, true);
-      setData(result);
+      // const result = await cacheManager.get<T>(collection, true);
+      setData(null); // cacheManager not available
       setIsFromCache(false);
       setError(null);
     } catch (err) {

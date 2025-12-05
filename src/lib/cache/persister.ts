@@ -7,7 +7,7 @@ import { CacheKey } from './types';
  */
 export function createIDBPersister(idb = idbStorage): Persister {
   return {
-    persistClient: async (client) => {
+    persistClient: async (client: any) => {
       // We don't persist the whole client state in one blob.
       // Instead, we rely on the individual query persistence.
       // However, the standard Persister interface expects full client persistence.
@@ -69,7 +69,7 @@ export class GranularPersister {
             metadata: {
               createdAt: query.state.dataUpdatedAt,
               updatedAt: Date.now(),
-              staleAt: Date.now() + (query.options.staleTime || 0),
+              staleAt: Date.now() + ((query.options as any).staleTime || 0),
               expiresAt: Date.now() + (query.options.gcTime || 5 * 60 * 1000),
               version: 'v1', // TODO: Extract from key
             }

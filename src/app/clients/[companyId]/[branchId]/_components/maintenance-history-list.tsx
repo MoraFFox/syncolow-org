@@ -5,6 +5,7 @@ import { useMemo } from 'react';
 import Link from 'next/link';
 import { useMaintenanceStore } from '@/store/use-maintenance-store';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { DrillTarget } from '@/components/drilldown/drill-target';
 import { Star, HardHat } from 'lucide-react';
 import { format, isValid, parseISO } from 'date-fns';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -69,17 +70,32 @@ export function MaintenanceHistoryList({ companyId, branchId }: MaintenanceHisto
                             {branchVisits.map(visit => {
                                 const rating = getEvaluationRating(visit.overallReport);
                                 return (
-                                <Link href={`/maintenance`} key={visit.id}>
-                                    <div className="p-3 rounded-lg border bg-card text-card-foreground shadow-sm hover:bg-muted/50 transition-colors">
-                                        <div className="flex justify-between items-center">
-                                            <span className="text-sm font-medium">{visit.maintenanceNotes}</span>
-                                            <span className="text-xs text-muted-foreground">{formatDateSafe(visit.date)}</span>
+                                <DrillTarget 
+                                    key={visit.id}
+                                    kind="maintenance" 
+                                    payload={{ 
+                                        id: visit.id, 
+                                        branchId: visit.branchId, 
+                                        companyId: companyId, 
+                                        date: typeof visit.date === 'object' ? visit.date.toISOString() : visit.date, 
+                                        notes: visit.maintenanceNotes, 
+                                        status: visit.status, 
+                                        rating: getEvaluationRating(visit.overallReport) 
+                                    }} 
+                                    asChild
+                                >
+                                    <Link href={`/maintenance`} className="block">
+                                        <div className="p-3 rounded-lg border bg-card text-card-foreground shadow-sm hover:bg-muted/50 transition-colors cursor-pointer">
+                                            <div className="flex justify-between items-center">
+                                                <span className="text-sm font-medium">{visit.maintenanceNotes}</span>
+                                                <span className="text-xs text-muted-foreground">{formatDateSafe(visit.date)}</span>
+                                            </div>
+                                            <div className="mt-1">
+                                                {renderRating(rating)}
+                                            </div>
                                         </div>
-                                        <div className="mt-1">
-                                            {renderRating(rating)}
-                                        </div>
-                                    </div>
-                                </Link>
+                                    </Link>
+                                </DrillTarget>
                                 )
                             })}
                         </div>

@@ -7,6 +7,7 @@ import { toast } from '@/hooks/use-toast';
 import { logError, logSupabaseError, logDebug } from '@/lib/error-logger';
 import { universalCache } from '@/lib/cache/universal-cache';
 import { CacheKeyFactory } from '@/lib/cache/key-factory';
+import { drilldownCacheInvalidator } from '@/lib/cache/drilldown-cache-invalidator';
 
 interface CompanyState {
   companies: Company[];
@@ -190,6 +191,13 @@ export const useCompanyStore = create<CompanyState>((set, get) => ({
     
     toast({ title: 'Company Updated', description: 'Company details have been updated.' });
     await universalCache.invalidate(['app', 'list', 'companies'] as any);
+    
+    // Invalidate drilldown preview
+    try {
+      drilldownCacheInvalidator.invalidatePreview('company', companyId);
+    } catch (e) {
+      console.error('Failed to invalidate drilldown cache:', e);
+    }
   },
 
   deleteCompany: async (companyId: string, forceCascade: boolean = false, reassignToCompanyId?: string) => {
@@ -272,6 +280,14 @@ export const useCompanyStore = create<CompanyState>((set, get) => ({
       
       const msg = forceCascade ? "Company and all related data removed." : reassignToCompanyId ? "Company deleted and data reassigned." : `Company deleted. Related data preserved under "[DELETED] ${companyToDelete.name}".`;
       toast({ title: "Company Deleted", description: msg });
+      
+      // Invalidate drilldown preview
+      try {
+        drilldownCacheInvalidator.invalidatePreview('company', companyId);
+        branches.forEach(b => drilldownCacheInvalidator.invalidatePreview('company', b.id));
+      } catch (e) {
+        console.error('Failed to invalidate drilldown cache:', e);
+      }
     } catch (error: any) {
       toast({ 
         title: "Delete Failed", 

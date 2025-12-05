@@ -1,4 +1,5 @@
 import { QueryClient } from '@tanstack/react-query';
+import { drilldownCacheInvalidator } from './cache/drilldown-cache-invalidator';
 
 export const queryClient = new QueryClient({
   defaultOptions: {
@@ -10,3 +11,6 @@ export const queryClient = new QueryClient({
     },
   },
 });
+
+// Initialize cache invalidator with queryClient
+drilldownCacheInvalidator.initialize(queryClient);

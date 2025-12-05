@@ -1,7 +1,7 @@
 import { test, expect } from './fixtures/auth.fixture';
 
 test.describe('Order Lifecycle', () => {
-  test('should create, approve, and deliver an order', async ({ page, login }) => {
+  test('should create, approve, and deliver an order', async ({ page }) => {
     // 1. Navigate to Orders
     await page.goto('/orders');
     await expect(page.getByRole('heading', { name: 'Orders' })).toBeVisible();

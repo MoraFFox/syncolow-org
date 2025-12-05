@@ -2,15 +2,14 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { isPast } from "date-fns";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
 import type { VisitCall } from "@/lib/types";
-import { TaskItem } from "./task-item";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { format } from "date-fns";
 import { useOrderStore } from "@/store/use-order-store";
+import { DrillTarget } from "@/components/drilldown/drill-target";
 
 interface HistoryLogViewProps {
     onEdit: (visit: VisitCall) => void;
@@ -55,7 +54,9 @@ export function HistoryLogView({ onEdit }: HistoryLogViewProps) {
                            completedTasks.map(task => (
                                 <div key={task.id} className="p-3 rounded-lg border bg-muted/30" onClick={() => onEdit(task)}>
                                     <div className="flex justify-between items-center">
-                                        <p className="font-semibold">{task.clientName}</p>
+                                        <DrillTarget kind="company" payload={{ id: task.clientId, name: task.clientName }} asChild>
+                                            <p className="font-semibold cursor-pointer hover:underline" onClick={(e) => e.stopPropagation()}>{task.clientName}</p>
+                                        </DrillTarget>
                                         <p className="text-xs text-muted-foreground">{format(new Date(task.date), 'PPP')}</p>
                                     </div>
                                     <p className="text-sm text-muted-foreground mt-1">{task.outcome}</p>

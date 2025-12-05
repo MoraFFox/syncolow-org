@@ -8,6 +8,7 @@ import { Search } from 'lucide-react';
 import Link from 'next/link';
 import { useManufacturerStore } from '@/store/use-manufacturer-store';
 import { ManufacturerCard } from './_components/manufacturer-card';
+import { DrillTarget } from '@/components/drilldown/drill-target';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -20,7 +21,7 @@ import {
 } from "@/components/ui/alert-dialog";
 
 export default function ManufacturersPage() {
-  const { manufacturers, loading, error, fetchManufacturersAndProducts, deleteManufacturer } = useManufacturerStore();
+  const { manufacturers, productsByManufacturer, loading, error, fetchManufacturersAndProducts, deleteManufacturer } = useManufacturerStore();
   const [searchTerm, setSearchTerm] = useState('');
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [manufacturerToDelete, setManufacturerToDelete] = useState<string | null>(null);
@@ -133,11 +134,21 @@ export default function ManufacturersPage() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredManufacturers.map((manufacturer) => (
-          <ManufacturerCard 
-            key={manufacturer.id} 
-            manufacturer={manufacturer} 
-            onDelete={handleDeleteClick} 
-          />
+          <DrillTarget 
+            key={manufacturer.id}
+            kind="manufacturer" 
+            payload={{ 
+              id: manufacturer.id, 
+              name: manufacturer.name, 
+              icon: manufacturer.icon,
+              productCount: productsByManufacturer[manufacturer.id]?.length || 0
+            }}
+          >
+            <ManufacturerCard 
+              manufacturer={manufacturer} 
+              onDelete={handleDeleteClick} 
+            />
+          </DrillTarget>
         ))}
       </div>
 

@@ -19,6 +19,7 @@ import { MoreHorizontal, XCircle } from 'lucide-react';
 import { format } from 'date-fns';
 import type { Order, Company } from '@/lib/types';
 import { useRouter } from 'next/navigation';
+import { DrillTarget } from '@/components/drilldown/drill-target';
 
 interface OrderListProps {
   orders: Order[];
@@ -85,13 +86,17 @@ export function OrderList({
         <Card key={order.id}>
           <CardContent className="p-4 flex flex-col gap-2">
             <div className="flex justify-between items-start">
-              <Link href={`/orders/${order.id}`} className="flex-1">
-                <div className="flex items-center gap-2">
-                  <p className="font-semibold">{getCompanyName(order)}</p>
-                  {order.isPotentialClient && <Badge variant="outline">Potential</Badge>}
-                </div>
-                <p className="text-sm text-muted-foreground">#{order.id.slice(0, 7)}</p>
-              </Link>
+              <div className="flex-1">
+                <DrillTarget kind="company" payload={{ id: order.companyId, name: getCompanyName(order) }} asChild>
+                  <div className="flex items-center gap-2 cursor-pointer">
+                    <p className="font-semibold">{getCompanyName(order)}</p>
+                    {order.isPotentialClient && <Badge variant="outline">Potential</Badge>}
+                  </div>
+                </DrillTarget>
+                <DrillTarget kind="order" payload={{ id: order.id }} asChild>
+                  <p className="text-sm text-muted-foreground cursor-pointer">#{order.id.slice(0, 7)}</p>
+                </DrillTarget>
+              </div>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="h-8 w-8 p-0 -mr-2">
@@ -183,12 +188,18 @@ export function OrderList({
                       aria-label="Select row"
                     />
                   </TableCell>
-                  <TableCell className="font-medium cursor-pointer" onClick={() => router.push(`/orders/${order.id}`)}>#{order.id.slice(0, 7)}</TableCell>
-                  <TableCell className="cursor-pointer" onClick={() => router.push(`/orders/${order.id}`)}>
-                    <div className="flex items-center gap-2">
-                      <span>{getCompanyName(order)}</span>
-                      {order.isPotentialClient && <Badge variant="outline">Potential</Badge>}
-                    </div>
+                  <TableCell className="font-medium">
+                    <DrillTarget kind="order" payload={{ id: order.id }} asChild>
+                      <span className="cursor-pointer">#{order.id.slice(0, 7)}</span>
+                    </DrillTarget>
+                  </TableCell>
+                  <TableCell>
+                    <DrillTarget kind="company" payload={{ id: order.companyId, name: getCompanyName(order) }} asChild>
+                      <div className="flex items-center gap-2 cursor-pointer">
+                        <span>{getCompanyName(order)}</span>
+                        {order.isPotentialClient && <Badge variant="outline">Potential</Badge>}
+                      </div>
+                    </DrillTarget>
                   </TableCell>
                   <TableCell className="cursor-pointer" onClick={() => router.push(`/orders/${order.id}`)}>{format(new Date(order.orderDate), 'PPP')}</TableCell>
                   <TableCell>

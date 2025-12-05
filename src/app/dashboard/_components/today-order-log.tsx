@@ -2,18 +2,16 @@
 
 "use client";
 
-import { useMemo } from 'react';
-import { useOrderStore } from '@/store/use-order-store';
-import { isToday } from 'date-fns';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Package } from 'lucide-react';
-import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Order } from '@/lib/types';
 import { DrillTarget } from '@/components/drilldown/drill-target';
-
-const OrderCard = ({ order }: { order: Order }) => {
+import { useTodayDeliveries } from '../_hooks/use-dashboard-data';
+import { Skeleton } from '@/components/ui/skeleton';
+import { CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Package } from 'lucide-react';
+import Link from 'next/link';
+import { Order } from '@/lib/types';
+const OrderCard = ({ order }: { order: Pick<Order, 'id' | 'companyId' | 'companyName'> }) => {
     return (
         <div className="p-3 rounded-lg border bg-card text-card-foreground shadow-sm hover:bg-muted/50 transition-colors">
             <div className="flex items-start gap-4">
@@ -47,11 +45,33 @@ const OrderCard = ({ order }: { order: Order }) => {
 }
 
 export function TodayOrderLog() {
-    const { orders } = useOrderStore();
+    const { data: todayDeliveries, isLoading } = useTodayDeliveries();
 
-    const todayDeliveries = useMemo(() => {
-        return orders.filter(o => o.deliveryDate && o.status !== 'Delivered' && o.status !== 'Cancelled' && isToday(new Date(o.deliveryDate)));
-    }, [orders]);
+    if (isLoading) {
+        return (
+            <div>
+                <CardHeader className="p-0 mb-4">
+                    <CardTitle>Today's Delivery Log</CardTitle>
+                    <CardDescription>All orders scheduled for delivery today.</CardDescription>
+                </CardHeader>
+                <ScrollArea className="h-[200px] w-full pr-4">
+                    <div className="space-y-3">
+                         {[1, 2].map((i) => (
+                             <div key={i} className="p-3 rounded-lg border bg-card text-card-foreground shadow-sm">
+                                <div className="flex items-start gap-4">
+                                    <Skeleton className="h-5 w-5 rounded-full" />
+                                    <div className="flex-1 space-y-2">
+                                        <Skeleton className="h-4 w-3/4" />
+                                        <Skeleton className="h-3 w-1/2" />
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </ScrollArea>
+            </div>
+        );
+    }
 
     return (
         <div>
@@ -61,7 +81,7 @@ export function TodayOrderLog() {
             </CardHeader>
             <ScrollArea className="h-[200px] w-full pr-4">
                 <div className="space-y-3">
-                    {todayDeliveries.length > 0 ? (
+                    {todayDeliveries && todayDeliveries.length > 0 ? (
                         todayDeliveries.map(order => (
                             <OrderCard key={order.id} order={order} />
                         ))

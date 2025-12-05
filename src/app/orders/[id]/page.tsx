@@ -1,5 +1,5 @@
-
 "use client"
+import { DrillTarget } from '@/components/drilldown/drill-target';
 import { useMemo, useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { useOrderStore } from '@/store/use-order-store';
@@ -165,7 +165,9 @@ export default function OrderDetailsPage() {
                       return (
                            <Card key={item.productId} className="bg-muted/30">
                               <CardContent className="p-4 flex flex-col gap-2">
-                                  <p className="font-semibold">{item.productName || product?.name || 'Unknown Product'}</p>
+                                  <DrillTarget kind="product" payload={{ id: item.productId, name: item.productName || product?.name || 'Unknown Product' }} asChild>
+                                    <p className="font-semibold cursor-pointer hover:underline">{item.productName || product?.name || 'Unknown Product'}</p>
+                                  </DrillTarget>
                                   <div className="flex justify-between items-center text-sm text-muted-foreground">
                                       <span>Quantity: {item.quantity}</span>
                                       <span>@ ${(item.price || 0).toFixed(2)} each</span>
@@ -198,7 +200,9 @@ export default function OrderDetailsPage() {
                       return (
                           <TableRow key={item.productId}>
                               <TableCell>
-                                  <div className="font-medium">{item.productName || product?.name || 'Unknown Product'}</div>
+                                  <DrillTarget kind="product" payload={{ id: item.productId, name: item.productName || product?.name || 'Unknown Product' }} asChild>
+                                    <div className="font-medium cursor-pointer hover:underline w-fit">{item.productName || product?.name || 'Unknown Product'}</div>
+                                  </DrillTarget>
                                   <div className="text-sm text-muted-foreground hidden md:block">{product?.description}</div>
                               </TableCell>
                               <TableCell className="text-center">{item.quantity}</TableCell>
@@ -386,8 +390,16 @@ export default function OrderDetailsPage() {
                         </div>
                     ) : (
                       <>
-                        <Link href={`/clients/${company?.id}`} className="font-medium hover:underline">{clientName}</Link>
-                        <p className="text-muted-foreground">{branchName}</p>
+                        <DrillTarget kind="company" payload={{ id: company?.id || '', name: clientName || 'Unknown' }} asChild>
+                            <Link href={`/clients/${company?.id}`} className="font-medium hover:underline inline-block">{clientName}</Link>
+                        </DrillTarget>
+                        {branch && branchName ? (
+                            <DrillTarget kind="branch" payload={{ id: branch.id, name: branchName, companyId: branch.parentCompanyId || company?.id || '' }} asChild>
+                                <p className="text-muted-foreground cursor-pointer hover:underline">{branchName}</p>
+                            </DrillTarget>
+                        ) : (
+                            <p className="text-muted-foreground">{branchName}</p>
+                        )}
                         <div>{company?.managerName}</div>
                         <div>{company?.email}</div>
                         <div className="text-muted-foreground">{company?.location}</div>

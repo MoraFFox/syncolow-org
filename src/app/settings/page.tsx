@@ -1,10 +1,23 @@
+/** @format */
 
 "use client";
 
 import { useSettingsStore, ViewMode } from "@/store/use-settings-store";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { ClearData } from "./_components/clear-data";
 import { NotificationSettings } from "./_components/notification-settings";
 import { Integrations } from "./_components/integrations";
@@ -13,51 +26,223 @@ import { UpdatePaymentScores } from "./_components/update-payment-scores";
 import { SyncSearchCollection } from "./_components/sync-search-collection";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { Slider } from "@/components/ui/slider";
+import { Switch } from "@/components/ui/switch";
+import { useDrillDownStore } from "@/store/use-drilldown-store";
+import { useState } from "react";
+import { HelpCircle } from "lucide-react";
+import { DrilldownHelpDialog } from "@/components/drilldown/drilldown-help-dialog";
 
 const viewModes: { name: ViewMode }[] = [
-    { name: 'Comfortable' },
-    { name: 'Compact' },
-    { name: 'Geospatial' },
-]
+  { name: "Comfortable" },
+  { name: "Compact" },
+  { name: "Geospatial" },
+];
 
 export default function SettingsPage() {
-  const {
-    paginationLimit,
-    viewMode,
-    setPaginationLimit,
-    setViewMode,
-  } = useSettingsStore();
+  const { paginationLimit, viewMode, setPaginationLimit, setViewMode } =
+    useSettingsStore();
+
+  const { settings, setHoverDelay, togglePreviews, setVisualStyle, toggleQuietMode, setPreviewSize, setPreviewTheme } =
+    useDrillDownStore();
+
+  const [isHelpDialogOpen, setIsHelpDialogOpen] = useState(false);
 
   return (
-    <div className="flex flex-col gap-8">
+    <div className='flex flex-col gap-8'>
       <div>
-        <h1 className="text-3xl font-bold">Settings</h1>
-        <p className="text-muted-foreground">Customize application appearance and behavior.</p>
+        <h1 className='text-3xl font-bold'>Settings</h1>
+        <p className='text-muted-foreground'>
+          Customize application appearance and behavior.
+        </p>
       </div>
 
       <Card>
         <CardHeader>
           <CardTitle>Appearance</CardTitle>
-          <CardDescription>Adjust the look and feel of the application.</CardDescription>
+          <CardDescription>
+            Adjust the look and feel of the application.
+          </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-6">
-            <div className="space-y-2">
-                <Label>View Mode</Label>
-                <Select onValueChange={(value: ViewMode) => setViewMode(value)} value={viewMode}>
-                    <SelectTrigger className="w-full md:w-1/2">
-                        <SelectValue placeholder="Select a view mode" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        {viewModes.map(mode => (
-                            <SelectItem key={mode.name} value={mode.name}>{mode.name}</SelectItem>
-                        ))}
-                    </SelectContent>
-                </Select>
-                <p className="text-sm text-muted-foreground">Change the layout and density of the application.</p>
-            </div>
+        <CardContent className='space-y-6'>
+          <div className='space-y-2'>
+            <Label>View Mode</Label>
+            <Select
+              onValueChange={(value: ViewMode) => setViewMode(value)}
+              value={viewMode}
+            >
+              <SelectTrigger className='w-full md:w-1/2'>
+                <SelectValue placeholder='Select a view mode' />
+              </SelectTrigger>
+              <SelectContent>
+                {viewModes.map((mode) => (
+                  <SelectItem key={mode.name} value={mode.name}>
+                    {mode.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <p className='text-sm text-muted-foreground'>
+              Change the layout and density of the application.
+            </p>
+          </div>
         </CardContent>
       </Card>
-      
+
+      <Card data-testid="drilldown-settings-card">
+        <CardHeader className='flex flex-row items-center justify-between'>
+          <div>
+            <CardTitle>Drilldown Settings</CardTitle>
+            <CardDescription>
+              Customize hover previews and navigation behavior.{" "}
+              <Button
+                variant='link'
+                className='p-0 h-auto text-sm'
+                onClick={() => setIsHelpDialogOpen(true)}
+              >
+                Learn more
+              </Button>
+            </CardDescription>
+          </div>
+          <Button
+            variant='ghost'
+            size='icon'
+            onClick={() => setIsHelpDialogOpen(true)}
+            aria-label='Drilldown help'
+          >
+            <HelpCircle className='h-4 w-4' />
+          </Button>
+        </CardHeader>
+        <CardContent className='space-y-6'>
+          {/* Enable/Disable Previews */}
+          <div className='flex items-center justify-between'>
+            <div className='space-y-0.5'>
+              <Label>Enable Hover Previews</Label>
+              <p className='text-sm text-muted-foreground'>
+                Show preview cards when hovering over drilldown targets.
+              </p>
+            </div>
+            <Switch
+              checked={settings.previewsEnabled}
+              onCheckedChange={togglePreviews}
+            />
+          </div>
+
+          {/* Quiet Mode Toggle */}
+          <div className='flex items-center justify-between'>
+            <div className='space-y-0.5'>
+              <Label>Quiet Mode</Label>
+              <p className='text-sm text-muted-foreground'>
+                Disable automatic pinning of previews after 3 seconds.
+              </p>
+            </div>
+            <Switch
+              checked={settings.quietMode}
+              onCheckedChange={toggleQuietMode}
+              disabled={!settings.previewsEnabled}
+            />
+          </div>
+
+          {/* Hover Delay Slider */}
+          <div className='space-y-2'>
+            <div className='flex items-center justify-between'>
+              <Label>Hover Delay</Label>
+              <span className='text-sm text-muted-foreground'>
+                {settings.hoverDelay}ms
+              </span>
+            </div>
+            <Slider
+              value={[settings.hoverDelay]}
+              onValueChange={([value]) => setHoverDelay(value)}
+              min={200}
+              max={1000}
+              step={100}
+              disabled={!settings.previewsEnabled}
+              className='w-full'
+            />
+            <p className='text-xs text-muted-foreground'>
+              Adjust how quickly previews appear (200ms = instant, 1000ms =
+              delayed).
+            </p>
+          </div>
+
+          {/* Preview Size Select */}
+          <div className='space-y-2'>
+            <Label>Preview Size</Label>
+            <Select
+              value={settings.previewSize}
+              onValueChange={(value) =>
+                setPreviewSize(value as "compact" | "normal" | "expanded")
+              }
+              disabled={!settings.previewsEnabled}
+            >
+              <SelectTrigger className='w-full md:w-1/2'>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value='compact'>Compact (minimal info)</SelectItem>
+                <SelectItem value='normal'>Normal (balanced)</SelectItem>
+                <SelectItem value='expanded'>Expanded (full details)</SelectItem>
+              </SelectContent>
+            </Select>
+            <p className='text-sm text-muted-foreground'>
+              Control how much information is shown in preview cards.
+            </p>
+          </div>
+
+          {/* Preview Theme Select */}
+          <div className='space-y-2'>
+            <Label>Preview Theme</Label>
+            <Select
+              value={settings.previewTheme}
+              onValueChange={(value) =>
+                setPreviewTheme(value as "default" | "glass" | "solid")
+              }
+              disabled={!settings.previewsEnabled}
+            >
+              <SelectTrigger className='w-full md:w-1/2'>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value='default'>Default (semi-transparent)</SelectItem>
+                <SelectItem value='glass'>Glass (frosted blur)</SelectItem>
+                <SelectItem value='solid'>Solid (opaque colors)</SelectItem>
+              </SelectContent>
+            </Select>
+            <p className='text-sm text-muted-foreground'>
+              Choose the visual style for preview cards.
+            </p>
+          </div>
+
+          {/* Visual Style Select */}
+          <div className='space-y-2'>
+            <Label>Visual Style</Label>
+            <Select
+              value={settings.visualStyle}
+              onValueChange={(value) =>
+                setVisualStyle(value as "subtle" | "normal" | "prominent")
+              }
+            >
+              <SelectTrigger className='w-full md:w-1/2'>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value='subtle'>Subtle (cursor only)</SelectItem>
+                <SelectItem value='normal'>
+                  Normal (dotted underline)
+                </SelectItem>
+                <SelectItem value='prominent'>
+                  Prominent (bold underline)
+                </SelectItem>
+              </SelectContent>
+            </Select>
+            <p className='text-sm text-muted-foreground'>
+              Control how drilldown targets are visually indicated.
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+
       <NotificationSettings />
 
       <Integrations />
@@ -65,26 +250,28 @@ export default function SettingsPage() {
       <Card>
         <CardHeader>
           <CardTitle>General Settings</CardTitle>
-          <CardDescription>Control general application behavior.</CardDescription>
+          <CardDescription>
+            Control general application behavior.
+          </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="pagination-limit">Items Per Page</Label>
+        <CardContent className='space-y-4'>
+          <div className='space-y-2'>
+            <Label htmlFor='pagination-limit'>Items Per Page</Label>
             <Select
               value={String(paginationLimit)}
               onValueChange={(value) => setPaginationLimit(Number(value))}
             >
-              <SelectTrigger className="w-full md:w-[180px]">
-                <SelectValue placeholder="Select a limit" />
+              <SelectTrigger className='w-full md:w-[180px]'>
+                <SelectValue placeholder='Select a limit' />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="10">10</SelectItem>
-                <SelectItem value="20">20</SelectItem>
-                <SelectItem value="50">50</SelectItem>
-                <SelectItem value="100">100</SelectItem>
+                <SelectItem value='10'>10</SelectItem>
+                <SelectItem value='20'>20</SelectItem>
+                <SelectItem value='50'>50</SelectItem>
+                <SelectItem value='100'>100</SelectItem>
               </SelectContent>
             </Select>
-            <p className="text-sm text-muted-foreground">
+            <p className='text-sm text-muted-foreground'>
               Set the default number of items to show on paginated lists.
             </p>
           </div>
@@ -93,13 +280,15 @@ export default function SettingsPage() {
 
       <Card>
         <CardHeader>
-            <CardTitle>Tax Settings</CardTitle>
-            <CardDescription>Manage tax rates for your products and services.</CardDescription>
+          <CardTitle>Tax Settings</CardTitle>
+          <CardDescription>
+            Manage tax rates for your products and services.
+          </CardDescription>
         </CardHeader>
         <CardContent>
-            <Button asChild>
-                <Link href="/settings/taxes">Manage Taxes</Link>
-            </Button>
+          <Button asChild>
+            <Link href='/settings/taxes'>Manage Taxes</Link>
+          </Button>
         </CardContent>
       </Card>
 
@@ -111,6 +300,10 @@ export default function SettingsPage() {
 
       <ClearData />
 
+      <DrilldownHelpDialog
+        isOpen={isHelpDialogOpen}
+        onOpenChange={setIsHelpDialogOpen}
+      />
     </div>
   );
 }

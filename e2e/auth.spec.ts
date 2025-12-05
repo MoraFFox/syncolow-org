@@ -1,6 +1,6 @@
 import { test, expect } from './fixtures/auth.fixture';
 
-test('should login and access dashboard', async ({ page, login }) => {
+test('should login and access dashboard', async ({ page }) => {
   // The 'login' fixture automatically runs before this test body
   // and ensures we are logged in.
   
@@ -13,7 +13,7 @@ test('should login and access dashboard', async ({ page, login }) => {
   // await expect(page.locator('text=Overview')).toBeVisible();
 });
 
-test('should be able to logout', async ({ page, login }) => {
+test('should be able to logout', async ({ page }) => {
   await page.goto('/');
   
   // Find logout button (adjust selector as needed)

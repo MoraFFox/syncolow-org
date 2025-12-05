@@ -4,9 +4,9 @@
 import { useMemo } from 'react';
 import type { Order } from '@/lib/types';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Package } from 'lucide-react';
 import Link from 'next/link';
+import { DrillTarget } from '@/components/drilldown/drill-target';
 
 interface TopProductsProps {
   orders: Order[];
@@ -52,15 +52,15 @@ export function TopProducts({ orders }: TopProductsProps) {
         {topProducts.length > 0 ? (
             <div className="space-y-3">
                 {topProducts.map(product => (
-                    <Link href={`/products/${product.id}`} key={product.id}>
-                        <div className="flex items-center justify-between p-3 rounded-md border hover:bg-muted transition-colors">
-                            <p className="font-medium text-sm">{product.name}</p>
-                            <div className="text-right">
-                                <p className="text-sm font-bold">{product.quantity} units</p>
-                                <p className="text-xs text-muted-foreground">${product.revenue.toFixed(2)}</p>
-                            </div>
+                    <div key={product.id} className="flex items-center justify-between p-3 rounded-md border hover:bg-muted transition-colors">
+                        <DrillTarget kind="product" payload={{ id: product.id, name: product.name }} asChild>
+                            <Link href={`/products/${product.id}`} className="font-medium text-sm hover:underline">{product.name}</Link>
+                        </DrillTarget>
+                        <div className="text-right">
+                            <p className="text-sm font-bold">{product.quantity} units</p>
+                            <p className="text-xs text-muted-foreground">${product.revenue.toFixed(2)}</p>
                         </div>
-                    </Link>
+                    </div>
                 ))}
             </div>
         ) : (

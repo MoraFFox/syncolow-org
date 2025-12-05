@@ -1,0 +1,124 @@
+/* Drilldown System - Global Animations and Transitions */
+
+/* Smooth hover effect for all drillable elements */
+[data-drill-kind]:not([data-drill-disabled]) {
+  transition: all 0.15s ease-out;
+  cursor: pointer;
+}
+
+/* Baseline visual indicator for raw drilldown elements (not using DrillTarget) */
+[data-drill-kind]:not([data-drill-disabled]):not([data-drill-variant]) {
+  text-decoration: underline;
+  text-decoration-style: dotted;
+  text-decoration-color: hsl(var(--muted-foreground));
+  text-underline-offset: 2px;
+}
+
+[data-drill-kind]:not([data-drill-disabled]):not([data-drill-variant]):hover {
+  text-decoration-color: hsl(var(--foreground));
+  opacity: 0.8;
+}
+
+/* Primary variant - bold, prominent */
+.drill-target-primary:not([data-drill-disabled]) {
+  text-decoration: underline;
+  text-decoration-style: solid;
+  text-decoration-color: hsl(var(--primary));
+  text-underline-offset: 3px;
+  text-decoration-thickness: 2px;
+}
+
+.drill-target-primary:not([data-drill-disabled]):hover {
+  text-decoration-thickness: 2.5px;
+  color: hsl(var(--primary));
+}
+
+/* Secondary variant - subtle, dotted */
+.drill-target-secondary:not([data-drill-disabled]) {
+  text-decoration: underline;
+  text-decoration-style: dotted;
+  text-decoration-color: hsl(var(--muted-foreground));
+  text-underline-offset: 2px;
+}
+
+.drill-target-secondary:not([data-drill-disabled]):hover {
+  text-decoration-color: hsl(var(--foreground));
+}
+
+/* Subtle variant - cursor only */
+.drill-target-subtle:not([data-drill-disabled]) {
+  /* No underline, just cursor change */
+  text-decoration: none;
+}
+
+.drill-target-subtle:not([data-drill-disabled]):hover {
+  opacity: 0.8;
+}
+
+/* Focus ring for keyboard navigation */
+[data-drill-kind]:not([data-drill-disabled]):focus {
+  outline: 2px solid hsl(var(--primary));
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Active state */
+[data-drill-kind]:not([data-drill-disabled]):active {
+  transform: scale(0.98);
+  filter: brightness(0.95);
+}
+
+/* Smooth animation for preview card entrance */
+@keyframes drill-preview-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.drill-preview-enter {
+  animation: drill-preview-in 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Mobile Bottom Sheet Animations */
+@media (max-width: 767px) {
+  @keyframes slideUpFromBottom {
+    from {
+      transform: translateY(100%);
+    }
+    to {
+      transform: translateY(0);
+    }
+  }
+
+  .drill-preview-mobile-enter {
+    animation: slideUpFromBottom 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+  }
+
+  .drill-preview-mobile-exit {
+    transform: translateY(100%);
+    transition: transform 0.2s ease-in;
+  }
+}
+
+/* Backdrop Animation */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.drill-backdrop-enter {
+  animation: fadeIn 0.2s ease-out forwards;
+}
+
+/* Touch feedback for mobile */
+@media (hover: none) and (pointer: coarse) {
+  [data-drill-kind]:not([data-drill-disabled]):active {
+    background-color: hsl(var(--accent));
+    transform: scale(0.98);
+  }
+}

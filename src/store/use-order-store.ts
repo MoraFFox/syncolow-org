@@ -3,6 +3,7 @@
 import { create } from "zustand";
 import { produce } from "immer";
 import { supabase } from "@/lib/supabase";
+import { drilldownCacheInvalidator } from "@/lib/cache/drilldown-cache-invalidator";
 import type {
   Order,
   Product,
@@ -83,7 +84,7 @@ interface AppState {
   fetchOrders: (limitCount: number) => Promise<void>;
   fetchOrdersWithFilters: (
     limitCount: number,
-    filters: { status?: string; paymentStatus?: string; companyId?: string }
+    filters: { status?: string; paymentStatus?: string; companyId?: string; branchId?: string }
   ) => Promise<void>;
   searchOrdersByText: (searchTerm: string) => Promise<void>;
   loadMoreOrders: (limitCount: number) => Promise<void>;
@@ -151,7 +152,7 @@ interface AppState {
     reference?: string,
     notes?: string
   ) => Promise<void>;
-  updatePaymentScores: () => Promise<void>;
+  updatePaymentScores: (companyId?: string) => Promise<void>;
   deleteOrder: (orderId: string) => Promise<void>;
   deleteAllOrders: () => Promise<void>;
   submitOrder: (data: any) => Promise<void>;
@@ -383,6 +384,9 @@ export const useOrderStore = create<AppState>((set, get) => ({
           if (filters.companyId) {
             query = query.eq("companyId", filters.companyId);
           }
+          if (filters.branchId) {
+            query = query.eq("branchId", filters.branchId);
+          }
 
           const { data, error } = await query
             .order("orderDate", { ascending: false })
@@ -581,6 +585,16 @@ export const useOrderStore = create<AppState>((set, get) => ({
     
     // Invalidate cache
     await universalCache.invalidate(['app', 'list', 'orders'] as any);
+    
+    // Invalidate drilldown preview
+    try {
+      drilldownCacheInvalidator.invalidateRelatedPreviews('order', orderId, {
+        companyId: updatedOrder?.companyId,
+        branchId: updatedOrder?.branchId
+      });
+    } catch (e) {
+      console.error('Failed to invalidate drilldown cache:', e);
+    }
   },
 
   updateOrderPaymentStatus: async (orderId, paymentStatus) => {
@@ -657,7 +671,7 @@ export const useOrderStore = create<AppState>((set, get) => ({
     });
   },
 
-  updatePaymentScores: async (companyId?: string) => {
+  updatePaymentScores: async (companyId) => {
     const { orders } = get();
 
     const orderUpdates = orders
@@ -697,8 +711,9 @@ export const useOrderStore = create<AppState>((set, get) => ({
 
   deleteOrder: async (orderId: string) => {
     // Get order before deleting to update company score
-    const { data: order } = await supabase.from("orders").select("companyId").eq("id", orderId).single();
+    const { data: order } = await supabase.from("orders").select("companyId, branchId").eq("id", orderId).single();
     const companyId = order?.companyId;
+    const branchId = order?.branchId;
     
     await supabase.from("orders").delete().eq("id", orderId);
     await deleteOrderFromSearch(orderId);
@@ -711,6 +726,16 @@ export const useOrderStore = create<AppState>((set, get) => ({
     
     // Invalidate cache
     await universalCache.invalidate(['app', 'list', 'orders'] as any);
+    
+    // Invalidate drilldown preview
+    try {
+      drilldownCacheInvalidator.invalidateRelatedPreviews('order', orderId, {
+        companyId,
+        branchId
+      });
+    } catch (e) {
+      console.error('Failed to invalidate drilldown cache:', e);
+    }
     
     toast({
       title: "Order Deleted",

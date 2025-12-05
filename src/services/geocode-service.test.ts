@@ -21,7 +21,7 @@ describe('GeocodeService', () => {
 
     const result = await geocodeService.geocode('Cairo, Egypt');
     expect(result).toEqual([30.0, 31.0]);
-    expect(global.fetch).toHaveBeenCalledWith(expect.stringContaining('/api/geocode?address='));
+    expect(global.fetch).toHaveBeenCalledWith(expect.stringContaining('/api/geo?address='));
   });
 
   it('should return null for invalid address', async () => {
@@ -44,6 +44,6 @@ describe('GeocodeService', () => {
 
       const result = await geocodeService.reverseGeocode(30.0, 31.0);
       expect(result).toBe('123 Main St');
-      expect(global.fetch).toHaveBeenCalledWith(expect.stringContaining('/api/geocode?lat=30&lng=31'));
+      expect(global.fetch).toHaveBeenCalledWith(expect.stringContaining('/api/geo?lat=30&lng=31'));
   });
 });

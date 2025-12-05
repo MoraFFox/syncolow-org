@@ -70,7 +70,7 @@ export class GoogleTasksService {
     let pageToken: string | undefined = undefined;
 
     do {
-      const res = await tasks.tasks.list({
+      const res: any = await tasks.tasks.list({
         tasklist: taskListId,
         showCompleted: true,
         showHidden: true,

@@ -1,13 +1,11 @@
 
 "use client"
 import { useState, useMemo, useEffect } from "react";
-import { Star, PlusCircle, Bot, Share2, MoreHorizontal, ArrowUpDown, Calendar as CalendarIcon } from 'lucide-react';
+import { Star, PlusCircle, Share2, MoreHorizontal, ArrowUpDown, Calendar as CalendarIcon, MessageSquare } from 'lucide-react';
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
-  CardTitle,
 } from '@/components/ui/card';
 import {
   Table,
@@ -18,8 +16,8 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import type { Feedback, Company } from "@/lib/types";
-import { format, parseISO } from "date-fns";
+import type { Feedback } from "@/lib/types";
+import { format } from "date-fns";
 import { useCompanyStore } from "@/store/use-company-store";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -37,6 +35,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { SubmitFeedbackDialog } from "./_components/submit-feedback-dialog";
+import { ReplyDialog } from "./_components/reply-dialog";
 import Loading from "../loading";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
@@ -45,6 +44,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { useSettingsStore } from "@/store/use-settings-store";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
+import { DrillTarget } from "@/components/drilldown/drill-target";
 
 
 type SortableKey = 'client' | 'date' | 'rating';
@@ -55,7 +55,9 @@ export default function FeedbackPage() {
   const { toast } = useToast();
   
   const [isSubmitOpen, setIsSubmitOpen] = useState(false);
+  const [replyDialogOpen, setReplyDialogOpen] = useState(false);
   const [selectedFeedback, setSelectedFeedback] = useState<Feedback | null>(null);
+
   
   const [searchTerm, setSearchTerm] = useState('');
   const [sentimentFilter, setSentimentFilter] = useState('All');
@@ -206,6 +208,11 @@ export default function FeedbackPage() {
       </div>
 
       <SubmitFeedbackDialog isOpen={isSubmitOpen} onOpenChange={setIsSubmitOpen} />
+      <ReplyDialog 
+        isOpen={replyDialogOpen} 
+        onOpenChange={setReplyDialogOpen} 
+        feedback={selectedFeedback} 
+      />
 
       <Card>
         <CardHeader>
@@ -282,27 +289,56 @@ export default function FeedbackPage() {
           {/* Unified View */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:hidden">
             {visibleFeedback.map((item) => (
-              <Card key={item.id}>
-                <CardContent className="p-4 flex flex-col gap-3">
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <p className="font-semibold">{item.clientName}</p>
-                      <p className="text-xs text-muted-foreground">{format(new Date(item.feedbackDate), 'PPP')}</p>
+              <DrillTarget 
+                key={item.id} 
+                kind="feedback" 
+                payload={{ 
+                  id: item.id, 
+                  clientId: item.clientId, 
+                  clientName: item.clientName, 
+                  rating: item.rating, 
+                  sentiment: item.sentiment, 
+                  message: item.message, 
+                  feedbackDate: item.feedbackDate 
+                }}
+              >
+                <Card>
+                  <CardContent className="p-4 flex flex-col gap-3">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <DrillTarget kind="company" payload={{ id: item.clientId, name: item.clientName }} asChild>
+                          <p className="font-semibold cursor-pointer hover:underline" onClick={(e) => e.stopPropagation()}>{item.clientName}</p>
+                        </DrillTarget>
+                        <p className="text-xs text-muted-foreground">{format(new Date(item.feedbackDate), 'PPP')}</p>
+                      </div>
+                      <Badge variant={getSentimentVariant(item.sentiment)}>{item.sentiment}</Badge>
                     </div>
-                    <Badge variant={getSentimentVariant(item.sentiment)}>{item.sentiment}</Badge>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    {renderRating(item.rating)}
-                  </div>
-                  <p className="text-sm text-muted-foreground italic">"{item.message}"</p>
-                  <div className="flex gap-2 mt-2">
-                     <Button variant="outline" size="sm" onClick={() => copyShareLink(item.clientId)} className="w-full">
-                        <Share2 className="h-4 w-4 mr-2" />
-                        Share
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
+                    <div className="flex items-center gap-2">
+                      {renderRating(item.rating)}
+                    </div>
+                    <p className="text-sm text-muted-foreground italic">"{item.message}"</p>
+                    <div className="flex gap-2 mt-2">
+                       <Button 
+                         variant="outline" 
+                         size="sm" 
+                         onClick={(e) => {
+                           e.stopPropagation();
+                           setSelectedFeedback(item);
+                           setReplyDialogOpen(true);
+                         }} 
+                         className="w-full"
+                       >
+                         <MessageSquare className="h-4 w-4 mr-2" />
+                         Reply
+                       </Button>
+                       <Button variant="outline" size="sm" onClick={(e) => { e.stopPropagation(); copyShareLink(item.clientId); }} className="w-full">
+                          <Share2 className="h-4 w-4 mr-2" />
+                          Share
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              </DrillTarget>
             ))}
           </div>
         
@@ -336,31 +372,58 @@ export default function FeedbackPage() {
                   </TableHeader>
                   <TableBody>
                     {visibleFeedback.map((item) => (
-                      <TableRow key={item.id}>
-                        <TableCell className="font-medium truncate">{item.clientName}</TableCell>
-                        <TableCell>{format(new Date(item.feedbackDate), 'PPP')}</TableCell>
-                        <TableCell className="truncate">{item.message}</TableCell>
-                        <TableCell>{renderRating(item.rating)}</TableCell>
-                        <TableCell>
-                          {item.sentiment && <Badge variant={getSentimentVariant(item.sentiment)}>{item.sentiment}</Badge>}
-                        </TableCell>
-                        <TableCell className="text-right space-x-2">
-                          <DropdownMenu>
-                              <DropdownMenuTrigger asChild>
-                                  <Button variant="ghost" className="h-8 w-8 p-0">
-                                      <span className="sr-only">Open menu</span>
-                                      <MoreHorizontal className="h-4 w-4" />
-                                  </Button>
-                              </DropdownMenuTrigger>
-                              <DropdownMenuContent align="end">
-                                   <DropdownMenuItem onClick={() => copyShareLink(item.clientId)}>
-                                      <Share2 className="h-4 w-4 mr-2" />
-                                      Copy Link
-                                  </DropdownMenuItem>
-                              </DropdownMenuContent>
-                          </DropdownMenu>
-                        </TableCell>
-                      </TableRow>
+                      <DrillTarget 
+                        key={item.id} 
+                        kind="feedback" 
+                        payload={{ 
+                          id: item.id, 
+                          clientId: item.clientId, 
+                          clientName: item.clientName, 
+                          rating: item.rating, 
+                          sentiment: item.sentiment, 
+                          message: item.message, 
+                          feedbackDate: item.feedbackDate 
+                        }}
+                        asChild
+                      >
+                        <TableRow className="cursor-pointer hover:bg-muted/50">
+                          <TableCell className="font-medium truncate">
+                              <DrillTarget kind="company" payload={{ id: item.clientId, name: item.clientName }} asChild>
+                                  <span className="cursor-pointer hover:underline" onClick={(e) => e.stopPropagation()}>{item.clientName}</span>
+                              </DrillTarget>
+                          </TableCell>
+                          <TableCell>{format(new Date(item.feedbackDate), 'PPP')}</TableCell>
+                          <TableCell className="truncate">{item.message}</TableCell>
+                          <TableCell>{renderRating(item.rating)}</TableCell>
+                          <TableCell>
+                            {item.sentiment && <Badge variant={getSentimentVariant(item.sentiment)}>{item.sentiment}</Badge>}
+                          </TableCell>
+                          <TableCell className="text-right space-x-2">
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <Button variant="ghost" className="h-8 w-8 p-0">
+                                        <span className="sr-only">Open menu</span>
+                                        <MoreHorizontal className="h-4 w-4" />
+                                    </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
+                                     <DropdownMenuItem onClick={(e) => {
+                                       e.stopPropagation();
+                                       setSelectedFeedback(item);
+                                       setReplyDialogOpen(true);
+                                     }}>
+                                       <MessageSquare className="h-4 w-4 mr-2" />
+                                       Reply
+                                     </DropdownMenuItem>
+                                     <DropdownMenuItem onClick={(e) => { e.stopPropagation(); copyShareLink(item.clientId); }}>
+                                        <Share2 className="h-4 w-4 mr-2" />
+                                        Copy Link
+                                    </DropdownMenuItem>
+                                </DropdownMenuContent>
+                            </DropdownMenu>
+                          </TableCell>
+                        </TableRow>
+                      </DrillTarget>
                     ))}
                   </TableBody>
                 </Table>

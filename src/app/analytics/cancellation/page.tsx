@@ -118,10 +118,10 @@ export default function CancellationAnalysisPage() {
     }, {} as Record<string, number>);
 
     const topReasons = Object.entries(reasonCounts)
-      .map(([reason, count]: [string, number]) => ({
+      .map(([reason, count]) => ({
         reason,
-        count,
-        percentage: (count / canceledOrders.length) * 100,
+        count: count as number,
+        percentage: ((count as number) / canceledOrders.length) * 100,
       }))
       .sort((a, b) => b.count - a.count);
 

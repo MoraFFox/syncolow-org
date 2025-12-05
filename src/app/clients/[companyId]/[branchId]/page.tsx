@@ -12,6 +12,7 @@ import Loading from '@/app/loading';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { ArrowLeft, Building, Gauge, HardHat, Cog, MapPin, Phone, Edit, User, Briefcase } from 'lucide-react';
+import { DrillTarget } from '@/components/drilldown/drill-target';
 import { Separator } from '@/components/ui/separator';
 import { BaristaManagement } from '@/app/clients/_components/barista-management';
 import { MaintenanceHistoryList } from './_components/maintenance-history-list';
@@ -89,7 +90,7 @@ export default function BranchDetailsPage() {
                   </Button>
                   <div>
                       <h1 className="text-3xl font-bold">{branch.name}</h1>
-                      <p className="text-muted-foreground">Branch of <Link href={`/clients/${companyId}`} className="hover:underline">{company.name}</Link></p>
+                      <p className="text-muted-foreground">Branch of <DrillTarget kind="company" payload={{ id: company.id, name: company.name }} asChild><Link href={`/clients/${companyId}`} className="hover:underline">{company.name}</Link></DrillTarget></p>
                   </div>
               </div>
                <Button variant="outline" onClick={() => setIsFormOpen(true)} className="self-start">

@@ -3,16 +3,17 @@
 "use client";
 
 import React, { useMemo } from 'react';
-import { format, parseISO, isValid, differenceInDays } from 'date-fns';
+import { format, parseISO, isValid } from 'date-fns';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
-import { MoreHorizontal, Edit, CheckCircle, XCircle, GitBranch, ChevronsRight, CornerDownRight, Timer, DollarSign, Package, PlusCircle, Trash2 } from 'lucide-react';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
+import { MoreHorizontal, Edit, XCircle, GitBranch, ChevronsRight, CornerDownRight, Timer, DollarSign, Trash2 } from 'lucide-react';
 import type { MaintenanceVisit } from '@/lib/types';
-import { cn } from '@/lib/utils';
+
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { DrillTarget } from '@/components/drilldown/drill-target';
 
 interface MaintenanceListProps {
     visits: MaintenanceVisit[];
@@ -103,7 +104,11 @@ export function MaintenanceList({ visits, onEditVisit, onUpdateStatus, onDeleteV
                            return (
                             <React.Fragment key={rootVisit.id}>
                                 <TableRow>
-                                    <TableCell className="font-bold">{rootVisit.branchName}</TableCell>
+                                    <TableCell className="font-bold">
+                                        <DrillTarget kind="company" payload={{ id: rootVisit.companyId, name: rootVisit.branchName }} asChild>
+                                            <span className="cursor-pointer hover:underline">{rootVisit.branchName}</span>
+                                        </DrillTarget>
+                                    </TableCell>
                                     <TableCell>{formatDateSafe(rootVisit.date)}</TableCell>
                                     <TableCell className="capitalize">{rootVisit.visitType?.replace('_', ' ')}</TableCell>
                                     <TableCell className="truncate max-w-xs">{rootVisit.maintenanceNotes}</TableCell>
@@ -176,7 +181,9 @@ export function MaintenanceList({ visits, onEditVisit, onUpdateStatus, onDeleteV
                                 <CardContent className="p-4 flex flex-col gap-2">
                                     <div className="flex justify-between items-start">
                                         <div>
-                                            <p className="font-semibold">{rootVisit.branchName}</p>
+                                            <DrillTarget kind="company" payload={{ id: rootVisit.companyId, name: rootVisit.branchName }} asChild>
+                                                <p className="font-semibold cursor-pointer hover:underline">{rootVisit.branchName}</p>
+                                            </DrillTarget>
                                             <p className="text-sm text-muted-foreground">{formatDateSafe(rootVisit.date)}</p>
                                         </div>
                                         <div className="flex items-center gap-2">

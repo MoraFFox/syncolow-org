@@ -112,3 +112,36 @@
   filter: invert(1) brightness(2) !important;
   opacity: 1 !important;
 }
+
+/* Drilldown System - Global Animations and Transitions */
+
+/* Smooth hover effect for all drillable elements */
+[data-drill-kind]:not([data-drill-disabled]) {
+  transition: all 0.15s ease-out;
+}
+
+[data-drill-kind]:not([data-drill-disabled]):hover {
+  transform: translateY(-1px);
+  filter: brightness(1.05);
+}
+
+/* Focus ring for keyboard navigation */
+[data-drill-kind]:not([data-drill-disabled]):focus {
+  outline: 2px solid hsl(var(--primary));
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Active state */
+[data-drill-kind]:not([data-drill-disabled]):active {
+  transform: translateY(0);
+  filter: brightness(0.95);
+}
+
+/* Touch feedback for mobile */
+@media (hover: none) and (pointer: coarse) {
+  [data-drill-kind]:not([data-drill-disabled]):active {
+    background-color: hsl(var(--accent));
+    transform: scale(0.98);
+  }
+}

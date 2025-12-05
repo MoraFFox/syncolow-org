@@ -1,10 +1,10 @@
 
 "use client";
 
-import { useMemo } from 'react';
 import Link from 'next/link';
 import { format } from 'date-fns';
 import type { Order } from '@/lib/types';
+import { DrillTarget } from '@/components/drilldown/drill-target';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
@@ -49,12 +49,14 @@ export function AllOrders({ orders }: AllOrdersProps) {
         {/* Mobile View */}
         <div className="grid grid-cols-1 gap-4 md:hidden">
              {orders.map(order => (
-                <Link href={`/orders/${order.id}`} key={order.id} className="active:scale-95 transition-transform">
+                <div key={order.id} className="transition-transform">
                     <Card>
                         <CardContent className="p-4 flex flex-col gap-2">
                             <div className="flex justify-between items-start">
                                 <div>
-                                    <p className="font-semibold text-primary">#{order.id.slice(0,7)}</p>
+                                    <DrillTarget kind="order" payload={{ id: order.id }} asChild>
+                                        <Link href={`/orders/${order.id}`} className="font-semibold text-primary hover:underline">#{order.id.slice(0,7)}</Link>
+                                    </DrillTarget>
                                     <p className="text-sm font-medium">{order.branchName}</p>
                                 </div>
                                 <Badge variant={getStatusVariant(order.status)}>{order.status}</Badge>
@@ -65,7 +67,7 @@ export function AllOrders({ orders }: AllOrdersProps) {
                             </div>
                         </CardContent>
                     </Card>
-                </Link>
+                </div>
              ))}
              {orders.length === 0 && (
                 <p className="text-center text-muted-foreground py-4">No orders found for this company.</p>
@@ -87,9 +89,11 @@ export function AllOrders({ orders }: AllOrdersProps) {
                 </TableHeader>
                 <TableBody>
                   {orders.map(order => (
-                    <TableRow key={order.id} className="cursor-pointer">
+                    <TableRow key={order.id}>
                       <TableCell className="font-medium">
-                        <Link href={`/orders/${order.id}`} className="hover:underline">#{order.id.slice(0, 7)}</Link>
+                        <DrillTarget kind="order" payload={{ id: order.id }} asChild>
+                            <Link href={`/orders/${order.id}`} className="hover:underline">#{order.id.slice(0, 7)}</Link>
+                        </DrillTarget>
                       </TableCell>
                       <TableCell>{order.branchName}</TableCell>
                       <TableCell>{format(new Date(order.orderDate), 'PPP')}</TableCell>

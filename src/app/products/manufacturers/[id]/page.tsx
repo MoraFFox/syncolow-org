@@ -1,4 +1,3 @@
-
 "use client";
 import { notFound } from 'next/navigation';
 import { Button } from '@/components/ui/button';
@@ -12,6 +11,7 @@ import ManufacturerAnalytics from './_components/manufacturer-analytics';
 import ProductAssignment from './_components/product-assignment';
 import { subMonths } from 'date-fns';
 import Image from 'next/image';
+import { DrillTarget } from '@/components/drilldown/drill-target';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -129,7 +129,18 @@ export default function ManufacturerDetailPage({ params }: { params: Promise<{ i
     <div className="container mx-auto py-10">
       <div className="flex items-center justify-between mb-6">
         <div className="min-w-0 flex-1">
-          <h1 className="text-3xl font-bold truncate">{displayName}</h1>
+          <DrillTarget 
+            kind="manufacturer" 
+            payload={{ 
+              id: manufacturer.id, 
+              name: displayName, 
+              icon: manufacturer.icon,
+              productCount: manufacturerProducts.length 
+            }} 
+            asChild
+          >
+            <h1 className="text-3xl font-bold truncate cursor-pointer hover:underline">{displayName}</h1>
+          </DrillTarget>
           <p className="text-muted-foreground line-clamp-2">{manufacturer.description}</p>
         </div>
         <div className="flex gap-2">
@@ -195,7 +206,9 @@ export default function ManufacturerDetailPage({ params }: { params: Promise<{ i
           {manufacturerProducts.map(product => (
             <Card key={product.id}>
               <CardContent className="p-4">
-                <h3 className="font-semibold">{product.name}</h3>
+                <DrillTarget kind="product" payload={{ id: product.id, name: product.name }} asChild>
+                    <h3 className="font-semibold cursor-pointer hover:underline">{product.name}</h3>
+                </DrillTarget>
                 <p className="text-sm text-muted-foreground">SKU: {product.sku}</p>
                 <p className="text-sm">Price: ${product.price?.toFixed(2) || '0.00'}</p>
                 <p className="text-sm">Stock: {product.stock || 0}</p>

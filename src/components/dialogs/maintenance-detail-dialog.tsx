@@ -20,7 +20,8 @@ export function MaintenanceDetailDialog({ isOpen, onOpenChange }: MaintenanceDet
   
   // Fetch real maintenance data from Supabase  
   React.useEffect(() => {
-    if (!isOpen || !payload?.id) return;
+    if (!isOpen || !payload) return;
+    if (!("id" in payload)) return;
     
     const fetchMaintenanceData = async () => {
       setIsLoading(true);
@@ -34,14 +35,14 @@ export function MaintenanceDetailDialog({ isOpen, onOpenChange }: MaintenanceDet
         const { data, error } = await supabase
           .from('maintenance_visits')
           .select('*')
-          .eq('id', payload.id)
+          .eq('id', (payload as any).id)
           .single();
         
         if (error || !data) {
           console.error('Failed to fetch maintenance data:', error);
           // Fallback data if table doesn't exist yet
           setMaintenanceData({
-            id: payload.id,
+            id: (payload as any).id,
             visitType: 'Periodic',
             scheduledDate: new Date().toISOString().split('T')[0],
             status: 'Scheduled',
@@ -57,7 +58,7 @@ export function MaintenanceDetailDialog({ isOpen, onOpenChange }: MaintenanceDet
         console.error('Error fetching maintenance data:', err);
         // Fallback data
         setMaintenanceData({
-          id: payload.id,
+          id: (payload as any).id,
           visitType: 'Periodic',
           scheduledDate: new Date().toISOString().split('T')[0],
           status: 'Scheduled',
@@ -72,7 +73,7 @@ export function MaintenanceDetailDialog({ isOpen, onOpenChange }: MaintenanceDet
     };
     
     fetchMaintenanceData();
-  }, [isOpen, payload?.id]);
+  }, [isOpen, payload]);
 
   const getStatusColor = (status: string) => {
     switch (status) {

@@ -63,7 +63,7 @@ export function CalendarSyncButton({
     setIsSyncing(true);
     try {
       const event = {
-        summary: `Order #${order.id} - ${order.companyName || order.clientName || 'Client'}`,
+        summary: `Order #${order.id} - ${order.companyName || order.temporaryCompanyName || 'Client'}`,
         description: `Order Details:\nTotal: ${order.grandTotal || 'N/A'}\nStatus: ${order.status || 'Scheduled'}\n\nView in App: ${window.location.href}`,
         start: {
           dateTime: order.deliveryDate ? new Date(order.deliveryDate).toISOString() : new Date().toISOString(),
@@ -73,7 +73,7 @@ export function CalendarSyncButton({
             ? new Date(new Date(order.deliveryDate).getTime() + 60 * 60 * 1000).toISOString() 
             : new Date(new Date().getTime() + 60 * 60 * 1000).toISOString(),
         },
-        location: order.location || order.clientName || '',
+        location: order.area || '',
       };
 
       const res = await fetch('/api/google-calendar/create-event', {

@@ -11,6 +11,7 @@ import { subMonths } from 'date-fns';
 import Link from 'next/link';
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
+import { DrillTarget } from '@/components/drilldown/drill-target';
 
 export default function CategoryDetailsPage() {
   const params = useParams();
@@ -74,7 +75,9 @@ export default function CategoryDetailsPage() {
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <div>
-            <h1 className="text-3xl font-bold">{category.name}</h1>
+            <DrillTarget kind="category" payload={{ id: category.id, name: category.name }} asChild>
+              <h1 className="text-3xl font-bold cursor-pointer hover:underline">{category.name}</h1>
+            </DrillTarget>
             <p className="text-muted-foreground">Category Analytics & Products</p>
           </div>
         </div>
@@ -112,10 +115,12 @@ export default function CategoryDetailsPage() {
                 />
                 <div className='flex-1 flex flex-col justify-between'>
                   <div>
-                    <p className='font-semibold'>
-                      {product.name}{" "}
-                      {product.variantName && `- ${product.variantName}`}
-                    </p>
+                    <DrillTarget kind="product" payload={{ id: product.id, name: product.name, price: product.price, stock: product.stock }} asChild>
+                      <p className='font-semibold cursor-pointer hover:underline'>
+                        {product.name}{" "}
+                        {product.variantName && `- ${product.variantName}`}
+                      </p>
+                    </DrillTarget>
                     <p className='text-sm text-muted-foreground'>
                       ${typeof product.price === "number" ? product.price.toFixed(2) : "0.00"}
                     </p>

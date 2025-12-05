@@ -1,6 +1,6 @@
 import { test, expect } from './fixtures/auth.fixture';
 
-test('should complete client creation wizard', async ({ page, login }) => {
+test('should complete client creation wizard', async ({ page }) => {
   // Navigate to clients page
   await page.goto('/clients');
   

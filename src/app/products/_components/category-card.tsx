@@ -3,6 +3,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Category, Product } from "@/lib/types";
 import { Package, DollarSign } from "lucide-react";
+import { DrillTarget } from '@/components/drilldown/drill-target';
 
 
 interface CategoryCardProps {
@@ -21,7 +22,19 @@ export function CategoryCard({ category, products, onClick }: CategoryCardProps)
         className="hover:bg-muted/50 transition-colors cursor-pointer h-full"
       >
         <CardHeader className="pb-2">
-          <CardTitle className="text-lg font-bold">{category.name}</CardTitle>
+          <DrillTarget 
+            kind="category" 
+            payload={{ 
+              id: category.id, 
+              name: category.name,
+              productCount: products.length 
+            }} 
+            asChild
+          >
+            <CardTitle className="text-lg font-bold cursor-pointer hover:underline">
+              {category.name}
+            </CardTitle>
+          </DrillTarget>
         </CardHeader>
         <CardContent>
           <div className="flex flex-col gap-2">

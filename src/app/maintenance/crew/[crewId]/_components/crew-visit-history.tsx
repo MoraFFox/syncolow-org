@@ -3,6 +3,7 @@
 
 import { useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { DrillTarget } from '@/components/drilldown/drill-target';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import type { MaintenanceEmployee, MaintenanceVisit } from '@/lib/types';
@@ -49,7 +50,11 @@ export function CrewVisitHistory({ crewMember, visits }: CrewVisitHistoryProps) 
             <TableBody>
                 {sortedVisits.map(visit => (
                     <TableRow key={visit.id}>
-                        <TableCell className="font-medium">{visit.branchName}</TableCell>
+                        <TableCell className="font-medium">
+                            <DrillTarget kind="branch" payload={{ id: visit.branchId, name: visit.branchName, companyId: visit.companyId }} asChild>
+                                <span className="cursor-pointer hover:underline">{visit.branchName}</span>
+                            </DrillTarget>
+                        </TableCell>
                         <TableCell>{format(parseISO(visit.date as string), 'PPP')}</TableCell>
                         <TableCell className="capitalize">{visit.visitType.replace('_', ' ')}</TableCell>
                         <TableCell><Badge variant={getStatusVariant(visit.status)}>{visit.status}</Badge></TableCell>
