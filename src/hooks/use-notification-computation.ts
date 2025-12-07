@@ -34,9 +34,9 @@ export function useNotificationComputation(userId: string | undefined) {
 
   useEffect(() => {
     if (
-      orders.length &&
-      products.length &&
-      companies.length &&
+      orders?.length &&
+      products?.length &&
+      companies?.length &&
       userId &&
       notifications.length === 0
     ) {

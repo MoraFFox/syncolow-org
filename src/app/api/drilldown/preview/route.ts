@@ -14,6 +14,13 @@ function calculateHealthScore(company: any) {
 
 export async function POST(req: NextRequest) {
   try {
+    if (!supabaseAdmin) {
+      return NextResponse.json(
+        { error: 'Database not configured' },
+        { status: 503 }
+      );
+    }
+
     const body = await req.json();
     const { kind, payload } = body;
     const id = payload.id;
