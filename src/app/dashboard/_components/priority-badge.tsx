@@ -1,3 +1,4 @@
+import * as React from "react";
 import { Badge } from "@/components/ui/badge";
 import { AlertCircle, AlertTriangle } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -9,7 +10,7 @@ interface PriorityBadgeProps {
   className?: string;
 }
 
-export function PriorityBadge({ priority, className }: PriorityBadgeProps) {
+export const PriorityBadge = React.memo<PriorityBadgeProps>(function PriorityBadge({ priority, className }) {
   const styles = {
     critical: "bg-destructive/15 text-destructive border-destructive/40",
     high: "bg-orange-500/15 text-orange-600 dark:text-orange-400 border-orange-500/40",
@@ -29,4 +30,4 @@ export function PriorityBadge({ priority, className }: PriorityBadgeProps) {
       <span className="capitalize">{priority}</span>
     </Badge>
   );
-}
+});

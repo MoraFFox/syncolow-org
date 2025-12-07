@@ -92,91 +92,7 @@ interface CompanyFormProps {
     initialAccordionState?: 'companyDetails' | 'contacts' | 'branches';
 }
 
-const POSITION_OPTIONS = [
-  { label: 'Operation Manager', value: 'Operation Manager' },
-  { label: 'Branch Manager', value: 'Branch Manager' },
-  { label: 'Chief', value: 'Chief' },
-  { label: 'Sales Manager', value: 'Sales Manager' },
-  { label: 'Owner', value: 'Owner' },
-  { label: 'Barista', value: 'Barista' },
-];
-
-export function PhoneNumbersSubForm({ control, register, contactFieldNamePrefix }: {
-  control: Control<any>, register: UseFormRegister<any>, errors: FieldErrors<any>, contactFieldNamePrefix: string
-}) {
-  const { fields, append, remove } = useFieldArray({ control, name: `${contactFieldNamePrefix}.phoneNumbers` as any });
-  
-  return (
-    <div className="space-y-2">
-        <Label>Phone Numbers</Label>
-        {fields.map((field, index) => (
-            <div key={field.id} className="flex items-center gap-2">
-                <PhoneNumberInput {...register(`${contactFieldNamePrefix}.phoneNumbers.${index}.number` as any)} />
-                <Button type="button" variant="ghost" size="icon" onClick={() => remove(index)} disabled={fields.length <= 1}>
-                    <Trash2 className="h-4 w-4"/>
-                </Button>
-            </div>
-        ))}
-         <Button type="button" variant="outline" size="sm" onClick={() => append({ number: '' } as any)}>
-            <PlusCircle className="mr-2 h-4 w-4" /> Add Phone
-        </Button>
-    </div>
-  )
-}
-
-export function ContactsSubForm({ control, register, errors, setValue, fieldNamePrefix, title, description }: {
-  control: Control<any>, register: UseFormRegister<any>, errors: FieldErrors<any>, setValue: UseFormSetValue<any>, fieldNamePrefix: string, title: string, description: string
-}) {
-  const { fields, append, remove } = useFieldArray({ control, name: fieldNamePrefix as any });
-
-  return (
-    <div className="space-y-4">
-      <div className="flex justify-between items-center">
-        <div>
-            <h4 className="font-semibold">{title}</h4>
-            <p className="text-sm text-muted-foreground">{description}</p>
-        </div>
-           <Button type="button" variant="secondary" size="sm" onClick={() => append({ name: '', position: '', phoneNumbers: [{ number: '' }] } as any)}>
-            <PlusCircle className="mr-2 h-4 w-4" /> Add Contact
-          </Button>
-      </div>
-      {fields.map((field, index) => (
-        <div key={field.id} className="p-4 border rounded-md space-y-4 relative bg-muted/30">
-           <Button type="button" variant="ghost" size="icon" onClick={() => remove(index)} className="absolute top-1 right-1 h-6 w-6">
-              <Trash2 className="h-4 w-4 text-destructive" />
-          </Button>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-             <div className="grid gap-2">
-                <Label>Name</Label>
-                <Input {...register(`${fieldNamePrefix}.${index}.name` as any)} />
-            </div>
-             <div className="grid gap-2">
-                <Label>Position</Label>
-                <div className="flex gap-2">
-                     <Input {...register(`${fieldNamePrefix}.${index}.position` as any)} placeholder="Type custom position..." />
-                     <Controller
-                        name={`${fieldNamePrefix}.${index}.position` as any}
-                        control={control}
-                        render={({ field: controllerField }) => (
-                            <Combobox
-                                options={POSITION_OPTIONS}
-                                value={controllerField.value}
-                                onChange={(value) => setValue(`${fieldNamePrefix}.${index}.position` as any, value as any, { shouldValidate: true, shouldDirty: true })}
-                                placeholder="Or select..."
-                                searchPlaceholder="Search..."
-                                emptyText="No matching position."
-                            />
-                        )}
-                    />
-                </div>
-            </div>
-          </div>
-           <PhoneNumbersSubForm control={control} register={register} errors={errors} contactFieldNamePrefix={`${fieldNamePrefix}.${index}`} />
-        </div>
-      ))}
-    </div>
-  )
-}
+import { ContactsSubForm } from './contacts-sub-form';
 
 
 function ProductFormContent({ company, onSubmit, onCancel, isEmbedded = false, initialAccordionState = 'companyDetails' }: Omit<CompanyFormProps, 'isOpen'|'onOpenChange'> & { onCancel: () => void, isEmbedded?: boolean }) {
@@ -196,8 +112,7 @@ function ProductFormContent({ company, onSubmit, onCancel, isEmbedded = false, i
         }
     });
 
-    console.log("Form Errors:", errors); // Debugging
-
+    // Form errors are handled by react-hook-form's error display
 
     const { fields, append, remove, replace } = useFieldArray({
         control,
@@ -234,7 +149,7 @@ function ProductFormContent({ company, onSubmit, onCancel, isEmbedded = false, i
                         machineOwned: b.machineOwned || false,
                         machineLeased: b.machineLeased,
                         leaseMonthlyCost: b.leaseMonthlyCost,
-                    })) as any,
+                    })),
                     paymentMethod: company.paymentMethod,
                     paymentDueType: company.paymentDueType,
                     paymentDueDays: company.paymentDueDays,
@@ -280,7 +195,7 @@ function ProductFormContent({ company, onSubmit, onCancel, isEmbedded = false, i
 
     const handleFormSubmit = async (data: CompanyFormData) => {
       try {
-      const companyToSubmit: any = {
+      const companyToSubmit: Partial<Omit<Company, 'id' | 'isBranch' | 'parentCompanyId'>> = {
         name: data.name,
         location: data.location === '' ? null : data.location,
         region: data.region || 'A',
@@ -301,7 +216,7 @@ function ProductFormContent({ company, onSubmit, onCancel, isEmbedded = false, i
       if (data.paymentDueDays !== undefined && data.paymentDueDays !== null) companyToSubmit.paymentDueDays = data.paymentDueDays;
       if (data.paymentDueDate !== undefined && data.paymentDueDate !== null && !isNaN(data.paymentDueDate)) companyToSubmit.paymentDueDate = data.paymentDueDate;
       if (data.bulkPaymentSchedule && data.bulkPaymentSchedule.frequency) {
-        const schedule: any = {
+        const schedule: Company['bulkPaymentSchedule'] = {
           frequency: data.bulkPaymentSchedule.frequency,
         };
         if (data.bulkPaymentSchedule.dayOfMonth !== undefined && data.bulkPaymentSchedule.dayOfMonth !== null && !isNaN(data.bulkPaymentSchedule.dayOfMonth)) {

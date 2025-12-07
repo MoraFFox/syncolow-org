@@ -1,4 +1,5 @@
 import { DrillKind, DrillPayload } from './drilldown-types';
+import { logger } from './logger';
 
 export interface DrillAnalyticsEvent {
   id: string;
@@ -60,7 +61,7 @@ export const drillAnalytics = new class DrillAnalytics {
         this.performanceMetrics = JSON.parse(storedMetrics);
       }
     } catch (error) {
-      console.error('Failed to load drill analytics:', error);
+      logger.error(error, { component: 'DrillAnalytics', action: 'loadFromStorage' });
     }
   }
 
@@ -70,7 +71,7 @@ export const drillAnalytics = new class DrillAnalytics {
       localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.events.slice(-this.MAX_EVENTS)));
       localStorage.setItem(this.PERFORMANCE_KEY, JSON.stringify(this.performanceMetrics.slice(-this.MAX_EVENTS)));
     } catch (error) {
-      console.error('Failed to save drill analytics:', error);
+      logger.error(error, { component: 'DrillAnalytics', action: 'saveToStorage' });
     }
   }
 

@@ -1,4 +1,3 @@
-
 "use client";
 
 import { SectionCard } from './section-card';

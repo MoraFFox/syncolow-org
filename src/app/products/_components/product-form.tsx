@@ -20,7 +20,7 @@ import { Textarea } from '@/components/ui/textarea';
 import Image from 'next/image';
 import { UploadCloud } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useOrderStore } from '@/store/use-order-store';
+import { useCategoriesStore } from '@/store';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Combobox } from '@/components/ui/combo-box';
 
@@ -59,7 +59,7 @@ type AddProductData = Omit<Product, 'id' | 'imageUrl'> & { image?: File };
 function ProductFormContent({ product, onSubmit, onCancel, isEmbedded }: Omit<ProductFormProps, 'isOpen'|'onOpenChange'> & { onCancel: () => void, isEmbedded?: boolean }) {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
-  const { categories, addCategory } = useOrderStore();
+  const { categories, addCategory } = useCategoriesStore();
 
   const { register, handleSubmit, reset, setValue, watch, control, formState: { errors } } = useForm<ProductFormData>({
     resolver: zodResolver(productSchema),

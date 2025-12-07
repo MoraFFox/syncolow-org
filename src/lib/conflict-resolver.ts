@@ -1,5 +1,5 @@
-
 import { supabase } from './supabase';
+import { logger } from './logger';
 
 export interface Conflict {
   id: string;
@@ -62,7 +62,7 @@ class ConflictResolver {
 
       return null;
     } catch (error) {
-      console.error('Error detecting conflict:', error);
+      logger.error(error, { component: 'ConflictResolver', action: 'detectConflict' });
       return null;
     }
   }

@@ -1,7 +1,7 @@
-
 "use client";
 
 import { Controller } from 'react-hook-form';
+import type { Control, UseFormRegister, FieldErrors, UseFormWatch, UseFormSetValue } from 'react-hook-form';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
@@ -9,9 +9,19 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { MapPin } from 'lucide-react';
-import { ContactsSubForm } from '../company-form';
+import { ContactsSubForm } from '../contacts-sub-form';
+import type { CompanyFormProps } from '@/types/forms';
 
-export function Step3_BranchOrFinal({ control, register, errors, watch, openMapPicker, setValue }: any) {
+interface Step3Props {
+  control: Control<CompanyFormProps>;
+  register: UseFormRegister<CompanyFormProps>;
+  errors: FieldErrors<CompanyFormProps>;
+  watch: UseFormWatch<CompanyFormProps>;
+  openMapPicker: (type: string) => void;
+  setValue: UseFormSetValue<CompanyFormProps>;
+}
+
+export function Step3_BranchOrFinal({ control, register, errors, watch, openMapPicker, setValue }: Step3Props) {
   const watchHasBranches = watch('hasBranches');
   const watchMachineOwned = watch('machineOwned');
   const companyName = watch('companyName');

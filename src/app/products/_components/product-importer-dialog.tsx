@@ -4,7 +4,7 @@
 import { useState, useCallback, useEffect } from 'react';
 import Papa from 'papaparse';
 import * as XLSX from 'xlsx';
-import { useOrderStore } from '@/store/use-order-store';
+import { useProductsStore } from '@/store';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -59,7 +59,7 @@ export function ProductImporterDialog({
   isOpen: boolean;
   onOpenChange: (isOpen: boolean) => void;
 }) {
-  const { fetchInitialData } = useOrderStore();
+  const { loadRemainingProducts } = useProductsStore();
   const [stage, setStage] = useState<'upload' | 'mapping' | 'importing' | 'complete'>('upload');
   const [file, setFile] = useState<File | null>(null);
   const [fileName, setFileName] = useState('');
@@ -207,7 +207,7 @@ export function ProductImporterDialog({
     const result = await importProductsFlow({ products: mappedData });
     setImportResult(result);
     setStage('complete');
-    await fetchInitialData();
+    await loadRemainingProducts();
     setIsLoading(false);
 
   }, [rows, columnMapping, fetchInitialData]);

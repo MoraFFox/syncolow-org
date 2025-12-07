@@ -3,6 +3,7 @@ import { supabase } from '@/lib/supabase';
 import { useOfflineQueueStore } from '@/store/use-offline-queue-store';
 import { QueuedOperation } from './indexeddb-storage';
 import { toast } from '@/hooks/use-toast';
+import { logger } from './logger';
 
 const MAX_RETRIES = 5;
 const RETRY_DELAYS = [1000, 2000, 5000, 10000, 30000]; // Exponential backoff
@@ -33,7 +34,7 @@ class OfflineQueueManager {
         failCount++;
         
         if (operation.retries >= MAX_RETRIES) {
-          console.error(`Max retries reached for operation ${operation.id}:`, error);
+          logger.error(error, { component: 'OfflineQueueManager', action: 'processQueue - max retries', operationId: operation.id });
           await updateQueueItem({
             ...operation,
             error: error.message || 'Max retries exceeded',

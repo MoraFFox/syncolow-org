@@ -8,6 +8,7 @@ import { logError, logSupabaseError, logDebug } from '@/lib/error-logger';
 import { universalCache } from '@/lib/cache/universal-cache';
 import { CacheKeyFactory } from '@/lib/cache/key-factory';
 import { drilldownCacheInvalidator } from '@/lib/cache/drilldown-cache-invalidator';
+import { logger } from '@/lib/logger';
 
 interface CompanyState {
   companies: Company[];
@@ -105,7 +106,7 @@ export const useCompanyStore = create<CompanyState>((set, get) => ({
                 .single();
 
             if (branchError) {
-                console.error("Error creating branch:", branchError);
+                logger.error(branchError, { component: 'useCompanyStore', action: 'addCompanyAndRelatedData - create branch' });
                 continue;
             }
 
@@ -149,7 +150,7 @@ export const useCompanyStore = create<CompanyState>((set, get) => ({
 
     const { error: companyError } = await supabase.from('companies').update(cleanCompanyData).eq('id', companyId);
     if (companyError) {
-      console.error('Company update error:', companyError);
+      logger.error(companyError, { component: 'useCompanyStore', action: 'updateCompanyAndBranches - update company' });
       throw companyError;
     }
 
@@ -173,7 +174,7 @@ export const useCompanyStore = create<CompanyState>((set, get) => ({
             if (id) {
                 const { error: branchError } = await supabase.from('companies').update(cleanBranchData).eq('id', id);
                 if (branchError) {
-                  console.error('Branch update error:', branchError, 'Data:', cleanBranchData);
+                  logger.error(branchError, { component: 'useCompanyStore', action: 'updateCompanyAndBranches - update branch' });
                   throw branchError;
                 }
             } else {
@@ -196,7 +197,7 @@ export const useCompanyStore = create<CompanyState>((set, get) => ({
     try {
       drilldownCacheInvalidator.invalidatePreview('company', companyId);
     } catch (e) {
-      console.error('Failed to invalidate drilldown cache:', e);
+      logger.error(e, { component: 'useCompanyStore', action: 'updateCompanyAndBranches - invalidate cache' });
     }
   },
 
@@ -286,7 +287,7 @@ export const useCompanyStore = create<CompanyState>((set, get) => ({
         drilldownCacheInvalidator.invalidatePreview('company', companyId);
         branches.forEach(b => drilldownCacheInvalidator.invalidatePreview('company', b.id));
       } catch (e) {
-        console.error('Failed to invalidate drilldown cache:', e);
+        logger.error(e, { component: 'useCompanyStore', action: 'deleteCompany - invalidate cache' });
       }
     } catch (error: any) {
       toast({ 
@@ -449,7 +450,7 @@ export const useCompanyStore = create<CompanyState>((set, get) => ({
                         page++;
                     }
                 }
-                console.log('[DEBUG] Revenue Stats - Total fetched orders:', totalOrders);
+                logger.debug('Revenue Stats - Total fetched orders', { totalOrders });
                 return revenueMap;
             }
         );
@@ -460,7 +461,7 @@ export const useCompanyStore = create<CompanyState>((set, get) => ({
             });
         }));
     } catch (error) {
-        console.error('Error fetching revenue stats:', error);
+        logger.error(error, { component: 'useCompanyStore', action: 'fetchRevenueStats' });
     }
   },
 }));

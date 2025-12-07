@@ -1,5 +1,6 @@
 
 import { supabase } from '@/lib/supabase';
+import { logger } from '@/lib/logger';
 
 class StorageService {
   async uploadFile(file: File, path: string): Promise<string> {
@@ -34,7 +35,7 @@ class StorageService {
 
       return publicUrl;
     } catch (error) {
-      console.error("Error uploading file:", error);
+      logger.error(error, { component: 'StorageService', action: 'uploadFile' });
       throw new Error("File upload failed. Please try again.");
     }
   }

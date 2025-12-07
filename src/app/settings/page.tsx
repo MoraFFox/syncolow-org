@@ -2,6 +2,7 @@
 
 "use client";
 
+import { lazy, Suspense } from "react";
 import { useSettingsStore, ViewMode } from "@/store/use-settings-store";
 import {
   Card,
@@ -18,12 +19,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ClearData } from "./_components/clear-data";
-import { NotificationSettings } from "./_components/notification-settings";
-import { Integrations } from "./_components/integrations";
-import { PaymentMigration } from "./_components/payment-migration";
-import { UpdatePaymentScores } from "./_components/update-payment-scores";
-import { SyncSearchCollection } from "./_components/sync-search-collection";
+import { Skeleton } from "@/components/ui/skeleton";
+
+const ClearData = lazy(() => import("./_components/clear-data").then(m => ({ default: m.ClearData })));
+const NotificationSettings = lazy(() => import("./_components/notification-settings").then(m => ({ default: m.NotificationSettings })));
+const Integrations = lazy(() => import("./_components/integrations").then(m => ({ default: m.Integrations })));
+const PaymentMigration = lazy(() => import("./_components/payment-migration").then(m => ({ default: m.PaymentMigration })));
+const UpdatePaymentScores = lazy(() => import("./_components/update-payment-scores").then(m => ({ default: m.UpdatePaymentScores })));
+const SyncSearchCollection = lazy(() => import("./_components/sync-search-collection").then(m => ({ default: m.SyncSearchCollection })));
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
@@ -243,9 +246,13 @@ export default function SettingsPage() {
         </CardContent>
       </Card>
 
-      <NotificationSettings />
+      <Suspense fallback={<Card><CardHeader><Skeleton className="h-6 w-48" /></CardHeader><CardContent><Skeleton className="h-20 w-full" /></CardContent></Card>}>
+        <NotificationSettings />
+      </Suspense>
 
-      <Integrations />
+      <Suspense fallback={<Card><CardHeader><Skeleton className="h-6 w-48" /></CardHeader><CardContent><Skeleton className="h-20 w-full" /></CardContent></Card>}>
+        <Integrations />
+      </Suspense>
 
       <Card>
         <CardHeader>
@@ -292,13 +299,21 @@ export default function SettingsPage() {
         </CardContent>
       </Card>
 
-      <PaymentMigration />
+      <Suspense fallback={<Card><CardHeader><Skeleton className="h-6 w-48" /></CardHeader><CardContent><Skeleton className="h-20 w-full" /></CardContent></Card>}>
+        <PaymentMigration />
+      </Suspense>
 
-      <UpdatePaymentScores />
+      <Suspense fallback={<Card><CardHeader><Skeleton className="h-6 w-48" /></CardHeader><CardContent><Skeleton className="h-20 w-full" /></CardContent></Card>}>
+        <UpdatePaymentScores />
+      </Suspense>
 
-      <SyncSearchCollection />
+      <Suspense fallback={<Card><CardHeader><Skeleton className="h-6 w-48" /></CardHeader><CardContent><Skeleton className="h-20 w-full" /></CardContent></Card>}>
+        <SyncSearchCollection />
+      </Suspense>
 
-      <ClearData />
+      <Suspense fallback={<Card><CardHeader><Skeleton className="h-6 w-48" /></CardHeader><CardContent><Skeleton className="h-20 w-full" /></CardContent></Card>}>
+        <ClearData />
+      </Suspense>
 
       <DrilldownHelpDialog
         isOpen={isHelpDialogOpen}

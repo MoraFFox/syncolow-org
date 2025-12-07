@@ -1,14 +1,19 @@
 /** @format */
 
 import admin from 'firebase-admin';
+import dotenv from 'dotenv';
 
-const serviceAccount = {
-  projectId: 'synergyflow-pvqrj',
-};
+dotenv.config();
+
+if (!process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID) {
+  console.error('Error: Missing NEXT_PUBLIC_FIREBASE_PROJECT_ID environment variable.');
+  console.error('Please copy .env.example to .env and configure your Firebase credentials.');
+  process.exit(1);
+}
 
 admin.initializeApp({
   credential: admin.credential.applicationDefault(),
-  projectId: 'synergyflow-pvqrj'
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID
 });
 
 const db = admin.firestore();

@@ -1,6 +1,5 @@
-/** @format */
-
 "use client";
+/** @format */
 
 import { useEffect } from "react";
 import { useDrillDownStore } from "@/store/use-drilldown-store";

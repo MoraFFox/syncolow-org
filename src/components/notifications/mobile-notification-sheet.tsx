@@ -1,5 +1,6 @@
 "use client";
 
+import * as React from 'react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -18,7 +19,7 @@ interface MobileNotificationSheetProps {
   children: React.ReactNode;
 }
 
-export function MobileNotificationSheet({
+export const MobileNotificationSheet = React.memo<MobileNotificationSheetProps>(function MobileNotificationSheet({
   open,
   onOpenChange,
   notifications,
@@ -77,4 +78,4 @@ export function MobileNotificationSheet({
       </SheetContent>
     </Sheet>
   );
-}
+});

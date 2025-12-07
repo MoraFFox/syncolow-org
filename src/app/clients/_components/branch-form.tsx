@@ -22,7 +22,7 @@ import { LocationPickerDialog } from '../[companyId]/_components/location-picker
 import type { Branch, Company, Contact } from "@/lib/types";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
-import { ContactsSubForm } from './company-form';
+import { ContactsSubForm } from './contacts-sub-form';
 import { useCompanyStore } from '@/store/use-company-store';
 
 const contactSchema = z.object({

@@ -1,11 +1,16 @@
-
 "use client";
 
 import { Controller } from 'react-hook-form';
+import type { Control } from 'react-hook-form';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import type { CompanyFormProps } from '@/types/forms';
 
-export function Step2_CompanyStructure({ control }: any) {
+interface Step2Props {
+  control: Control<CompanyFormProps>;
+}
+
+export function Step2_CompanyStructure({ control }: Step2Props) {
   return (
     <div className="space-y-4">
         <Controller

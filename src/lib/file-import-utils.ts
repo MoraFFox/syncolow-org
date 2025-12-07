@@ -1,5 +1,5 @@
 
-import * as XLSX from 'xlsx';
+import { read, utils } from 'xlsx';
 import Papa from 'papaparse';
 import { CsvRow } from './types';
 import { calculateTotal, calculateOrderTotals } from './pricing-calculator';
@@ -50,7 +50,7 @@ export function parseExcelFile(file: File): Promise<CsvRow[]> {
     reader.onload = (e) => {
       try {
         const data = new Uint8Array(e.target?.result as ArrayBuffer);
-        const workbook = XLSX.read(data, { type: 'array' });
+        const workbook = read(data, { type: 'array' });
         
         // Get the first worksheet
         const firstSheetName = workbook.SheetNames[0];
@@ -58,7 +58,7 @@ export function parseExcelFile(file: File): Promise<CsvRow[]> {
         
         // Convert to JSON with automatic header detection
         // This will parse the sheet treating the first row as headers
-        const jsonData: any[] = XLSX.utils.sheet_to_json(worksheet, {
+        const jsonData: any[] = utils.sheet_to_json(worksheet, {
           header: 1,
           defval: ''
         });

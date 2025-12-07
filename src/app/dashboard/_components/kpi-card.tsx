@@ -1,5 +1,6 @@
 /** @format */
 
+import * as React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
@@ -34,7 +35,7 @@ const iconStyles = {
   info: DASHBOARD_CONFIG.KPI_CARD_VARIANTS.info.icon,
 };
 
-export function KpiCard({
+export const KpiCard = React.memo<KpiCardProps>(function KpiCard({
   title,
   value,
   icon: Icon,
@@ -43,7 +44,7 @@ export function KpiCard({
   className,
   trend,
   sparklineData,
-}: KpiCardProps) {
+}) {
   const trendPositive = typeof trend === "number" ? trend >= 0 : undefined;
   const TrendIcon = trendPositive ? ArrowUpRight : ArrowDownRight;
   const trendColor = trendPositive
@@ -111,4 +112,4 @@ export function KpiCard({
       </CardContent>
     </Card>
   );
-}
+});

@@ -1,5 +1,6 @@
 "use client";
 
+import * as React from "react";
 import { Check, Clock, Package, Truck } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -17,7 +18,7 @@ const steps = [
   { id: "Delivered", icon: Check, label: "Delivered" },
 ];
 
-export function OrderStepper({ status, className }: OrderStepperProps) {
+export const OrderStepper = React.memo<OrderStepperProps>(function OrderStepper({ status, className }) {
   const currentStepIndex = steps.findIndex((s) => s.id === status);
   const isCancelled = status === "Cancelled";
 
@@ -67,4 +68,4 @@ export function OrderStepper({ status, className }: OrderStepperProps) {
       })}
     </div>
   );
-}
+});

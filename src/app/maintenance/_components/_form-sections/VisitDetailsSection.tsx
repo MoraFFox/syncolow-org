@@ -2,19 +2,21 @@
 "use client";
 
 import { useFormContext, Controller } from 'react-hook-form';
+import type { Control, UseFormRegister, FieldErrors } from 'react-hook-form';
+import type { VisitOutcomeFormData } from '../maintenance-schemas';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { format } from 'date-fns';
-import { VisitOutcomeFormData } from '../maintenance-visit-form';
+import { VisitOutcomeFormData } from '../../maintenance-schemas';
 import { useMaintenanceStore } from '@/store/use-maintenance-store';
 import { Combobox } from '@/components/ui/combo-box';
 
 interface VisitDetailsSectionProps {
-    control: any;
-    register: any;
-    errors: any;
+    control: Control<VisitOutcomeFormData>;
+    register: UseFormRegister<VisitOutcomeFormData>;
+    errors: FieldErrors<VisitOutcomeFormData>;
 }
 
 export function VisitDetailsSection({ control, register, errors }: VisitDetailsSectionProps) {

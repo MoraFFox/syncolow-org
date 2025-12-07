@@ -1,4 +1,5 @@
 import { DrillKind, DrillPayload } from "../drilldown-types";
+import { logger } from '../logger';
 
 export async function fetchDrillPreview<K extends DrillKind>(kind: K, payload: DrillPayload<K>) {
   try {
@@ -10,7 +11,7 @@ export async function fetchDrillPreview<K extends DrillKind>(kind: K, payload: D
     if (!response.ok) return null;
     return await response.json();
   } catch (e) {
-    console.error("Failed to fetch drill preview", e);
+    logger.error(e, { component: 'DrilldownAPI', action: 'fetchDrillPreview' });
     return null;
   }
 }

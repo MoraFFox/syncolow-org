@@ -1,6 +1,5 @@
-/** @format */
-
 "use client";
+/** @format */
 
 import { Car, Wrench } from "lucide-react";
 import Link from "next/link";

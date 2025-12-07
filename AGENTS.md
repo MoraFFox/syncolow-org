@@ -76,19 +76,67 @@ The primary goal is to produce **clean, maintainable, and bug-free code** that i
 
 1. **Write Tests for Every New Logic**
    - Use **Vitest** for all unit and integration tests.
-   - Store tests next to source files (`*.test.ts` / `*.test.tsx`).
    - Follow **AAA pattern** (Arrange → Act → Assert).
+   - Every new feature or bug fix **must have corresponding tests**.
 
-2. **Coverage & Reliability**
-   - Test all core logic: utilities, hooks, and API integrations.
-   - Mock network requests or localStorage interactions.
-   - Ensure `vitest run` passes before finalizing work.
+2. **Test File Organization**
+   - **Co-locate tests** with source files in `__tests__/` directories:
+     ```
+     src/lib/__tests__/notification-service.test.ts
+     src/store/__tests__/use-order-store.test.ts
+     src/hooks/__tests__/use-auth.test.tsx
+     src/app/api/geocode/__tests__/route.test.ts
+     ```
+   - Use `.test.ts` for logic, `.test.tsx` for React components/hooks.
 
-3. **Agent Checklist Before Finishing**
-   - ✅ Build succeeds (`next build` has 0 errors).  
-   - ✅ ESLint and Prettier are clean.  
-   - ✅ TypeScript compiles without errors.  
-   - ✅ Vitest tests pass.  
+3. **Test Utilities (src/test/)**
+   - `setup.ts` - Global mocks (Supabase, Next.js navigation, window APIs).
+   - `test-utils.ts` - Reusable mock factories and helpers:
+     - `createMockOrder()`, `createMockCompany()`, `createMockNotification()`
+     - `createSupabaseChain()` for chainable query mocks
+     - `daysAgo()`, `daysFromNow()` for date helpers
+   - `example.test.ts` - Reference patterns for all testing scenarios.
+
+4. **Mocking Strategies**
+   - **Supabase**: Mock `@/lib/supabase` with chainable methods:
+     ```typescript
+     vi.mock('@/lib/supabase', () => ({
+       supabase: {
+         from: vi.fn(() => ({
+           select: vi.fn().mockReturnThis(),
+           eq: vi.fn().mockReturnThis(),
+           single: vi.fn().mockResolvedValue({ data: mockData, error: null }),
+         })),
+       },
+     }));
+     ```
+   - **Next.js**: Mock `next/navigation`, `next/headers` for router/cookies.
+   - **Browser APIs**: Mock `matchMedia`, `localStorage`, `IndexedDB`.
+   - **External APIs**: Mock `fetch` for geocoding, Google Tasks, etc.
+
+5. **Coverage Requirements**
+   - **Target**: 70%+ coverage for business logic files.
+   - **Priority files**:
+     | File | Target |
+     |------|--------|
+     | Services (`notification-service.ts`, `payment-score.ts`) | 80%+ |
+     | Zustand Stores | 70%+ |
+     | Custom Hooks | 80%+ |
+     | API Routes | 75%+ |
+   - Run coverage: `npm run test -- --coverage`
+
+6. **Testing Patterns by Type**
+   - **Services**: Test all methods, edge cases, error handling.
+   - **Stores**: Test state updates, async actions, cache invalidation.
+   - **Hooks**: Use `renderHook` from `@testing-library/react`.
+   - **API Routes**: Mock `NextRequest`, test all HTTP status codes.
+
+7. **Agent Checklist Before Finishing**
+   - ✅ Build succeeds (`next build` has 0 errors).
+   - ✅ ESLint and Prettier are clean.
+   - ✅ TypeScript compiles without errors.
+   - ✅ All Vitest tests pass (`npm run test`).
+   - ✅ Coverage meets thresholds for modified files.
    - ✅ No console warnings in browser or server logs.
 
 ---

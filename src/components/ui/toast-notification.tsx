@@ -1,8 +1,7 @@
 "use client";
 
 import { useEffect, useState } from 'react';
-import { X, Bell } from 'lucide-react';
-import * as LucideIcons from 'lucide-react';
+import { X, Bell, AlertCircle, TrendingUp, Package, Users, DollarSign, Clock, CheckCircle, Info } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { Notification } from '@/lib/types';
 import { formatDistanceToNow } from 'date-fns';
@@ -29,8 +28,12 @@ export function ToastNotification({ notification, onClose, onView }: ToastNotifi
     setTimeout(onClose, 300);
   };
 
+  const iconMap: Record<string, React.ElementType> = {
+    AlertCircle, TrendingUp, Package, Users, DollarSign, Clock, CheckCircle, Info, Bell
+  };
+
   const Icon = () => {
-    const LucideIcon = ((LucideIcons as any)[notification.icon] || Bell) as React.ElementType;
+    const LucideIcon = iconMap[notification.icon] || Bell;
     return <LucideIcon className="h-5 w-5" />;
   };
 

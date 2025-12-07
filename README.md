@@ -151,6 +151,8 @@ GOOGLE_GENAI_API_KEY=
 
 See [.env.example](./.env.example) for complete template.
 
+**⚠️ Security Note**: Never commit `.env` files to version control. All Firebase credentials must be configured via environment variables. Development scripts (`delete-orders-client.js`, `delete-orders.js`) require these variables to be set in your `.env` file.
+
 ### Firestore Setup
 
 ```bash

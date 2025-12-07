@@ -7,10 +7,11 @@ import { Label } from '@/components/ui/label';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Minus, Plus, Trash2, Tag, Percent, DollarSign, Wrench } from 'lucide-react';
 import { useFormContext, useFieldArray, Controller } from 'react-hook-form';
-import type { OrderFormData } from '../order-form';
+import type { OrderFormData } from '../order-schemas';
 import { ProductPicker } from '@/components/ui/product-picker';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useOrderStore } from '@/store/use-order-store';
+import { useTaxesStore } from '@/store';
 import { Tax } from '@/lib/types';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { useMaintenanceStore } from '@/store/use-maintenance-store';
@@ -19,7 +20,7 @@ import { format, subMonths, isAfter, isValid, parseISO } from 'date-fns';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
 interface Step2OrderItemsProps {
-    products: any[]; // This is not used anymore but kept to avoid breaking changes in order-form
+    products?: unknown[]; // Deprecated: Not used, kept for backward compatibility
 }
 
 function ClientInsights() {
@@ -65,7 +66,8 @@ function ClientInsights() {
 
 export function Step2_OrderItems({ products }: Step2OrderItemsProps) {
     const { control, setValue, watch } = useFormContext<OrderFormData>();
-    const { taxes, orders } = useOrderStore();
+    const { orders } = useOrderStore();
+    const { taxes } = useTaxesStore();
     
     const selectedBranchId = watch('branchId');
 

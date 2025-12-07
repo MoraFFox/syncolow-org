@@ -1,5 +1,6 @@
 import { openDB, DBSchema, IDBPDatabase } from 'idb';
 import { CacheEntry, CacheKey } from './types';
+import { logger } from '../logger';
 
 interface UniversalCacheDB extends DBSchema {
   'universal-cache': {
@@ -50,7 +51,7 @@ export class IndexedDBStorage {
     } as any);
     
     // Trigger eviction check (fire and forget)
-    this.prune().catch(console.error);
+    this.prune().catch(err => logger.error(err, { component: 'IndexedDBStorage', action: 'prune' }));
   }
 
   async del(key: CacheKey): Promise<void> {

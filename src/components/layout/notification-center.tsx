@@ -1,6 +1,5 @@
-/** @format */
-
 "use client";
+/** @format */
 
 import { useMemo, useState } from "react";
 import { isToday, isYesterday, isThisWeek } from "date-fns";
@@ -13,11 +12,10 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { Bell, CheckCheck, ShoppingCart, Wrench, Clock, X } from "lucide-react";
+import { Bell, CheckCheck, ShoppingCart, Wrench, Clock, X, AlertCircle, TrendingUp, Package, Users, DollarSign, CheckCircle, Info, AlertTriangle, Calendar, FileText, MessageSquare } from "lucide-react";
 import Link from "next/link";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { formatDistanceToNow, addHours, addDays } from "date-fns";
-import * as LucideIcons from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
   Accordion,
@@ -127,9 +125,13 @@ export function NotificationCenter() {
     return { priorityColor: color, hasCritical };
   }, [unreadNotifications]);
 
+  const iconMap: Record<string, React.ElementType> = {
+    Bell, AlertCircle, TrendingUp, Package, Users, DollarSign, CheckCircle, Info, 
+    AlertTriangle, Calendar, FileText, MessageSquare, ShoppingCart, Wrench, Clock
+  };
+
   const Icon = ({ name }: { name: string }) => {
-    const LucideIcon = ((LucideIcons as any)[name] ||
-      Bell) as React.ElementType;
+    const LucideIcon = iconMap[name] || Bell;
     return <LucideIcon className='h-5 w-5' />;
   };
 

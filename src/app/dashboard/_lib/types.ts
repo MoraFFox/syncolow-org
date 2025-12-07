@@ -1,17 +1,19 @@
-export type AlertPriority = "critical" | "high" | "medium" | "low";
+/** @format */
 
-export type AlertType =
-  | "Overdue Payment"
-  | "Low Stock"
-  | "Inactive Client"
-  | "Tomorrow Delivery";
+export type AlertPriority = 'critical' | 'high' | 'medium' | 'low';
 
-import type { Order, Product, Company } from "@/lib/types";
+export type AlertType = 'Overdue Payment' | 'Low Stock' | 'Inactive Client' | 'Tomorrow Delivery';
 
-export type OverdueOrder = Pick<Order, "id" | "companyName"> & { overdueDays?: number };
-export type LowStockProduct = Pick<Product, "id" | "name" | "stock">;
-export type TomorrowDeliveryOrder = Pick<Order, "id" | "deliveryDate">;
-export type InactiveCompany = Pick<Company, "id" | "name"> & { lastOrderDate?: string };
+import type { Order, Product, Company } from '@/lib/types';
+
+export type OverdueOrder = Pick<Order, 'id' | 'companyName'> & {
+  overdueDays?: number;
+};
+export type LowStockProduct = Pick<Product, 'id' | 'name' | 'stock'>;
+export type TomorrowDeliveryOrder = Pick<Order, 'id' | 'deliveryDate'>;
+export type InactiveCompany = Pick<Company, 'id' | 'name'> & {
+  lastOrderDate?: string;
+};
 export type AlertData = OverdueOrder | LowStockProduct | TomorrowDeliveryOrder | InactiveCompany;
 
 export interface AlertItem {
@@ -21,6 +23,18 @@ export interface AlertItem {
   link: string;
   timestamp: Date;
   id: string;
+}
+
+// Activity feed types
+export type ActivityType = 'New Order' | 'New Feedback' | 'New Client';
+export type ActivityData =
+  | Pick<Order, 'id' | 'companyId' | 'companyName' | 'orderDate'>
+  | Pick<Company, 'id' | 'name' | 'createdAt'>
+  | Pick<import('@/lib/types').Feedback, 'id' | 'clientId' | 'message' | 'feedbackDate'>;
+export interface Activity {
+  type: ActivityType;
+  data: ActivityData;
+  date: string;
 }
 
 export interface KpiTrend {

@@ -1,8 +1,7 @@
-/** @format */
-
 "use client";
 
-import { useFormContext, Controller, useFieldArray } from "react-hook-form";
+import type { Control, UseFormRegister } from 'react-hook-form';
+import { Controller, useFieldArray } from "react-hook-form";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -17,9 +16,16 @@ import {
 import { Switch } from "@/components/ui/switch";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { MapPin, PlusCircle, Trash2 } from "lucide-react";
-import { ContactsSubForm } from "../company-form";
+import { ContactsSubForm } from "../contacts-sub-form";
+import type { CompanyFormProps } from '@/types/forms';
+import type { Company } from '@/lib/types';
 
-function CustomDatesField({ control, register }: any) {
+interface CustomDatesFieldProps {
+  control: Control<Company>;
+  register: UseFormRegister<Company>;
+}
+
+function CustomDatesField({ control, register }: CustomDatesFieldProps) {
   const { fields, append, remove } = useFieldArray({
     control,
     name: "bulkPaymentSchedule.customDates",
@@ -77,16 +83,17 @@ function CustomDatesField({ control, register }: any) {
   );
 }
 
-export function Step1_CompanyDetails({
-  control,
-  register,
-  errors,
-  openMapPicker,
-  setValue,
-  watch,
-  isWizard = true,
-  isEditMode = false,
-}: any) {
+export function Step1_CompanyDetails(props: CompanyFormProps) {
+  const {
+    control,
+    register,
+    errors,
+    openMapPicker,
+    setValue,
+    watch,
+    isWizard = true,
+    isEditMode = false,
+  } = props;
   const watchRegion = watch("region");
 
   return (

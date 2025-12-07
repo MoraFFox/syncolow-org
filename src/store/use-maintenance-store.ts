@@ -8,6 +8,7 @@ import { produce } from 'immer';
 import { universalCache } from '@/lib/cache/universal-cache';
 import { CacheKeyFactory } from '@/lib/cache/key-factory';
 import { drilldownCacheInvalidator } from '@/lib/cache/drilldown-cache-invalidator';
+import { logger } from '@/lib/logger';
 
 const INITIAL_SERVICES_CATALOG: { [category: string]: { [service: string]: number } } = {
   "دورات تنظيف (Cleaning Cycles)": {
@@ -161,7 +162,7 @@ export const useMaintenanceStore = create<MaintenanceState>((set, get) => ({
             loading: false 
         });
     } catch (e) {
-        console.error("Error fetching maintenance data:", e);
+        logger.error(e, { component: 'useMaintenanceStore', action: 'fetchInitialData' });
         set({ loading: false });
     }
   },
@@ -175,7 +176,7 @@ export const useMaintenanceStore = create<MaintenanceState>((set, get) => ({
   },
   
   updateMaintenanceVisit: async (visitId, visitData) => {
-    console.log('useMaintenanceStore - updateMaintenanceVisit called with visitId:', visitId);
+    logger.debug('updateMaintenanceVisit called', { visitId });
     const visitToUpdate = get().maintenanceVisits.find(v => v.id === visitId);
     if (!visitToUpdate) {
         toast({ title: 'Error', description: 'Visit not found.', variant: 'destructive' });
@@ -264,7 +265,7 @@ export const useMaintenanceStore = create<MaintenanceState>((set, get) => ({
     }
 
     await get().fetchInitialData();
-    console.log('useMaintenanceStore - updateMaintenanceVisit completed');
+    logger.debug('updateMaintenanceVisit completed', { visitId });
     
     // Invalidate drilldown preview
     try {
@@ -274,7 +275,7 @@ export const useMaintenanceStore = create<MaintenanceState>((set, get) => ({
         baristaId: visitToUpdate.baristaId
       });
     } catch (e) {
-      console.error('Failed to invalidate drilldown cache:', e);
+      logger.error(e, { component: 'useMaintenanceStore', action: 'updateMaintenanceVisit - invalidate cache' });
     }
 
     toast({ title: "Visit Outcome Logged" });
@@ -309,7 +310,7 @@ export const useMaintenanceStore = create<MaintenanceState>((set, get) => ({
         baristaId: visitToDelete.baristaId
       });
     } catch (e) {
-      console.error('Failed to invalidate drilldown cache:', e);
+      logger.error(e, { component: 'useMaintenanceStore', action: 'deleteMaintenanceVisit - invalidate cache' });
     }
 
     await get().fetchInitialData();
@@ -369,7 +370,7 @@ export const useMaintenanceStore = create<MaintenanceState>((set, get) => ({
 
       set({ maintenanceVisits: (allVisits || []) as MaintenanceVisit[] });
     } catch (e) {
-      console.error("Error searching maintenance visits:", e);
+      logger.error(e, { component: 'useMaintenanceStore', action: 'searchMaintenanceVisits' });
     }
   },
 

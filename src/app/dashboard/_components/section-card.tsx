@@ -1,5 +1,6 @@
 "use client";
 
+import * as React from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
@@ -15,7 +16,7 @@ interface SectionCardProps {
   icon?: ReactNode;
 }
 
-export function SectionCard({ title, description, children, className, headerAction, loading, icon }: SectionCardProps) {
+export const SectionCard = React.memo<SectionCardProps>(function SectionCard({ title, description, children, className, headerAction, loading, icon }) {
   return (
     <Card className={cn("transition-all duration-200", className)}>
       <CardHeader className="flex items-start justify-between gap-2">
@@ -43,4 +44,4 @@ export function SectionCard({ title, description, children, className, headerAct
       </CardContent>
     </Card>
   );
-}
+});

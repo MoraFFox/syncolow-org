@@ -1,15 +1,17 @@
 
 "use client"
-import { useMemo, useState, useEffect, useCallback } from "react";
+import { useMemo, useState, useEffect, useCallback, lazy, Suspense } from "react";
 import { useOrderStore } from "@/store/use-order-store";
 import './page.css';
 import { DollarSign, Package, Users, TrendingUp, Timer, Wrench, UserPlus, ShoppingCart, CheckCircle, Repeat } from 'lucide-react';
 import { KpiCard } from './_components/kpi-card';
-import { ChartsVisuals } from "./_components/charts-visuals";
-import { YearComparisonChart } from "./_components/year-comparison-chart";
-import { RevenueForecastChart } from "./_components/revenue-forecast-chart";
-import { InventoryReport } from "./_components/inventory-report";
-import { CustomerReport } from "./_components/customer-report";
+import { Skeleton } from "@/components/ui/skeleton";
+
+const ChartsVisuals = lazy(() => import("./_components/charts-visuals").then(m => ({ default: m.ChartsVisuals })));
+const YearComparisonChart = lazy(() => import("./_components/year-comparison-chart").then(m => ({ default: m.YearComparisonChart })));
+const RevenueForecastChart = lazy(() => import("./_components/revenue-forecast-chart").then(m => ({ default: m.RevenueForecastChart })));
+const InventoryReport = lazy(() => import("./_components/inventory-report").then(m => ({ default: m.InventoryReport })));
+const CustomerReport = lazy(() => import("./_components/customer-report").then(m => ({ default: m.CustomerReport })));
 import { differenceInMilliseconds, differenceInDays, parseISO, format, subMonths, subDays, parse, startOfMonth, endOfMonth, isWithinInterval, startOfDay, endOfDay, eachDayOfInterval } from "date-fns";
 import { useCompanyStore } from "@/store/use-company-store";
 import { useMaintenanceStore } from "@/store/use-maintenance-store";
@@ -413,25 +415,31 @@ export default function AnalyticsPage() {
                     />
                 </div>
                 
-                <div className="print-break-inside-avoid">
-                    <ChartsVisuals dateRange={dateRange} />
-                </div>
+                <Suspense fallback={<div className="space-y-4"><Skeleton className="h-[400px] w-full" /><Skeleton className="h-[400px] w-full" /></div>}>
+                    <div className="print-break-inside-avoid">
+                        <ChartsVisuals dateRange={dateRange} />
+                    </div>
+                </Suspense>
                 
-                <div>
-                    <h2 className="text-2xl font-bold mb-4">Advanced Analytics</h2>
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        <YearComparisonChart />
-                        <RevenueForecastChart />
+                <Suspense fallback={<div className="grid grid-cols-1 lg:grid-cols-2 gap-6"><Skeleton className="h-[300px]" /><Skeleton className="h-[300px]" /></div>}>
+                    <div>
+                        <h2 className="text-2xl font-bold mb-4">Advanced Analytics</h2>
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <YearComparisonChart />
+                            <RevenueForecastChart />
+                        </div>
                     </div>
-                </div>
+                </Suspense>
 
-                <div className="print-break-inside-avoid">
-                    <h2 className="text-2xl font-bold mb-4">Drill-Down Reports</h2>
-                    <div className="flex flex-col gap-6">
-                        <InventoryReport dateRange={dateRange} />
-                        <CustomerReport dateRange={dateRange} />
+                <Suspense fallback={<div className="space-y-6"><Skeleton className="h-[400px] w-full" /><Skeleton className="h-[400px] w-full" /></div>}>
+                    <div className="print-break-inside-avoid">
+                        <h2 className="text-2xl font-bold mb-4">Drill-Down Reports</h2>
+                        <div className="flex flex-col gap-6">
+                            <InventoryReport dateRange={dateRange} />
+                            <CustomerReport dateRange={dateRange} />
+                        </div>
                     </div>
-                </div>
+                </Suspense>
             </div>
         </>
     );

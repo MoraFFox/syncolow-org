@@ -1,16 +1,16 @@
 
 "use client";
 
-import { Control, FieldErrors, UseFormRegister, UseFormSetValue, UseFormWatch, Controller } from 'react-hook-form';
+import { Control, FieldErrors, UseFormRegister, UseFormSetValue, UseFormWatch, Controller, Path } from 'react-hook-form';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { MapPin, Trash2 } from 'lucide-react';
-import type { CompanyWizardFormData } from './company-wizard-form';
+import type { CompanyWizardFormData } from './company-wizard-schemas';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
-import { ContactsSubForm } from './company-form';
+import { ContactsSubForm } from './contacts-sub-form';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
@@ -26,11 +26,8 @@ interface BranchSubFormProps {
 }
 
 export function BranchSubForm({ index, control, register, errors, watch, setValue, removeBranch, openMapPicker }: BranchSubFormProps) {
-
-    const branchLocation = watch(`branches.${index}.location`);
     const watchMachineOwned = watch(`branches.${index}.machineOwned`);
-    const watchRegion = watch(`branches.${index}.region`);
-    
+
     return (
         <Card className="animate-in fade-in-0 slide-in-from-top-5">
             <CardHeader className="flex flex-row justify-between items-start">
@@ -63,7 +60,7 @@ export function BranchSubForm({ index, control, register, errors, watch, setValu
                     <div className="grid gap-2">
                          <Label>Delivery Schedule</Label>
                         <Controller
-                            name={`branches.${index}.region` as any}
+                            name={`branches.${index}.region` as Path<CompanyWizardFormData>}
                             control={control}
                             render={({ field }) => (
                                 <Select onValueChange={field.onChange} defaultValue={field.value}>
@@ -81,7 +78,7 @@ export function BranchSubForm({ index, control, register, errors, watch, setValu
                      <div className="grid gap-2">
                         <Label>Area</Label>
                         <Controller
-                            name={`branches.${index}.area` as any}
+                            name={`branches.${index}.area` as Path<CompanyWizardFormData>}
                             control={control}
                             render={({ field }) => (
                                 <Select onValueChange={field.onChange} defaultValue={field.value}>
@@ -108,7 +105,7 @@ export function BranchSubForm({ index, control, register, errors, watch, setValu
                 <div className="grid gap-2">
                     <Label>Maintenance Location</Label>
                     <Controller
-                        name={`branches.${index}.maintenanceLocation` as any}
+                        name={`branches.${index}.maintenanceLocation` as Path<CompanyWizardFormData>}
                         control={control}
                         render={({ field }) => (
                             <Select onValueChange={field.onChange} value={field.value || ''}>
@@ -159,7 +156,7 @@ export function BranchSubForm({ index, control, register, errors, watch, setValu
                                 <div className="grid gap-2">
                                     <Label>Machine Status (Owned by SynergyFlow)</Label>
                                     <Controller
-                                        name={`branches.${index}.machineLeased` as any}
+                                        name={`branches.${index}.machineLeased` as Path<CompanyWizardFormData>}
                                         control={control}
                                         render={({ field }) => (
                                             <RadioGroup
@@ -184,7 +181,7 @@ export function BranchSubForm({ index, control, register, errors, watch, setValu
                                             id={`leaseMonthlyCost-${index}`}
                                             type="number"
                                             min="0"
-                                            {...register(`branches.${index}.leaseMonthlyCost` as any, { valueAsNumber: true })}
+                                            {...register(`branches.${index}.leaseMonthlyCost` as Path<CompanyWizardFormData>, { valueAsNumber: true })}
                                             placeholder="e.g. 1000"
                                         />
                                         {errors.branches?.[index]?.leaseMonthlyCost && (

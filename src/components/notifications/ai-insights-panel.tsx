@@ -4,8 +4,7 @@ import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ChevronDown, ChevronUp, ArrowRight } from 'lucide-react';
-import * as LucideIcons from 'lucide-react';
+import { ChevronDown, ChevronUp, ArrowRight, Sparkles, TrendingUp, AlertTriangle, Info, Target, Zap } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { NotificationInsight } from '@/lib/notification-insights';
 import { getInsightIcon, getInsightColor } from '@/lib/notification-insights';
@@ -21,8 +20,12 @@ export function AIInsightsPanel({ insights, onActionClick }: AIInsightsPanelProp
 
   if (insights.length === 0) return null;
 
+  const iconMap: Record<string, React.ElementType> = {
+    TrendingUp, AlertTriangle, Info, Target, Zap, Sparkles
+  };
+
   const Icon = ({ name }: { name: string }) => {
-    const LucideIcon = ((LucideIcons as any)[name] || LucideIcons.Info) as React.ElementType;
+    const LucideIcon = iconMap[name] || Info;
     return <LucideIcon className="h-4 w-4" />;
   };
 
@@ -32,7 +35,7 @@ export function AIInsightsPanel({ insights, onActionClick }: AIInsightsPanelProp
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="p-2 rounded-lg bg-primary/10">
-              <LucideIcons.Sparkles className="h-5 w-5 text-primary" />
+              <Sparkles className="h-5 w-5 text-primary" />
             </div>
             <div>
               <CardTitle className="text-lg">AI Insights</CardTitle>

@@ -4,6 +4,7 @@ import { DrillKind, DrillPayload, DrillMode } from '@/lib/drilldown-types';
 import { DRILL_REGISTRY } from '@/lib/drilldown/registry';
 import { drillSchemas } from '@/lib/drilldown/schemas';
 import { drillAnalytics } from '@/lib/drill-analytics';
+import { logger } from '@/lib/logger';
 
 export function useDrillDown() {
   const router = useRouter();
@@ -30,13 +31,12 @@ export function useDrillDown() {
   const goToDetail = (kind: DrillKind, payload: DrillPayload = {}, mode: DrillMode = 'page') => {
     // Validate payload
     try {
-      // @ts-ignore - Indexing with string on explicit keys
-      if (drillSchemas[kind]) {
-        // @ts-ignore
-        drillSchemas[kind].parse(payload);
+      const schema = drillSchemas[kind];
+      if (schema) {
+        schema.parse(payload);
       }
     } catch (e) {
-      console.error(`Invalid drill payload for kind ${kind}:`, e);
+      logger.error(e, { component: 'useDrillDown', action: 'validatePayload' });
       // We continue despite validation error to avoid blocking user flow, 
       // but this log helps debugging.
     }
@@ -61,18 +61,18 @@ export function useDrillDown() {
         pushHistory(historyItem);
         
         if (typeof document !== 'undefined' && 'startViewTransition' in document) {
-          // @ts-ignore - View Transitions API is new
-          document.startViewTransition(() => {
+          // View Transitions API - using type assertion for experimental API
+          (document as Document & { startViewTransition?: (callback: () => void) => void }).startViewTransition?.(() => {
             router.push(route);
           });
         } else {
           router.push(route);
         }
       } else {
-        console.warn(`Page route not yet implemented for drill kind: ${kind}`);
+        logger.warn(`Page route not yet implemented for drill kind: ${kind}`, { component: 'useDrillDown' });
       }
     } else {
-      console.warn(`No registry entry for drill kind: ${kind}`);
+      logger.warn(`No registry entry for drill kind: ${kind}`, { component: 'useDrillDown' });
     }
   };
 

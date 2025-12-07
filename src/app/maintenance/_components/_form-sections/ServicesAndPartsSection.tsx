@@ -2,6 +2,7 @@
 "use client";
 
 import { useFormContext, Controller, useFieldArray, useWatch } from 'react-hook-form';
+import type { Control, UseFormRegister, UseFormSetValue } from 'react-hook-form';
 import { AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Wrench, PlusCircle, Trash2, Minus } from 'lucide-react';
@@ -14,9 +15,9 @@ import { toast } from '@/hooks/use-toast';
 import { useState, useEffect } from 'react';
 
 interface ServicesAndPartsSectionProps {
-    control: any;
-    register: any;
-    setValue: any;
+    control: Control<any>;
+    register: UseFormRegister<any>;
+    setValue: UseFormSetValue<any>;
     onOpenPartSelector: (onSelect: (part: { name: string; price: number }) => void) => void;
 }
 

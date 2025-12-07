@@ -3,6 +3,7 @@ import { DrillTarget } from '@/components/drilldown/drill-target';
 import { useMemo, useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { useOrderStore } from '@/store/use-order-store';
+import { useProductsStore } from '@/store';
 import { useCompanyStore } from '@/store/use-company-store';
 import { format } from 'date-fns';
 import { Button } from '@/components/ui/button';
@@ -38,7 +39,8 @@ export default function OrderDetailsPage() {
   const id = params.id as string;
   const isMobile = useIsMobile();
 
-  const { orders, products, loading, updateOrderStatus, updateOrderPaymentStatus, registerPotentialClient } = useOrderStore();
+  const { orders, loading, updateOrderStatus, updateOrderPaymentStatus, registerPotentialClient } = useOrderStore();
+  const { products } = useProductsStore();
   const { companies } = useCompanyStore();
   
   const [isCompanyFormOpen, setIsCompanyFormOpen] = useState(false);

@@ -2,14 +2,34 @@
 
 import { initializeApp } from 'firebase/app';
 import { getFirestore, collection, getDocs, writeBatch, limit, query } from 'firebase/firestore';
+import dotenv from 'dotenv';
+
+dotenv.config();
+
+const requiredEnvVars = [
+  'NEXT_PUBLIC_FIREBASE_API_KEY',
+  'NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN',
+  'NEXT_PUBLIC_FIREBASE_PROJECT_ID',
+  'NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET',
+  'NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID',
+  'NEXT_PUBLIC_FIREBASE_APP_ID'
+];
+
+const missingVars = requiredEnvVars.filter(varName => !process.env[varName]);
+if (missingVars.length > 0) {
+  console.error('Error: Missing required environment variables:');
+  missingVars.forEach(varName => console.error(`  - ${varName}`));
+  console.error('\nPlease copy .env.example to .env and configure your Firebase credentials.');
+  process.exit(1);
+}
 
 const firebaseConfig = {
-  projectId: "synergyflow-pvqrj",
-  appId: "1:945618752972:web:c66774aa022a98cd74b969",
-  storageBucket: "synergyflow-pvqrj.appspot.com",
-  apiKey: "AIzaSyDzFTXPJHLLfjPpzx2eSaVCiI5krW7Hy0s",
-  authDomain: "synergyflow-pvqrj.firebaseapp.com",
-  messagingSenderId: "945618752972",
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID
 };
 
 const app = initializeApp(firebaseConfig);

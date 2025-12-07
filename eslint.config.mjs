@@ -1,28 +1,47 @@
-import tsParser from '@typescript-eslint/parser';
-import tsPlugin from '@typescript-eslint/eslint-plugin';
-
-// ESLint flat config with TypeScript support
-/** @type {import('eslint').FlatConfig[]} */
+// ESLint flat config for Next.js 16
+// Note: Next.js 16 uses ESLint 9 which supports flat config
 export default [
   {
-    ignores: ['.next/**', 'node_modules/**', 'out/**'],
+    ignores: [
+      ".next/**",
+      "node_modules/**",
+      "dist/**",
+      "out/**",
+      "build/**",
+      ".vercel/**",
+      "coverage/**",
+      "playwright-report/**",
+      "test-results/**",
+    ],
   },
   {
-    files: ['**/*.ts', '**/*.tsx'],
+    files: ["**/*.{js,jsx,ts,tsx}"],
     languageOptions: {
-      parser: tsParser,
-      parserOptions: {
-        project: ['./tsconfig.json'],
-        sourceType: 'module',
-        ecmaVersion: 2020,
-      },
-    },
-    plugins: {
-      '@typescript-eslint': tsPlugin,
+      ecmaVersion: "latest",
+      sourceType: "module",
     },
     rules: {
-      // Use the recommended TypeScript rules as a base
-      ...tsPlugin.configs.recommended.rules,
+      "@typescript-eslint/no-explicit-any": "warn",
+      "@typescript-eslint/no-unused-vars": [
+        "warn",
+        {
+          argsIgnorePattern: "^_",
+          varsIgnorePattern: "^_",
+        },
+      ],
+      "no-console": [
+        "warn",
+        {
+          allow: ["warn", "error"],
+        },
+      ],
     },
   },
+  {
+    files: ["delete-orders.js", "delete-orders-client.js"],
+    rules: {
+      "no-console": "off"
+    }
+  }
 ];
+

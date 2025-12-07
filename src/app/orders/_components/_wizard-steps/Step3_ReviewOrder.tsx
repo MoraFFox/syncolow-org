@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Separator } from '@/components/ui/separator';
 import { format } from 'date-fns';
 import { useFormContext, Controller } from 'react-hook-form';
-import type { OrderFormData } from '../order-form';
+import type { OrderFormData } from '../order-schemas';
 import type { Company } from '@/lib/types';
 import { useMemo, useEffect } from 'react';
 import { Input } from '@/components/ui/input';

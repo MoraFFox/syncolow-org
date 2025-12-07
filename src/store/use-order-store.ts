@@ -6,16 +6,12 @@ import { supabase } from "@/lib/supabase";
 import { drilldownCacheInvalidator } from "@/lib/cache/drilldown-cache-invalidator";
 import type {
   Order,
-  Product,
   VisitCall,
   Notification,
   Company,
-  Category,
-  Tax,
   Return,
 } from "@/lib/types";
 import { toast } from "@/hooks/use-toast";
-import { generateImage } from "@/ai/flows/generate-image";
 import { calculateOrderTotals } from "@/lib/pricing-calculator";
 import { useCompanyStore } from "./use-company-store";
 import { useMaintenanceStore } from "@/store/use-maintenance-store";
@@ -32,10 +28,10 @@ import {
   deleteOrderFromSearch,
   bulkSyncOrdersToSearch,
 } from "@/lib/order-search-sync";
-// import { AnalyticsCache } from "@/lib/analytics-cache";
-// import { productCache } from "@/lib/product-cache";
 import { universalCache } from "@/lib/cache/universal-cache";
 import { CacheKeyFactory } from "@/lib/cache/key-factory";
+import { initializeAllStores } from "./utils/store-initializer";
+import { logger } from "@/lib/logger";
 
 const calculateNextDeliveryDate = (
   region: "A" | "B",
@@ -65,9 +61,6 @@ const calculateNextDeliveryDate = (
 interface AppState {
   orders: Order[];
   analyticsOrders: Order[];
-  products: Product[];
-  categories: Category[];
-  taxes: Tax[];
   returns: Return[];
   notifications: Notification[];
   visits: VisitCall[];
@@ -76,8 +69,6 @@ interface AppState {
   ordersHasMore: boolean;
   ordersLoading: boolean;
   analyticsLoading: boolean;
-  productsOffset: number;
-  productsHasMore: boolean;
   currentFetchId: string | null;
 
   fetchInitialData: () => Promise<void>;
@@ -91,36 +82,6 @@ interface AppState {
   refreshOrders: () => Promise<void>;
   fetchOrdersByDateRange: (from: string, to: string) => Promise<void>;
   syncAllOrdersToSearch: () => Promise<void>;
-  loadRemainingProducts: () => Promise<void>;
-  searchProducts: (searchTerm: string) => Promise<void>;
-  filterProductsByCategory: (category: string) => Promise<void>;
-
-  // Product Actions
-  addProduct: (
-    product: Omit<Product, "id" | "imageUrl"> & { image?: File }
-  ) => Promise<Product>;
-  updateProduct: (
-    productId: string,
-    productData: Partial<Product>
-  ) => Promise<void>;
-  deleteProduct: (productId: string) => Promise<void>;
-  deleteAllProducts: () => Promise<void>;
-
-  // Category Actions
-  addCategory: (category: Omit<Category, "id">) => Promise<Category>;
-  updateCategory: (
-    categoryId: string,
-    categoryData: Partial<Category>
-  ) => Promise<void>;
-  deleteCategory: (categoryId: string) => Promise<void>;
-
-  // Tax Actions
-  addTax: (tax: Omit<Tax, "id">) => Promise<void>;
-  updateTax: (
-    taxId: string,
-    taxData: Partial<Omit<Tax, "id">>
-  ) => Promise<void>;
-  deleteTax: (taxId: string) => Promise<void>;
 
   // Order Actions
   updateOrderStatus: (
@@ -183,9 +144,6 @@ interface AppState {
 export const useOrderStore = create<AppState>((set, get) => ({
   orders: [],
   analyticsOrders: [],
-  products: [],
-  categories: [],
-  taxes: [],
   returns: [],
   notifications: [],
   visits: [],
@@ -194,149 +152,26 @@ export const useOrderStore = create<AppState>((set, get) => ({
   ordersHasMore: true,
   ordersLoading: false,
   analyticsLoading: false,
-  productsOffset: 0,
-  productsHasMore: true,
   deleteVisit: async () => {},
 
   fetchInitialData: async () => {
-    // Only set loading if we don't have data yet
     const currentState = get();
-    const hasData = currentState.orders.length > 0 || currentState.products.length > 0;
+    const hasData = currentState.orders.length > 0;
     
     if (!hasData && !currentState.loading) {
       set({ loading: true });
     }
 
     try {
-      const [
-        visits,
-        companies,
-        baristas,
-        feedback,
-        areas,
-        maintenanceVisits,
-        maintenanceEmployees,
-        cancellationReasons,
-        manufacturers,
-        categories,
-        taxes,
-        returns,
-      ] = await Promise.all([
-        universalCache.get(CacheKeyFactory.list('visits'), async () => {
-          const { data, error } = await supabase.from("visits").select("*");
-          if (error) throw error;
-          return data;
-        }),
-        universalCache.get(CacheKeyFactory.list('companies'), async () => {
-          const { data, error } = await supabase.from("companies").select("*").not('name', 'like', '[DELETED]%');
-          if (error) throw error;
-          return data;
-        }),
-        universalCache.get(CacheKeyFactory.list('baristas'), async () => {
-          const { data, error } = await supabase.from("baristas").select("*");
-          if (error) throw error;
-          return data;
-        }),
-        universalCache.get(CacheKeyFactory.list('feedback'), async () => {
-          const { data, error } = await supabase.from("feedback").select("*");
-          if (error) throw error;
-          return data;
-        }),
-        universalCache.get(CacheKeyFactory.list('areas'), async () => {
-          const { data, error } = await supabase.from("areas").select("*");
-          if (error) throw error;
-          return data;
-        }),
-        universalCache.get(CacheKeyFactory.list('maintenance'), async () => {
-          const { data, error } = await supabase.from("maintenance").select("*");
-          if (error) throw error;
-          return data;
-        }),
-        universalCache.get(CacheKeyFactory.list('maintenanceEmployees'), async () => {
-          const { data, error } = await supabase.from("maintenanceEmployees").select("*");
-          if (error) throw error;
-          return data;
-        }),
-        universalCache.get(CacheKeyFactory.list('cancellationReasons'), async () => {
-          const { data, error } = await supabase.from("cancellationReasons").select("*");
-          if (error) throw error;
-          return data;
-        }),
-        universalCache.get(CacheKeyFactory.list('manufacturers'), async () => {
-          const { data, error } = await supabase.from("manufacturers").select("*");
-          if (error) throw error;
-          return data;
-        }),
-        universalCache.get(CacheKeyFactory.list('categories'), async () => {
-          const { data, error } = await supabase.from("categories").select("*");
-          if (error) throw error;
-          return data;
-        }),
-        universalCache.get(CacheKeyFactory.list('taxes'), async () => {
-          const { data, error } = await supabase.from("taxes").select("*");
-          if (error) throw error;
-          return data;
-        }),
-        universalCache.get(CacheKeyFactory.list('returns'), async () => {
-          const { data, error } = await supabase.from("returns").select("*");
-          if (error) throw error;
-          return data;
-        }),
-      ]);
-      
-      const products = await universalCache.get(
-        CacheKeyFactory.list('products', { limit: 50, offset: 0 }), 
-        async () => {
-          const { data, error } = await supabase
-            .from("products")
-            .select("*")
-            .range(0, 49);
-          if (error) throw error;
-          return data;
-        }
-      );
+      const data = await initializeAllStores();
       
       set({ 
-        productsOffset: 50, 
-        productsHasMore: (products?.length || 0) === 50 
-      });
-
-      const productsByManufacturer = (products || []).reduce((acc, product) => {
-        const key = product.manufacturerId || "unassigned";
-        if (!acc[key]) {
-          acc[key] = [];
-        }
-        acc[key].push(product);
-        return acc;
-      }, {} as Record<string, Product[]>);
-
-      set({ products: products || [], visits: visits || [], categories: categories || [], taxes: taxes || [], returns: returns || [], loading: false });
-      useCompanyStore.setState({
-        companies: companies || [],
-        baristas: baristas || [],
-        feedback: feedback || [],
-        areas: areas || [],
-        loading: false,
-      });
-      useMaintenanceStore.setState({
-        maintenanceVisits: maintenanceVisits || [],
-        maintenanceEmployees: maintenanceEmployees || [],
-        cancellationReasons: cancellationReasons || [],
-        loading: false,
-      });
-      useManufacturerStore.setState({
-        manufacturers: manufacturers || [],
-        productsByManufacturer,
-        loading: false,
+        visits: data.visits || [], 
+        returns: data.returns || [], 
+        loading: false 
       });
     } catch {
       set({ loading: false });
-      useCompanyStore.setState({ loading: false });
-      useMaintenanceStore.setState({ loading: false });
-      useManufacturerStore.setState({
-        loading: false,
-        productsByManufacturer: {},
-      });
     }
   },
 
@@ -535,7 +370,7 @@ export const useOrderStore = create<AppState>((set, get) => ({
 
     } catch (error: any) {
       if (get().currentFetchId === fetchId && error.message !== "Fetch aborted") {
-        console.error("Error fetching analytics orders:", error);
+        logger.error(error, { component: 'use-order-store', action: 'fetchAnalyticsOrders' });
         set({ analyticsLoading: false });
         toast({
             variant: "destructive",
@@ -593,7 +428,7 @@ export const useOrderStore = create<AppState>((set, get) => ({
         branchId: updatedOrder?.branchId
       });
     } catch (e) {
-      console.error('Failed to invalidate drilldown cache:', e);
+      logger.error(e, { component: 'use-order-store', action: 'updateOrderStatus' });
     }
   },
 
@@ -734,7 +569,7 @@ export const useOrderStore = create<AppState>((set, get) => ({
         branchId
       });
     } catch (e) {
-      console.error('Failed to invalidate drilldown cache:', e);
+      logger.error(e, { component: 'use-order-store', action: 'markOrderAsPaid' });
     }
     
     toast({
@@ -757,167 +592,7 @@ export const useOrderStore = create<AppState>((set, get) => ({
     });
   },
 
-  addProduct: async (product) => {
-    const { image, ...productData } = product;
-    let imageUrl = "";
 
-    if (product.hint && !image) {
-      const result = await generateImage({ prompt: product.hint });
-      imageUrl = result.imageUrl;
-    } else if (image) {
-      imageUrl = await new Promise((resolve) => {
-        const reader = new FileReader();
-        reader.onloadend = () => resolve(reader.result as string);
-        reader.readAsDataURL(image);
-      });
-    }
-
-    const dataToSave = { ...productData, imageUrl };
-    if (!dataToSave.isVariant) {
-      dataToSave.parentProductId = null;
-      dataToSave.variantName = null;
-    }
-
-    const { data: productResult, error } = await supabase.from("products").insert([dataToSave]).select().single();
-    if (error) throw error;
-    const newProduct = { ...productResult, imageUrl } as Product;
-
-    // Update local state and cache
-    set(
-      produce((state: AppState) => {
-        state.products.push(newProduct);
-      })
-    );
-    // productCache.setProducts(get().products).catch(console.error);
-
-    toast({
-      title: "Product Added",
-      description: `${newProduct.name} has been added to the inventory.`,
-    });
-    return newProduct;
-  },
-
-  updateProduct: async (productId, productData) => {
-    const dataToUpdate = { ...productData };
-
-    if (
-      Object.prototype.hasOwnProperty.call(dataToUpdate, "variantName") &&
-      !dataToUpdate.variantName
-    ) {
-      dataToUpdate.variantName = null;
-    }
-    if (
-      Object.prototype.hasOwnProperty.call(dataToUpdate, "sku") &&
-      !dataToUpdate.sku
-    ) {
-      dataToUpdate.sku = null;
-    }
-
-    await supabase.from("products").update(dataToUpdate).eq("id", productId);
-    set(
-      produce((state: AppState) => {
-        const index = state.products.findIndex((p) => p.id === productId);
-        if (index !== -1) {
-          state.products[index] = { ...state.products[index], ...dataToUpdate };
-        }
-      })
-    );
-    // productCache.setProducts(get().products).catch(console.error);
-  },
-
-  deleteProduct: async (productId: string) => {
-    await supabase.from("products").delete().eq("id", productId);
-    set(
-      produce((state: AppState) => {
-        state.products = state.products.filter((p) => p.id !== productId);
-      })
-    );
-    // productCache.setProducts(get().products).catch(console.error);
-  },
-
-  deleteAllProducts: async () => {
-    const { error } = await supabase
-      .from("products")
-      .delete()
-      .neq("id", "00000000-0000-0000-0000-000000000000"); // Delete all rows
-
-    if (error) throw error;
-    set({ products: [] });
-    // productCache.clearProducts().catch(console.error);
-    toast({
-      title: "All Products Deleted",
-      description: "All products have been removed from the database.",
-    });
-  },
-
-  // Category Actions
-  addCategory: async (category) => {
-    const { data: categoryResult, error } = await supabase.from("categories").insert([category]).select().single();
-    if (error) throw error;
-    const newCategory = categoryResult as Category;
-    set(
-      produce((state) => {
-        state.categories.push(newCategory);
-      })
-    );
-    return newCategory;
-  },
-  updateCategory: async (categoryId, categoryData) => {
-    await supabase.from("categories").update(categoryData).eq("id", categoryId);
-    set(
-      produce((state: AppState) => {
-        const index = state.categories.findIndex(
-          (c: Category) => c.id === categoryId
-        );
-        if (index !== -1) {
-          state.categories[index] = {
-            ...state.categories[index],
-            ...categoryData,
-          };
-        }
-      })
-    );
-  },
-  deleteCategory: async (categoryId) => {
-    await supabase.from("categories").delete().eq("id", categoryId);
-    set(
-      produce((state: AppState) => {
-        state.categories = state.categories.filter(
-          (c: Category) => c.id !== categoryId
-        );
-      })
-    );
-  },
-
-  // Tax Actions
-  addTax: async (tax) => {
-    const { data: taxResult, error } = await supabase.from("taxes").insert([tax]).select().single();
-    if (error) throw error;
-    set(
-      produce((state: AppState) => {
-        state.taxes.push(taxResult as Tax);
-      })
-    );
-  },
-  updateTax: async (taxId, taxData) => {
-    await supabase.from("taxes").update(taxData).eq("id", taxId);
-    set(
-      produce((state: AppState) => {
-        const index = state.taxes.findIndex((t) => t.id === taxId);
-        if (index !== -1) {
-          state.taxes[index] = { ...state.taxes[index], ...taxData };
-        }
-      })
-    );
-  },
-  deleteTax: async (taxId) => {
-    await supabase.from("taxes").delete().eq("id", taxId);
-    set(
-      produce((state: AppState) => {
-        state.taxes = state.taxes.filter((t) => t.id !== taxId);
-      })
-    );
-  },
 
   submitOrder: async (data: Record<string, unknown>) => {
     const { isPotentialClient, temporaryCompanyName, branchId, ...orderCore } =
@@ -1122,7 +797,7 @@ export const useOrderStore = create<AppState>((set, get) => ({
         readAt: new Date().toISOString() 
       }).eq("id", notificationId);
     } catch (e) {
-      console.error('Failed to mark notification as read:', e);
+      logger.error(e, { component: 'use-order-store', action: 'markNotificationAsRead' });
     }
   },
 
@@ -1156,7 +831,7 @@ export const useOrderStore = create<AppState>((set, get) => ({
         readAt: new Date().toISOString()
       }).eq("id", notificationId);
     } catch (e) {
-      console.error('Failed to snooze notification:', e);
+      logger.error(e, { component: 'use-order-store', action: 'snoozeNotification' });
     }
   },
 
@@ -1180,7 +855,7 @@ export const useOrderStore = create<AppState>((set, get) => ({
         readAt: null
       }).eq("id", notificationId);
     } catch (e) {
-      console.error('Failed to clear snooze:', e);
+      logger.error(e, { component: 'use-order-store', action: 'clearSnooze' });
     }
   },
 
@@ -1193,81 +868,12 @@ export const useOrderStore = create<AppState>((set, get) => ({
         description: `${orders?.length || 0} orders synced to search collection.`,
       });
     } catch (e) {
-      console.error("Error syncing orders to search:", e);
+      logger.error(e, { component: 'use-order-store', action: 'syncAllOrdersToSearch' });
       toast({
         title: "Sync Failed",
         description: "Failed to sync orders to search collection.",
         variant: "destructive",
       });
-    }
-  },
-
-  loadRemainingProducts: async () => {
-    try {
-      const { productsOffset, productsHasMore } = get();
-      
-      if (!productsHasMore) return;
-      
-      const { data: newProducts } = await supabase
-        .from("products")
-        .select("*")
-        .range(productsOffset, productsOffset + 49);
-      
-      set(
-        produce((state: AppState) => {
-          state.products.push(...(newProducts || []));
-          state.productsOffset = productsOffset + 50;
-          state.productsHasMore = (newProducts?.length || 0) === 50;
-        })
-      );
-      
-      // productCache.setProducts(get().products).catch(console.error);
-    } catch {
-      // Error handled silently
-    }
-  },
-
-  searchProducts: async (searchTerm: string) => {
-    if (!searchTerm.trim()) {
-      await get().fetchInitialData();
-      return;
-    }
-    
-    try {
-      const { data: allProducts } = await supabase.from("products").select("*");
-      
-      const searchLower = searchTerm.toLowerCase();
-      const filtered = (allProducts || []).filter(product =>
-        (product.name && product.name.toLowerCase().includes(searchLower)) ||
-        (product.variantName && product.variantName.toLowerCase().includes(searchLower)) ||
-        (product.description && product.description.toLowerCase().includes(searchLower)) ||
-        (product.sku && product.sku.toLowerCase().includes(searchLower)) ||
-        (product.category && product.category.toLowerCase().includes(searchLower))
-      );
-      
-      set({ products: filtered });
-    } catch {
-      // Error handled silently
-    }
-  },
-
-  filterProductsByCategory: async (category: string) => {
-    if (category === "All") {
-      await get().fetchInitialData();
-      return;
-    }
-    
-    set({ loading: true });
-    try {
-      const { data: products } = await supabase
-        .from("products")
-        .select("*")
-        .eq("category", category)
-        .limit(100);
-      
-      set({ products: products || [], loading: false });
-    } catch {
-      set({ loading: false });
     }
   },
 
@@ -1286,7 +892,7 @@ export const useOrderStore = create<AppState>((set, get) => ({
     try {
       await supabase.from("notifications").upsert(notificationsWithUser);
     } catch (e) {
-      console.error('Failed to sync notifications:', e);
+      logger.error(e, { component: 'use-order-store', action: 'syncNotifications' });
     }
   },
 }));

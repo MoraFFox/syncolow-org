@@ -2,6 +2,7 @@
 
 import { create } from "zustand";
 import { DrillKind, DrillPayload } from "@/lib/drilldown-types";
+import { logger } from '@/lib/logger';
 
 export interface DrillHistoryItem {
   kind: DrillKind;
@@ -272,7 +273,7 @@ export const useDrillDownStore = create<DrillDownState>((set, get) => ({
         const stored = localStorage.getItem("drill-bookmarks");
         if (stored) set({ bookmarks: JSON.parse(stored) });
       } catch (e) {
-        console.error("Failed to load bookmarks:", e);
+        logger.error(e, { component: 'useDrillDownStore', action: 'loadBookmarks' });
       }
     }
   },
@@ -309,7 +310,7 @@ export const useDrillDownStore = create<DrillDownState>((set, get) => ({
         const stored = localStorage.getItem("drill-pinned");
         if (stored) set({ pinnedPreviews: JSON.parse(stored) });
       } catch (e) {
-        console.error("Failed to load pinned previews:", e);
+        logger.error(e, { component: 'useDrillDownStore', action: 'loadPinnedPreviews' });
       }
     }
   },
@@ -384,7 +385,7 @@ export const useDrillDownStore = create<DrillDownState>((set, get) => ({
           set((state) => ({ settings: { ...state.settings, ...parsed } }));
         }
       } catch (e) {
-        console.error("Failed to load drilldown settings:", e);
+        logger.error(e, { component: 'useDrillDownStore', action: 'loadSettings' });
       }
     }
   },
@@ -503,7 +504,7 @@ export const useDrillDownStore = create<DrillDownState>((set, get) => ({
           }));
         }
       } catch (e) {
-        console.error("Failed to load onboarding state:", e);
+        logger.error(e, { component: 'useDrillDownStore', action: 'loadOnboardingState' });
       }
     }
   },

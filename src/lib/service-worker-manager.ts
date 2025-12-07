@@ -1,30 +1,32 @@
 /** @format */
 
+import { logger } from './logger';
+
 export async function registerServiceWorker(): Promise<ServiceWorkerRegistration | null> {
   if (!('serviceWorker' in navigator)) return null;
 
   try {
     const registration = await navigator.serviceWorker.register('/sw.js');
-    console.log('Service Worker registered');
+    logger.debug('Service Worker registered', {});
     return registration;
   } catch (error) {
-    console.error('Service Worker registration failed:', error);
+    logger.error(error, { component: 'ServiceWorkerManager', action: 'registerServiceWorker' });
     return null;
   }
 }
 
 export async function requestBackgroundSync(tag: string = 'sync-offline-queue'): Promise<void> {
   if (!('serviceWorker' in navigator) || !('sync' in ServiceWorkerRegistration.prototype)) {
-    console.warn('Background Sync not supported');
+    logger.warn('Background Sync not supported', { component: 'ServiceWorkerManager' });
     return;
   }
 
   try {
     const registration = await navigator.serviceWorker.ready;
     await (registration as any).sync.register(tag);
-    console.log('Background sync registered');
+    logger.debug('Background sync registered', { tag });
   } catch (error) {
-    console.error('Background sync failed:', error);
+    logger.error(error, { component: 'ServiceWorkerManager', action: 'requestBackgroundSync' });
   }
 }
 
@@ -46,7 +48,7 @@ export async function subscribeToPushNotifications(vapidPublicKey: string): Prom
     });
     return subscription;
   } catch (error) {
-    console.error('Push subscription failed:', error);
+    logger.error(error, { component: 'ServiceWorkerManager', action: 'subscribeToPushNotifications' });
     return null;
   }
 }
@@ -68,7 +70,7 @@ export async function unregisterServiceWorker(): Promise<void> {
   const registration = await navigator.serviceWorker.getRegistration();
   if (registration) {
     await registration.unregister();
-    console.log('Service Worker unregistered');
+    logger.debug('Service Worker unregistered', {});
   }
 }
 

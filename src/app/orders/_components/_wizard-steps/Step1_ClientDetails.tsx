@@ -33,7 +33,7 @@ import { Building, Check, ChevronsUpDown, GitBranch } from "lucide-react";
 import { useState, useMemo, useEffect } from "react";
 import type { Company } from "@/lib/types";
 import { useFormContext, Controller } from "react-hook-form";
-import { OrderFormData } from "../order-form";
+import { OrderFormData } from "../order-schemas";
 import { useCompanyStore } from "@/store/use-company-store";
 import { ClientPaymentStatusBar } from "@/components/client-payment-status-bar";
 import { PaymentWarningDialog } from "@/components/payment-warning-dialog";

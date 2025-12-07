@@ -1,5 +1,6 @@
 import type { Notification, Order, Company, MaintenanceVisit } from './types';
 import { addDays } from 'date-fns';
+import { logger } from './logger';
 
 export type AutomationAction = 
   | 'SEND_EMAIL'
@@ -233,7 +234,7 @@ export class NotificationAutomation {
     notification: Notification,
     context?: any
   ): Promise<void> {
-    console.log(`Executing automation rule: ${rule.name}`);
+    logger.debug(`Executing automation rule: ${rule.name}`);
 
     for (const action of rule.actions) {
       if (action.delay) {
@@ -253,7 +254,7 @@ export class NotificationAutomation {
     notification: Notification,
     context?: any
   ): Promise<void> {
-    console.log(`Executing action: ${action.type}`, action.config);
+    logger.debug(`Executing action: ${action.type}`, action.config);
 
     switch (action.type) {
       case 'SEND_EMAIL':
@@ -289,12 +290,12 @@ export class NotificationAutomation {
 
   private static async createTask(config: any, notification: Notification): Promise<void> {
     // TODO: Integrate with task management system
-    console.log('Task created:', config.title);
+    logger.debug('Task created:', config.title);
   }
 
   private static async updateStatus(config: any, context?: any): Promise<void> {
     // TODO: Update order/maintenance status
-    console.log('Status updated:', config);
+    logger.debug('Status updated:', config);
   }
 
   private static async escalate(config: any, notification: Notification): Promise<void> {
@@ -311,17 +312,17 @@ export class NotificationAutomation {
 
   private static async scheduleFollowUp(config: any, context?: any): Promise<void> {
     // TODO: Schedule follow-up visit/call
-    console.log('Follow-up scheduled:', config);
+    logger.debug('Follow-up scheduled:', config);
   }
 
   private static async suspendOrders(config: any, context?: any): Promise<void> {
     // TODO: Suspend new orders for company
-    console.log('Orders suspended:', config.reason);
+    logger.debug('Orders suspended:', config.reason);
   }
 
   private static async sendSMS(config: any, notification: Notification): Promise<void> {
     // TODO: Integrate with SMS service (Twilio, etc.)
-    console.log('SMS sent:', notification.title);
+    logger.debug('SMS sent:', notification.title);
   }
 
   /**

@@ -10,25 +10,30 @@ import { DrillTarget } from '@/components/drilldown/drill-target';
 import { Skeleton } from '@/components/ui/skeleton';
 import { EmptyState } from './empty-state';
 import type { Order, Feedback, Company } from '@/lib/types';
+import { memo } from 'react';
 
-type ActivityType = 'New Order' | 'New Feedback' | 'New Client';
-
-type ActivityData =
-  | Pick<Order, 'id' | 'companyId' | 'companyName' | 'orderDate'>
-  | Pick<Feedback, 'id' | 'clientId' | 'message' | 'feedbackDate'>
-  | Pick<Company, 'id' | 'name' | 'createdAt'>;
-
-interface Activity {
-  type: ActivityType;
-  data: ActivityData;
-  date: string;
-}
+type Activity =
+  | {
+      type: 'New Order';
+      data: Pick<Order, 'id' | 'companyId' | 'companyName' | 'orderDate'>;
+      date: string;
+    }
+  | {
+      type: 'New Feedback';
+      data: Pick<Feedback, 'id' | 'clientId' | 'message' | 'feedbackDate'>;
+      date: string;
+    }
+  | {
+      type: 'New Client';
+      data: Pick<Company, 'id' | 'name' | 'createdAt'>;
+      date: string;
+    };
 
 interface ActivityItemProps {
     activity: Activity;
 }
 
-const ActivityIcon = ({ type }: { type: ActivityType }) => {
+const ActivityIcon = ({ type }: { type: Activity['type'] }) => {
     switch (type) {
         case 'New Order': return <ShoppingCart className="h-5 w-5 text-primary" />;
         case 'New Feedback': return <Star className="h-5 w-5 text-yellow-500" />;
@@ -40,33 +45,29 @@ const ActivityIcon = ({ type }: { type: ActivityType }) => {
 const ActivityDetails = ({ activity }: { activity: Activity }) => {
     switch (activity.type) {
         case 'New Order':
-            const order = activity.data as Pick<Order, 'id' | 'companyId' | 'companyName' | 'orderDate'>;
             return (
                 <p className="text-sm">
-                    New order from <DrillTarget kind="company" payload={{ id: order.companyId, name: order.companyName }} asChild>
-                        <span className="font-medium hover:underline cursor-pointer text-primary">{order.companyName}</span>
+                    New order from <DrillTarget kind="company" payload={{ id: activity.data.companyId, name: activity.data.companyName }} asChild>
+                        <span className="font-medium hover:underline cursor-pointer text-primary">{activity.data.companyName}</span>
                     </DrillTarget>.
                 </p>
             )
         case 'New Feedback':
-            const feedback = activity.data as Pick<Feedback, 'id' | 'clientId' | 'message' | 'feedbackDate'>;
             return (
                 <p className="text-sm">
-                    New feedback from <Link href={`/clients/${feedback.clientId}`} className="font-medium hover:underline">Client</Link>: "{feedback.message?.slice(0, 30)}..."
+                    New feedback from <Link href={`/clients/${activity.data.clientId}`} className="font-medium hover:underline">Client</Link>: "{activity.data.message?.slice(0, 30)}..."
                 </p>
             )
         case 'New Client':
-            const client = activity.data as Pick<Company, 'id' | 'name' | 'createdAt'>;
             return (
                 <p className="text-sm">
-                    Welcome <Link href={`/clients/${client.id}`} className="font-medium hover:underline">{client.name}</Link>!
+                    Welcome <Link href={`/clients/${activity.data.id}`} className="font-medium hover:underline">{activity.data.name}</Link>!
                 </p>
             )
-        default: return null;
     }
 }
 
-const ActivityLink = ({activity}: {activity: Activity}) => {
+const ActivityLink = ({activity}: {activity: Activity}): string => {
     switch (activity.type) {
         case 'New Order': return `/orders/${activity.data.id}`;
         case 'New Feedback': return `/feedback`;
@@ -75,7 +76,7 @@ const ActivityLink = ({activity}: {activity: Activity}) => {
     }
 }
 
-const ActivityItem = ({ activity }: ActivityItemProps) => {
+const ActivityItem = memo(({ activity }: ActivityItemProps) => {
     return (
         <div className="p-3 rounded-lg border bg-card text-card-foreground shadow-sm hover:bg-muted/50 transition-colors">
              <div className="flex items-start gap-4">
@@ -101,7 +102,7 @@ const ActivityItem = ({ activity }: ActivityItemProps) => {
             </div>
         </div>
     )
-}
+});
 
 export function ActivityFeed() {
   const { data: recentActivities, isLoading } = useRecentActivity();

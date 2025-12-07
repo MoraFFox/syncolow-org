@@ -1,7 +1,6 @@
 
 import { NextRequest, NextResponse } from 'next/server';
-
-const GOOGLE_GEOCODING_API_KEY = process.env.GOOGLE_GEOCODING_API_KEY;
+import { createErrorResponse, createSuccessResponse, validateEnvVars } from '@/lib/api-error-utils';
 
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
@@ -9,9 +8,16 @@ export async function GET(request: NextRequest) {
   const lat = searchParams.get('lat');
   const lng = searchParams.get('lng');
 
-  if (!GOOGLE_GEOCODING_API_KEY) {
-    return NextResponse.json({ error: 'Server configuration error: Missing API Key' }, { status: 500 });
+  try {
+    validateEnvVars(
+      { GOOGLE_GEOCODING_API_KEY: process.env.GOOGLE_GEOCODING_API_KEY },
+      'geocode-api'
+    );
+  } catch (error) {
+    return createErrorResponse(error, 500, { component: 'geocode-api', action: 'validate-env' });
   }
+
+  const GOOGLE_GEOCODING_API_KEY = process.env.GOOGLE_GEOCODING_API_KEY!;
 
   if (address) {
     try {
@@ -22,17 +28,20 @@ export async function GET(request: NextRequest) {
 
       if (data.status === 'OK' && data.results.length > 0) {
         const result = data.results[0];
-        return NextResponse.json({
+        return createSuccessResponse({
           lat: result.geometry.location.lat,
           lng: result.geometry.location.lng,
           formattedAddress: result.formatted_address,
         });
       } else {
-        return NextResponse.json({ error: 'Address not found', details: data.status }, { status: 404 });
+        return createErrorResponse(
+          new Error(`Address not found: ${data.status}`),
+          404,
+          { component: 'geocode-api', action: 'geocode-address' }
+        );
       }
     } catch (error) {
-      console.error('Geocoding error:', error);
-      return NextResponse.json({ error: 'Geocoding failed' }, { status: 500 });
+      return createErrorResponse(error, 500, { component: 'geocode-api', action: 'geocode-address' });
     }
   } else if (lat && lng) {
     try {
@@ -43,17 +52,24 @@ export async function GET(request: NextRequest) {
 
         if (data.status === 'OK' && data.results.length > 0) {
             const result = data.results[0];
-            return NextResponse.json({
+            return createSuccessResponse({
                 formattedAddress: result.formatted_address,
             });
         } else {
-            return NextResponse.json({ error: 'Location not found', details: data.status }, { status: 404 });
+            return createErrorResponse(
+              new Error(`Location not found: ${data.status}`),
+              404,
+              { component: 'geocode-api', action: 'reverse-geocode' }
+            );
         }
     } catch (error) {
-        console.error('Reverse geocoding error:', error);
-        return NextResponse.json({ error: 'Reverse geocoding failed' }, { status: 500 });
+        return createErrorResponse(error, 500, { component: 'geocode-api', action: 'reverse-geocode' });
     }
   }
 
-  return NextResponse.json({ error: 'Missing address or lat/lng parameters' }, { status: 400 });
+  return createErrorResponse(
+    new Error('Missing address or lat/lng parameters'),
+    400,
+    { component: 'geocode-api', action: 'validate-params' }
+  );
 }

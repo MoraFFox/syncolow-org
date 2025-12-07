@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 
 /**
  * Simulates an asynchronous action with a delay.
@@ -11,9 +12,9 @@ export async function simulateAction(label: string, durationMs?: number): Promis
   const duration = durationMs || Math.floor(Math.random() * 700) + 800;
   
   return new Promise((resolve) => {
-    console.log(`[DrillAction] Starting: ${label}...`);
+    logger.debug(`[DrillAction] Starting: ${label}...`);
     setTimeout(() => {
-      console.log(`[DrillAction] Completed: ${label}`);
+      logger.debug(`[DrillAction] Completed: ${label}`);
       resolve();
     }, duration);
   });

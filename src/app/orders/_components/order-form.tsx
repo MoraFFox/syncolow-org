@@ -1,7 +1,7 @@
 
-"use client"
+"use client";
 
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import { useForm, FormProvider } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -18,62 +18,27 @@ import {
 } from '@/components/ui/dialog';
 import { ArrowLeft, ArrowRight, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { OrderItem, Product, Company } from '@/lib/types';
 import { Progress } from '@/components/ui/progress';
+import { useWizardNavigation } from '@/hooks/use-wizard-navigation';
+import { useFormDraftPersistence } from '@/hooks/use-form-draft-persistence';
 
 import { Step1_ClientDetails } from './_wizard-steps/Step1_ClientDetails';
 import { Step2_OrderItems } from './_wizard-steps/Step2_OrderItems';
 import { Step3_ReviewOrder } from './_wizard-steps/Step3_ReviewOrder';
 
 
-const orderItemSchema = z.object({
-    id: z.string(),
-    productId: z.string(),
-    productName: z.string(),
-    quantity: z.number().min(1),
-    price: z.number(),
-    taxId: z.string().nullable().optional(),
-    taxRate: z.number().optional(),
-    discountType: z.enum(['percentage', 'fixed']).nullable().optional(),
-    discountValue: z.number().nullable().optional(),
-});
+import { orderSchema, OrderFormData } from './order-schemas';
 
-const orderSchema = z.object({
-    isPotentialClient: z.boolean(),
-    temporaryCompanyName: z.string().optional(),
-    branchId: z.string().optional(),
-    region: z.enum(['A', 'B', 'Custom']).optional(),
-    area: z.string().optional(),
-    paymentDueDate: z.date().optional().nullable(),
-    items: z.array(orderItemSchema).min(1, "Order must have at least one item."),
-    discountType: z.enum(['percentage', 'fixed']).nullable().optional(),
-    discountValue: z.number().optional(),
-    // Calculated fields, for review step display
-    subtotal: z.number().optional(),
-    totalTax: z.number().optional(),
-    discountAmount: z.number().optional(),
-    grandTotal: z.number().optional(),
-}).refine(data => {
-    if (data.isPotentialClient) {
-        return !!data.temporaryCompanyName && data.temporaryCompanyName.length > 0;
-    }
-    return !!data.branchId;
-}, {
-    message: "Client selection is required.",
-    path: ["branchId"], // Assign error to a relevant field
-});
+interface OrderFormProps {
+  isOpen: boolean;
+  onOpenChange: (isOpen: boolean) => void;
+}
 
-
-export type OrderFormData = z.infer<typeof orderSchema>;
-
-
-export default function OrderForm({ isOpen, onOpenChange }: { isOpen: boolean, onOpenChange: (isOpen: boolean) => void }) {
+export default function OrderForm({ isOpen, onOpenChange }: OrderFormProps) {
     const { products, submitOrder } = useOrderStore();
     const { companies } = useCompanyStore();
     const { toast } = useToast();
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [step, setStep] = useState(1);
-    const [isNavigating, setIsNavigating] = useState(false);
 
     const methods = useForm<OrderFormData>({
         resolver: zodResolver(orderSchema),
@@ -83,54 +48,35 @@ export default function OrderForm({ isOpen, onOpenChange }: { isOpen: boolean, o
             paymentDueDate: null,
         },
     });
-
-    // Restore from sessionStorage on mount
-    useState(() => {
-        const savedData = sessionStorage.getItem('orderFormDraft');
-        if (savedData && isOpen) {
-            try {
-                const parsedData = JSON.parse(savedData);
-                methods.reset(parsedData);
-            } catch (e) {
-                console.error('Failed to restore order draft:', e);
-            }
-        }
-    });
-
-    // Auto-save to sessionStorage
-    useState(() => {
-        const subscription = methods.watch((data) => {
-            if (isOpen) {
-                sessionStorage.setItem('orderFormDraft', JSON.stringify(data));
-            }
-        });
-        return () => subscription.unsubscribe();
-    });
     
     const { handleSubmit, trigger, watch, reset } = methods;
     const watchItems = watch("items");
 
+    const { step, nextStep, prevStep, progressValue, isNavigating } = useWizardNavigation(
+        3,
+        trigger,
+        {
+            1: ["branchId", "temporaryCompanyName", "isPotentialClient"],
+            2: ["items"],
+        }
+    );
+
+    const { clearDraft } = useFormDraftPersistence('orderFormDraft', isOpen, methods);
+
     const handleClose = () => {
         if (isSubmitting) return;
-        // Don't clear draft on close, only on successful submit
         onOpenChange(false);
-        setStep(1);
-    }
+    };
     
     const onSubmit = async (data: OrderFormData) => {
-        // If we're in the middle of navigation, prevent submission
-        if (isNavigating) {
-            return;
-        }
+        if (isNavigating) return;
         setIsSubmitting(true);
         try {
             await submitOrder(data);
-            // Clear draft on successful submission
-            sessionStorage.removeItem('orderFormDraft');
+            clearDraft();
             reset();
             handleClose();
         } catch (error) {
-            console.error("Order submission failed:", error);
             toast({
                 title: "Order submission Failed",
                 description: (error as Error).message || "An unexpected error occurred.",
@@ -139,27 +85,9 @@ export default function OrderForm({ isOpen, onOpenChange }: { isOpen: boolean, o
         } finally {
             setIsSubmitting(false);
         }
-    }
-    
-    const nextStep = async () => {
-        setIsNavigating(true);
-        let isValid = true;
-        if(step === 1) {
-             isValid = await trigger(["branchId", "temporaryCompanyName", "isPotentialClient"]);
-        }
-        if(step === 2) {
-             isValid = await trigger(["items"]);
-        }
-
-        if(isValid) {
-            setStep(s => Math.min(s + 1, 3));
-        }
-        setIsNavigating(false);
     };
-    const prevStep = () => setStep(s => Math.max(s - 1, 1));
     
     const isSubmitDisabled = isSubmitting || watchItems.length === 0;
-    const progressValue = (step / 3) * 100;
     
     const renderStepContent = () => {
         switch (step) {
@@ -168,11 +96,11 @@ export default function OrderForm({ isOpen, onOpenChange }: { isOpen: boolean, o
             case 2:
                 return <Step2_OrderItems products={products} />;
             case 3:
-                 return <Step3_ReviewOrder companies={companies} />;
+                return <Step3_ReviewOrder companies={companies} />;
             default:
                 return null;
         }
-    }
+    };
 
     return (
         <Dialog open={isOpen} onOpenChange={handleClose}>

@@ -2,6 +2,7 @@
 "use client";
 
 import { Controller, useFieldArray } from 'react-hook-form';
+import type { Control, UseFormWatch, UseFormSetValue } from 'react-hook-form';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
@@ -9,9 +10,9 @@ import { AccordionContent, AccordionItem, AccordionTrigger } from '@/components/
 import { AlertTriangle, PlusCircle, Trash2 } from 'lucide-react';
 
 interface ProblemDiagnosisSectionProps {
-    control: any;
-    watch: any;
-    setValue: any;
+    control: Control<any>;
+    watch: UseFormWatch<any>;
+    setValue: UseFormSetValue<any>;
     onOpenReasonSelector: () => void;
 }
 

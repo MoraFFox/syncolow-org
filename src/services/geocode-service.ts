@@ -1,4 +1,5 @@
 import { LatLngTuple } from "leaflet";
+import { logger } from '@/lib/logger';
 
 class GeocodeService {
     private geocodeCache: Map<string, LatLngTuple> = new Map();
@@ -12,7 +13,7 @@ class GeocodeService {
         try {
             const response = await fetch(`/api/geo?address=${encodeURIComponent(address)}`);
             if (!response.ok) {
-                console.warn(`Geocoding API request for "${address}" failed with status: ${response.status}.`);
+                logger.warn(`Geocoding API request failed with status: ${response.status}`, { component: 'GeocodeService', address });
                 return null;
             }
             const data = await response.json();
@@ -23,7 +24,8 @@ class GeocodeService {
             }
             return null;
         } catch (error) {
-            console.warn(`A network error occurred during geocoding for address "${address}".`, error);
+            logger.warn('Network error during geocoding', { component: 'GeocodeService', address });
+            logger.error(error, { component: 'GeocodeService', action: 'geocode' });
             return null;
         }
     }
@@ -37,7 +39,7 @@ class GeocodeService {
         try {
             const response = await fetch(`/api/geo?lat=${lat}&lng=${lon}`);
              if (!response.ok) {
-                console.warn(`Reverse geocoding API request for "${lat},${lon}" failed with status: ${response.status}.`);
+                logger.warn(`Reverse geocoding API request failed with status: ${response.status}`, { component: 'GeocodeService', lat, lon });
                 return null;
             }
             const data = await response.json();
@@ -48,7 +50,8 @@ class GeocodeService {
             }
             return null;
         } catch(error) {
-            console.warn(`A network error occurred during reverse geocoding for "${lat},${lon}".`, error);
+            logger.warn('Network error during reverse geocoding', { component: 'GeocodeService', lat, lon });
+            logger.error(error, { component: 'GeocodeService', action: 'reverseGeocode' });
             return null;
         }
     }

@@ -19,7 +19,7 @@ interface MetricCardProps {
   valueClassName?: string;
 }
 
-export function MetricCard({
+export const MetricCard = React.memo<MetricCardProps>(function MetricCard({
   label,
   value,
   trend,
@@ -29,7 +29,7 @@ export function MetricCard({
   size = "md",
   className,
   valueClassName,
-}: MetricCardProps) {
+}) {
   // Determine trend direction if not provided but trend value is
   const direction = trendDirection || (trend ? (trend > 0 ? "up" : trend < 0 ? "down" : "neutral") : undefined);
   
@@ -76,4 +76,4 @@ export function MetricCard({
       )}
     </div>
   );
-}
+});

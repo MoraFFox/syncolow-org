@@ -21,7 +21,7 @@ import {
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useOrderStore } from "@/store/use-order-store";
+import { useProductsStore, useCategoriesStore } from "@/store";
 import { Product, Category, Manufacturer } from "@/lib/types";
 
 import { ProductForm } from "./_components/product-form";
@@ -61,8 +61,8 @@ function ProductsPageContent() {
     deleteAllProducts,
     loading: productsLoading,
     loadRemainingProducts,
-    categories,
-  } = useOrderStore();
+  } = useProductsStore();
+  const { categories } = useCategoriesStore();
   const { manufacturers, loading: manufacturersLoading } =
     useManufacturerStore();
 
@@ -131,12 +131,12 @@ function ProductsPageContent() {
     if (!term.trim()) {
       setIsSearching(false);
       setIsLoadingMore(false);
-      await useOrderStore.getState().fetchInitialData();
+      await useProductsStore.getState().loadRemainingProducts();
       return;
     }
     setIsLoadingMore(true);
     setIsSearching(true);
-    await useOrderStore.getState().searchProducts(term);
+    await useProductsStore.getState().searchProducts(term);
     setIsLoadingMore(false);
   }, 500);
 
@@ -404,10 +404,9 @@ function ProductsPageContent() {
                        <CategoryCard 
                          category={categoryObj} 
                          products={categoryProducts} 
-                         onClick={() => {
-                           console.log("Category clicked:", categoryObj);
-                           setSelectedCategory(categoryObj);
-                         }}
+                        onClick={() => {
+                          setSelectedCategory(categoryObj);
+                        }}
                        />
                      </DrillTarget>
                    );
@@ -450,10 +449,9 @@ function ProductsPageContent() {
                        <ManufacturerCard 
                          manufacturer={manufacturerObj} 
                          products={manufacturerProducts} 
-                         onClick={() => {
-                           console.log("Manufacturer clicked:", manufacturerObj);
-                           setSelectedManufacturer(manufacturerObj);
-                         }}
+                        onClick={() => {
+                          setSelectedManufacturer(manufacturerObj);
+                        }}
                        />
                      </DrillTarget>
                    );

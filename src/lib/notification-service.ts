@@ -1,6 +1,7 @@
 
 import { supabase } from './supabase';
 import type { Notification } from './types';
+import { logger } from './logger';
 
 const NOTIFICATIONS_COLLECTION = 'notifications';
 
@@ -14,15 +15,22 @@ export class NotificationService {
     limitCount: number = 50
   ) {
     // Initial fetch
-    supabase
-      .from(NOTIFICATIONS_COLLECTION)
-      .select('*')
-      .eq('userId', userId)
-      .order('createdAt', { ascending: false })
-      .limit(limitCount)
-      .then(({ data }) => {
-        if (data) callback(data as Notification[]);
-      });
+    (async () => {
+      try {
+        const { data } = await supabase
+          .from(NOTIFICATIONS_COLLECTION)
+          .select('*')
+          .eq('userId', userId)
+          .order('createdAt', { ascending: false })
+          .limit(limitCount);
+        
+        if (data) {
+          callback(data as Notification[]);
+        }
+      } catch (error) {
+        logger.error(error, { component: 'NotificationService', action: 'subscribeToNotifications' });
+      }
+    })();
 
     // Realtime subscription
     const channel = supabase
@@ -35,18 +43,23 @@ export class NotificationService {
           table: NOTIFICATIONS_COLLECTION,
           filter: `userId=eq.${userId}`,
         },
-        (payload) => {
+        async () => {
           // Re-fetch notifications on any change to ensure correct order and limit
           // Or we could optimistically update, but re-fetching is safer for now
-          supabase
-            .from(NOTIFICATIONS_COLLECTION)
-            .select('*')
-            .eq('userId', userId)
-            .order('createdAt', { ascending: false })
-            .limit(limitCount)
-            .then(({ data }) => {
-              if (data) callback(data as Notification[]);
-            });
+          try {
+            const { data } = await supabase
+              .from(NOTIFICATIONS_COLLECTION)
+              .select('*')
+              .eq('userId', userId)
+              .order('createdAt', { ascending: false })
+              .limit(limitCount);
+            
+            if (data) {
+              callback(data as Notification[]);
+            }
+          } catch (error) {
+            logger.error(error, { component: 'NotificationService', action: 'realtime-callback' });
+          }
         }
       )
       .subscribe();
@@ -102,7 +115,8 @@ export class NotificationService {
       .eq('id', notificationId);
 
     if (error) {
-        console.warn(`Error updating notification ${notificationId}:`, error);
+        logger.warn(`Error updating notification ${notificationId}`, { component: 'NotificationService' });
+        logger.error(error, { component: 'NotificationService', action: 'markAsRead' });
     }
   }
 
@@ -135,7 +149,8 @@ export class NotificationService {
       .eq('id', notificationId);
 
     if (error) {
-        console.warn(`Error snoozing notification ${notificationId}:`, error);
+        logger.warn(`Error snoozing notification ${notificationId}`, { component: 'NotificationService' });
+        logger.error(error, { component: 'NotificationService', action: 'snoozeNotification' });
     }
   }
 
@@ -152,7 +167,8 @@ export class NotificationService {
       .eq('id', notificationId);
 
     if (error) {
-        console.warn(`Error clearing snooze for notification ${notificationId}:`, error);
+        logger.warn(`Error clearing snooze for notification ${notificationId}`, { component: 'NotificationService' });
+        logger.error(error, { component: 'NotificationService', action: 'clearSnooze' });
     }
   }
 
