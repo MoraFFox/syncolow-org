@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { googleTasksService } from '@/services/google-tasks-service';
 import { cookies } from 'next/headers';
+import { logger } from '@/lib/logger';
 
 const LIST_TITLE = 'SynergyFlow Visits';
 
@@ -70,7 +71,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
 
   } catch (error) {
-    console.error('Error syncing google task:', error);
+    logger.error(error, { component: 'GoogleTasksSyncAPI', action: 'POST' });
     return NextResponse.json({ error: 'Failed to sync task' }, { status: 500 });
   }
 }

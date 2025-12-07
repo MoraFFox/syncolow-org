@@ -101,7 +101,17 @@ src/
 
 docs/                       # Comprehensive documentation
 public/                     # Static assets and service worker
+scripts/                    # Development utility scripts
 ```
+
+### Development Scripts
+
+Utility scripts for development and maintenance tasks are located in `scripts/`:
+- Order batch operations (deletion, migration)
+- Data conversion utilities (XLSX to CSV)
+- Debugging tools (delivery date calculation)
+
+See [scripts/README.md](./scripts/README.md) for usage instructions.
 
 ## 🎯 Key Features
 
@@ -177,7 +187,12 @@ npm run lint
 
 # Build
 npm run build
+
+# Full CI validation (lint + test + typecheck + build)
+npm run ci
 ```
+
+> **⚠️ Important**: `next build` is configured with `typescript.ignoreBuildErrors: true` in `next.config.mjs`. This means **a successful build does NOT guarantee TypeScript correctness**. Always run `npm run typecheck` separately to catch type errors before deploying.
 
 ## 📊 Monitoring
 

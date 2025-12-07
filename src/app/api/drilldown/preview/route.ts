@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { DrillKind } from "@/lib/drilldown-types";
 import { supabaseAdmin } from "@/lib/supabase";
 import { getCompanyPreview, getProductPreview, getBranchPreview } from "@/lib/drilldown/data-service";
+import { logger } from "@/lib/logger";
 
 // Helper to compute health score if not present
 function calculateHealthScore(company: any) {
@@ -75,7 +76,7 @@ export async function POST(req: NextRequest) {
           .select("grandTotal")
           .gte("orderDate", new Date(new Date().setDate(new Date().getDate() - 30)).toISOString()); // Last 30 days
         
-        const totalRev = revenueOrders?.reduce((sum, o) => sum + (o.grandTotal || 0), 0) || 0;
+        const totalRev = revenueOrders?.reduce((sum: number, o: { grandTotal?: number }) => sum + (o.grandTotal || 0), 0) || 0;
         
         data = {
           totalRevenue: totalRev,
@@ -247,7 +248,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(data);
   } catch (error) {
-    console.error("Drill preview error:", error);
+    logger.error(error, { component: 'DrillPreviewAPI', action: 'POST' });
     return NextResponse.json({ error: "Failed to fetch data" }, { status: 500 });
   }
 }

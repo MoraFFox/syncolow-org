@@ -176,33 +176,71 @@ export class NotificationService {
    * Delete a notification
    */
   static async deleteNotification(notificationId: string): Promise<void> {
-    await supabase.from(NOTIFICATIONS_COLLECTION).delete().eq('id', notificationId);
+    try {
+      const { error } = await supabase
+        .from(NOTIFICATIONS_COLLECTION)
+        .delete()
+        .eq('id', notificationId);
+
+      if (error) throw error;
+    } catch (error) {
+      logger.error(error, {
+        component: 'NotificationService',
+        action: 'deleteNotification',
+        notificationId,
+      });
+      throw new Error('Failed to delete notification. Please try again.');
+    }
   }
 
   /**
    * Delete old notifications (older than X days)
    */
   static async cleanupOldNotifications(userId: string, daysOld: number = 30): Promise<void> {
-    const cutoffDate = new Date();
-    cutoffDate.setDate(cutoffDate.getDate() - daysOld);
+    try {
+      const cutoffDate = new Date();
+      cutoffDate.setDate(cutoffDate.getDate() - daysOld);
 
-    await supabase
-      .from(NOTIFICATIONS_COLLECTION)
-      .delete()
-      .eq('userId', userId)
-      .lt('createdAt', cutoffDate.toISOString());
+      const { error } = await supabase
+        .from(NOTIFICATIONS_COLLECTION)
+        .delete()
+        .eq('userId', userId)
+        .lt('createdAt', cutoffDate.toISOString());
+
+      if (error) throw error;
+    } catch (error) {
+      logger.error(error, {
+        component: 'NotificationService',
+        action: 'cleanupOldNotifications',
+        userId,
+        daysOld,
+      });
+      // Don't throw - cleanup is non-critical
+      logger.warn('Notification cleanup failed but continuing', { component: 'NotificationService' });
+    }
   }
 
   /**
    * Record action taken on notification
    */
   static async recordAction(notificationId: string): Promise<void> {
-    await supabase
-      .from(NOTIFICATIONS_COLLECTION)
-      .update({
-        actionTakenAt: new Date().toISOString(),
-        read: true,
-      })
-      .eq('id', notificationId);
+    try {
+      const { error } = await supabase
+        .from(NOTIFICATIONS_COLLECTION)
+        .update({
+          actionTakenAt: new Date().toISOString(),
+          read: true,
+        })
+        .eq('id', notificationId);
+
+      if (error) throw error;
+    } catch (error) {
+      logger.error(error, {
+        component: 'NotificationService',
+        action: 'recordAction',
+        notificationId,
+      });
+      // Don't throw - action recording is non-critical
+    }
   }
 }

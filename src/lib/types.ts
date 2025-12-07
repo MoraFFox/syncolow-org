@@ -55,6 +55,9 @@ export interface Company {
   baristas?: Partial<Barista>[];
   performanceScore?: number;
   last12MonthsRevenue?: number;
+  // Suspension fields for order automation
+  isSuspended?: boolean;
+  suspensionReason?: string;
 }
 
 export interface Branch {

@@ -6,27 +6,72 @@ import { Switch } from '@/components/ui/switch';
 import { useSettingsStore } from '@/store/use-settings-store';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { useState } from 'react';
-import { Bell, Mail, Clock, Smartphone } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Bell, Mail, Clock, Smartphone, Loader2 } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
 import { usePushNotifications } from '@/lib/notification-push-service';
 import { useAuth } from '@/hooks/use-auth';
 import { Badge } from '@/components/ui/badge';
+import { useUserSettings } from '@/hooks/use-user-settings';
 
 export function NotificationPreferences() {
   const { notificationSettings, toggleNotificationType } = useSettingsStore();
   const { user } = useAuth();
   const { permission, isSubscribed, requestPermission, unsubscribe } = usePushNotifications(user?.id);
+  const { settings, isLoading: settingsLoading, saveSettings } = useUserSettings();
+
   const [emailEnabled, setEmailEnabled] = useState(false);
   const [emailAddress, setEmailAddress] = useState('');
   const [digestFrequency, setDigestFrequency] = useState('daily');
   const [quietHoursStart, setQuietHoursStart] = useState('22:00');
   const [quietHoursEnd, setQuietHoursEnd] = useState('07:00');
+  const [isSaving, setIsSaving] = useState(false);
 
-  const handleSaveEmailSettings = () => {
-    // TODO: Save to user preferences in Firestore
-    console.log('Email settings saved:', { emailEnabled, emailAddress, digestFrequency });
+  // Disable inputs during initial load or save
+  const isDisabled = settingsLoading || isSaving;
+
+  // Load settings from Supabase on mount
+  useEffect(() => {
+    if (settings) {
+      setEmailEnabled(settings.email_enabled ?? false);
+      setEmailAddress(settings.email_address ?? '');
+      setDigestFrequency(settings.digest_frequency ?? 'daily');
+      setQuietHoursStart(settings.quiet_hours_start ?? '22:00');
+      setQuietHoursEnd(settings.quiet_hours_end ?? '07:00');
+    }
+  }, [settings]);
+
+  const handleSaveEmailSettings = async () => {
+    setIsSaving(true);
+    try {
+      // Convert notificationSettings from store to Record<string, boolean>
+      const notificationTypesMap: Record<string, boolean> = {};
+      Object.entries(notificationSettings).forEach(([key, value]) => {
+        notificationTypesMap[key] = value.enabled;
+      });
+
+      await saveSettings({
+        email_enabled: emailEnabled,
+        email_address: emailAddress,
+        digest_frequency: digestFrequency as 'disabled' | 'daily' | 'weekly',
+        notification_types: notificationTypesMap
+      });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleSaveQuietHours = async () => {
+    setIsSaving(true);
+    try {
+      await saveSettings({
+        quiet_hours_start: quietHoursStart,
+        quiet_hours_end: quietHoursEnd
+      });
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
@@ -92,7 +137,7 @@ export function NotificationPreferences() {
           {emailEnabled && (
             <>
               <Separator />
-              
+
               <div className="space-y-2">
                 <Label htmlFor="email-address">Email Address</Label>
                 <Input
@@ -141,7 +186,8 @@ export function NotificationPreferences() {
                 </div>
               </div>
 
-              <Button onClick={handleSaveEmailSettings}>
+              <Button onClick={handleSaveEmailSettings} disabled={isDisabled}>
+                {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 Save Email Settings
               </Button>
             </>
@@ -221,6 +267,10 @@ export function NotificationPreferences() {
           <p className="text-sm text-muted-foreground">
             Critical notifications will still be delivered during quiet hours
           </p>
+          <Button onClick={handleSaveQuietHours} disabled={isDisabled} variant="outline">
+            {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            Save Quiet Hours
+          </Button>
         </CardContent>
       </Card>
     </div>

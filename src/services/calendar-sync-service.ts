@@ -1,4 +1,19 @@
-import type { Order } from '@/lib/types';
+import { logger } from '@/lib/logger';
+
+/**
+ * Common interface for visits that can be synced to Google Calendar.
+ * Supports both regular VisitCall and MaintenanceVisit entities.
+ */
+export interface SyncVisit {
+  id: string;
+  date?: string | Date;
+  address?: string;
+  location?: string;
+  clientName?: string;
+  companyName?: string;
+  outcome?: string;
+  maintenanceNotes?: string;
+}
 
 interface SyncMap {
   [visitId: string]: {
@@ -41,12 +56,12 @@ export const calendarSyncService = {
       const data = await res.json();
       return data.connected;
     } catch (error) {
-      console.error('Failed to check calendar status', error);
+      logger.error(error, { component: 'CalendarSyncService', action: 'checkConnectionStatus' });
       return false;
     }
   },
 
-  generateHash(visit: any): string {
+  generateHash(visit: SyncVisit): string {
     const data = {
       date: visit.date,
       address: visit.address || visit.location,
@@ -56,7 +71,7 @@ export const calendarSyncService = {
     return JSON.stringify(data);
   },
 
-  async syncVisit(visit: any, type: 'Visit' | 'Maintenance' = 'Visit'): Promise<string | null> {
+  async syncVisit(visit: SyncVisit, type: 'Visit' | 'Maintenance' = 'Visit'): Promise<string | null> {
     const syncMap = this.getSyncMap();
     let syncData = syncMap[visit.id];
     
@@ -91,7 +106,7 @@ export const calendarSyncService = {
         }
 
         // Hash changed, perform update
-        console.log(`Updating calendar event for visit ${visit.id}`);
+        logger.debug(`Updating calendar event for visit ${visit.id}`, { component: 'CalendarSyncService', action: 'syncVisit' });
         const res = await fetch('/api/google-calendar/update-event', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -123,12 +138,12 @@ export const calendarSyncService = {
       }
       return null;
     } catch (error) {
-      console.error('Failed to sync visit', error);
+      logger.error(error, { component: 'CalendarSyncService', action: 'syncVisit', visitId: visit.id });
       return null;
     }
   },
 
-  async syncAll(visits: any[], maintenanceVisits: any[]) {
+  async syncAll(visits: SyncVisit[], maintenanceVisits: SyncVisit[]) {
     const connected = await this.checkConnectionStatus();
     if (!connected) return { success: false, error: 'Not connected' };
 

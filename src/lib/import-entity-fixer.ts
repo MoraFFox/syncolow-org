@@ -1,6 +1,7 @@
 import { supabase } from '@/lib/supabase';
 import { toast } from '@/hooks/use-toast';
 import type { ImportRowError } from '@/lib/types';
+import { logger } from '@/lib/logger';
 
 interface FixAllEntitiesOptions {
   errors: ImportRowError[];
@@ -57,11 +58,11 @@ export async function fixAllMissingEntities(
         .in('name', companyNames);
 
       if (checkError) {
-        console.error('Error checking companies:', checkError);
+        logger.error(checkError, { component: 'ImportEntityFixer', action: 'checkExistingCompanies', companyCount: companyNames.length });
         throw new Error(`Failed to check companies: ${checkError.message}`);
       }
 
-      const existingNames = new Set(existingCompanies?.map(c => c.name) || []);
+      const existingNames = new Set(existingCompanies?.map((c: { name: string }) => c.name) || []);
       const companiesToCreate = companyNames.filter(name => !existingNames.has(name));
 
       if (companiesToCreate.length > 0) {
@@ -83,7 +84,7 @@ export async function fixAllMissingEntities(
           .insert(newCompaniesData);
 
         if (insertError) {
-          console.error('Error inserting companies:', insertError);
+          logger.error(insertError, { component: 'ImportEntityFixer', action: 'insertCompanies', companyCount: companiesToCreate.length });
           throw new Error(`Failed to create companies: ${insertError.message}`);
         }
         
@@ -106,11 +107,11 @@ export async function fixAllMissingEntities(
         .in('name', productNames);
 
       if (checkError) {
-        console.error('Error checking products:', checkError);
+        logger.error(checkError, { component: 'ImportEntityFixer', action: 'checkExistingProducts', productCount: productNames.length });
         throw new Error(`Failed to check products: ${checkError.message}`);
       }
 
-      const existingNames = new Set(existingProducts?.map(p => p.name) || []);
+      const existingNames = new Set(existingProducts?.map((p: { name: string }) => p.name) || []);
       const productsToCreate = productNames.filter(name => !existingNames.has(name));
 
       if (productsToCreate.length > 0) {
@@ -128,7 +129,7 @@ export async function fixAllMissingEntities(
           .insert(newProductsData);
 
         if (insertError) {
-          console.error('Error inserting products:', insertError);
+          logger.error(insertError, { component: 'ImportEntityFixer', action: 'insertProducts', productCount: productsToCreate.length });
           throw new Error(`Failed to create products: ${insertError.message}`);
         }
         
@@ -159,7 +160,7 @@ export async function fixAllMissingEntities(
       success: true,
     };
   } catch (error: any) {
-    console.error('Fix all entities failed:', error);
+    logger.error(error, { component: 'ImportEntityFixer', action: 'fixAllMissingEntities', errorCount: errors.length });
     
     toast({
       title: 'Fix All Failed',
@@ -231,7 +232,7 @@ export async function createMissingEntity(
 
     return { success: true };
   } catch (error: any) {
-    console.error('Create entity failed:', error);
+    logger.error(error, { component: 'ImportEntityFixer', action: 'createMissingEntity', entityType, entityName: entityData.name });
     
     toast({
       title: 'Creation Failed',

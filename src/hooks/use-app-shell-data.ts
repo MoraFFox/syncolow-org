@@ -1,7 +1,11 @@
 import { useEffect } from 'react';
+import type { User } from '@/lib/types';
 
+/**
+ * Hook to handle app shell data loading based on authentication state
+ */
 export function useAppShellData(
-  user: any,
+  user: User | null,
   fetchInitialData: () => void,
   fetchOrders: (limit: number) => void
 ) {
@@ -9,11 +13,6 @@ export function useAppShellData(
     if (user) {
       fetchInitialData();
       fetchOrders(50);
-
-      // Preload cache in background
-      // import('@/lib/cache-manager').then(({ cacheManager }) => {
-      //   cacheManager.preloadAll().catch(console.error);
-      // });
     }
   }, [user, fetchInitialData, fetchOrders]);
 }

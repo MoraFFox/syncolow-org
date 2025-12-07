@@ -2,6 +2,7 @@ import { QueryClient, QueryKey } from '@tanstack/react-query';
 import { IUniversalCache, CacheKey, CacheOptions, CacheMetrics } from './types';
 import { GranularPersister } from './persister';
 import { idbStorage } from './indexed-db';
+import { logger } from '@/lib/logger';
 
 /**
  * Universal Cache System
@@ -53,7 +54,7 @@ export class UniversalCache implements IUniversalCache {
         });
       }
     } catch (err) {
-      console.warn('Failed to hydrate from cache:', err);
+      logger.warn('Failed to hydrate from cache', { component: 'UniversalCache', action: 'hydrateFromIndexedDB', key: String(key) });
     }
 
     // 3. Fetch (or return hydrated data if it was set)

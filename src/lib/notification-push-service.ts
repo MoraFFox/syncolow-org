@@ -6,6 +6,7 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
+import { logger } from '@/lib/logger';
 
 export class PushNotificationService {
   private static vapidPublicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY || '';
@@ -57,7 +58,7 @@ export class PushNotificationService {
 
       return subscription;
     } catch (error) {
-      console.error('Push subscription failed:', error);
+      logger.error(error, { component: 'PushNotificationService', action: 'subscribe', userId });
       return null;
     }
   }
@@ -77,7 +78,7 @@ export class PushNotificationService {
         await this.removeSubscription(userId);
       }
     } catch (error) {
-      console.error('Push unsubscribe failed:', error);
+      logger.error(error, { component: 'PushNotificationService', action: 'unsubscribe', userId });
     }
   }
 
@@ -98,7 +99,7 @@ export class PushNotificationService {
         ...options,
       });
     } catch (error) {
-      console.error('Show notification failed:', error);
+      logger.error(error, { component: 'PushNotificationService', action: 'showNotification', title });
     }
   }
 

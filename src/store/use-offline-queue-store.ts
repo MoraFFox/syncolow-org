@@ -22,7 +22,7 @@ export const useOfflineQueueStore = create<OfflineQueueState>((set, get) => ({
     try {
       const queue = await indexedDBStorage.getQueue();
       set({ queue: queue.sort((a, b) => a.timestamp - b.timestamp) });
-    } catch (error: any) {
+    } catch (error) {
       logError(error, {
         component: 'useOfflineQueueStore',
         action: 'loadQueue'
@@ -41,7 +41,7 @@ export const useOfflineQueueStore = create<OfflineQueueState>((set, get) => ({
     try {
       await indexedDBStorage.addToQueue(queuedOp);
       set((state) => ({ queue: [...state.queue, queuedOp] }));
-    } catch (error: any) {
+    } catch (error) {
       logError(error, {
         component: 'useOfflineQueueStore',
         action: 'addToQueue',
@@ -55,7 +55,7 @@ export const useOfflineQueueStore = create<OfflineQueueState>((set, get) => ({
     try {
       await indexedDBStorage.removeFromQueue(id);
       set((state) => ({ queue: state.queue.filter((op) => op.id !== id) }));
-    } catch (error: any) {
+    } catch (error) {
       logError(error, {
         component: 'useOfflineQueueStore',
         action: 'removeFromQueue',
@@ -70,7 +70,7 @@ export const useOfflineQueueStore = create<OfflineQueueState>((set, get) => ({
       set((state) => ({
         queue: state.queue.map((op) => (op.id === operation.id ? operation : op)),
       }));
-    } catch (error: any) {
+    } catch (error) {
       logError(error, {
         component: 'useOfflineQueueStore',
         action: 'updateQueueItem',
@@ -83,7 +83,7 @@ export const useOfflineQueueStore = create<OfflineQueueState>((set, get) => ({
     try {
       await indexedDBStorage.clearQueue();
       set({ queue: [] });
-    } catch (error: any) {
+    } catch (error) {
       logError(error, {
         component: 'useOfflineQueueStore',
         action: 'clearQueue'
@@ -93,4 +93,3 @@ export const useOfflineQueueStore = create<OfflineQueueState>((set, get) => ({
 
   setProcessing: (isProcessing) => set({ isProcessing }),
 }));
-

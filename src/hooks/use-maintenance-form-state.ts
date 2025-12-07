@@ -1,11 +1,40 @@
 import { useEffect, useCallback } from 'react';
 import type { MaintenanceVisit } from '@/lib/types';
+import type { UseFormReset } from 'react-hook-form';
 import { parseDateSafely, formatDateForForm } from '@/lib/date-utils';
 
+/**
+ * Form values type for the maintenance visit form
+ */
+export interface MaintenanceFormValues {
+  actualArrivalDate: Date | null;
+  scheduledDate: string;
+  delayDays: number;
+  delayReason: string;
+  isSignificantDelay: boolean;
+  resolutionDate: Date | null;
+  technicianName: string;
+  baristaRecommendations: string;
+  overallReport: string;
+  problemOccurred: boolean;
+  problemReasons: Array<{ reason: string }>;
+  resolutionStatus: string | undefined;
+  nonResolutionReason: string;
+  partialResolutionNotes: string;
+  partsChanged: boolean;
+  spareParts: Array<{ name?: string; cost?: number; paidBy?: string }>;
+  services: Array<{ name?: string; cost?: number; paidBy?: string }>;
+  reportSignedBy: string;
+  supervisorWitness: string;
+}
+
+/**
+ * Hook to manage maintenance form state synchronization with visit data
+ */
 export function useMaintenanceFormState(
   visit: MaintenanceVisit | null,
   isOpen: boolean,
-  reset: any
+  reset: UseFormReset<MaintenanceFormValues>
 ) {
   const resetForm = useCallback(() => {
     reset({

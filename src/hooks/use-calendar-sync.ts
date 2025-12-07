@@ -4,6 +4,7 @@ import { useMaintenanceStore } from '@/store/use-maintenance-store';
 import { calendarSyncService } from '@/services/calendar-sync-service';
 import { useToast } from '@/hooks/use-toast';
 import { isToday, isFuture } from 'date-fns';
+import { logger } from '@/lib/logger';
 
 export function useCalendarSync(enableBackgroundSync = false) {
   const { visits } = useOrderStore();
@@ -42,10 +43,10 @@ export function useCalendarSync(enableBackgroundSync = false) {
       const result = await calendarSyncService.syncAll(relevantVisits, relevantMaintenance);
       
       if (result.success && result.syncedCount !== undefined && result.syncedCount > 0) {
-        console.log(`Synced ${result.syncedCount} visits to calendar`);
+        logger.debug(`Synced ${result.syncedCount} visits to calendar`, { component: 'useCalendarSync', action: 'triggerSync' });
       }
     } catch (error) {
-      console.error('Auto-sync failed', error);
+      logger.error(error, { component: 'useCalendarSync', action: 'triggerSync' });
     } finally {
       setIsSyncing(false);
     }

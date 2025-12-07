@@ -13,6 +13,7 @@
     "typecheck": "node --max-old-space-size=8192 ./node_modules/typescript/bin/tsc --noEmit",
     "test": "vitest",
     "test:e2e": "playwright test",
+    "ci": "npm run lint && npm run test -- --run && npm run typecheck && npm run build",
     "prepare": "husky"
   },
   "dependencies": {
@@ -79,6 +80,7 @@
     "tailwind-merge": "^2.4.0",
     "tailwindcss-animate": "^1.0.7",
     "tough-cookie": "4.1.4",
+    "twilio": "^6.0.0",
     "use-debounce": "^10.0.3",
     "xlsx": "^0.18.5",
     "zod": "^3.23.8",

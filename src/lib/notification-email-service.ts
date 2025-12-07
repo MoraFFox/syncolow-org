@@ -2,11 +2,22 @@ import type { Notification } from './types';
 import { format } from 'date-fns';
 import { supabase } from '@/lib/supabase';
 import { logError } from '@/lib/error-logger';
+import { logger } from '@/lib/logger';
 
 interface EmailTemplate {
   subject: string;
   html: string;
   text: string;
+}
+
+/**
+ * Supported metadata keys for email notifications
+ */
+interface EmailMetadata {
+  amount?: number;
+  daysUntil?: number;
+  clientName?: string;
+  orderCount?: number;
 }
 
 /**
@@ -128,7 +139,7 @@ export class NotificationEmailService {
   /**
    * Generate metadata HTML section
    */
-  private static generateMetadataHTML(metadata: Record<string, any>): string {
+  private static generateMetadataHTML(metadata: EmailMetadata): string {
     const items: string[] = [];
 
     if (metadata.amount) {
@@ -320,7 +331,7 @@ export async function sendEmailNotification(
 
     if (error) throw error;
 
-    console.log('Email notification sent:', { to, subject: template.subject });
+    logger.debug('Email notification sent', { component: 'NotificationEmailService', action: 'sendEmailNotification', to, subject: template.subject });
   } catch (error: any) {
     logError(error, {
       component: 'NotificationEmailService',
@@ -352,7 +363,7 @@ export async function sendDailyDigest(
 
     if (error) throw error;
 
-    console.log('Daily digest sent:', { to, subject: template.subject, count: notifications.length });
+    logger.debug('Daily digest sent', { component: 'NotificationEmailService', action: 'sendDailyDigest', to, subject: template.subject, count: notifications.length });
   } catch (error: any) {
     logError(error, {
       component: 'NotificationEmailService',

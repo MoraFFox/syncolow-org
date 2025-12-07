@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from 'react';
+import { logger } from '@/lib/logger';
 
 export default function GlobalError({
   error,
@@ -10,22 +11,25 @@ export default function GlobalError({
   reset: () => void;
 }) {
   useEffect(() => {
-    console.error('Global error:', error);
+    logger.error(error, {
+      component: 'GlobalErrorBoundary',
+      digest: error.digest,
+    });
   }, [error]);
 
   return (
     <html>
       <body>
-        <div style={{ 
-          display: 'flex', 
-          alignItems: 'center', 
-          justifyContent: 'center', 
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
           minHeight: '100vh',
           padding: '1rem',
           fontFamily: 'system-ui, sans-serif'
         }}>
-          <div style={{ 
-            maxWidth: '500px', 
+          <div style={{
+            maxWidth: '500px',
             width: '100%',
             padding: '2rem',
             border: '1px solid #e5e7eb',
@@ -37,9 +41,9 @@ export default function GlobalError({
             <p style={{ color: '#6b7280', marginBottom: '1rem' }}>
               A critical error occurred. Please refresh the page.
             </p>
-            <div style={{ 
-              padding: '1rem', 
-              backgroundColor: '#f3f4f6', 
+            <div style={{
+              padding: '1rem',
+              backgroundColor: '#f3f4f6',
               borderRadius: '0.375rem',
               marginBottom: '1rem',
               fontSize: '0.875rem'

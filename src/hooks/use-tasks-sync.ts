@@ -4,6 +4,7 @@ import { useMaintenanceStore } from '@/store/use-maintenance-store';
 import { tasksSyncService } from '@/services/tasks-sync-service';
 import { useToast } from '@/hooks/use-toast';
 import { isToday, isFuture } from 'date-fns';
+import { logger } from '@/lib/logger';
 
 export function useTasksSync(enableBackgroundSync = false) {
   const { visits, updateVisitStatus, deleteVisit } = useOrderStore(); 
@@ -58,12 +59,12 @@ export function useTasksSync(enableBackgroundSync = false) {
       
       if (result.success) {
         if (result.syncedCount !== undefined && result.syncedCount > 0) {
-            console.log(`Synced ${result.syncedCount} tasks`);
+            logger.debug(`Synced ${result.syncedCount} tasks`, { component: 'useTasksSync', action: 'triggerSync' });
         }
         
         // Handle completed tasks
         if (result.completedVisits && result.completedVisits.length > 0) {
-            console.log('Marking visits as completed:', result.completedVisits);
+            logger.debug('Marking visits as completed', { component: 'useTasksSync', action: 'handleCompletedVisits', visitIds: result.completedVisits });
             
             result.completedVisits.forEach(id => {
                  const isSalesVisit = visits.some(v => v.id === id);
@@ -71,10 +72,10 @@ export function useTasksSync(enableBackgroundSync = false) {
 
                  if (isSalesVisit) {
                      updateVisitStatus(id, 'Completed');
-                     console.log(`Sales Visit ${id} marked completed`);
+                     logger.debug(`Sales Visit ${id} marked completed`, { component: 'useTasksSync', action: 'markCompleted' });
                  } else if (isMaintenanceVisit) {
                      updateMaintenanceVisitStatus(id, 'Completed');
-                     console.log(`Maintenance Visit ${id} marked completed`);
+                     logger.debug(`Maintenance Visit ${id} marked completed`, { component: 'useTasksSync', action: 'markCompleted' });
                  }
             });
             
@@ -86,7 +87,7 @@ export function useTasksSync(enableBackgroundSync = false) {
 
         // Handle deleted tasks
         if (result.deletedVisits && result.deletedVisits.length > 0) {
-            console.log('Deleting visits removed from Google Tasks:', result.deletedVisits);
+            logger.debug('Deleting visits removed from Google Tasks', { component: 'useTasksSync', action: 'handleDeletedVisits', visitIds: result.deletedVisits });
             
             result.deletedVisits.forEach(id => {
                  const isSalesVisit = visits.some(v => v.id === id);
@@ -94,10 +95,10 @@ export function useTasksSync(enableBackgroundSync = false) {
 
                  if (isSalesVisit) {
                      deleteVisit(id);
-                     console.log(`Sales Visit ${id} deleted`);
+                     logger.debug(`Sales Visit ${id} deleted`, { component: 'useTasksSync', action: 'deleteVisit' });
                  } else if (isMaintenanceVisit) {
                      deleteMaintenanceVisit(id);
-                     console.log(`Maintenance Visit ${id} deleted`);
+                     logger.debug(`Maintenance Visit ${id} deleted`, { component: 'useTasksSync', action: 'deleteVisit' });
                  }
             });
 
@@ -111,7 +112,7 @@ export function useTasksSync(enableBackgroundSync = false) {
           setIsConnected(false);
       }
     } catch (error) {
-      console.error('Auto-sync failed', error);
+      logger.error(error, { component: 'useTasksSync', action: 'triggerSync' });
     } finally {
       setIsSyncing(false);
     }

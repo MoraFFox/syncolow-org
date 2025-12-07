@@ -1,3 +1,20 @@
+import { logger } from '@/lib/logger';
+
+/**
+ * Common interface for visits that can be synced to Google Tasks.
+ * Supports both regular VisitCall and MaintenanceVisit entities.
+ */
+export interface SyncVisit {
+  id: string;
+  date?: string | Date;
+  address?: string;
+  location?: string;
+  clientName?: string;
+  companyName?: string;
+  outcome?: string;
+  maintenanceNotes?: string;
+}
+
 interface SyncMap {
   [visitId: string]: {
     taskId: string;
@@ -40,12 +57,12 @@ export const tasksSyncService = {
       const data = await res.json();
       return data.connected;
     } catch (error) {
-      console.error('Failed to check tasks status', error);
+      logger.error(error, { component: 'TasksSyncService', action: 'checkConnectionStatus' });
       return false;
     }
   },
 
-  generateHash(visit: any): string {
+  generateHash(visit: SyncVisit): string {
     const data = {
       date: visit.date,
       address: visit.address || visit.location,
@@ -55,7 +72,7 @@ export const tasksSyncService = {
     return JSON.stringify(data);
   },
 
-  async syncVisit(visit: any, type: 'Visit' | 'Maintenance' = 'Visit'): Promise<{ taskId: string } | null> {
+  async syncVisit(visit: SyncVisit, type: 'Visit' | 'Maintenance' = 'Visit'): Promise<{ taskId: string } | null> {
     const syncMap = this.getSyncMap();
     const syncData = syncMap[visit.id];
     const currentHash = this.generateHash(visit);
@@ -74,7 +91,7 @@ export const tasksSyncService = {
           return { taskId: syncData.taskId };
         }
 
-        console.log(`Updating task for visit ${visit.id}`);
+        logger.debug(`Updating task for visit ${visit.id}`, { component: 'TasksSyncService', action: 'syncVisit' });
         const res = await fetch('/api/google-tasks/sync', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -114,12 +131,12 @@ export const tasksSyncService = {
       }
       return null;
     } catch (error) {
-      console.error('Failed to sync task', error);
+      logger.error(error, { component: 'TasksSyncService', action: 'syncVisit', visitId: visit.id });
       return null;
     }
   },
 
-  async syncAll(visits: any[], maintenanceVisits: any[]) {
+  async syncAll(visits: SyncVisit[], maintenanceVisits: SyncVisit[]) {
     // We assume the caller has checked connection status or we handle errors gracefully
     // const connected = await this.checkConnectionStatus(); 
     // if (!connected) return { success: false, error: 'Not connected' };
@@ -190,7 +207,7 @@ export const tasksSyncService = {
                 }
             }
         } catch (e) {
-            console.error("Failed to check batch completion/deletion", e);
+            logger.error(e, { component: 'TasksSyncService', action: 'syncAll-batchCheck' });
         }
     }
 

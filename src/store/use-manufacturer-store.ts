@@ -5,6 +5,7 @@ import { Manufacturer, Product } from '@/lib/types';
 import { storageService } from '@/services/storage-service';
 import { logError, logSupabaseError } from '@/lib/error-logger';
 import { drilldownCacheInvalidator } from '@/lib/cache/drilldown-cache-invalidator';
+import { logger } from '@/lib/logger';
 
 interface ManufacturerState {
   manufacturers: Manufacturer[];
@@ -127,7 +128,7 @@ export const useManufacturerStore = create<ManufacturerState & ManufacturerActio
     try {
       drilldownCacheInvalidator.invalidateAllPreviews('product');
     } catch (e) {
-      console.error('Failed to invalidate drilldown cache:', e);
+      logger.error(e, { component: 'useManufacturerStore', action: 'invalidateDrilldownCache', manufacturerId: id });
     }
   },
 
@@ -142,7 +143,7 @@ export const useManufacturerStore = create<ManufacturerState & ManufacturerActio
       try {
         drilldownCacheInvalidator.invalidateAllPreviews('product');
       } catch (e) {
-        console.error('Failed to invalidate drilldown cache:', e);
+        logger.error(e, { component: 'useManufacturerStore', action: 'invalidateDrilldownCache', manufacturerId: id });
       }
     } catch (error: any) {
       logError(error, {

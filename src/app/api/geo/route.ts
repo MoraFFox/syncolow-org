@@ -1,5 +1,5 @@
-
 import { NextRequest, NextResponse } from 'next/server';
+import { logger } from '@/lib/logger';
 
 const GOOGLE_GEOCODING_API_KEY = process.env.GOOGLE_GEOCODING_API_KEY;
 
@@ -31,7 +31,7 @@ export async function GET(request: NextRequest) {
         return NextResponse.json({ error: 'Address not found', details: data.status }, { status: 404 });
       }
     } catch (error) {
-      console.error('Geocoding error:', error);
+      logger.error(error, { component: 'GeoAPI', action: 'geocode', address });
       return NextResponse.json({ error: 'Geocoding failed' }, { status: 500 });
     }
   } else if (lat && lng) {
@@ -50,7 +50,7 @@ export async function GET(request: NextRequest) {
             return NextResponse.json({ error: 'Location not found', details: data.status }, { status: 404 });
         }
     } catch (error) {
-        console.error('Reverse geocoding error:', error);
+        logger.error(error, { component: 'GeoAPI', action: 'reverseGeocode', lat, lng });
         return NextResponse.json({ error: 'Reverse geocoding failed' }, { status: 500 });
     }
   }

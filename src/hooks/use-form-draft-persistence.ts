@@ -1,25 +1,30 @@
 import { useEffect } from 'react';
+import type { UseFormReturn, FieldValues } from 'react-hook-form';
 
-export function useFormDraftPersistence(
+/**
+ * Hook to handle form draft persistence to session storage
+ * Provides auto-save on change and restoration on mount
+ */
+export function useFormDraftPersistence<T extends FieldValues>(
   storageKey: string,
   isOpen: boolean,
-  methods: any
+  methods: UseFormReturn<T>
 ) {
   useEffect(() => {
     const savedData = sessionStorage.getItem(storageKey);
     if (savedData && isOpen) {
       try {
-        const parsedData = JSON.parse(savedData);
+        const parsedData = JSON.parse(savedData) as T;
         methods.reset(parsedData);
-      } catch (e) {
-        // Failed to restore draft
+      } catch {
+        // Failed to restore draft - invalid JSON or schema mismatch
       }
     }
   }, [isOpen, methods, storageKey]);
 
   useEffect(() => {
-    const subscription = methods.watch((data: any) => {
-      if (isOpen) {
+    const subscription = methods.watch((data) => {
+      if (isOpen && data) {
         sessionStorage.setItem(storageKey, JSON.stringify(data));
       }
     });

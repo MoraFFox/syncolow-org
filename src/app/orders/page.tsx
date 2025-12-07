@@ -37,6 +37,7 @@ import { OrderActions } from './_components/order-actions';
 import { KanbanBoard } from './_components/kanban-board';
 import { AdvancedSearchDialog } from './_components/advanced-search-dialog';
 import { searchOrders, type OrderSearchFilters } from '@/lib/advanced-search';
+import { ErrorBoundary } from '@/components/error-boundary';
 
 function OrdersPageContent() {
   const router = useRouter();
@@ -46,10 +47,10 @@ function OrdersPageContent() {
   const { companies } = useCompanyStore();
   const { paginationLimit } = useSettingsStore();
   const [viewMode, setLocalViewMode] = useState<'list' | 'kanban'>('list');
-  
+
   const isMobile = useIsMobile();
   const { loading: authLoading } = useAuth();
-  
+
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
   const [isSearching, setIsSearching] = useState(false);
@@ -118,7 +119,7 @@ function OrdersPageContent() {
   }, [searchParams]);
 
   const loading = storeLoading || authLoading;
-  
+
   const filteredOrders = useMemo(() => {
     let results = orders;
 
@@ -127,16 +128,16 @@ function OrdersPageContent() {
     } else if (!hasActiveSearch && !canUseServerFilter) {
       results = results.filter(order => {
         if (statusFilter === 'Cancelled') {
-            return order.status === 'Cancelled';
-        }
-        
-        if (order.status === 'Cancelled') {
-            return false;
+          return order.status === 'Cancelled';
         }
 
-        const statusMatch = statusFilter === 'All' 
-            || order.status === statusFilter 
-            || order.paymentStatus === statusFilter;
+        if (order.status === 'Cancelled') {
+          return false;
+        }
+
+        const statusMatch = statusFilter === 'All'
+          || order.status === statusFilter
+          || order.paymentStatus === statusFilter;
 
         return statusMatch;
       });
@@ -148,7 +149,7 @@ function OrdersPageContent() {
   const handleLoadMore = async () => {
     await loadMoreOrders(paginationLimit);
   };
-  
+
   const handleBulkUpdate = async (updateFn: (id: string, status: any) => Promise<void>, status: any) => {
     const promises = Array.from(selectedRowKeys).map(orderId => updateFn(orderId, status));
     await Promise.all(promises);
@@ -165,11 +166,11 @@ function OrdersPageContent() {
 
   const handleDeleteConfirm = async () => {
     if (orderToDelete) {
-        await deleteOrder(orderToDelete);
+      await deleteOrder(orderToDelete);
     }
     setOrderToDelete(null);
   }
-  
+
   const handleDeleteAllConfirm = async () => {
     try {
       await deleteAllOrders();
@@ -197,7 +198,7 @@ function OrdersPageContent() {
     setIsCancelDialogOpen(false);
     setOrderToCancel(null);
   };
-  
+
   const handlePrintTodaysOrders = () => {
     const todaysOrders = orders.filter(order => isToday(new Date(order.orderDate)));
     if (todaysOrders.length === 0) {
@@ -208,14 +209,14 @@ function OrdersPageContent() {
     const printContainer = document.createElement('div');
     printContainer.id = 'daily-orders-print-container';
     document.body.appendChild(printContainer);
-    
+
     const root = createRoot(printContainer);
     root.render(<DailyOrdersReport orders={todaysOrders} companies={companies} />);
 
     setTimeout(() => {
-        window.print();
-        root.unmount();
-        document.body.removeChild(printContainer);
+      window.print();
+      root.unmount();
+      document.body.removeChild(printContainer);
     }, 500);
   }
 
@@ -243,44 +244,44 @@ function OrdersPageContent() {
 
   return (
     <div className="flex flex-col gap-8">
-        <AlertDialog open={!!orderToDelete} onOpenChange={(open) => !open && setOrderToDelete(null)}>
-            <AlertDialogContent>
-                <AlertDialogHeader>
-                    <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                    <AlertDialogDescription>
-                        This action cannot be undone. This will permanently delete this order and all of its data from our servers.
-                    </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <AlertDialogAction onClick={handleDeleteConfirm}>Delete</AlertDialogAction>
-                </AlertDialogFooter>
-            </AlertDialogContent>
-        </AlertDialog>
+      <AlertDialog open={!!orderToDelete} onOpenChange={(open) => !open && setOrderToDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete this order and all of its data from our servers.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteConfirm}>Delete</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
-        <AlertDialog open={isDeleteAllAlertOpen} onOpenChange={setIsDeleteAllAlertOpen}>
-            <AlertDialogContent>
-                <AlertDialogHeader>
-                    <AlertDialogTitle>Delete All Orders?</AlertDialogTitle>
-                    <AlertDialogDescription>
-                        This will permanently delete all orders in the database. This action cannot be undone.
-                    </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <AlertDialogAction onClick={handleDeleteAllConfirm} className='bg-red-500/10 text-red-800 hover:bg-red-600/80 '>Delete All</AlertDialogAction>
-                </AlertDialogFooter>
-            </AlertDialogContent>
-        </AlertDialog>
+      <AlertDialog open={isDeleteAllAlertOpen} onOpenChange={setIsDeleteAllAlertOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete All Orders?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will permanently delete all orders in the database. This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteAllConfirm} className='bg-red-500/10 text-red-800 hover:bg-red-600/80 '>Delete All</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
-        <CancellationDialog
-            isOpen={isCancelDialogOpen}
-            onOpenChange={setIsCancelDialogOpen}
-            order={orderToCancel}
-            onSubmit={handleCancelSubmit}
-        />
-        
-      <OrderActions 
+      <CancellationDialog
+        isOpen={isCancelDialogOpen}
+        onOpenChange={setIsCancelDialogOpen}
+        order={orderToCancel}
+        onSubmit={handleCancelSubmit}
+      />
+
+      <OrderActions
         onSearch={handleSearch}
         onFilter={setStatusFilter}
         onOpenOrderForm={() => setIsOrderFormOpen(true)}
@@ -301,17 +302,18 @@ function OrdersPageContent() {
         isSearching={isLoadingSearch}
       />
 
-       <OrderForm isOpen={isOrderFormOpen} onOpenChange={setIsOrderFormOpen} />
-       <CsvImporterDialog isOpen={isImportDialogOpen} onOpenChange={setIsImportDialogOpen} entityType="order" fileType={importFileType} />
-       <AdvancedSearchDialog
-         isOpen={isAdvancedSearchOpen}
-         onOpenChange={setIsAdvancedSearchOpen}
-         onApplyFilters={setAdvancedFilters}
-         currentFilters={advancedFilters}
-       />
-      
+      <OrderForm isOpen={isOrderFormOpen} onOpenChange={setIsOrderFormOpen} />
+      <CsvImporterDialog isOpen={isImportDialogOpen} onOpenChange={setIsImportDialogOpen} entityType="order" fileType={importFileType} />
+      <AdvancedSearchDialog
+        isOpen={isAdvancedSearchOpen}
+        onOpenChange={setIsAdvancedSearchOpen}
+        onApplyFilters={setAdvancedFilters}
+        currentFilters={advancedFilters}
+      />
+
       {viewMode === 'list' || viewMode === 'kanban' ? (
         <>
+          <ErrorBoundary>
             <OrderList
               orders={filteredOrders}
               companies={companies}
@@ -322,26 +324,29 @@ function OrdersPageContent() {
               onCancelOrder={handleOpenCancelDialog}
               onDeleteOrder={setOrderToDelete}
             />
-          
-            {ordersHasMore && !hasAdvancedFilters && !hasActiveSearch && (
-              <div className="mt-4 flex justify-center">
-                <Button onClick={handleLoadMore} disabled={ordersLoading}>
-                  {ordersLoading ? 'Loading...' : 'Load More'}
-                </Button>
-              </div>
-            )}
+          </ErrorBoundary>
+
+          {ordersHasMore && !hasAdvancedFilters && !hasActiveSearch && (
+            <div className="mt-4 flex justify-center">
+              <Button onClick={handleLoadMore} disabled={ordersLoading}>
+                {ordersLoading ? 'Loading...' : 'Load More'}
+              </Button>
+            </div>
+          )}
         </>
       ) : (
-        <KanbanBoard orders={filteredOrders} onStatusChange={updateOrderStatus} />
+        <ErrorBoundary>
+          <KanbanBoard orders={filteredOrders} onStatusChange={updateOrderStatus} />
+        </ErrorBoundary>
       )}
     </div>
   );
 }
 
 export default function OrdersPage() {
-    return (
-        <Suspense fallback={<Loading />}>
-            <OrdersPageContent />
-        </Suspense>
-    )
+  return (
+    <Suspense fallback={<Loading />}>
+      <OrdersPageContent />
+    </Suspense>
+  )
 }

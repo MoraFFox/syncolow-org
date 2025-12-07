@@ -1,7 +1,7 @@
-
 import { NextRequest, NextResponse } from 'next/server';
 import { googleCalendarService } from '@/services/google-calendar-service';
 import { cookies } from 'next/headers';
+import { logger } from '@/lib/logger';
 
 export async function POST(request: NextRequest) {
   try {
@@ -23,7 +23,7 @@ export async function POST(request: NextRequest) {
     const result = await googleCalendarService.createEvent(tokens, event);
     return NextResponse.json({ success: true, eventId: result.data.id, link: result.data.htmlLink });
   } catch (error) {
-    console.error('Error creating calendar event:', error);
+    logger.error(error, { component: 'GoogleCalendarCreateEventAPI', action: 'POST' });
     return NextResponse.json({ error: 'Failed to create event' }, { status: 500 });
   }
 }

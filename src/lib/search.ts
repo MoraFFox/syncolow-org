@@ -1,5 +1,6 @@
 
 import { useOrderStore } from '@/store/use-order-store';
+import { useProductsStore } from '@/store/use-products-store';
 import { useCompanyStore } from '@/store/use-company-store';
 import { useMaintenanceStore } from '@/store/use-maintenance-store';
 import { useMemo } from 'react';
@@ -14,50 +15,131 @@ export type SearchResult = {
   score?: number;
 };
 
-const fuseOptions: IFuseOptions<any> = {
+/**
+ * Fuse.js options for Company search
+ */
+const companyFuseOptions: IFuseOptions<Company> = {
   includeScore: true,
   includeMatches: true,
   threshold: 0.3,
-  keys: ['name', 'title', 'id', 'message', 'companyName', 'branchName', 'technicianName']
+  keys: ['name']
+};
+
+/**
+ * Fuse.js options for Product search
+ */
+const productFuseOptions: IFuseOptions<Product> = {
+  includeScore: true,
+  includeMatches: true,
+  threshold: 0.3,
+  keys: ['name']
+};
+
+/**
+ * Fuse.js options for Order search
+ */
+const orderFuseOptions: IFuseOptions<Order> = {
+  includeScore: true,
+  includeMatches: true,
+  threshold: 0.3,
+  keys: ['id', 'companyName', 'branchName']
+};
+
+/**
+ * Fuse.js options for MaintenanceVisit search
+ */
+const maintenanceFuseOptions: IFuseOptions<MaintenanceVisit> = {
+  includeScore: true,
+  includeMatches: true,
+  threshold: 0.3,
+  keys: ['branchName', 'maintenanceNotes', 'technicianName']
+};
+
+/**
+ * Fuse.js options for Feedback search
+ */
+const feedbackFuseOptions: IFuseOptions<Feedback> = {
+  includeScore: true,
+  includeMatches: true,
+  threshold: 0.3,
+  keys: ['message']
 };
 
 export function useGlobalSearch(query: string) {
-  const { products, orders } = useOrderStore();
+  const { orders } = useOrderStore();
+  const { products } = useProductsStore();
   const { companies, feedback } = useCompanyStore();
   const { maintenanceVisits } = useMaintenanceStore();
 
   const searchResults = useMemo(() => {
     if (!query) return [];
 
-    const fuseInstances = {
-        client: new Fuse(companies.filter(Boolean), { ...fuseOptions, keys: ['name'] }),
-        product: new Fuse(products.filter(Boolean), { ...fuseOptions, keys: ['name'] }),
-        order: new Fuse(orders.filter(Boolean), { ...fuseOptions, keys: ['id', 'companyName', 'branchName'] }),
-        maintenance: new Fuse(maintenanceVisits.filter(Boolean), { ...fuseOptions, keys: ['branchName', 'maintenanceNotes', 'technicianName'] }),
-        feedback: new Fuse(feedback.filter(Boolean), { ...fuseOptions, keys: ['message'] }),
-    };
+    // Create typed Fuse instances
+    const clientFuse = new Fuse<Company>(companies.filter(Boolean), companyFuseOptions);
+    const productFuse = new Fuse<Product>(products.filter(Boolean), productFuseOptions);
+    const orderFuse = new Fuse<Order>(orders.filter(Boolean), orderFuseOptions);
+    const maintenanceFuse = new Fuse<MaintenanceVisit>(maintenanceVisits.filter(Boolean), maintenanceFuseOptions);
+    const feedbackFuse = new Fuse<Feedback>(feedback.filter(Boolean), feedbackFuseOptions);
 
     const results: SearchResult[] = [];
 
-    fuseInstances.client.search(query).forEach((result: FuseResult<any>) => {
-        results.push({ type: 'client', id: result.item.id, title: result.item.name, matches: result.matches, score: result.score });
+    // Search clients (companies)
+    clientFuse.search(query).forEach((result: FuseResult<Company>) => {
+      results.push({ 
+        type: 'client', 
+        id: result.item.id, 
+        title: result.item.name || 'Unknown Company', 
+        matches: result.matches, 
+        score: result.score 
+      });
     });
 
-    fuseInstances.product.search(query).forEach((result: FuseResult<any>) => {
-        results.push({ type: 'product', id: result.item.id, title: result.item.name, matches: result.matches, score: result.score });
+    // Search products
+    productFuse.search(query).forEach((result: FuseResult<Product>) => {
+      results.push({ 
+        type: 'product', 
+        id: result.item.id, 
+        title: result.item.name || 'Unknown Product', 
+        matches: result.matches, 
+        score: result.score 
+      });
     });
 
-    fuseInstances.order.search(query).forEach((result: FuseResult<any>) => {
-        results.push({ type: 'order', id: result.item.id, title: `Order #${result.item.id.substring(0,7)} for ${result.item.companyName}`, matches: result.matches, score: result.score });
+    // Search orders
+    orderFuse.search(query).forEach((result: FuseResult<Order>) => {
+      const orderId = result.item.id || '';
+      const companyName = result.item.companyName || 'Unknown';
+      results.push({ 
+        type: 'order', 
+        id: result.item.id, 
+        title: `Order #${orderId.substring(0, 7)} for ${companyName}`, 
+        matches: result.matches, 
+        score: result.score 
+      });
     });
 
-    fuseInstances.maintenance.search(query).forEach((result: FuseResult<any>) => {
-        results.push({ type: 'maintenance', id: result.item.id, title: `Visit for ${result.item.branchName}`, matches: result.matches, score: result.score });
+    // Search maintenance visits
+    maintenanceFuse.search(query).forEach((result: FuseResult<MaintenanceVisit>) => {
+      const branchName = result.item.branchName || 'Unknown Branch';
+      results.push({ 
+        type: 'maintenance', 
+        id: result.item.id, 
+        title: `Visit for ${branchName}`, 
+        matches: result.matches, 
+        score: result.score 
+      });
     });
     
-    fuseInstances.feedback.search(query).forEach((result: FuseResult<any>) => {
-        const clientName = companies.find(c => c.id === result.item.clientId)?.name || 'Unknown';
-        results.push({ type: 'feedback', id: result.item.id, title: `Feedback from ${clientName}`, matches: result.matches, score: result.score });
+    // Search feedback
+    feedbackFuse.search(query).forEach((result: FuseResult<Feedback>) => {
+      const clientName = companies.find(c => c.id === result.item.clientId)?.name || 'Unknown';
+      results.push({ 
+        type: 'feedback', 
+        id: result.item.id, 
+        title: `Feedback from ${clientName}`, 
+        matches: result.matches, 
+        score: result.score 
+      });
     });
 
     return results.sort((a, b) => (a.score || 1) - (b.score || 1));

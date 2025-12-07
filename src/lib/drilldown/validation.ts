@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { DrillKind, DrillPayloadMap } from "../drilldown-types";
+import { logger } from "@/lib/logger";
 
 // Helper to create optional string/number/boolean schemas
 const optionalString = z.string().optional();
@@ -135,17 +136,14 @@ export function validateDrillPayload<K extends DrillKind>(
 ): DrillPayloadMap[K] | null {
   const schema = drillPayloadSchemas[kind];
   if (!schema) {
-    console.warn(`No validation schema found for drill kind: ${kind}`);
+    logger.warn(`No validation schema found for drill kind: ${kind}`, { component: 'DrilldownValidation', action: 'validateDrillPayload', kind });
     return payload as DrillPayloadMap[K];
   }
 
   const result = schema.safeParse(payload);
 
   if (!result.success) {
-    console.warn(
-      `Invalid payload for drill kind "${kind}":`,
-      result.error.flatten()
-    );
+    logger.warn(`Invalid payload for drill kind "${kind}"`, { component: 'DrilldownValidation', action: 'validateDrillPayload', kind, errors: result.error.flatten() });
     return strict ? null : (payload as DrillPayloadMap[K]);
   }
 

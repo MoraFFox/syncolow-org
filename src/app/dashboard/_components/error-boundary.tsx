@@ -2,6 +2,7 @@
 
 import React from "react";
 import { Button } from "@/components/ui/button";
+import { logger } from "@/lib/logger";
 
 interface ErrorBoundaryProps {
   fallback?: React.ReactNode;
@@ -22,9 +23,11 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
 
   componentDidCatch(error: Error, info: React.ErrorInfo) {
     if (this.props.onError) this.props.onError(error, info);
-    if (process.env.NODE_ENV === "development") {
-      console.error(error);
-    }
+    logger.error(error, {
+      component: 'DashboardErrorBoundary',
+      action: 'componentDidCatch',
+      errorInfo: info.componentStack,
+    });
   }
 
   reset = () => {

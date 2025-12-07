@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { googleTasksService } from '@/services/google-tasks-service';
 import { cookies } from 'next/headers';
+import { logger } from '@/lib/logger';
 
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
@@ -23,7 +24,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.redirect(new URL('/settings?tasks_sync=success', request.url));
   } catch (error) {
-    console.error('Error exchanging code for tokens:', error);
+    logger.error(error, { component: 'GoogleTasksCallbackAPI', action: 'GET' });
     return NextResponse.json({ error: 'Failed to exchange code' }, { status: 500 });
   }
 }

@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { AlertTriangle, Home, RefreshCw } from 'lucide-react';
 import Link from 'next/link';
+import { logger } from '@/lib/logger';
 
 export default function Error({
   error,
@@ -14,7 +15,10 @@ export default function Error({
   reset: () => void;
 }) {
   useEffect(() => {
-    console.error('Route error:', error);
+    logger.error(error, {
+      component: 'RouteErrorBoundary',
+      digest: error.digest,
+    });
   }, [error]);
 
   return (

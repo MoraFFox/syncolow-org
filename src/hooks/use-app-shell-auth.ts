@@ -1,9 +1,13 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import type { User } from '@/lib/types';
 
+/**
+ * Hook to handle authentication-based routing in app shell
+ */
 export function useAppShellAuth(
   authLoading: boolean,
-  user: any,
+  user: User | null,
   pathname: string,
   isPublicRoute: boolean
 ) {

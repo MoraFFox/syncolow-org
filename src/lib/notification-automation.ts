@@ -11,6 +11,36 @@ export type AutomationAction =
   | 'SUSPEND_ORDERS'
   | 'SEND_SMS';
 
+/**
+ * Typed value for automation rule conditions
+ */
+export type ConditionValue = string | number | boolean;
+
+/**
+ * Context provided to automation rule processing
+ */
+export interface AutomationContext {
+  order?: Order;
+  company?: Company;
+  maintenanceVisit?: MaintenanceVisit;
+}
+
+/**
+ * Configuration for automation actions
+ */
+export interface ActionConfig {
+  template?: string;
+  to?: string;
+  priority?: string;
+  title?: string;
+  assignee?: string;
+  dueDate?: string;
+  newStatus?: string;
+  type?: string;
+  daysFromNow?: number;
+  reason?: string;
+}
+
 export interface AutomationRule {
   id: string;
   name: string;
@@ -20,12 +50,12 @@ export interface AutomationRule {
     conditions: Array<{
       field: string;
       operator: 'equals' | 'greater_than' | 'less_than' | 'contains';
-      value: any;
+      value: ConditionValue;
     }>;
   };
   actions: Array<{
     type: AutomationAction;
-    config: Record<string, any>;
+    config: ActionConfig;
     delay?: number; // minutes
   }>;
 }
@@ -178,7 +208,7 @@ export class NotificationAutomation {
   private static matchesRule(
     notification: Notification,
     rule: AutomationRule,
-    context?: any
+    context?: AutomationContext
   ): boolean {
     if (notification.type !== rule.trigger.notificationType) {
       return false;
@@ -193,32 +223,40 @@ export class NotificationAutomation {
   /**
    * Get field value from notification or context
    */
-  private static getFieldValue(notification: Notification, field: string, context?: any): any {
+  private static getFieldValue(notification: Notification, field: string, context?: AutomationContext): ConditionValue | undefined {
     const parts = field.split('.');
-    let value: any = notification;
+    let value: Record<string, unknown> = notification as unknown as Record<string, unknown>;
 
     for (const part of parts) {
-      value = value?.[part];
+      if (value && typeof value === 'object' && part in value) {
+        value = value[part] as Record<string, unknown>;
+      } else {
+        value = undefined as unknown as Record<string, unknown>;
+        break;
+      }
     }
 
     if (value === undefined && context) {
-      value = context[parts[0]]?.[parts[1]];
+      const contextObj = context as Record<string, Record<string, unknown>>;
+      value = contextObj[parts[0]]?.[parts[1]] as Record<string, unknown>;
     }
 
-    return value;
+    return value as unknown as ConditionValue | undefined;
   }
 
   /**
    * Evaluate condition
    */
-  private static evaluateCondition(value: any, operator: string, expected: any): boolean {
+  private static evaluateCondition(value: ConditionValue | undefined, operator: string, expected: ConditionValue): boolean {
+    if (value === undefined) return false;
+    
     switch (operator) {
       case 'equals':
         return value === expected;
       case 'greater_than':
-        return value > expected;
+        return typeof value === 'number' && typeof expected === 'number' && value > expected;
       case 'less_than':
-        return value < expected;
+        return typeof value === 'number' && typeof expected === 'number' && value < expected;
       case 'contains':
         return String(value).includes(String(expected));
       default:
@@ -232,7 +270,7 @@ export class NotificationAutomation {
   private static async executeRule(
     rule: AutomationRule,
     notification: Notification,
-    context?: any
+    context?: AutomationContext
   ): Promise<void> {
     logger.debug(`Executing automation rule: ${rule.name}`);
 
@@ -250,9 +288,9 @@ export class NotificationAutomation {
    * Execute single action
    */
   private static async executeAction(
-    action: { type: AutomationAction; config: Record<string, any> },
+    action: { type: AutomationAction; config: ActionConfig },
     notification: Notification,
-    context?: any
+    context?: AutomationContext
   ): Promise<void> {
     logger.debug(`Executing action: ${action.type}`, action.config);
 
@@ -281,24 +319,263 @@ export class NotificationAutomation {
     }
   }
 
-  private static async sendEmail(config: any, notification: Notification, context?: any): Promise<void> {
-    const { sendEmailNotification } = await import('./notification-email-service');
-    // TODO: Get recipient email based on config.to
-    const email = 'manager@company.com'; // Placeholder
-    await sendEmailNotification(email, notification);
+  /**
+   * Resolve recipient email based on role or context
+   */
+  private static async resolveRecipientEmail(
+    to: string,
+    context?: { order?: Order; company?: Company; maintenanceVisit?: MaintenanceVisit }
+  ): Promise<string | null> {
+    try {
+      // Import cache for caching of role lookups
+      const { universalCache } = await import('./cache/universal-cache');
+      const { CacheKeyFactory } = await import('./cache/key-factory');
+      
+      if (to === 'client') {
+        // Get email from company context
+        if (context?.company?.email) {
+          return context.company.email;
+        }
+        // If order context, try to look up company
+        if (context?.order?.companyId) {
+          const { supabaseAdmin } = await import('./supabase');
+          const { data: company } = await supabaseAdmin
+            .from('companies')
+            .select('email')
+            .eq('id', context.order.companyId)
+            .single();
+          return company?.email || null;
+        }
+        return null;
+      }
+
+      // For role-based recipients (manager, supervisor, admin)
+      // Map role names to actual user roles
+      const roleMap: Record<string, string> = {
+        'manager': 'Manager',
+        'supervisor': 'Admin',
+        'admin': 'Admin'
+      };
+      const targetRole = roleMap[to.toLowerCase()] || to;
+
+      // Use universalCache.get with a fetcher for proper caching
+      const cacheKey = CacheKeyFactory.detail('automation', `role-email-${targetRole}`);
+      
+      const email = await universalCache.get<string | null>(
+        cacheKey,
+        async () => {
+          // Query Supabase auth.users via admin API
+          const { supabaseAdmin } = await import('./supabase');
+          const { data: users, error } = await supabaseAdmin.auth.admin.listUsers();
+          
+          if (error || !users?.users) {
+            logger.warn('Failed to list users for email resolution', { error });
+            return null;
+          }
+
+          // Find first user with matching role
+          const user = users.users.find(
+            (u: { user_metadata?: { role?: string }; email?: string }) => u.user_metadata?.role === targetRole
+          );
+
+          if (!user?.email) {
+            logger.warn('No user found with role', { role: targetRole });
+            return null;
+          }
+
+          return user.email;
+        },
+        { staleTime: 5 * 60 * 1000 } // Cache for 5 minutes
+      );
+
+      return email;
+    } catch (error) {
+      logger.error(error, { component: 'NotificationAutomation', action: 'resolveRecipientEmail' });
+      return null;
+    }
   }
 
-  private static async createTask(config: any, notification: Notification): Promise<void> {
-    // TODO: Integrate with task management system
-    logger.debug('Task created:', config.title);
+  /**
+   * Resolve user by role (for SMS phone number resolution)
+   */
+  private static async resolveUserByRole(
+    role: string
+  ): Promise<{ email?: string; phone?: string } | null> {
+    try {
+      const { supabaseAdmin } = await import('./supabase');
+      const { data: users } = await supabaseAdmin.auth.admin.listUsers();
+      
+      if (!users?.users) return null;
+
+      const user = users.users.find(
+        (u: any) => u.user_metadata?.role === role
+      );
+
+      if (!user) return null;
+
+      return {
+        email: user.email || undefined,
+        phone: user.user_metadata?.phone || user.phone || undefined
+      };
+    } catch (error) {
+      logger.error(error, { component: 'NotificationAutomation', action: 'resolveUserByRole' });
+      return null;
+    }
   }
 
-  private static async updateStatus(config: any, context?: any): Promise<void> {
-    // TODO: Update order/maintenance status
-    logger.debug('Status updated:', config);
+  private static async sendEmail(config: ActionConfig, notification: Notification, context?: AutomationContext): Promise<void> {
+    try {
+      const { sendEmailNotification } = await import('./notification-email-service');
+      
+      const recipientEmail = config.to ? await this.resolveRecipientEmail(config.to, context) : null;
+      
+      if (!recipientEmail) {
+        logger.warn('No recipient found for email automation', { to: config.to });
+        return;
+      }
+
+      // If a specific template is requested, we could customize the notification
+      // For now, send with the standard template
+      const notificationWithTemplate = config.template ? {
+        ...notification,
+        metadata: { 
+          ...notification.metadata, 
+          automationTemplate: config.template 
+        }
+      } : notification;
+
+      await sendEmailNotification(recipientEmail, notificationWithTemplate);
+      
+      logger.debug('Automation email sent', { 
+        to: recipientEmail, 
+        template: config.template,
+        notificationId: notification.id 
+      });
+    } catch (error) {
+      logger.error(error, { 
+        component: 'NotificationAutomation', 
+        action: 'sendEmail',
+        config 
+      });
+    }
   }
 
-  private static async escalate(config: any, notification: Notification): Promise<void> {
+  private static async createTask(config: ActionConfig, notification: Notification): Promise<void> {
+    try {
+      // Call the automation API route to create task with server-side token access
+      const baseUrl = typeof window !== 'undefined' 
+        ? window.location.origin 
+        : process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:9002';
+
+      const response = await fetch(`${baseUrl}/api/automation/create-task`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: config.title || notification.title,
+          assignee: config.assignee,
+          priority: config.priority,
+          notificationId: notification.id,
+          notes: notification.message,
+          dueDate: config.dueDate
+        })
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        logger.warn('Task creation failed', { error, config });
+        return;
+      }
+
+      const result = await response.json();
+      logger.debug('Automation task created', { 
+        taskId: result.taskId, 
+        title: config.title 
+      });
+    } catch (error) {
+      logger.error(error, { 
+        component: 'NotificationAutomation', 
+        action: 'createTask',
+        config 
+      });
+    }
+  }
+
+  private static async updateStatus(config: ActionConfig, context?: AutomationContext): Promise<void> {
+    try {
+      const { supabase } = await import('./supabase');
+      const { drilldownCacheInvalidator } = await import('./cache/drilldown-cache-invalidator');
+      const { universalCache } = await import('./cache/universal-cache');
+
+      if (context?.order && config.newStatus) {
+        // Validate status is valid for Order type
+        const validOrderStatuses = ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled', 'Delivery Failed'];
+        if (!validOrderStatuses.includes(config.newStatus)) {
+          logger.warn('Invalid order status', { newStatus: config.newStatus });
+          return;
+        }
+
+        const { error } = await supabase
+          .from('orders')
+          .update({ 
+            status: config.newStatus,
+            statusHistory: [
+              ...(context.order.statusHistory || []),
+              { status: config.newStatus, timestamp: new Date().toISOString() }
+            ]
+          })
+          .eq('id', context.order.id);
+
+        if (error) {
+          logger.error(error, { component: 'NotificationAutomation', action: 'updateStatus', orderId: context.order.id });
+          return;
+        }
+
+        // Invalidate caches using namespace tag
+        await universalCache.invalidate('orders');
+        await drilldownCacheInvalidator.invalidatePreview('order', context.order.id);
+        
+        logger.debug('Order status updated via automation', { 
+          orderId: context.order.id, 
+          status: config.newStatus 
+        });
+      } else if (context?.maintenanceVisit && config.newStatus) {
+        // Validate status is valid for MaintenanceVisit type
+        const validMaintenanceStatuses = ['Scheduled', 'In Progress', 'Completed', 'Cancelled', 'Follow-up Required', 'Waiting for Parts'];
+        if (!validMaintenanceStatuses.includes(config.newStatus)) {
+          logger.warn('Invalid maintenance status', { newStatus: config.newStatus });
+          return;
+        }
+
+        const { error } = await supabase
+          .from('maintenance')
+          .update({ status: config.newStatus })
+          .eq('id', context.maintenanceVisit.id);
+
+        if (error) {
+          logger.error(error, { component: 'NotificationAutomation', action: 'updateStatus', visitId: context.maintenanceVisit.id });
+          return;
+        }
+
+        // Invalidate caches using namespace tag
+        await universalCache.invalidate('maintenance');
+        
+        logger.debug('Maintenance status updated via automation', { 
+          visitId: context.maintenanceVisit.id, 
+          status: config.newStatus 
+        });
+      } else {
+        logger.warn('No valid context for status update', { config });
+      }
+    } catch (error) {
+      logger.error(error, { 
+        component: 'NotificationAutomation', 
+        action: 'updateStatus',
+        config 
+      });
+    }
+  }
+
+  private static async escalate(config: ActionConfig, notification: Notification): Promise<void> {
     const { NotificationService } = await import('./notification-service');
     
     // Create escalated notification
@@ -310,19 +587,166 @@ export class NotificationAutomation {
     });
   }
 
-  private static async scheduleFollowUp(config: any, context?: any): Promise<void> {
-    // TODO: Schedule follow-up visit/call
-    logger.debug('Follow-up scheduled:', config);
+  private static async scheduleFollowUp(config: ActionConfig, context?: AutomationContext): Promise<void> {
+    try {
+      const { supabase } = await import('./supabase');
+
+      if (config.type === 'delivery_retry' && context?.order) {
+        // Reschedule delivery
+        const newDeliveryDate = addDays(new Date(), config.daysFromNow || 1);
+        
+        const { error } = await supabase
+          .from('orders')
+          .update({ 
+            deliveryDate: newDeliveryDate.toISOString(),
+            status: 'Pending' // Reset to pending for retry
+          })
+          .eq('id', context.order.id);
+
+        if (error) {
+          logger.error(error, { component: 'NotificationAutomation', action: 'scheduleFollowUp' });
+          return;
+        }
+
+        logger.debug('Delivery rescheduled via automation', { 
+          orderId: context.order.id, 
+          newDate: newDeliveryDate.toISOString() 
+        });
+      } else if (context?.maintenanceVisit) {
+        // Schedule follow-up maintenance visit
+        const scheduledDate = addDays(new Date(), config.daysFromNow || 3);
+        
+        const { error } = await supabase
+          .from('maintenance')
+          .insert({
+            branchId: context.maintenanceVisit.branchId,
+            companyId: context.maintenanceVisit.companyId,
+            branchName: context.maintenanceVisit.branchName,
+            companyName: context.maintenanceVisit.companyName,
+            scheduledDate: scheduledDate.toISOString(),
+            date: scheduledDate.toISOString(),
+            status: 'Scheduled',
+            visitType: 'customer_request',
+            technicianName: context.maintenanceVisit.technicianName || 'TBD',
+            maintenanceNotes: `Follow-up visit for ${context.maintenanceVisit.id}`,
+            rootVisitId: context.maintenanceVisit.id
+          });
+
+        if (error) {
+          logger.error(error, { component: 'NotificationAutomation', action: 'scheduleFollowUp' });
+          return;
+        }
+
+        logger.debug('Follow-up visit scheduled via automation', { 
+          rootVisitId: context.maintenanceVisit.id, 
+          scheduledDate: scheduledDate.toISOString() 
+        });
+      } else {
+        logger.warn('No valid context for scheduling follow-up', { config });
+      }
+    } catch (error) {
+      logger.error(error, { 
+        component: 'NotificationAutomation', 
+        action: 'scheduleFollowUp',
+        config 
+      });
+    }
   }
 
-  private static async suspendOrders(config: any, context?: any): Promise<void> {
-    // TODO: Suspend new orders for company
-    logger.debug('Orders suspended:', config.reason);
+  private static async suspendOrders(config: ActionConfig, context?: AutomationContext): Promise<void> {
+    try {
+      const { supabase } = await import('./supabase');
+      const { universalCache } = await import('./cache/universal-cache');
+
+      let companyId: string | null = null;
+
+      if (context?.company) {
+        companyId = context.company.id;
+      } else if (context?.order?.companyId) {
+        companyId = context.order.companyId;
+      }
+
+      if (!companyId) {
+        logger.warn('No company ID found for order suspension', { config });
+        return;
+      }
+
+      const { error } = await supabase
+        .from('companies')
+        .update({ 
+          is_suspended: true, 
+          suspension_reason: config.reason || 'Automated suspension'
+        })
+        .eq('id', companyId);
+
+      if (error) {
+        logger.error(error, { component: 'NotificationAutomation', action: 'suspendOrders' });
+        return;
+      }
+
+      // Invalidate company cache using namespace tag
+      await universalCache.invalidate('companies');
+
+      logger.debug('Company orders suspended via automation', { 
+        companyId, 
+        reason: config.reason 
+      });
+    } catch (error) {
+      logger.error(error, { 
+        component: 'NotificationAutomation', 
+        action: 'suspendOrders',
+        config 
+      });
+    }
   }
 
-  private static async sendSMS(config: any, notification: Notification): Promise<void> {
-    // TODO: Integrate with SMS service (Twilio, etc.)
-    logger.debug('SMS sent:', notification.title);
+  private static async sendSMS(config: ActionConfig, notification: Notification, context?: AutomationContext): Promise<void> {
+    try {
+      const { SMSService } = await import('./sms-service');
+
+      let phoneNumber: string | null = null;
+
+      // Resolve phone number based on recipient type
+      if (config.to === 'client' && context?.company) {
+        // Get first phone number from company contacts
+        const contact = context.company.contacts?.[0];
+        const rawPhone = contact?.phoneNumbers?.[0]?.number;
+        if (rawPhone) {
+          phoneNumber = SMSService.formatPhoneNumber(rawPhone);
+        }
+      } else if (config.to === 'manager' || config.to === 'supervisor') {
+        // Get phone from user metadata
+        const user = await this.resolveUserByRole(
+          config.to === 'manager' ? 'Manager' : 'Admin'
+        );
+        if (user?.phone) {
+          phoneNumber = SMSService.formatPhoneNumber(user.phone);
+        }
+      }
+
+      if (!phoneNumber) {
+        logger.warn('No phone number found for SMS automation', { to: config.to });
+        return;
+      }
+
+      // Build SMS message
+      const message = `SynergyFlow: ${notification.title}\n${notification.message}`;
+      
+      const success = await SMSService.sendSMS(phoneNumber, message);
+      
+      if (success) {
+        logger.debug('Automation SMS sent', { 
+          to: phoneNumber, 
+          notificationId: notification.id 
+        });
+      }
+    } catch (error) {
+      logger.error(error, { 
+        component: 'NotificationAutomation', 
+        action: 'sendSMS',
+        config 
+      });
+    }
   }
 
   /**

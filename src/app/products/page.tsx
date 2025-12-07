@@ -47,6 +47,7 @@ import { ManufacturerCard } from "./_components/manufacturer-card";
 import { ProductGrid } from "./_components/product-grid";
 import { ArrowLeft } from "lucide-react";
 import { DrillTarget } from '@/components/drilldown/drill-target';
+import { ErrorBoundary } from '@/components/error-boundary';
 
 type AddProductData = Omit<Product, "id" | "imageUrl"> & { image?: File };
 
@@ -93,7 +94,7 @@ function ProductsPageContent() {
     setIsLoadingMore(true);
     const initialCount = products.length;
     await loadRemainingProducts();
-    const newCount = useOrderStore.getState().products.length;
+    const newCount = useProductsStore.getState().products.length;
 
     if (newCount === initialCount) {
       setHasLoadedAll(true);
@@ -353,21 +354,25 @@ function ProductsPageContent() {
           <TabsContent value='overview' className='mt-4'>
             <div className="space-y-8">
               <div className="h-[600px] overflow-y-auto pr-2 border rounded-md p-4">
-                <ProductGrid 
-                  products={products} 
-                  onEdit={handleOpenForm}
-                  onDelete={handleDeleteClick}
-                  manufacturers={manufacturers}
-                />
+                <ErrorBoundary>
+                  <ProductGrid
+                    products={products}
+                    onEdit={handleOpenForm}
+                    onDelete={handleDeleteClick}
+                    manufacturers={manufacturers}
+                  />
+                </ErrorBoundary>
               </div>
-              
+
               <div className="pt-4 border-t">
                 <h2 className="text-2xl font-bold mb-4">Analytics Overview</h2>
-                <ProductsOverview
-                  products={products}
-                  categories={categories}
-                  manufacturers={manufacturers}
-                />
+                <ErrorBoundary>
+                  <ProductsOverview
+                    products={products}
+                    categories={categories}
+                    manufacturers={manufacturers}
+                  />
+                </ErrorBoundary>
               </div>
             </div>
           </TabsContent>
@@ -381,8 +386,8 @@ function ProductsPageContent() {
                   </Button>
                   <h2 className="text-xl font-bold">{selectedCategory.name}</h2>
                 </div>
-                <ProductGrid 
-                  products={productsByCategory[selectedCategory.name] || []} 
+                <ProductGrid
+                  products={productsByCategory[selectedCategory.name] || []}
                   onEdit={handleOpenForm}
                   onDelete={handleDeleteClick}
                 />
@@ -390,32 +395,32 @@ function ProductsPageContent() {
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                 {Object.entries(productsByCategory).map(([categoryName, categoryProducts]) => {
-                   const categoryObj = categories.find(c => c.name === categoryName) || { id: 'uncategorized', name: categoryName };
-                   return (
-                     <DrillTarget 
-                       key={categoryName}
-                       kind="category" 
-                       payload={{ 
-                         id: categoryObj.id, 
-                         name: categoryObj.name,
-                         productCount: categoryProducts.length 
-                       }}
-                     >
-                       <CategoryCard 
-                         category={categoryObj} 
-                         products={categoryProducts} 
+                  const categoryObj = categories.find(c => c.name === categoryName) || { id: 'uncategorized', name: categoryName };
+                  return (
+                    <DrillTarget
+                      key={categoryName}
+                      kind="category"
+                      payload={{
+                        id: categoryObj.id,
+                        name: categoryObj.name,
+                        productCount: categoryProducts.length
+                      }}
+                    >
+                      <CategoryCard
+                        category={categoryObj}
+                        products={categoryProducts}
                         onClick={() => {
                           setSelectedCategory(categoryObj);
                         }}
-                       />
-                     </DrillTarget>
-                   );
+                      />
+                    </DrillTarget>
+                  );
                 })}
               </div>
             )}
           </TabsContent>
           <TabsContent value='manufacturer' className='mt-4'>
-             {selectedManufacturer ? (
+            {selectedManufacturer ? (
               <div className="space-y-4">
                 <div className="flex items-center gap-2">
                   <Button variant="ghost" onClick={() => setSelectedManufacturer(null)}>
@@ -424,8 +429,8 @@ function ProductsPageContent() {
                   </Button>
                   <h2 className="text-xl font-bold">{selectedManufacturer.name}</h2>
                 </div>
-                <ProductGrid 
-                  products={productsByManufacturer[selectedManufacturer.name] || []} 
+                <ProductGrid
+                  products={productsByManufacturer[selectedManufacturer.name] || []}
                   onEdit={handleOpenForm}
                   onDelete={handleDeleteClick}
                 />
@@ -433,28 +438,28 @@ function ProductsPageContent() {
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                 {Object.entries(productsByManufacturer).map(([manufacturerName, manufacturerProducts]) => {
-                   const manufacturerObj = manufacturers.find(m => m.name === manufacturerName) || { id: 'unknown', name: manufacturerName, icon: undefined };
-                   
-                   return (
-                     <DrillTarget 
-                       key={manufacturerName}
-                       kind="manufacturer" 
-                       payload={{ 
-                         id: manufacturerObj.id, 
-                         name: manufacturerObj.name,
-                         icon: manufacturerObj.icon,
-                         productCount: manufacturerProducts.length 
-                       }}
-                     >
-                       <ManufacturerCard 
-                         manufacturer={manufacturerObj} 
-                         products={manufacturerProducts} 
+                  const manufacturerObj = manufacturers.find(m => m.name === manufacturerName) || { id: 'unknown', name: manufacturerName, icon: undefined };
+
+                  return (
+                    <DrillTarget
+                      key={manufacturerName}
+                      kind="manufacturer"
+                      payload={{
+                        id: manufacturerObj.id,
+                        name: manufacturerObj.name,
+                        icon: manufacturerObj.icon,
+                        productCount: manufacturerProducts.length
+                      }}
+                    >
+                      <ManufacturerCard
+                        manufacturer={manufacturerObj}
+                        products={manufacturerProducts}
                         onClick={() => {
                           setSelectedManufacturer(manufacturerObj);
                         }}
-                       />
-                     </DrillTarget>
-                   );
+                      />
+                    </DrillTarget>
+                  );
                 })}
               </div>
             )}

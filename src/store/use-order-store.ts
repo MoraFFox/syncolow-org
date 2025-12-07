@@ -253,7 +253,7 @@ export const useOrderStore = create<AppState>((set, get) => ({
       const { data: allOrders } = await supabase.from("orders").select("*");
 
       const searchLower = searchTerm.toLowerCase();
-      const filtered = (allOrders || []).filter(order =>
+      const filtered = (allOrders || []).filter((order: Order) =>
         (order.companyName && order.companyName.toLowerCase().includes(searchLower)) ||
         (order.branchName && order.branchName.toLowerCase().includes(searchLower)) ||
         (order.id && order.id.toLowerCase().includes(searchLower)) ||
@@ -261,7 +261,7 @@ export const useOrderStore = create<AppState>((set, get) => ({
       );
 
       filtered.sort(
-        (a, b) =>
+        (a: Order, b: Order) =>
           new Date(b.orderDate).getTime() - new Date(a.orderDate).getTime()
       );
 
@@ -291,7 +291,7 @@ export const useOrderStore = create<AppState>((set, get) => ({
         produce((state: AppState) => {
           // Deduplicate by checking if order ID already exists
           const existingIds = new Set(state.orders.map(o => o.id));
-          const uniqueNewOrders = (newOrders || []).filter(order => !existingIds.has(order.id));
+          const uniqueNewOrders = (newOrders || []).filter((order: Order) => !existingIds.has(order.id));
           
           state.orders.push(...uniqueNewOrders);
           state.ordersOffset = ordersOffset + limitCount;
@@ -569,7 +569,7 @@ export const useOrderStore = create<AppState>((set, get) => ({
         branchId
       });
     } catch (e) {
-      logger.error(e, { component: 'use-order-store', action: 'markOrderAsPaid' });
+      logger.error(e, { component: 'use-order-store', action: 'deleteOrder', orderId, companyId, branchId });
     }
     
     toast({
@@ -622,6 +622,17 @@ export const useOrderStore = create<AppState>((set, get) => ({
           .getState()
           .companies.find((c) => c.id === client.parentCompanyId)
       : client;
+
+    // Check if company is suspended - block order creation
+    if (parentCompany?.isSuspended) {
+      toast({
+        title: "Order Blocked",
+        description: `Orders are suspended for ${parentCompany.name}: ${parentCompany.suspensionReason || 'Payment overdue'}`,
+        variant: "destructive"
+      });
+      throw new Error(`Orders suspended for ${parentCompany.name}`);
+    }
+
     const deliveryDate = calculateNextDeliveryDate(
       region as "A" | "B",
       orderDate

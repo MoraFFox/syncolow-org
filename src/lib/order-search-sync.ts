@@ -1,6 +1,7 @@
 
 import { supabase } from './supabase';
 import type { Order } from './types';
+import { logger } from '@/lib/logger';
 
 export interface OrderSearchDoc {
   id: string;
@@ -53,7 +54,7 @@ export async function bulkSyncOrdersToSearch(orders: Order[]): Promise<void> {
 
     const { error } = await supabase.from('orders_search').upsert(searchDocs);
     if (error) {
-        console.error('Error in bulk sync to search:', error);
+        logger.error(error, { component: 'OrderSearchSync', action: 'bulkSyncOrdersToSearch', batchSize: batchOrders.length });
     }
   }
 }

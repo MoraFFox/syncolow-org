@@ -59,10 +59,100 @@ The primary goal is to produce **clean, maintainable, and bug-free code** that i
    - Use modern React patterns (hooks, functional components, context where needed).
    - Keep components small and single-purpose (<150 lines ideally).
 
-4. **Error Handling**
-   - Wrap async calls in `try/catch`.
-   - Handle null, undefined, and empty states gracefully.
-   - Provide user-friendly error UI for API or data-fetching failures.
+4. **Error Handling Standards**
+   This project follows a consistent error handling pattern across all layers:
+
+   **A. Services (`src/services/`, `src/lib/`)**
+   - Wrap all async methods in `try/catch` blocks.
+   - Use `logger.error()` from `@/lib/logger` for all error logging.
+   - Include context object with `component` and `action` properties.
+   - Additional context (e.g., `taskId`, `orderId`, `userId`) is encouraged.
+   - **Critical operations** (create, update, delete): Throw user-friendly errors.
+   - **Non-critical operations** (cleanup, analytics): Log but don't throw.
+   
+   ```typescript
+   // Critical operation - throw error
+   async createTask(taskData: TaskData) {
+     try {
+       const result = await api.create(taskData);
+       return result;
+     } catch (error) {
+       logger.error(error, {
+         component: 'TaskService',
+         action: 'createTask',
+         taskData,
+       });
+       throw new Error('Failed to create task. Please try again.');
+     }
+   }
+
+   // Non-critical operation - log only
+   async cleanupOldRecords(days: number) {
+     try {
+       await db.deleteOlderThan(days);
+     } catch (error) {
+       logger.error(error, { component: 'CleanupService', action: 'cleanupOldRecords', days });
+       logger.warn('Cleanup failed but continuing', { component: 'CleanupService' });
+       // Don't throw - cleanup is non-critical
+     }
+   }
+   ```
+
+   **B. API Routes (`src/app/api/`)**
+   - Use `logger.error()` instead of `console.error`.
+   - Return appropriate HTTP status codes (400, 401, 404, 500).
+   - Include meaningful error messages in response body.
+   
+   ```typescript
+   import { logger } from '@/lib/logger';
+
+   export async function POST(request: NextRequest) {
+     try {
+       // ... route logic
+     } catch (error) {
+       logger.error(error, { component: 'MyAPI', action: 'POST' });
+       return NextResponse.json({ error: 'Failed to process request' }, { status: 500 });
+     }
+   }
+   ```
+
+   **C. React Components**
+   - Use `ErrorBoundary` from `@/components/error-boundary` for critical sections.
+   - Wrap data-heavy components (tables, charts, lists) in ErrorBoundary.
+   - Combine with `Suspense` for lazy-loaded components.
+   - Display toast notifications for user actions that fail.
+   
+   ```tsx
+   import { ErrorBoundary } from '@/components/error-boundary';
+
+   <ErrorBoundary>
+     <DataTable data={orders} />
+   </ErrorBoundary>
+
+   <Suspense fallback={<Skeleton />}>
+     <ErrorBoundary>
+       <ChartComponent />
+     </ErrorBoundary>
+   </Suspense>
+   ```
+
+   **D. User-Facing Errors**
+   - Use `toast()` from `@/hooks/use-toast` for actionable feedback.
+   - Messages should be helpful, not technical.
+   - Include recovery actions when possible.
+   
+   ```typescript
+   try {
+     await updateOrder(orderId, data);
+     toast({ title: "Order Updated", description: "Changes saved successfully." });
+   } catch (error) {
+     toast({
+       title: "Update Failed",
+       description: "Could not save changes. Please try again.",
+       variant: "destructive",
+     });
+   }
+   ```
 
 5. **TypeScript Strict Mode**
    - Always define types and interfaces explicitly.
@@ -132,10 +222,27 @@ The primary goal is to produce **clean, maintainable, and bug-free code** that i
    - **API Routes**: Mock `NextRequest`, test all HTTP status codes.
 
 7. **Agent Checklist Before Finishing**
-   - ✅ Build succeeds (`next build` has 0 errors).
+
+   > **⚠️ Important**: `next build` is configured with `typescript.ignoreBuildErrors: true`. A successful build does NOT guarantee TypeScript correctness. You MUST run `typecheck` separately.
+
+   **Required sequence:**
+   ```bash
+   npm run lint          # Step 1: Fix lint errors
+   npm run test          # Step 2: Ensure tests pass
+   npm run typecheck     # Step 3: Verify TypeScript correctness
+   npm run build         # Step 4: Build for production
+   ```
+
+   Or use the combined CI script:
+   ```bash
+   npm run ci            # Runs all 4 steps in sequence
+   ```
+
+   **Final checks:**
    - ✅ ESLint and Prettier are clean.
-   - ✅ TypeScript compiles without errors.
-   - ✅ All Vitest tests pass (`npm run test`).
+   - ✅ All Vitest tests pass.
+   - ✅ TypeScript compiles without errors (`npm run typecheck`).
+   - ✅ Build succeeds (`next build`).
    - ✅ Coverage meets thresholds for modified files.
    - ✅ No console warnings in browser or server logs.
 

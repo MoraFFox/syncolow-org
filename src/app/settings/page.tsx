@@ -35,6 +35,7 @@ import { useDrillDownStore } from "@/store/use-drilldown-store";
 import { useState } from "react";
 import { HelpCircle } from "lucide-react";
 import { DrilldownHelpDialog } from "@/components/drilldown/drilldown-help-dialog";
+import { ErrorBoundary } from "@/components/error-boundary";
 
 const viewModes: { name: ViewMode }[] = [
   { name: "Comfortable" },
@@ -247,11 +248,15 @@ export default function SettingsPage() {
       </Card>
 
       <Suspense fallback={<Card><CardHeader><Skeleton className="h-6 w-48" /></CardHeader><CardContent><Skeleton className="h-20 w-full" /></CardContent></Card>}>
-        <NotificationSettings />
+        <ErrorBoundary>
+          <NotificationSettings />
+        </ErrorBoundary>
       </Suspense>
 
       <Suspense fallback={<Card><CardHeader><Skeleton className="h-6 w-48" /></CardHeader><CardContent><Skeleton className="h-20 w-full" /></CardContent></Card>}>
-        <Integrations />
+        <ErrorBoundary>
+          <Integrations />
+        </ErrorBoundary>
       </Suspense>
 
       <Card>

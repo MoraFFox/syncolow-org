@@ -1,6 +1,15 @@
 import { logDebug, logError, logWarning } from './error-logger';
 
 /**
+ * Context type for logger methods that allows component, action, and additional properties
+ */
+interface LogContext {
+  component?: string;
+  action?: string;
+  [key: string]: unknown;
+}
+
+/**
  * Centralized logging utility that wraps the error-logger service.
  * Automatically handles development vs production logging.
  * 
@@ -26,18 +35,19 @@ export const logger = {
   /**
    * Log error information (all environments)
    * @param error - Error object or message
-   * @param context - Error context with component and action
+   * @param context - Error context with component, action, and additional properties
    */
-  error: (error: unknown, context?: { component?: string; action?: string }) => {
+  error: (error: unknown, context?: LogContext) => {
     logError(error, context);
   },
   
   /**
    * Log warning information (all environments)
    * @param message - Warning message
-   * @param context - Warning context with component
+   * @param context - Warning context with component and additional properties
    */
-  warn: (message: string, context?: { component?: string }) => {
+  warn: (message: string, context?: LogContext) => {
     logWarning(message, context);
   },
 };
+
