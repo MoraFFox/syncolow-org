@@ -15,14 +15,31 @@ export interface RelatedEntity {
   relationship: string;
 }
 
+// Shared options type for preview rendering functions
+export interface PreviewRenderOptions {
+  isMobile?: boolean;
+  isCompact?: boolean;
+  isExpanded?: boolean;
+}
+
+// Use a looser type for async preview functions to allow typed data parameters
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type AsyncPreviewFunction<K extends DrillKind> = (
+  payload: DrillPayload<K>,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  data: any,
+  options?: PreviewRenderOptions
+) => React.ReactNode;
+
 export interface DrillConfig<K extends DrillKind> {
   getRoute: (payload: DrillPayload<K>) => string | null;
-  renderPreview: (payload: DrillPayload<K>, options?: { isMobile?: boolean }) => React.ReactNode;
+  renderPreview: (payload: DrillPayload<K>, options?: PreviewRenderOptions) => React.ReactNode;
 
   // Optional async preview data fetching
-  fetchPreviewData?: (payload: DrillPayload<K>) => Promise<unknown>;
-  renderLoadingPreview?: (options?: { isMobile?: boolean }) => React.ReactNode;
-  renderAsyncPreview?: (payload: DrillPayload<K>, data: unknown, options?: { isMobile?: boolean }) => React.ReactNode;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  fetchPreviewData?: (payload: DrillPayload<K>) => Promise<any>;
+  renderLoadingPreview?: (options?: PreviewRenderOptions) => React.ReactNode;
+  renderAsyncPreview?: AsyncPreviewFunction<K>;
 
   // Quick actions in preview
   quickActions?: (payload: DrillPayload<K>) => QuickAction[];

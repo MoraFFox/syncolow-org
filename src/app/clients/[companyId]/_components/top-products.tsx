@@ -18,7 +18,7 @@ export function TopProducts({ orders }: TopProductsProps) {
 
     orders.forEach(order => {
       if (order.status === 'Cancelled') return;
-      
+
       order.items.forEach(item => {
         if (productSales[item.productId]) {
           productSales[item.productId].quantity += item.quantity;
@@ -43,28 +43,28 @@ export function TopProducts({ orders }: TopProductsProps) {
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-            <Package className="h-5 w-5" />
-            Top Products
+          <Package className="h-5 w-5" />
+          Top Products
         </CardTitle>
         <CardDescription>Most purchased products by this company.</CardDescription>
       </CardHeader>
       <CardContent>
         {topProducts.length > 0 ? (
-            <div className="space-y-3">
-                {topProducts.map(product => (
-                    <div key={product.id} className="flex items-center justify-between p-3 rounded-md border hover:bg-muted transition-colors">
-                        <DrillTarget kind="product" payload={{ id: product.id, name: product.name }} asChild>
-                            <Link href={`/products/${product.id}`} className="font-medium text-sm hover:underline">{product.name}</Link>
-                        </DrillTarget>
-                        <div className="text-right">
-                            <p className="text-sm font-bold">{product.quantity} units</p>
-                            <p className="text-xs text-muted-foreground">${product.revenue.toFixed(2)}</p>
-                        </div>
-                    </div>
-                ))}
-            </div>
+          <div className="space-y-3">
+            {topProducts.map(product => (
+              <div key={product.id} className="flex items-center justify-between p-3 rounded-md border hover:bg-muted transition-colors">
+                <DrillTarget kind="product" payload={{ id: product.id, name: product.name }} asChild expandHitArea>
+                  <Link href={`/products/${product.id}`} className="font-medium text-sm hover:underline">{product.name}</Link>
+                </DrillTarget>
+                <div className="text-right">
+                  <p className="text-sm font-bold">{product.quantity} units</p>
+                  <p className="text-xs text-muted-foreground">${product.revenue.toFixed(2)}</p>
+                </div>
+              </div>
+            ))}
+          </div>
         ) : (
-            <p className="text-sm text-muted-foreground text-center py-4">No order data available.</p>
+          <p className="text-sm text-muted-foreground text-center py-4">No order data available.</p>
         )}
       </CardContent>
     </Card>

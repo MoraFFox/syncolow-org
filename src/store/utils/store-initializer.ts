@@ -95,7 +95,7 @@ export async function initializeAllStores() {
       }
     );
 
-    const productsByManufacturer = (products || []).reduce((acc, product) => {
+    const productsByManufacturer = (products || []).reduce((acc: Record<string, Product[]>, product: Product) => {
       const key = product.manufacturerId || 'unassigned';
       if (!acc[key]) {
         acc[key] = [];

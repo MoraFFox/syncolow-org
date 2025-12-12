@@ -6,7 +6,8 @@ import { usePathname } from "next/navigation";
 import { Loader2 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { useOrderStore } from "@/store/use-order-store";
-import type { MaintenanceVisit } from "@/lib/types";
+import { useProductsStore } from "@/store/use-products-store";
+import type { MaintenanceVisit, Product } from "@/lib/types";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { AppShellDialogs } from "./app-shell-dialogs";
 import { useMaintenanceStore } from "@/store/use-maintenance-store";
@@ -34,7 +35,8 @@ const PUBLIC_ROUTES = [
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const { user, loading: authLoading } = useAuth();
-  const { fetchInitialData, fetchOrders, addProduct } = useOrderStore();
+  const { fetchInitialData, fetchOrders } = useOrderStore();
+  const { addProduct } = useProductsStore();
   const { addMaintenanceVisit } = useMaintenanceStore();
   const pathname = usePathname();
   const isMobile = useIsMobile();
@@ -62,14 +64,15 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     }
   }, [user, hasSeenOnboarding, tourDismissedAt, isPublicRoute]);
 
-  const handleAddProduct = async (data: AddProductData) => {
-    await addProduct(data);
-    setIsProductFormOpen(false);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const handleAddProduct = async (data: Partial<Product>) => {
+    await addProduct(data as any);
+    dialogState.setIsProductFormOpen(false);
   };
 
   const handleAddMaintenance = async (data: Omit<MaintenanceVisit, "id">) => {
     await addMaintenanceVisit(data);
-    setIsMaintenanceFormOpen(false);
+    dialogState.setIsMaintenanceFormOpen(false);
   };
 
   if (shouldShowLoader) {

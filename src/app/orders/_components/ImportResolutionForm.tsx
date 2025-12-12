@@ -6,7 +6,7 @@ import { CompanyForm } from "@/app/clients/_components/company-form";
 import { ProductForm } from "@/app/products/_components/product-form";
 import { ImportRowError, Company, Product } from "@/lib/types";
 import { useCompanyStore } from "@/store/use-company-store";
-import { useOrderStore } from "@/store/use-order-store";
+import { useProductsStore } from "@/store/use-products-store";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
 import { ArrowLeft, Loader2 } from "lucide-react";
@@ -23,14 +23,14 @@ export function ImportResolutionForm({
   onCancel
 }: ImportResolutionFormProps) {
   const { addCompanyAndRelatedData } = useCompanyStore();
-  const { addProduct } = useOrderStore();
+  const { addProduct } = useProductsStore();
 
   if (!errorToFix.resolution) {
     return (
       <div className="p-4 text-center text-sm text-muted-foreground">
         No resolution available for this error.
         <div className="mt-4">
-            <Button variant="outline" onClick={onCancel}>Back to Error List</Button>
+          <Button variant="outline" onClick={onCancel}>Back to Error List</Button>
         </div>
       </div>
     );
@@ -48,8 +48,8 @@ export function ImportResolutionForm({
       } else {
         throw new Error("Company creation returned undefined.");
       }
-    } catch(e) {
-       toast({
+    } catch (e) {
+      toast({
         title: "Error adding company",
         description: (e as Error).message,
         variant: "destructive",
@@ -67,9 +67,9 @@ export function ImportResolutionForm({
         });
         onResolved(errorToFix, newProduct);
       } else {
-         throw new Error("Product creation returned undefined.");
+        throw new Error("Product creation returned undefined.");
       }
-    } catch(e) {
+    } catch (e) {
       toast({
         title: "Error adding product",
         description: (e as Error).message,
@@ -79,19 +79,19 @@ export function ImportResolutionForm({
   };
 
   const header = (
-     <div className="flex justify-between items-start mb-4">
-        <div>
-            <h3 className="text-lg font-semibold">
-                Create New {errorToFix.resolution.entity === 'company' ? 'Company/Branch' : 'Product'}
-            </h3>
-            <p className="text-sm text-muted-foreground">
-                The {errorToFix.resolution.entity} "{errorToFix.resolution.suggestedData.name}" was not found. Please confirm the details below to create it.
-            </p>
-        </div>
-         <Button variant="ghost" onClick={onCancel} size="sm">
-            <ArrowLeft className="mr-2 h-4 w-4"/>
-            Back
-        </Button>
+    <div className="flex justify-between items-start mb-4">
+      <div>
+        <h3 className="text-lg font-semibold">
+          Create New {errorToFix.resolution.entity === 'company' ? 'Company/Branch' : 'Product'}
+        </h3>
+        <p className="text-sm text-muted-foreground">
+          The {errorToFix.resolution.entity} "{errorToFix.resolution.suggestedData.name}" was not found. Please confirm the details below to create it.
+        </p>
+      </div>
+      <Button variant="ghost" onClick={onCancel} size="sm">
+        <ArrowLeft className="mr-2 h-4 w-4" />
+        Back
+      </Button>
     </div>
   )
 
@@ -104,8 +104,8 @@ export function ImportResolutionForm({
             <CompanyForm
               company={errorToFix.resolution.suggestedData}
               onSubmit={handleCompanySubmit}
-              isOpen={true} 
-              onOpenChange={() => {}}
+              isOpen={true}
+              onOpenChange={() => { }}
             />
           </Suspense>
         </div>
@@ -118,8 +118,8 @@ export function ImportResolutionForm({
             <ProductForm
               product={errorToFix.resolution.suggestedData}
               onSubmit={handleProductSubmit}
-              isOpen={true} 
-              onOpenChange={() => {}}
+              isOpen={true}
+              onOpenChange={() => { }}
             />
           </Suspense>
         </div>
@@ -128,9 +128,9 @@ export function ImportResolutionForm({
       return (
         <div className="p-4 text-center">
           Could not determine the correct form for "{errorToFix.resolution.entity}".
-           <div className="mt-4">
+          <div className="mt-4">
             <Button variant="outline" onClick={onCancel}>Back to Error List</Button>
-        </div>
+          </div>
         </div>
       );
   }

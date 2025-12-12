@@ -7,17 +7,17 @@ import { useCompanyStore } from '@/store/use-company-store';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import {
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
+    ChartContainer,
+    ChartTooltip,
+    ChartTooltipContent,
 } from '@/components/ui/chart';
 import {
-  Line,
-  LineChart as RechartsLineChart,
-  ResponsiveContainer,
-  XAxis,
-  YAxis,
-  CartesianGrid,
+    Line,
+    LineChart as RechartsLineChart,
+    ResponsiveContainer,
+    XAxis,
+    YAxis,
+    CartesianGrid,
 } from 'recharts';
 import type { Product } from '@/lib/types';
 import { format, subMonths, differenceInMonths } from 'date-fns';
@@ -30,8 +30,8 @@ interface ProductSalesAnalyticsProps {
 
 const chartConfig = {
     unitsSold: {
-      label: "Units Sold",
-      color: "hsl(var(--chart-1))",
+        label: "Units Sold",
+        color: "hsl(var(--chart-1))",
     },
 };
 
@@ -41,25 +41,25 @@ export function ProductSalesAnalytics({ product }: ProductSalesAnalyticsProps) {
 
     const analytics = useMemo(() => {
         const productOrders = orders.filter(order => order.items.some(item => item.productId === product.id) && order.status !== 'Cancelled');
-        
+
         let totalRevenue = 0;
         let unitsSold = 0;
-        const clientPurchases: Record<string, {name: string, quantity: number, id: string}> = {};
+        const clientPurchases: Record<string, { name: string, quantity: number, id: string }> = {};
         const monthlySales: Record<string, number> = {};
 
         if (productOrders.length === 0) {
-           return {
+            return {
                 totalRevenue: 0, unitsSold: 0, salesVelocity: 0,
                 stockDepletionMonths: Infinity,
                 topClients: [], salesTrendData: [], recentProductOrders: []
-           }
+            }
         }
 
         let firstOrderDate = new Date();
         productOrders.forEach(order => {
             const orderDate = new Date(order.orderDate);
-            if(orderDate < firstOrderDate) firstOrderDate = orderDate;
-            
+            if (orderDate < firstOrderDate) firstOrderDate = orderDate;
+
             const orderMonth = format(orderDate, 'yyyy-MM');
             const item = order.items.find(i => i.productId === product.id);
 
@@ -69,18 +69,18 @@ export function ProductSalesAnalytics({ product }: ProductSalesAnalyticsProps) {
                 unitsSold += item.quantity * orderMultiplier;
 
                 if (order.companyId) {
-                  if (clientPurchases[order.companyId]) {
-                      clientPurchases[order.companyId].quantity += item.quantity * orderMultiplier;
-                  } else {
-                      const client = companies.find(c => c.id === order.companyId);
-                      clientPurchases[order.companyId] = {
-                          id: client?.id || order.companyId,
-                          name: client?.name || 'Unknown Client',
-                          quantity: item.quantity * orderMultiplier
-                      };
-                  }
+                    if (clientPurchases[order.companyId]) {
+                        clientPurchases[order.companyId].quantity += item.quantity * orderMultiplier;
+                    } else {
+                        const client = companies.find(c => c.id === order.companyId);
+                        clientPurchases[order.companyId] = {
+                            id: client?.id || order.companyId,
+                            name: client?.name || 'Unknown Client',
+                            quantity: item.quantity * orderMultiplier
+                        };
+                    }
                 }
-                
+
                 monthlySales[orderMonth] = (monthlySales[orderMonth] || 0) + (item.quantity * orderMultiplier);
             }
         });
@@ -90,7 +90,7 @@ export function ProductSalesAnalytics({ product }: ProductSalesAnalyticsProps) {
         const monthsActive = differenceInMonths(new Date(), firstOrderDate) || 1;
         const salesVelocity = unitsSold / monthsActive; // Units per month
         const stockDepletionMonths = salesVelocity > 0 ? product.stock / salesVelocity : Infinity;
-        
+
 
         const salesTrendData = Array.from({ length: 12 }).map((_, i) => {
             const date = subMonths(new Date(), 11 - i);
@@ -102,7 +102,7 @@ export function ProductSalesAnalytics({ product }: ProductSalesAnalyticsProps) {
         });
 
         const recentProductOrders = productOrders
-            .sort((a,b) => new Date(b.orderDate).getTime() - new Date(a.orderDate).getTime())
+            .sort((a, b) => new Date(b.orderDate).getTime() - new Date(a.orderDate).getTime())
             .slice(0, 5);
 
 
@@ -134,14 +134,14 @@ export function ProductSalesAnalytics({ product }: ProductSalesAnalyticsProps) {
                 <Card>
                     <CardHeader>
                         <CardTitle>Units Sold</CardTitle>
-                         <CardDescription>Total units sold lifetime.</CardDescription>
+                        <CardDescription>Total units sold lifetime.</CardDescription>
                     </CardHeader>
                     <CardContent>
                         <p className="text-2xl font-bold">{analytics.unitsSold}</p>
                     </CardContent>
                 </Card>
                 <Card>
-                     <CardHeader>
+                    <CardHeader>
                         <CardTitle>Sales Velocity</CardTitle>
                         <CardDescription>Average units sold per month.</CardDescription>
                     </CardHeader>
@@ -150,18 +150,18 @@ export function ProductSalesAnalytics({ product }: ProductSalesAnalyticsProps) {
                     </CardContent>
                 </Card>
                 <Card>
-                     <CardHeader>
+                    <CardHeader>
                         <CardTitle>Est. Stock Depletion</CardTitle>
                         <CardDescription>Predicted time until stock runs out.</CardDescription>
                     </CardHeader>
                     <CardContent>
-                       <p className="text-2xl font-bold">
-                           {isFinite(analytics.stockDepletionMonths) ? `${analytics.stockDepletionMonths.toFixed(1)} months` : "N/A"}
-                       </p>
+                        <p className="text-2xl font-bold">
+                            {isFinite(analytics.stockDepletionMonths) ? `${analytics.stockDepletionMonths.toFixed(1)} months` : "N/A"}
+                        </p>
                     </CardContent>
                 </Card>
             </div>
-            
+
             <Card>
                 <CardHeader>
                     <CardTitle>Sales Trend (Last 12 Months)</CardTitle>
@@ -191,7 +191,7 @@ export function ProductSalesAnalytics({ product }: ProductSalesAnalyticsProps) {
                         <div className="space-y-3 md:hidden">
                             {analytics.topClients.map(client => (
                                 <div key={client.id} className="p-3 border rounded-md hover:bg-muted flex justify-between items-center">
-                                    <DrillTarget kind="company" payload={{ id: client.id, name: client.name }} asChild>
+                                    <DrillTarget kind="company" payload={{ id: client.id, name: client.name }} asChild expandHitArea>
                                         <Link href={`/clients/${client.id}`} className="font-medium hover:underline">{client.name}</Link>
                                     </DrillTarget>
                                     <p className="text-sm font-bold">{client.quantity} units</p>
@@ -199,7 +199,7 @@ export function ProductSalesAnalytics({ product }: ProductSalesAnalyticsProps) {
                             ))}
                             {analytics.topClients.length === 0 && <p className="text-center text-sm text-muted-foreground py-4">No purchases yet.</p>}
                         </div>
-                         <div className="overflow-x-auto hidden md:block">
+                        <div className="overflow-x-auto hidden md:block">
                             <Table>
                                 <TableHeader>
                                     <TableRow>
@@ -207,11 +207,11 @@ export function ProductSalesAnalytics({ product }: ProductSalesAnalyticsProps) {
                                         <TableHead className="text-right">Units Purchased</TableHead>
                                     </TableRow>
                                 </TableHeader>
-                                 <TableBody>
+                                <TableBody>
                                     {analytics.topClients.map(client => (
                                         <TableRow key={client.id}>
                                             <TableCell>
-                                                <DrillTarget kind="company" payload={{ id: client.id, name: client.name }} asChild>
+                                                <DrillTarget kind="company" payload={{ id: client.id, name: client.name }} asChild expandHitArea>
                                                     <Link href={`/clients/${client.id}`} className="font-medium hover:underline">{client.name}</Link>
                                                 </DrillTarget>
                                             </TableCell>
@@ -224,17 +224,17 @@ export function ProductSalesAnalytics({ product }: ProductSalesAnalyticsProps) {
                         </div>
                     </CardContent>
                 </Card>
-                 <Card>
+                <Card>
                     <CardHeader>
                         <CardTitle>Recent Orders</CardTitle>
                         <CardDescription>The last 5 orders including this product.</CardDescription>
                     </CardHeader>
                     <CardContent>
-                         <div className="space-y-3 md:hidden">
+                        <div className="space-y-3 md:hidden">
                             {analytics.recentProductOrders.map(order => (
                                 <div key={order.id} className="p-3 border rounded-md hover:bg-muted">
                                     <div className="flex justify-between items-center">
-                                        <DrillTarget kind="order" payload={{ id: order.id }} asChild>
+                                        <DrillTarget kind="order" payload={{ id: order.id }} asChild expandHitArea>
                                             <Link href={`/orders/${order.id}`} className="font-semibold hover:underline">#{order.id.slice(0, 7)}</Link>
                                         </DrillTarget>
                                         <p className="text-sm">{order.items.find(i => i.productId === product.id)?.quantity} units</p>
@@ -244,7 +244,7 @@ export function ProductSalesAnalytics({ product }: ProductSalesAnalyticsProps) {
                             ))}
                             {analytics.recentProductOrders.length === 0 && <p className="text-center text-sm text-muted-foreground py-4">No recent orders.</p>}
                         </div>
-                         <div className="overflow-x-auto hidden md:block">
+                        <div className="overflow-x-auto hidden md:block">
                             <Table>
                                 <TableHeader>
                                     <TableRow>
@@ -255,9 +255,9 @@ export function ProductSalesAnalytics({ product }: ProductSalesAnalyticsProps) {
                                 </TableHeader>
                                 <TableBody>
                                     {analytics.recentProductOrders.map(order => (
-                                         <TableRow key={order.id}>
+                                        <TableRow key={order.id}>
                                             <TableCell>
-                                                <DrillTarget kind="order" payload={{ id: order.id }} asChild>
+                                                <DrillTarget kind="order" payload={{ id: order.id }} asChild expandHitArea>
                                                     <Link href={`/orders/${order.id}`} className="font-medium hover:underline">#{order.id.slice(0, 7)}</Link>
                                                 </DrillTarget>
                                             </TableCell>

@@ -15,15 +15,18 @@
 
 # production
 /build
+/dist
 
 # misc
 .DS_Store
 *.pem
+Thumbs.db
 
 # debug
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+.pnpm-debug.log*
 
 # local env files
 .env*.local
@@ -37,17 +40,48 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# e2e tests
+# e2e / playwright tests
 /test-results/
 /playwright-report/
-synergyflow-pvqrj-firebase-adminsdk-fbsvc-278af49f7d.json
-synergyflow-pvqrj-firebase-adminsdk-fbsvc-278af49f7d.json
-synergyflow-pvqrj-firebase-adminsdk-fbsvc-278af49f7d.json
+/playwright/.cache/
+/blob-report/
 
-# dot folders
+# firebase service account (SENSITIVE - must not commit)
+synergyflow-pvqrj-firebase-adminsdk-fbsvc-*.json
+
+# IDE / editor folders
+.vscode/settings.json
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# AI/tool specific folders
 .amazonq
-docs
-chat-history
-e2e
-indexing
+.gemini
+
+# documentation (optional - uncomment if you want docs in repo)
+# docs
+
+# logs
 logs
+*.log
+
+# cache
+.cache
+.turbo
+
+# temporary output/debug files
+*_output.txt
+*_errors.txt
+trace_output/
+
+# incremental tsconfig files (keep main tsconfig.json only)
+tsconfig.*.json
+!tsconfig.json
+
+# Indexing cache
+Indexing/

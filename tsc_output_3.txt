@@ -1,4 +1,0 @@
-src/app/clients/_components/client-list.tsx(72,10): error TS17008: JSX element 'div' has no corresponding closing tag.
-src/app/clients/_components/client-list.tsx(101,11): error TS1003: Identifier expected.
-src/app/clients/_components/client-list.tsx(103,2): error TS1005: ')' expected.
-src/app/clients/_components/client-list.tsx(103,2): error TS1005: '</' expected.

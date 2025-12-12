@@ -96,7 +96,7 @@ export function UnpaidInvoicesTable({
                   const daysOverdue = order.daysOverdue || 0;
                   const isOverdue = daysOverdue > 7;
                   const company = companies.find(c => c.id === order.companyId);
-                  
+
                   return (
                     <TableRow key={order.id} className={isOverdue ? 'bg-red-50 dark:bg-red-950/20' : ''}>
                       <TableCell>
@@ -106,7 +106,7 @@ export function UnpaidInvoicesTable({
                         />
                       </TableCell>
                       <TableCell className="font-mono text-sm">
-                        <DrillTarget kind="order" payload={{ id: order.id }} asChild>
+                        <DrillTarget kind="order" payload={{ id: order.id }} asChild expandHitArea>
                           <span className="hover:underline flex items-center gap-1 cursor-pointer">
                             #{order.id.substring(0, 8)}
                             <ExternalLink className="h-3 w-3" />
@@ -114,7 +114,7 @@ export function UnpaidInvoicesTable({
                         </DrillTarget>
                       </TableCell>
                       <TableCell className="font-medium">
-                        <DrillTarget kind="company" payload={{ id: order.companyId, name: order.companyName }} asChild>
+                        <DrillTarget kind="company" payload={{ id: order.companyId, name: order.companyName }} asChild expandHitArea>
                           <span className="cursor-pointer hover:underline">{order.companyName}</span>
                         </DrillTarget>
                       </TableCell>
@@ -144,8 +144,8 @@ export function UnpaidInvoicesTable({
                         )}
                       </TableCell>
                       <TableCell>
-                        <PaymentScoreBadge 
-                          score={order.paymentScore || 100} 
+                        <PaymentScoreBadge
+                          score={order.paymentScore || 100}
                           status={company?.paymentStatus}
                         />
                       </TableCell>

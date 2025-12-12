@@ -1,5 +1,7 @@
 // ESLint flat config for Next.js 16
 // Note: Next.js 16 uses ESLint 9 which supports flat config
+import tseslint from 'typescript-eslint';
+
 export default [
   {
     ignores: [
@@ -12,8 +14,10 @@ export default [
       "coverage/**",
       "playwright-report/**",
       "test-results/**",
+      "e2e/**",
     ],
   },
+  ...tseslint.configs.recommended,
   {
     files: ["**/*.{js,jsx,ts,tsx}"],
     languageOptions: {
@@ -44,4 +48,3 @@ export default [
     }
   }
 ];
-

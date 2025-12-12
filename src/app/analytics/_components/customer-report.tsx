@@ -7,12 +7,12 @@ import { useCompanyStore } from "@/store/use-company-store";
 import { parse, startOfDay, endOfDay, isWithinInterval } from "date-fns";
 import { SortableTableHeader } from './sortable-table-header';
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
 } from '@/components/ui/table';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -35,26 +35,26 @@ export function CustomerReport({ dateRange }: CustomerReportProps) {
 
     const customerAnalytics = useMemo(() => {
         if (!companies) return [];
-        
+
         const fromDate = parse(dateRange.from, 'yyyy-MM-dd', new Date());
         const toDate = parse(dateRange.to, 'yyyy-MM-dd', new Date());
         const start = startOfDay(fromDate);
         const end = endOfDay(toDate);
-        
+
         const result = companies.map(company => {
-            const clientOrders = analyticsOrders.filter(o => 
-                o.companyId === company.id && 
+            const clientOrders = analyticsOrders.filter(o =>
+                o.companyId === company.id &&
                 o.status !== 'Cancelled' &&
                 isWithinInterval(new Date(o.orderDate), { start, end })
             );
             const totalRevenue = clientOrders.reduce((sum, order) => sum + order.total, 0);
-            
+
             const allClientOrders = analyticsOrders.filter(o => o.companyId === company.id && o.status !== 'Cancelled');
             const clv = allClientOrders.reduce((sum, order) => sum + order.total, 0);
-            
-            const paymentStatus = clientOrders.some(o => o.paymentStatus === 'Overdue') ? 'Overdue' 
+
+            const paymentStatus = clientOrders.some(o => o.paymentStatus === 'Overdue') ? 'Overdue'
                 : clientOrders.some(o => o.paymentStatus === 'Pending') ? 'Pending'
-                : 'Paid';
+                    : 'Paid';
 
             return {
                 id: company.id,
@@ -65,7 +65,7 @@ export function CustomerReport({ dateRange }: CustomerReportProps) {
                 paymentStatus
             }
         }).filter(c => c.totalOrders > 0);
-        
+
         if (sortConfig) {
             result.sort((a, b) => {
                 const aVal = a[sortConfig.key as keyof typeof a];
@@ -74,10 +74,10 @@ export function CustomerReport({ dateRange }: CustomerReportProps) {
                 return aVal < bVal ? -modifier : aVal > bVal ? modifier : 0;
             });
         }
-        
+
         return result.slice(0, 20);
     }, [companies, analyticsOrders, dateRange, sortConfig]);
-    
+
     const visibleCustomerAnalytics = useMemo(() => {
         return customerAnalytics.slice(0, visibleCount);
     }, [customerAnalytics, visibleCount]);
@@ -90,7 +90,7 @@ export function CustomerReport({ dateRange }: CustomerReportProps) {
             return { key, direction: 'desc' };
         });
     };
-    
+
     const handleLoadMore = () => {
         setIsLoadingMore(true);
         setTimeout(() => {
@@ -118,7 +118,7 @@ export function CustomerReport({ dateRange }: CustomerReportProps) {
             </CardHeader>
             <CardContent>
                 {/* Mobile View */}
-                 <div className="grid grid-cols-1 gap-4 md:hidden">
+                <div className="grid grid-cols-1 gap-4 md:hidden">
                     {visibleCustomerAnalytics.map(client => (
                         <DrillTarget key={client.id} kind="company" payload={{ id: client.id, name: client.name, status: client.paymentStatus }} asChild>
                             <Link href={`/clients/${client.id}`}>
@@ -139,9 +139,9 @@ export function CustomerReport({ dateRange }: CustomerReportProps) {
                             </Link>
                         </DrillTarget>
                     ))}
-                 </div>
-                 
-                 {/* Desktop View */}
+                </div>
+
+                {/* Desktop View */}
                 <div className="hidden md:block">
                     <Table>
                         <TableHeader>
@@ -155,13 +155,13 @@ export function CustomerReport({ dateRange }: CustomerReportProps) {
                         </TableHeader>
                         <TableBody>
                             {visibleCustomerAnalytics.map((client) => (
-                                <DrillTarget 
+                                <DrillTarget
                                     key={client.id}
                                     kind="company"
                                     payload={{ id: client.id, name: client.name, status: client.paymentStatus }}
                                     asChild
                                 >
-                                    <TableRow 
+                                    <TableRow
                                         className="cursor-pointer hover:bg-muted/50"
                                     >
                                         <TableCell className="font-medium">
@@ -181,7 +181,7 @@ export function CustomerReport({ dateRange }: CustomerReportProps) {
                         </TableBody>
                     </Table>
                 </div>
-                 {visibleCount < customerAnalytics.length && (
+                {visibleCount < customerAnalytics.length && (
                     <div className="mt-4 flex justify-center">
                         <Button onClick={handleLoadMore} disabled={isLoadingMore}>
                             {isLoadingMore ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}

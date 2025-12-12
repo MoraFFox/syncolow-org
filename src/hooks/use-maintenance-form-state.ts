@@ -1,6 +1,6 @@
 import { useEffect, useCallback } from 'react';
 import type { MaintenanceVisit } from '@/lib/types';
-import type { UseFormReset } from 'react-hook-form';
+import type { UseFormReset, FieldValues } from 'react-hook-form';
 import { parseDateSafely, formatDateForForm } from '@/lib/date-utils';
 
 /**
@@ -30,11 +30,12 @@ export interface MaintenanceFormValues {
 
 /**
  * Hook to manage maintenance form state synchronization with visit data
+ * Generic to accept any form values that extend FieldValues
  */
-export function useMaintenanceFormState(
+export function useMaintenanceFormState<T extends FieldValues>(
   visit: MaintenanceVisit | null,
   isOpen: boolean,
-  reset: UseFormReset<MaintenanceFormValues>
+  reset: UseFormReset<T>
 ) {
   const resetForm = useCallback(() => {
     reset({
@@ -57,7 +58,7 @@ export function useMaintenanceFormState(
       services: [],
       reportSignedBy: '',
       supervisorWitness: '',
-    });
+    } as unknown as T);
   }, [reset]);
 
   useEffect(() => {
@@ -90,7 +91,7 @@ export function useMaintenanceFormState(
           visit.services?.map((s) => ({ ...s, paidBy: s.paidBy || 'Company' })) || [],
         reportSignedBy: visit.reportSignedBy || '',
         supervisorWitness: '',
-      });
+      } as unknown as T);
     } else if (!isOpen) {
       resetForm();
     }

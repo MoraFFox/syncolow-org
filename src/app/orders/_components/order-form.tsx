@@ -6,15 +6,16 @@ import { useForm, FormProvider } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { useOrderStore } from '@/store/use-order-store';
+import { useProductsStore } from '@/store/use-products-store';
 import { useCompanyStore } from '@/store/use-company-store';
 import { Button } from '@/components/ui/button';
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+    DialogFooter,
 } from '@/components/ui/dialog';
 import { ArrowLeft, ArrowRight, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
@@ -30,12 +31,13 @@ import { Step3_ReviewOrder } from './_wizard-steps/Step3_ReviewOrder';
 import { orderSchema, OrderFormData } from './order-schemas';
 
 interface OrderFormProps {
-  isOpen: boolean;
-  onOpenChange: (isOpen: boolean) => void;
+    isOpen: boolean;
+    onOpenChange: (isOpen: boolean) => void;
 }
 
 export default function OrderForm({ isOpen, onOpenChange }: OrderFormProps) {
-    const { products, submitOrder } = useOrderStore();
+    const { submitOrder } = useOrderStore();
+    const { products } = useProductsStore();
     const { companies } = useCompanyStore();
     const { toast } = useToast();
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -48,7 +50,7 @@ export default function OrderForm({ isOpen, onOpenChange }: OrderFormProps) {
             paymentDueDate: null,
         },
     });
-    
+
     const { handleSubmit, trigger, watch, reset } = methods;
     const watchItems = watch("items");
 
@@ -67,7 +69,7 @@ export default function OrderForm({ isOpen, onOpenChange }: OrderFormProps) {
         if (isSubmitting) return;
         onOpenChange(false);
     };
-    
+
     const onSubmit = async (data: OrderFormData) => {
         if (isNavigating) return;
         setIsSubmitting(true);
@@ -86,9 +88,9 @@ export default function OrderForm({ isOpen, onOpenChange }: OrderFormProps) {
             setIsSubmitting(false);
         }
     };
-    
+
     const isSubmitDisabled = isSubmitting || watchItems.length === 0;
-    
+
     const renderStepContent = () => {
         switch (step) {
             case 1:
@@ -111,9 +113,9 @@ export default function OrderForm({ isOpen, onOpenChange }: OrderFormProps) {
                         Step {step} of {3}: {step === 1 ? 'Client Details' : step === 2 ? 'Order Items' : 'Review & Submit'}
                     </DialogDescription>
                 </DialogHeader>
-                
+
                 <Progress value={progressValue} className="mx-6 w-auto" />
-                
+
                 <FormProvider {...methods}>
                     <div className="flex-1 min-h-0 overflow-y-auto px-6 py-4">
                         <form id="order-wizard-form" onSubmit={handleSubmit(onSubmit)}>

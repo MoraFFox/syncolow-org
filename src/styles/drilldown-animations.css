@@ -122,3 +122,72 @@
     transform: scale(0.98);
   }
 }
+
+/* 
+ * Expanded Hit Area System 
+ * Creates a pseudo-element that extends the interactive area of the target
+ * without affecting layout.
+ */
+.drill-target-expanded {
+  position: relative;
+  /* Ensure z-index context but don't force it high unless needed */
+}
+
+.drill-target-expanded::after {
+  content: '';
+  position: absolute;
+  top: calc(-1 * var(--hit-padding, 8px));
+  bottom: calc(-1 * var(--hit-padding, 8px));
+  left: calc(-1 * var(--hit-padding, 8px));
+  right: calc(-1 * var(--hit-padding, 8px));
+  z-index: 1;
+  /* Ensure pointer events are captured */
+  pointer-events: auto; 
+  /* Debugging helper - hidden by default */
+  background-color: transparent;
+  transition: background-color 0.2s;
+}
+
+/* 
+ * Debug Visual Indicator 
+ * Shows the expanded hit area when showHitAreaIndicator setting is enabled
+ * This is toggled via a class on the body or drilled container
+ */
+.show-drill-hit-areas .drill-target-expanded::after {
+  background-color: rgba(255, 0, 0, 0.1);
+  border: 1px dashed rgba(255, 0, 0, 0.3);
+}
+
+/* Hover effect on the hit area itself to verify capturing */
+.show-drill-hit-areas .drill-target-expanded:hover::after {
+  background-color: rgba(255, 0, 0, 0.15);
+}
+
+/* 
+ * Visual Affordances
+ * Subtle halo effect to indicate interactive zone without visual clutter
+ */
+.drill-target-expanded::before {
+  content: '';
+  position: absolute;
+  /* Halo is smaller than the full hit area, just enough to be a visual cue */
+  top: -4px; 
+  bottom: -4px; 
+  left: -6px; 
+  right: -6px;
+  border-radius: 6px;
+  background-color: transparent;
+  transition: background-color 0.15s ease-out;
+  pointer-events: none; /* Let clicks pass through */
+  z-index: 0;
+}
+
+/* Only show halo on hover if not disabled */
+.drill-target-expanded:not([data-drill-disabled]):hover::before {
+  background-color: hsl(var(--primary) / 0.04);
+}
+
+/* Stronger halo for primary items */
+.drill-target-primary.drill-target-expanded:not([data-drill-disabled]):hover::before {
+  background-color: hsl(var(--primary) / 0.08);
+}

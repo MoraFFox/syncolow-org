@@ -73,8 +73,7 @@ describe('Geocode API Route', () => {
       const data = await response.json();
 
       expect(response.status).toBe(404);
-      expect(data.error).toBe('Address not found');
-      expect(data.details).toBe('ZERO_RESULTS');
+      expect(data.error).toBe('Address not found: ZERO_RESULTS');
     });
 
     it('should return 500 on geocoding API error', async () => {
@@ -85,7 +84,7 @@ describe('Geocode API Route', () => {
       const data = await response.json();
 
       expect(response.status).toBe(500);
-      expect(data.error).toBe('Geocoding failed');
+      expect(data.error).toBe('Network error');
     });
 
     it('should encode address in URL', async () => {
@@ -155,7 +154,7 @@ describe('Geocode API Route', () => {
       const data = await response.json();
 
       expect(response.status).toBe(404);
-      expect(data.error).toBe('Location not found');
+      expect(data.error).toBe('Location not found: ZERO_RESULTS');
     });
 
     it('should return 500 on reverse geocoding API error', async () => {
@@ -166,7 +165,7 @@ describe('Geocode API Route', () => {
       const data = await response.json();
 
       expect(response.status).toBe(500);
-      expect(data.error).toBe('Reverse geocoding failed');
+      expect(data.error).toBe('Network error');
     });
   });
 
@@ -213,7 +212,7 @@ describe('Geocode API Route', () => {
       const data = await response.json();
 
       expect(response.status).toBe(500);
-      expect(data.error).toBe('Server configuration error: Missing API Key');
+      expect(data.error).toBe('Missing required environment variables: GOOGLE_GEOCODING_API_KEY');
     });
   });
 });

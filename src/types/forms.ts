@@ -1,29 +1,42 @@
 /**
  * Form type definitions for React Hook Form components
  * Provides type-safe props for form components across the application
+ * 
+ * Uses FieldValues as the default parameter to support multiple form schemas.
+ * This is the standard React Hook Form pattern for reusable form components.
  */
 
-import type { Control, UseFormRegister, FieldErrors, UseFormSetValue, UseFormWatch } from 'react-hook-form';
-import type { Company, Order, MaintenanceVisit, Product } from '@/lib/types';
+import type { Control, UseFormRegister, FieldErrors, UseFormSetValue, UseFormWatch, FieldValues } from 'react-hook-form';
+import type { Order, MaintenanceVisit, Product } from '@/lib/types';
 
 /**
  * Props for company form components
- * @example
- * ```typescript
- * function CompanyForm({ control, register, errors }: CompanyFormProps) {
- *   // Form implementation
- * }
- * ```
+ * Generic with FieldValues as default to support both Company type and CompanyFormData zod schemas
  */
-export interface CompanyFormProps {
-  control: Control<Company>;
-  register: UseFormRegister<Company>;
-  errors: FieldErrors<Company>;
-  setValue: UseFormSetValue<Company>;
-  watch: UseFormWatch<Company>;
-  openMapPicker?: (type: 'company' | 'branch', index?: number) => void;
+export interface CompanyFormProps<T extends FieldValues = FieldValues> {
+  control: Control<T>;
+  register: UseFormRegister<T>;
+  errors: FieldErrors<T>;
+  setValue: UseFormSetValue<T>;
+  watch: UseFormWatch<T>;
+  openMapPicker?: (type: 'company' | 'branch' | 'warehouse' | 'singleWarehouse', index?: number) => void;
   isWizard?: boolean;
   isEditMode?: boolean;
+}
+
+/**
+ * Props for branch sub-form components
+ * Generic with FieldValues as default to support multiple form schemas
+ */
+export interface BranchSubFormProps<T extends FieldValues = FieldValues> {
+  index: number;
+  control: Control<T>;
+  register: UseFormRegister<T>;
+  errors: FieldErrors<T>;
+  setValue: UseFormSetValue<T>;
+  watch: UseFormWatch<T>;
+  removeBranch: () => void;
+  openMapPicker: (type: 'branch' | 'warehouse', index: number) => void;
 }
 
 /**

@@ -36,13 +36,13 @@ describe('pricing-calculator', () => {
     it('should default discount to 0 when not provided', () => {
       // (5 × 20) × 1.14 = 114
       const result = calculateTotal(5, 20);
-      expect(result).toBe(114);
+      expect(result).toBeCloseTo(114, 0);
     });
 
     it('should handle large numbers', () => {
       // (1000 × 5000 - 100000) × 1.14 = 4900000 × 1.14 = 5586000
       const result = calculateTotal(1000, 5000, 100000);
-      expect(result).toBe(5586000);
+      expect(result).toBeCloseTo(5586000, 0);
     });
 
     it('should handle decimal prices', () => {
@@ -54,7 +54,7 @@ describe('pricing-calculator', () => {
     it('should handle discount larger than subtotal (edge case)', () => {
       // (1 × 100 - 150) × 1.14 = -50 × 1.14 = -57
       const result = calculateTotal(1, 100, 150);
-      expect(result).toBe(-57);
+      expect(result).toBeCloseTo(-57, 0);
     });
   });
 

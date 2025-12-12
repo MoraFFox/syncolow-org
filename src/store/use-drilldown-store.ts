@@ -18,6 +18,11 @@ export interface DrilldownSettings {
   quietMode: boolean; // Disables auto-pin
   previewSize: "compact" | "normal" | "expanded";
   previewTheme: "default" | "glass" | "solid";
+  // Enhanced Hit Area Settings
+  expandedHitArea: boolean;
+  hitAreaPadding: number;
+  proximityThreshold: number;
+  showHitAreaIndicator: boolean;
 }
 
 interface DrillDownState {
@@ -120,6 +125,11 @@ interface DrillDownState {
   setPreviewSize: (size: "compact" | "normal" | "expanded") => void;
   setPreviewTheme: (theme: "default" | "glass" | "solid") => void;
   loadSettings: () => void;
+  // Enhanced Hit Area Actions
+  toggleExpandedHitArea: () => void;
+  setHitAreaPadding: (padding: number) => void;
+  setProximityThreshold: (threshold: number) => void;
+  toggleHitAreaIndicator: () => void;
 
   // Onboarding Actions
   markOnboardingComplete: () => void;
@@ -172,6 +182,11 @@ export const useDrillDownStore = create<DrillDownState>((set, get) => ({
     quietMode: false,
     previewSize: "normal",
     previewTheme: "default",
+    // Enhanced Hit Area Defaults
+    expandedHitArea: true,
+    hitAreaPadding: 8,
+    proximityThreshold: 16,
+    showHitAreaIndicator: false,
   },
 
   // Onboarding State
@@ -389,6 +404,49 @@ export const useDrillDownStore = create<DrillDownState>((set, get) => ({
       }
     }
   },
+
+  // Enhanced Hit Area Actions
+  toggleExpandedHitArea: () =>
+    set((state) => {
+      const newSettings = {
+        ...state.settings,
+        expandedHitArea: !state.settings.expandedHitArea,
+      };
+      if (typeof window !== "undefined") {
+        localStorage.setItem("drill-settings", JSON.stringify(newSettings));
+      }
+      return { settings: newSettings };
+    }),
+
+  setHitAreaPadding: (padding) =>
+    set((state) => {
+      const newSettings = { ...state.settings, hitAreaPadding: padding };
+      if (typeof window !== "undefined") {
+        localStorage.setItem("drill-settings", JSON.stringify(newSettings));
+      }
+      return { settings: newSettings };
+    }),
+
+  setProximityThreshold: (threshold) =>
+    set((state) => {
+      const newSettings = { ...state.settings, proximityThreshold: threshold };
+      if (typeof window !== "undefined") {
+        localStorage.setItem("drill-settings", JSON.stringify(newSettings));
+      }
+      return { settings: newSettings };
+    }),
+
+  toggleHitAreaIndicator: () =>
+    set((state) => {
+      const newSettings = {
+        ...state.settings,
+        showHitAreaIndicator: !state.settings.showHitAreaIndicator,
+      };
+      if (typeof window !== "undefined") {
+        localStorage.setItem("drill-settings", JSON.stringify(newSettings));
+      }
+      return { settings: newSettings };
+    }),
 
   // Onboarding Actions
   markOnboardingComplete: () =>

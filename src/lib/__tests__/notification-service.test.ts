@@ -1,37 +1,48 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { NotificationService } from '../notification-service';
 import type { Notification } from '../types';
 
-// Mock supabase with chainable methods
-const mockEq = vi.fn();
-const mockLt = vi.fn();
-const mockOrder = vi.fn();
-const mockLimit = vi.fn();
-const mockSelect = vi.fn();
-const mockInsert = vi.fn();
-const mockUpdate = vi.fn();
-const mockDelete = vi.fn();
-const mockSingle = vi.fn();
-const mockSubscribe = vi.fn();
-const mockChannel = vi.fn();
-const mockOn = vi.fn();
-const mockRemoveChannel = vi.fn();
+// Use vi.hoisted() to define mocks before vi.mock hoisting
+const { 
+  mockEq, mockLt, mockOrder, mockLimit, mockSelect, mockInsert, 
+  mockUpdate, mockDelete, mockSingle, mockSubscribe, mockChannel, 
+  mockOn, mockRemoveChannel, mockFrom, buildChain 
+} = vi.hoisted(() => {
+  const mockEq = vi.fn();
+  const mockLt = vi.fn();
+  const mockOrder = vi.fn();
+  const mockLimit = vi.fn();
+  const mockSelect = vi.fn();
+  const mockInsert = vi.fn();
+  const mockUpdate = vi.fn();
+  const mockDelete = vi.fn();
+  const mockSingle = vi.fn();
+  const mockSubscribe = vi.fn();
+  const mockChannel = vi.fn();
+  const mockOn = vi.fn();
+  const mockRemoveChannel = vi.fn();
 
-// Build chainable mock
-const buildChain = () => ({
-  select: mockSelect.mockReturnThis(),
-  insert: mockInsert.mockReturnThis(),
-  update: mockUpdate.mockReturnThis(),
-  delete: mockDelete.mockReturnThis(),
-  eq: mockEq.mockReturnThis(),
-  lt: mockLt.mockReturnThis(),
-  order: mockOrder.mockReturnThis(),
-  limit: mockLimit.mockReturnThis(),
-  single: mockSingle,
-  then: vi.fn(),
+  // Build chainable mock
+  const buildChain = () => ({
+    select: mockSelect.mockReturnThis(),
+    insert: mockInsert.mockReturnThis(),
+    update: mockUpdate.mockReturnThis(),
+    delete: mockDelete.mockReturnThis(),
+    eq: mockEq.mockReturnThis(),
+    lt: mockLt.mockReturnThis(),
+    order: mockOrder.mockReturnThis(),
+    limit: mockLimit.mockReturnThis(),
+    single: mockSingle,
+    then: vi.fn(),
+  });
+
+  const mockFrom = vi.fn(() => buildChain());
+
+  return { 
+    mockEq, mockLt, mockOrder, mockLimit, mockSelect, mockInsert, 
+    mockUpdate, mockDelete, mockSingle, mockSubscribe, mockChannel, 
+    mockOn, mockRemoveChannel, mockFrom, buildChain 
+  };
 });
-
-const mockFrom = vi.fn(() => buildChain());
 
 vi.mock('../supabase', () => ({
   supabase: {
@@ -53,6 +64,9 @@ vi.mock('../logger', () => ({
     debug: vi.fn(),
   },
 }));
+
+// Import after mocks are set up
+import { NotificationService } from '../notification-service';
 
 describe('NotificationService', () => {
   beforeEach(() => {

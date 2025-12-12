@@ -7,19 +7,19 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { PlusCircle, Edit, Trash2, Search } from 'lucide-react';
-import { useOrderStore } from '@/store/use-order-store';
+import { useTaxesStore } from '@/store/use-taxes-store';
 import { TaxFormDialog } from './tax-form-dialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { toast } from '@/hooks/use-toast';
 import type { Tax } from '@/lib/types';
 
 export function TaxSettings() {
-    const { taxes, addTax, updateTax, deleteTax } = useOrderStore();
-    
+    const { taxes, addTax, updateTax, deleteTax } = useTaxesStore();
+
     const [searchTerm, setSearchTerm] = useState('');
     const [isFormOpen, setIsFormOpen] = useState(false);
     const [editingItem, setEditingItem] = useState<Tax | null>(null);
-    
+
     const [isAlertOpen, setIsAlertOpen] = useState(false);
     const [itemToDelete, setItemToDelete] = useState<Tax | null>(null);
 
@@ -60,7 +60,7 @@ export function TaxSettings() {
 
     return (
         <>
-            <TaxFormDialog 
+            <TaxFormDialog
                 isOpen={isFormOpen}
                 onOpenChange={setIsFormOpen}
                 onSubmit={handleFormSubmit}
@@ -91,9 +91,9 @@ export function TaxSettings() {
                             Add Tax
                         </Button>
                     </div>
-                     <div className="relative mt-2">
-                         <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                         <Input placeholder="Search taxes..." className="pl-8" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+                    <div className="relative mt-2">
+                        <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                        <Input placeholder="Search taxes..." className="pl-8" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
                     </div>
                 </CardHeader>
                 <CardContent>
@@ -116,11 +116,11 @@ export function TaxSettings() {
                                     </TableCell>
                                 </TableRow>
                             ))}
-                             {filteredTaxes.length === 0 && (
+                            {filteredTaxes.length === 0 && (
                                 <TableRow>
                                     <TableCell colSpan={3} className="text-center h-24">No tax rates found.</TableCell>
                                 </TableRow>
-                             )}
+                            )}
                         </TableBody>
                     </Table>
                 </CardContent>

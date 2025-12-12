@@ -14,18 +14,25 @@ import { PaymentFilters } from './_components/payment-filters';
 import { MarkPaidDialog } from './_components/mark-paid-dialog';
 import { PaymentHistoryDialog } from './_components/payment-history-dialog';
 import { exportToCSV } from '@/lib/export-utils';
+import type { Order } from '@/lib/types';
+
+// Extended order type for payments with additional payment fields
+interface PaymentOrder extends Order {
+  daysOverdue?: number;
+  expectedPaymentDate?: string;
+}
 
 export default function PaymentsPage() {
   const { markBulkCycleAsPaid, markOrderAsPaid, markBulkOrdersAsPaid } = useOrderStore();
   const { companies } = useCompanyStore();
-  const [allOrders, setAllOrders] = useState<any[]>([]);
+  const [allOrders, setAllOrders] = useState<PaymentOrder[]>([]);
   const [loading, setLoading] = useState(true);
-  
+
   useEffect(() => {
     const loadAllOrders = async () => {
       setLoading(true);
       try {
-        let allData: any[] = [];
+        let allData: PaymentOrder[] = [];
         const seenIds = new Set<string>();
         let from = 0;
         const batchSize = 1000;
@@ -37,11 +44,11 @@ export default function PaymentsPage() {
             .select('*')
             .order('orderDate', { ascending: false })
             .range(from, from + batchSize - 1);
-          
+
           if (error) throw error;
-          
+
           if (data && data.length > 0) {
-            const uniqueData = data.filter(order => {
+            const uniqueData = (data as PaymentOrder[]).filter((order: PaymentOrder) => {
               if (seenIds.has(order.id)) return false;
               seenIds.add(order.id);
               return true;
@@ -53,7 +60,7 @@ export default function PaymentsPage() {
             hasMore = false;
           }
         }
-        
+
         setAllOrders(allData);
       } catch (e) {
         console.error('Error loading orders:', e);
@@ -62,7 +69,7 @@ export default function PaymentsPage() {
     };
     loadAllOrders();
   }, []);
-  
+
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'pending' | 'overdue'>('all');
   const [companyFilter, setCompanyFilter] = useState<string>('all');
@@ -81,9 +88,9 @@ export default function PaymentsPage() {
       const daysUntilDue = Math.ceil((new Date(o.expectedPaymentDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
       return daysUntilDue >= 0 && daysUntilDue <= 7;
     });
-    
+
     const paidOrders = allOrders.filter(o => o.isPaid || o.paymentStatus === 'Paid');
-    
+
     return {
       totalOutstanding: unpaidOrders.reduce((sum, o) => sum + o.total, 0),
       totalOverdue: overdueOrders.reduce((sum, o) => sum + o.total, 0),
@@ -96,25 +103,25 @@ export default function PaymentsPage() {
 
   const filteredOrders = useMemo(() => {
     let filtered = allOrders.filter(o => !o.isPaid && o.paymentStatus !== 'Paid');
-    
+
     if (statusFilter === 'overdue') {
       filtered = filtered.filter(o => (o.daysOverdue || 0) > 7);
     } else if (statusFilter === 'pending') {
       filtered = filtered.filter(o => (o.daysOverdue || 0) <= 7);
     }
-    
+
     if (companyFilter !== 'all') {
       filtered = filtered.filter(o => o.companyId === companyFilter);
     }
-    
+
     if (searchTerm) {
       const search = searchTerm.toLowerCase();
-      filtered = filtered.filter(o => 
+      filtered = filtered.filter(o =>
         o.companyName?.toLowerCase().includes(search) ||
         o.id.toLowerCase().includes(search)
       );
     }
-    
+
     return filtered.sort((a, b) => (b.daysOverdue || 0) - (a.daysOverdue || 0));
   }, [allOrders, statusFilter, companyFilter, searchTerm]);
 
@@ -132,7 +139,7 @@ export default function PaymentsPage() {
     setPendingOrderId(null);
     setMarkPaidDialogOpen(true);
   };
-  
+
   const handleConfirmPayment = async (paidDate: string, reference?: string, notes?: string) => {
     if (pendingOrderId) {
       await markOrderAsPaid(pendingOrderId, paidDate, reference, notes);
@@ -142,18 +149,18 @@ export default function PaymentsPage() {
     }
     setPendingOrderId(null);
   };
-  
+
   const handleExport = () => {
     exportToCSV(filteredOrders, companies, 'unpaid-invoices');
   };
-  
+
   const handleViewHistory = (companyId: string, companyName: string) => {
     setSelectedCompanyId(companyId);
     setSelectedCompanyName(companyName);
     setHistoryDialogOpen(true);
   };
-  
-  const companyOrders = selectedCompanyId 
+
+  const companyOrders = selectedCompanyId
     ? allOrders.filter(o => o.companyId === selectedCompanyId)
     : [];
 
@@ -253,8 +260,8 @@ export default function PaymentsPage() {
 
       {/* Bulk Payment Cycles */}
       {!loading && (
-        <BulkPaymentCycles 
-          orders={allOrders} 
+        <BulkPaymentCycles
+          orders={allOrders}
           onMarkCycleAsPaid={handleMarkCycleAsPaid}
         />
       )}
@@ -268,7 +275,7 @@ export default function PaymentsPage() {
         onMarkAsPaid={handleMarkAsPaid}
         onViewHistory={handleViewHistory}
       />
-      
+
       {/* Mark Paid Dialog */}
       <MarkPaidDialog
         isOpen={markPaidDialogOpen}
@@ -276,7 +283,7 @@ export default function PaymentsPage() {
         onConfirm={handleConfirmPayment}
         orderCount={pendingOrderId ? 1 : selectedOrders.size}
       />
-      
+
       <PaymentHistoryDialog
         isOpen={historyDialogOpen}
         onOpenChange={setHistoryDialogOpen}

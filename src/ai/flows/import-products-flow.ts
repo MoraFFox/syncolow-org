@@ -95,12 +95,12 @@ export const importProductsFlow = ai.defineFlow(
         supabase.from('products').select('name, sku'),
     ]);
     
-    const existingManufacturers = new Map(
-        (manufacturersResult.data || []).map(m => [m.name.toLowerCase(), m.id])
+    const existingManufacturers = new Map<string, string>(
+        (manufacturersResult.data || []).map((m: { name: string; id: string }) => [m.name.toLowerCase(), m.id])
     );
 
-    const existingProductNames = new Set((productsResult.data || []).map(p => p.name.toLowerCase()));
-    const existingProductSkus = new Set((productsResult.data || []).map(p => p.sku?.toLowerCase()).filter(Boolean));
+    const existingProductNames = new Set((productsResult.data || []).map((p: { name: string; sku?: string }) => p.name.toLowerCase()));
+    const existingProductSkus = new Set((productsResult.data || []).map((p: { name: string; sku?: string }) => p.sku?.toLowerCase()).filter(Boolean));
     const processedInThisBatch = new Set<string>();
 
     for (let i = 0; i < products.length; i += BATCH_SIZE) {

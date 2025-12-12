@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useFormContext, Controller } from 'react-hook-form';
+import { Controller } from 'react-hook-form';
 import type { Control, UseFormRegister, FieldErrors } from 'react-hook-form';
 import type { VisitOutcomeFormData } from '../maintenance-schemas';
 import { Label } from '@/components/ui/label';
@@ -9,7 +9,6 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { format } from 'date-fns';
-import { VisitOutcomeFormData } from '../../maintenance-schemas';
 import { useMaintenanceStore } from '@/store/use-maintenance-store';
 import { Combobox } from '@/components/ui/combo-box';
 
@@ -21,7 +20,7 @@ interface VisitDetailsSectionProps {
 
 export function VisitDetailsSection({ control, register, errors }: VisitDetailsSectionProps) {
     const { maintenanceEmployees } = useMaintenanceStore();
-    
+
     return (
         <AccordionItem value="details">
             <AccordionTrigger className="font-semibold text-lg bg-muted px-5 rounded-sm bg-gray-500/20 border-gray-500/20 border">Visit Details</AccordionTrigger>

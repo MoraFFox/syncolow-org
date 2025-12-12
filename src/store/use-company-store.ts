@@ -135,7 +135,7 @@ export const useCompanyStore = create<CompanyState>((set, get) => ({
     // Refresh to get all data including branches (exclude deleted placeholders)
     const { data: allCompanies } = await supabase.from('companies').select('*').not('name', 'like', '[DELETED]%');
     if (allCompanies) {
-        set({ companies: allCompanies.map(c => ({ ...c, isBranch: !!c.parentCompanyId })) as Company[] });
+        set({ companies: allCompanies.map((c: { parentCompanyId?: string | null }) => ({ ...c, isBranch: !!c.parentCompanyId })) as Company[] });
     }
     
     return fullCompany;
@@ -187,7 +187,7 @@ export const useCompanyStore = create<CompanyState>((set, get) => ({
     // Update local state (exclude deleted placeholders)
     const { data: allCompanies } = await supabase.from('companies').select('*').not('name', 'like', '[DELETED]%');
     if (allCompanies) {
-        set({ companies: allCompanies.map(c => ({ ...c, isBranch: !!c.parentCompanyId })) as Company[] });
+        set({ companies: allCompanies.map((c: { parentCompanyId?: string | null }) => ({ ...c, isBranch: !!c.parentCompanyId })) as Company[] });
     }
     
     toast({ title: 'Company Updated', description: 'Company details have been updated.' });
@@ -276,7 +276,7 @@ export const useCompanyStore = create<CompanyState>((set, get) => ({
       // Refresh companies list (exclude deleted placeholders)
       const { data: allCompanies } = await supabase.from('companies').select('*').not('name', 'like', '[DELETED]%');
       if (allCompanies) {
-        set({ companies: allCompanies.map(c => ({ ...c, isBranch: !!c.parentCompanyId })) as Company[] });
+        set({ companies: allCompanies.map((c: { parentCompanyId?: string | null }) => ({ ...c, isBranch: !!c.parentCompanyId })) as Company[] });
       }
       
       const msg = forceCascade ? "Company and all related data removed." : reassignToCompanyId ? "Company deleted and data reassigned." : `Company deleted. Related data preserved under "[DELETED] ${companyToDelete.name}".`;
@@ -318,7 +318,7 @@ export const useCompanyStore = create<CompanyState>((set, get) => ({
     // Update local state (exclude deleted placeholders)
     const { data: allCompanies } = await supabase.from('companies').select('*').not('name', 'like', '[DELETED]%');
     if (allCompanies) {
-        set({ companies: allCompanies.map(c => ({ ...c, isBranch: !!c.parentCompanyId })) as Company[] });
+        set({ companies: allCompanies.map((c: { parentCompanyId?: string | null }) => ({ ...c, isBranch: !!c.parentCompanyId })) as Company[] });
     }
     
     toast({ title: "Merge Complete", description: "Companies have been successfully merged." });
@@ -436,7 +436,7 @@ export const useCompanyStore = create<CompanyState>((set, get) => ({
                         break;
                     }
 
-                    orders.forEach(order => {
+                    orders.forEach((order: { companyId?: string | null; grandTotal?: number | null }) => {
                         if (order.companyId) {
                             revenueMap[order.companyId] = (revenueMap[order.companyId] || 0) + (order.grandTotal || 0);
                         }

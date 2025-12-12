@@ -7,6 +7,9 @@ import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Loader2, CheckCircle2, XCircle, PlayCircle } from "lucide-react";
 import { useOrderStore } from "@/store/use-order-store";
+import { useProductsStore } from "@/store/use-products-store";
+import { useCategoriesStore } from "@/store/use-categories-store";
+import { useTaxesStore } from "@/store/use-taxes-store";
 import { useCompanyStore } from "@/store/use-company-store";
 import { useManufacturerStore } from "@/store/use-manufacturer-store";
 import { useMaintenanceStore } from "@/store/use-maintenance-store";
@@ -118,17 +121,17 @@ export function MigrationTester() {
 
       // 4. Create Category & Tax
       updateStep("create-category-tax", "running");
-      // Note: useOrderStore doesn't return the created object for these, so we verify via fetch/store
+      // Note: useCategoriesStore and useTaxesStore for these operations
       const catName = "Test Cat " + Date.now();
-      await useOrderStore.getState().addCategory({ name: catName });
-      const categories = useOrderStore.getState().categories;
+      await useCategoriesStore.getState().addCategory({ name: catName });
+      const categories = useCategoriesStore.getState().categories;
       const createdCat = categories.find(c => c.name === catName);
       if (!createdCat) throw new Error("Category creation failed");
       testCategoryId = createdCat.id;
 
       const taxName = "Test Tax " + Date.now();
-      await useOrderStore.getState().addTax({ name: taxName, rate: 14 });
-      const taxes = useOrderStore.getState().taxes;
+      await useTaxesStore.getState().addTax({ name: taxName, rate: 14 });
+      const taxes = useTaxesStore.getState().taxes;
       const createdTax = taxes.find(t => t.name === taxName);
       if (!createdTax) throw new Error("Tax creation failed");
       testTaxId = createdTax.id;
@@ -152,21 +155,21 @@ export function MigrationTester() {
       // For safety in this test script, I'll use direct Supabase for setup if store is ambiguous, 
       // BUT the goal is to test the store. Let's try to use the store methods if they are standard.
       // Looking at previous context, addCompanyAndRelatedData was viewed.
-      
+
       // Let's use direct Supabase for the setup to be sure we get the ID, 
       // unless we are testing the "add company" feature specifically. 
       // The plan said "Create Company", implying testing the creation.
       // Let's try to use the store, but if it doesn't return the ID, we'll fetch it.
-      
+
       const { data: companyData, error: companyError } = await supabase
         .from("companies")
         .insert(newCompany)
         .select()
         .single();
-      
+
       if (companyError) throw companyError;
       testCompanyId = companyData.id;
-      
+
       // Inject into store so submitOrder can find it
       useCompanyStore.setState((state) => ({
         companies: [...state.companies, companyData as any]
@@ -232,18 +235,18 @@ export function MigrationTester() {
         imageUrl: "",
         isVariant: false,
       };
-      const createdProduct = await useOrderStore.getState().addProduct(newProduct);
+      const createdProduct = await useProductsStore.getState().addProduct(newProduct);
       if (!createdProduct?.id) throw new Error("Product creation failed to return ID");
       testProductId = createdProduct.id;
       updateStep("create-product", "success", `Created product: ${createdProduct.name} (${testProductId})`);
 
       // 9. Update Product & Assign Manufacturer
       updateStep("update-product", "running");
-      await useOrderStore.getState().updateProduct(testProductId, { price: 150, stock: 200 });
+      await useProductsStore.getState().updateProduct(testProductId, { price: 150, stock: 200 });
       await useManufacturerStore.getState().updateProductManufacturer(testProductId, testManufacturerId);
       // Verify
       const { data: updatedProd } = await supabase.from("products").select("*").eq("id", testProductId).single();
-      if (updatedProd.price !== 150 || updatedProd.manufacturerId !== testManufacturerId) 
+      if (updatedProd.price !== 150 || updatedProd.manufacturerId !== testManufacturerId)
         throw new Error("Product update failed.");
       updateStep("update-product", "success", "Product updated and manufacturer assigned.");
 
@@ -265,11 +268,11 @@ export function MigrationTester() {
         ],
         notes: "Migration Test Order",
       };
-      
+
       // useOrderStore.submitOrder doesn't usually return the ID, it just submits.
       // We'll submit, then fetch the latest order for this company.
       await useOrderStore.getState().submitOrder(orderPayload);
-      
+
       // Give it a moment or fetch immediately
       const { data: orders, error: fetchOrderError } = await supabase
         .from("orders")
@@ -277,10 +280,10 @@ export function MigrationTester() {
         .eq("companyId", testCompanyId)
         .order("orderDate", { ascending: false })
         .limit(1);
-        
+
       if (fetchOrderError) throw fetchOrderError;
       if (!orders || orders.length === 0) throw new Error("Order submitted but not found in DB.");
-      
+
       testOrderId = orders[0].id;
       updateStep("create-order", "success", `Order submitted successfully. ID: ${testOrderId}`);
 
@@ -288,19 +291,19 @@ export function MigrationTester() {
       updateStep("verify-order", "running");
       const order = orders[0];
       // (2 * 150) * 1.14 = 342
-      if (Math.abs(order.total - 342) > 0.01) { 
-         addLog(`Warning: Expected total 342, got ${order.total}. Check tax calculation logic.`);
+      if (Math.abs(order.total - 342) > 0.01) {
+        addLog(`Warning: Expected total 342, got ${order.total}. Check tax calculation logic.`);
       }
       updateStep("verify-order", "success", `Order verified. Total: ${order.total}`);
 
       // 7. Update Order Status
       updateStep("update-order", "running");
       await useOrderStore.getState().updateOrderStatus(testOrderId, "Delivered", undefined, "Test Delivery");
-      
+
       // Verify update
       const { data: updatedOrder } = await supabase.from("orders").select("status").eq("id", testOrderId).single();
       if (updatedOrder?.status !== "Delivered") throw new Error("Order status update failed.");
-      
+
       updateStep("update-order", "success", "Order status updated to Delivered.");
 
       // 13. Add Visit Interaction
@@ -374,7 +377,7 @@ export function MigrationTester() {
       if (!reasons) throw new Error("Cancellation reason creation failed.");
       // No need to store ID for cleanup if we delete by reason or just leave it (it's ref data)
       // But let's try to clean it up if possible.
-      const testReasonId = reasons.id; 
+      const testReasonId = reasons.id;
       updateStep("add-cancellation-reason", "success", "Cancellation reason added.");
 
       // 19. Create & Update Notification
@@ -438,7 +441,7 @@ export function MigrationTester() {
 
       // NEW: 20. Update Company
       updateStep("update-company", "running");
-      await useCompanyStore.getState().updateCompanyAndBranches(testCompanyId, { 
+      await useCompanyStore.getState().updateCompanyAndBranches(testCompanyId, {
         email: "updated@test.com",
         location: "456 Updated St"
       }, []);
@@ -448,7 +451,7 @@ export function MigrationTester() {
 
       // NEW: 21. Update Product
       updateStep("update-product-full", "running");
-      await useOrderStore.getState().updateProduct(testProductId, {
+      await useProductsStore.getState().updateProduct(testProductId, {
         price: 150,
         stock: 75,
         description: "Updated Description"
@@ -460,7 +463,7 @@ export function MigrationTester() {
       // NEW: 22. Update Branch (via updateBarista as branch update not exposed)
       updateStep("update-branch", "running");
       // Branch update not directly exposed, using updateCompanyAndBranches instead
-      await useCompanyStore.getState().updateCompanyAndBranches(testCompanyId, {}, [{ 
+      await useCompanyStore.getState().updateCompanyAndBranches(testCompanyId, {}, [{
         id: testBranchId,
         name: "Updated Branch Name",
         email: "updatedbranch@test.com"
@@ -471,14 +474,14 @@ export function MigrationTester() {
 
       // NEW: 23. Update Category
       updateStep("update-category", "running");
-      await useOrderStore.getState().updateCategory(testCategoryId, { name: "Updated Category" });
+      await useCategoriesStore.getState().updateCategory(testCategoryId, { name: "Updated Category" });
       const { data: updatedCat } = await supabase.from("categories").select("name").eq("id", testCategoryId).single();
       if (updatedCat?.name !== "Updated Category") throw new Error("Category update failed.");
       updateStep("update-category", "success", "Category updated.");
 
       // NEW: 24. Update Tax
       updateStep("update-tax", "running");
-      await useOrderStore.getState().updateTax(testTaxId, { rate: 15 });
+      await useTaxesStore.getState().updateTax(testTaxId, { rate: 15 });
       const { data: updatedTaxData } = await supabase.from("taxes").select("rate").eq("id", testTaxId).single();
       if (updatedTaxData?.rate !== 15) throw new Error("Tax update failed.");
       updateStep("update-tax", "success", "Tax updated.");
@@ -491,7 +494,7 @@ export function MigrationTester() {
 
       // NEW: 26. Delete Category
       updateStep("delete-category", "running");
-      await useOrderStore.getState().deleteCategory(testCategoryId);
+      await useCategoriesStore.getState().deleteCategory(testCategoryId);
       const { data: delCat } = await supabase.from("categories").select("id").eq("id", testCategoryId).single();
       if (delCat) throw new Error("Category deletion failed.");
       testCategoryId = "";
@@ -499,7 +502,7 @@ export function MigrationTester() {
 
       // NEW: 27. Delete Tax
       updateStep("delete-tax", "running");
-      await useOrderStore.getState().deleteTax(testTaxId);
+      await useTaxesStore.getState().deleteTax(testTaxId);
       const { data: delTaxData } = await supabase.from("taxes").select("id").eq("id", testTaxId).single();
       if (delTaxData) throw new Error("Tax deletion failed.");
       testTaxId = "";
@@ -526,7 +529,7 @@ export function MigrationTester() {
 
       // 22. Delete Product
       updateStep("delete-product", "running");
-      await useOrderStore.getState().deleteProduct(testProductId);
+      await useProductsStore.getState().deleteProduct(testProductId);
       const { data: delProd } = await supabase.from("products").select("id").eq("id", testProductId).single();
       if (delProd) throw new Error("Product deletion failed.");
       testProductId = "";
@@ -581,7 +584,7 @@ export function MigrationTester() {
         if (testNotificationId) await supabase.from("notifications").delete().eq("id", testNotificationId);
         // Cleanup cancellation reason if we found it
         // if (testReasonId) await supabase.from("cancellationReasons").delete().eq("id", testReasonId); 
-        
+
         updateStep("cleanup", "success", "Test data cleaned up.");
       } catch (cleanupError: any) {
         updateStep("cleanup", "error", "Cleanup failed: " + cleanupError.message);

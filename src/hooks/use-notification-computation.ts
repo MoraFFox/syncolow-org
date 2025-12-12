@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { useOrderStore } from '@/store/use-order-store';
+import { useProductsStore } from '@/store/use-products-store';
 import { useCompanyStore } from '@/store/use-company-store';
 import { useMaintenanceStore } from '@/store/use-maintenance-store';
 import { useSettingsStore } from '@/store/use-settings-store';
@@ -8,7 +9,8 @@ import { useNotificationStore } from '@/store/use-notification-store';
 import { generateNotifications } from '@/lib/notification-generator';
 
 export function useNotificationComputation(userId: string | undefined) {
-  const { orders, products } = useOrderStore();
+  const { orders } = useOrderStore();
+  const { products } = useProductsStore();
   const { companies, feedback } = useCompanyStore();
   const { maintenanceVisits } = useMaintenanceStore();
   const { notificationSettings } = useSettingsStore();

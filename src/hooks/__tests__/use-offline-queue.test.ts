@@ -1,16 +1,24 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { renderHook, act } from '@testing-library/react';
+import { renderHook } from '@testing-library/react';
 
-// Mock dependencies before importing
-const mockLoadQueue = vi.fn();
-const mockProcessQueue = vi.fn();
-const mockQueueData = vi.fn(() => []);
-const mockIsProcessing = vi.fn(() => false);
+// Use vi.hoisted() to define mocks before vi.mock hoisting
+const { mockLoadQueue, mockProcessQueue, mockQueueData, mockIsProcessing, getIsOnline, setIsOnline } = vi.hoisted(() => {
+  const mockLoadQueue = vi.fn();
+  const mockProcessQueue = vi.fn();
+  const mockQueueData = vi.fn((): Array<{ id: string; action?: string; data?: unknown }> | undefined => []);
+  const mockIsProcessing = vi.fn(() => false);
+  
+  // Mutable online status
+  let isOnline = false;
+  const getIsOnline = () => isOnline;
+  const setIsOnline = (value: boolean) => { isOnline = value; };
+  
+  return { mockLoadQueue, mockProcessQueue, mockQueueData, mockIsProcessing, getIsOnline, setIsOnline };
+});
 
 // Mock online status
-let isOnline = false;
 vi.mock('../use-online-status', () => ({
-  useOnlineStatus: () => isOnline,
+  useOnlineStatus: () => getIsOnline(),
 }));
 
 // Mock offline queue store
@@ -35,7 +43,7 @@ import { useOfflineQueue } from '../use-offline-queue';
 describe('useOfflineQueue', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    isOnline = false;
+    setIsOnline(false);
     mockQueueData.mockReturnValue([]);
     mockIsProcessing.mockReturnValue(false);
   });
@@ -69,7 +77,7 @@ describe('useOfflineQueue', () => {
         { id: '1', action: 'create', data: {} },
         { id: '2', action: 'update', data: {} },
       ]);
-      isOnline = true;
+      setIsOnline(true);
 
       renderHook(() => useOfflineQueue());
 
@@ -78,7 +86,7 @@ describe('useOfflineQueue', () => {
 
     it('should NOT process queue when online but queue is empty', () => {
       mockQueueData.mockReturnValue([]);
-      isOnline = true;
+      setIsOnline(true);
 
       renderHook(() => useOfflineQueue());
 
@@ -87,7 +95,7 @@ describe('useOfflineQueue', () => {
 
     it('should NOT process queue when offline even with pending items', () => {
       mockQueueData.mockReturnValue([{ id: '1', action: 'create', data: {} }]);
-      isOnline = false;
+      setIsOnline(false);
 
       renderHook(() => useOfflineQueue());
 
@@ -97,7 +105,7 @@ describe('useOfflineQueue', () => {
     it('should NOT process queue when already processing', () => {
       mockQueueData.mockReturnValue([{ id: '1', action: 'create', data: {} }]);
       mockIsProcessing.mockReturnValue(true);
-      isOnline = true;
+      setIsOnline(true);
 
       renderHook(() => useOfflineQueue());
 
@@ -108,13 +116,13 @@ describe('useOfflineQueue', () => {
       mockQueueData.mockReturnValue([{ id: '1', action: 'create', data: {} }]);
       
       // Start offline
-      isOnline = false;
+      setIsOnline(false);
       const { rerender } = renderHook(() => useOfflineQueue());
       
       expect(mockProcessQueue).not.toHaveBeenCalled();
 
       // Go online
-      isOnline = true;
+      setIsOnline(true);
       rerender();
 
       expect(mockProcessQueue).toHaveBeenCalledTimes(1);
@@ -206,15 +214,15 @@ describe('useOfflineQueue', () => {
     it('should handle rapid online/offline toggles', () => {
       mockQueueData.mockReturnValue([{ id: '1' }]);
       
-      isOnline = false;
+      setIsOnline(false);
       const { rerender } = renderHook(() => useOfflineQueue());
       
       // Rapid toggles
-      isOnline = true;
+      setIsOnline(true);
       rerender();
-      isOnline = false;
+      setIsOnline(false);
       rerender();
-      isOnline = true;
+      setIsOnline(true);
       rerender();
 
       // Should have processed twice (each time going online with queue)

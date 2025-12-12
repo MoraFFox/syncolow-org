@@ -10,7 +10,7 @@ export { useMaintenanceStore } from './use-maintenance-store';
 export { useManufacturerStore } from './use-manufacturer-store';
 export { useSettingsStore } from './use-settings-store';
 export { useNotificationStore } from './use-notification-store';
-export { useDrilldownStore } from './use-drilldown-store';
+export { useDrillDownStore } from './use-drilldown-store';
 export { useConflictStore } from './use-conflict-store';
 export { useOfflineQueueStore } from './use-offline-queue-store';
 

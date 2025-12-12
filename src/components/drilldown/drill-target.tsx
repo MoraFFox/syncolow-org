@@ -24,11 +24,11 @@ interface DrillTargetProps extends React.HTMLAttributes<HTMLDivElement> {
  * Generates accessible label from payload
  */
 function getAccessibleLabel(kind: DrillKind, payload: DrillPayload): string {
-  const entityName = (payload as { name?: string }).name 
-    || (payload as { id?: string }).id 
+  const entityName = (payload as { name?: string }).name
+    || (payload as { id?: string }).id
     || (payload as { value?: string }).value
     || 'item';
-  
+
   const kindLabels: Record<DrillKind, string> = {
     order: 'Order',
     product: 'Product',
@@ -82,16 +82,22 @@ export function DrillTarget({
   variant,
   showIcon = false,
   ariaLabel,
+  expandHitArea,
+  hitAreaPadding,
   ...props
-}: DrillTargetProps) {
+}: DrillTargetProps & { expandHitArea?: boolean; hitAreaPadding?: number }) {
   const Comp = asChild ? Slot : "div";
   const { settings } = useDrillDownStore();
 
   const effectiveVariant = variant || (
     settings.visualStyle === 'prominent' ? 'primary' :
-    settings.visualStyle === 'normal' ? 'secondary' :
-    'subtle'
+      settings.visualStyle === 'normal' ? 'secondary' :
+        'subtle'
   );
+
+  // Determine if expanded hit area should be active (prop overrides setting)
+  const isExpandedHitArea = expandHitArea !== undefined ? expandHitArea : settings.expandedHitArea;
+  const effectiveHitPadding = hitAreaPadding !== undefined ? hitAreaPadding : settings.hitAreaPadding;
 
   const accessibleLabel = ariaLabel || getAccessibleLabel(kind, payload);
 
@@ -110,6 +116,7 @@ export function DrillTarget({
     <Comp
       className={cn(
         "drill-target",
+        isExpandedHitArea && "drill-target-expanded",
         !disabled && "cursor-pointer transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
         !disabled && effectiveVariant === 'primary' && "drill-target-primary",
         !disabled && effectiveVariant === 'secondary' && "drill-target-secondary",
@@ -122,6 +129,7 @@ export function DrillTarget({
       {...{ [DATA_DRILL_PAYLOAD]: JSON.stringify(payload) }}
       {...(mode !== 'page' && { [DATA_DRILL_MODE]: mode })}
       {...(disabled && { [DATA_DRILL_DISABLED]: "" })}
+      {...(hitAreaPadding !== undefined && { "data-drill-hit-padding": hitAreaPadding })}
       role="button"
       aria-label={accessibleLabel}
       aria-haspopup="dialog"
@@ -133,6 +141,11 @@ export function DrillTarget({
           e.preventDefault();
           (e.target as HTMLElement).click();
         }
+      }}
+      style={{
+        ...props.style,
+        // Set CSS variable for hit padding if expanded
+        ...(isExpandedHitArea ? { "--hit-padding": `${effectiveHitPadding}px` } as React.CSSProperties : {})
       }}
       {...props}
     >

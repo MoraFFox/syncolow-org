@@ -8,7 +8,7 @@ import { GlobalDrillListener } from './global-drill-listener';
 
 export function DrillDownProvider() {
   const { pinnedPreviews, unpinPreview, loadPinnedPreviews } = useDrillDownStore();
-  
+
   useEffect(() => {
     loadPinnedPreviews();
   }, [loadPinnedPreviews]);

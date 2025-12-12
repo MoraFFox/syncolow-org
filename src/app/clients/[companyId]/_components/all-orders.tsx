@@ -48,67 +48,67 @@ export function AllOrders({ orders }: AllOrdersProps) {
       <CardContent>
         {/* Mobile View */}
         <div className="grid grid-cols-1 gap-4 md:hidden">
-             {orders.map(order => (
-                <div key={order.id} className="transition-transform">
-                    <Card>
-                        <CardContent className="p-4 flex flex-col gap-2">
-                            <div className="flex justify-between items-start">
-                                <div>
-                                    <DrillTarget kind="order" payload={{ id: order.id }} asChild>
-                                        <Link href={`/orders/${order.id}`} className="font-semibold text-primary hover:underline">#{order.id.slice(0,7)}</Link>
-                                    </DrillTarget>
-                                    <p className="text-sm font-medium">{order.branchName}</p>
-                                </div>
-                                <Badge variant={getStatusVariant(order.status)}>{order.status}</Badge>
-                            </div>
-                            <div className="flex justify-between items-end pt-2">
-                                <p className="text-sm text-muted-foreground">{format(new Date(order.orderDate), 'PPP')}</p>
-                                <p className="text-lg font-bold">{formatCurrency(order.total)}</p>
-                            </div>
-                        </CardContent>
-                    </Card>
-                </div>
-             ))}
-             {orders.length === 0 && (
-                <p className="text-center text-muted-foreground py-4">No orders found for this company.</p>
-             )}
+          {orders.map(order => (
+            <div key={order.id} className="transition-transform">
+              <Card>
+                <CardContent className="p-4 flex flex-col gap-2">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <DrillTarget kind="order" payload={{ id: order.id }} asChild expandHitArea>
+                        <Link href={`/orders/${order.id}`} className="font-semibold text-primary hover:underline">#{order.id.slice(0, 7)}</Link>
+                      </DrillTarget>
+                      <p className="text-sm font-medium">{order.branchName}</p>
+                    </div>
+                    <Badge variant={getStatusVariant(order.status)}>{order.status}</Badge>
+                  </div>
+                  <div className="flex justify-between items-end pt-2">
+                    <p className="text-sm text-muted-foreground">{format(new Date(order.orderDate), 'PPP')}</p>
+                    <p className="text-lg font-bold">{formatCurrency(order.total)}</p>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          ))}
+          {orders.length === 0 && (
+            <p className="text-center text-muted-foreground py-4">No orders found for this company.</p>
+          )}
         </div>
 
         {/* Desktop View */}
         <div className="hidden md:block">
-            <ScrollArea className="h-[400px]">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Order</TableHead>
-                    <TableHead>Branch</TableHead>
-                    <TableHead>Date</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead className="text-right">Total</TableHead>
+          <ScrollArea className="h-[400px]">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Order</TableHead>
+                  <TableHead>Branch</TableHead>
+                  <TableHead>Date</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead className="text-right">Total</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {orders.map(order => (
+                  <TableRow key={order.id}>
+                    <TableCell className="font-medium">
+                      <DrillTarget kind="order" payload={{ id: order.id }} asChild expandHitArea>
+                        <Link href={`/orders/${order.id}`} className="hover:underline">#{order.id.slice(0, 7)}</Link>
+                      </DrillTarget>
+                    </TableCell>
+                    <TableCell>{order.branchName}</TableCell>
+                    <TableCell>{format(new Date(order.orderDate), 'PPP')}</TableCell>
+                    <TableCell><Badge variant={getStatusVariant(order.status)}>{order.status}</Badge></TableCell>
+                    <TableCell className="text-right">{formatCurrency(order.total)}</TableCell>
                   </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {orders.map(order => (
-                    <TableRow key={order.id}>
-                      <TableCell className="font-medium">
-                        <DrillTarget kind="order" payload={{ id: order.id }} asChild>
-                            <Link href={`/orders/${order.id}`} className="hover:underline">#{order.id.slice(0, 7)}</Link>
-                        </DrillTarget>
-                      </TableCell>
-                      <TableCell>{order.branchName}</TableCell>
-                      <TableCell>{format(new Date(order.orderDate), 'PPP')}</TableCell>
-                      <TableCell><Badge variant={getStatusVariant(order.status)}>{order.status}</Badge></TableCell>
-                      <TableCell className="text-right">{formatCurrency(order.total)}</TableCell>
-                    </TableRow>
-                  ))}
-                  {orders.length === 0 && (
-                    <TableRow>
-                      <TableCell colSpan={5} className="text-center h-24">No orders found for this company.</TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
-            </ScrollArea>
+                ))}
+                {orders.length === 0 && (
+                  <TableRow>
+                    <TableCell colSpan={5} className="text-center h-24">No orders found for this company.</TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </ScrollArea>
         </div>
       </CardContent>
     </Card>

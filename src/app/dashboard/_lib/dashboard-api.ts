@@ -93,7 +93,7 @@ export const dashboardApi = {
       ]);
 
       const maintenanceItems: AgendaItem[] = (maintenanceResult.data || []).map(
-        (item) => ({
+        (item: { branchName?: string; date?: string }) => ({
           type: "Maintenance",
           data: item as MaintenanceVisit,
           clientName: item.branchName,
@@ -102,11 +102,11 @@ export const dashboardApi = {
       );
 
       const visitItems: AgendaItem[] = (visitsResult.data || []).map(
-        (item) => ({
+        (item: { clientName?: string; date?: string }) => ({
           type: "Visit",
           data: item as VisitCall,
           clientName: item.clientName,
-          date: item.date,
+          date: item.date as string,
         })
       );
 
@@ -141,17 +141,17 @@ export const dashboardApi = {
       .limit(5);
 
     const activities = [
-      ...(orders || []).map((o) => ({
+      ...(orders || []).map((o: { id: string; companyId: string; companyName: string; orderDate: string }) => ({
         type: "New Order",
         data: o,
         date: o.orderDate,
       })),
-      ...(feedback || []).map((f) => ({
+      ...(feedback || []).map((f: { id: string; clientId: string; message: string; feedbackDate: string }) => ({
         type: "New Feedback",
         data: f,
         date: f.feedbackDate,
       })),
-      ...(companies || []).map((c) => ({
+      ...(companies || []).map((c: { id: string; name: string; createdAt: string }) => ({
         type: "New Client",
         data: c,
         date: c.createdAt,

@@ -24,23 +24,25 @@ interface KpiCardProps {
     sparklineData?: number[];
     drillKind?: 'revenue' | 'product' | 'company' | 'order';
     drillPayload?: any;
+    expandHitArea?: boolean;
 }
 
-export function KpiCard({ 
-    title, 
-    value, 
-    icon, 
-    trend, 
+export function KpiCard({
+    title,
+    value,
+    icon,
+    trend,
     trendValue,
     trendDirection,
     isPositiveTrend,
-    className, 
+    className,
     onClick,
     loading = false,
     tooltip,
     sparklineData,
     drillKind,
-    drillPayload
+    drillPayload,
+    expandHitArea
 }: KpiCardProps) {
     const getTrendColor = () => {
         if (trendDirection === 'neutral') return 'text-muted-foreground';
@@ -61,6 +63,7 @@ export function KpiCard({
         if (onClick) {
             onClick();
         } else if (drillKind) {
+            // This is largely fail-safe, DrillTarget handles interaction if present
             openDetailDialog(drillKind, drillPayload);
         }
     };
@@ -81,8 +84,8 @@ export function KpiCard({
     }
 
     const cardContent = (
-        <Card 
-            className={cn(className, (onClick || drillKind) && "cursor-pointer hover:bg-accent/50 transition-colors")} 
+        <Card
+            className={cn(className, (onClick || drillKind) && "cursor-pointer hover:bg-accent/50 transition-colors")}
             onClick={onClick} // Keep original onClick if provided, DrillTarget handles its own click
         >
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -120,9 +123,9 @@ export function KpiCard({
                         <div className="h-12 w-20">
                             <ResponsiveContainer width="100%" height="100%">
                                 <AreaChart data={sparklineData.map((value, index) => ({ value, index }))}>
-                                    <Area 
-                                        type="monotone" 
-                                        dataKey="value" 
+                                    <Area
+                                        type="monotone"
+                                        dataKey="value"
                                         stroke={trendDirection === 'up' && isPositiveTrend ? 'hsl(var(--chart-1))' : trendDirection === 'down' && !isPositiveTrend ? 'hsl(var(--chart-1))' : 'hsl(var(--muted-foreground))'}
                                         fill={trendDirection === 'up' && isPositiveTrend ? 'hsl(var(--chart-1))' : trendDirection === 'down' && !isPositiveTrend ? 'hsl(var(--chart-1))' : 'hsl(var(--muted-foreground))'}
                                         fillOpacity={0.2}
@@ -138,13 +141,13 @@ export function KpiCard({
     );
 
     if (drillKind) {
-        // Import DrillTarget dynamically or ensure it's imported at top
-        // Since we are in the same file, we need to import it.
-        // But wait, I need to add the import first.
-        // I will assume DrillTarget is imported.
-        // Actually, I should check imports.
         return (
-            <DrillTarget kind={drillKind} payload={drillPayload || {}} asChild>
+            <DrillTarget
+                kind={drillKind}
+                payload={drillPayload || {}}
+                asChild
+                expandHitArea={expandHitArea}
+            >
                 {cardContent}
             </DrillTarget>
         );

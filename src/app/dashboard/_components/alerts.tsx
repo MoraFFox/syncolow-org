@@ -11,13 +11,13 @@ import { SectionCard } from './section-card';
 import { EmptyState } from './empty-state';
 import { PriorityBadge } from './priority-badge';
 import { toAlertItems, sortAlertsByPriority, getAlertIcon, formatAlertMessage } from '../_lib/alert-utils';
-import type { AlertItem } from '../_lib/types';
+import type { AlertItem, LowStockProduct, InactiveCompany } from '../_lib/types';
 import type { Order, Product } from '@/lib/types';
 
 const AlertRow = ({ alert }: { alert: AlertItem }) => {
   const Icon = getAlertIcon(alert.type);
   return (
-    <Alert className={cn("flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 w-full border-l-4", "hover:bg-muted/50 transition-colors")}> 
+    <Alert className={cn("flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 w-full border-l-4", "hover:bg-muted/50 transition-colors")}>
       <div className="flex items-start gap-3">
         <Icon className="h-4 w-4" />
         <div className="min-w-0 flex-1">
@@ -34,16 +34,16 @@ const AlertRow = ({ alert }: { alert: AlertItem }) => {
               )}
               {alert.type === 'Low Stock' && (
                 <span className="flex items-center gap-1 flex-wrap">
-                  <DrillTarget kind="product" payload={{ id: alert.data.id, name: alert.data.name, stock: alert.data.stock }} asChild>
-                    <span className="hover:underline cursor-pointer">{alert.data.name}</span>
+                  <DrillTarget kind="product" payload={{ id: alert.data.id, name: (alert.data as LowStockProduct).name, stock: (alert.data as LowStockProduct).stock }} asChild>
+                    <span className="hover:underline cursor-pointer">{(alert.data as LowStockProduct).name}</span>
                   </DrillTarget>
                   <span>is Low</span>
                 </span>
               )}
               {alert.type === 'Inactive Client' && (
                 <span className="flex items-center gap-1 flex-wrap">
-                  <DrillTarget kind="company" payload={{ id: alert.data.id, name: alert.data.name }} asChild>
-                    <span className="hover:underline cursor-pointer">{alert.data.name}</span>
+                  <DrillTarget kind="company" payload={{ id: alert.data.id, name: (alert.data as InactiveCompany).name }} asChild>
+                    <span className="hover:underline cursor-pointer">{(alert.data as InactiveCompany).name}</span>
                   </DrillTarget>
                   <span>is Inactive</span>
                 </span>
@@ -77,9 +77,9 @@ export function Alerts() {
   const { data, isLoading } = useAlerts();
 
   const items = toAlertItems([
-    ...(data?.overdue || []).map((o) => ({ type: 'Overdue Payment' as const, data: o as Pick<Order, 'id' | 'companyName'>, link: `/orders?filter=overdue` })),
-    ...(data?.lowStock || []).map((p) => ({ type: 'Low Stock' as const, data: p as Pick<Product, 'id' | 'name' | 'stock'>, link: `/products/${p.id}` })),
-    ...(data?.tomorrowDeliveries || []).map((o) => ({ type: 'Tomorrow Delivery' as const, data: o as Pick<Order, 'id' | 'deliveryDate'>, link: `/orders/${o.id}` })),
+    ...(data?.overdue || []).map((o: Pick<Order, 'id' | 'companyName'>) => ({ type: 'Overdue Payment' as const, data: o as Pick<Order, 'id' | 'companyName'>, link: `/orders?filter=overdue` })),
+    ...(data?.lowStock || []).map((p: Pick<Product, 'id' | 'name' | 'stock'>) => ({ type: 'Low Stock' as const, data: p as Pick<Product, 'id' | 'name' | 'stock'>, link: `/products/${p.id}` })),
+    ...(data?.tomorrowDeliveries || []).map((o: Pick<Order, 'id' | 'deliveryDate'>) => ({ type: 'Tomorrow Delivery' as const, data: o as Pick<Order, 'id' | 'deliveryDate'>, link: `/orders/${o.id}` })),
   ]);
   const sorted = sortAlertsByPriority(items);
 

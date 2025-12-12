@@ -1,7 +1,7 @@
 
 "use client";
 import { useState, useMemo } from 'react';
-import { useOrderStore } from '@/store/use-order-store';
+import { useCategoriesStore } from '@/store/use-categories-store';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -21,71 +21,71 @@ import { Label } from '@/components/ui/label';
 import * as React from 'react';
 
 const categorySchema = z.object({
-  name: z.string().min(1, 'Category name is required.'),
+    name: z.string().min(1, 'Category name is required.'),
 });
 
 type CategoryFormData = z.infer<typeof categorySchema>;
 
 interface CategoryFormDialogProps {
-  isOpen: boolean;
-  onOpenChange: (isOpen: boolean) => void;
-  onSubmit: (data: Omit<Category, 'id'>) => void;
-  item: Category | null;
+    isOpen: boolean;
+    onOpenChange: (isOpen: boolean) => void;
+    onSubmit: (data: Omit<Category, 'id'>) => void;
+    item: Category | null;
 }
 
 function CategoryFormDialog({ isOpen, onOpenChange, onSubmit, item }: CategoryFormDialogProps) {
-  const { register, handleSubmit, reset, formState: { errors } } = useForm<CategoryFormData>({
-    resolver: zodResolver(categorySchema),
-  });
+    const { register, handleSubmit, reset, formState: { errors } } = useForm<CategoryFormData>({
+        resolver: zodResolver(categorySchema),
+    });
 
-  React.useEffect(() => {
-    if (isOpen) {
-      if (item) {
-        reset(item);
-      } else {
-        reset({ name: '' });
-      }
-    }
-  }, [isOpen, item, reset]);
+    React.useEffect(() => {
+        if (isOpen) {
+            if (item) {
+                reset(item);
+            } else {
+                reset({ name: '' });
+            }
+        }
+    }, [isOpen, item, reset]);
 
-  const handleFormSubmit = (data: CategoryFormData) => {
-    onSubmit(data);
-    onOpenChange(false);
-  };
+    const handleFormSubmit = (data: CategoryFormData) => {
+        onSubmit(data);
+        onOpenChange(false);
+    };
 
-  return (
-    <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>{item ? 'Edit' : 'Add'} Category</DialogTitle>
-        </DialogHeader>
-        <form onSubmit={handleSubmit(handleFormSubmit)}>
-          <div className="grid gap-4 py-4">
-            <div className="grid gap-2">
-              <Label htmlFor="name">Category Name</Label>
-              <Input id="name" {...register('name')} />
-              {errors.name && <p className="text-sm text-destructive">{errors.name.message}</p>}
-            </div>
-          </div>
-          <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
-            <Button type="submit">{item ? 'Save Changes' : 'Add Category'}</Button>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
-  );
+    return (
+        <Dialog open={isOpen} onOpenChange={onOpenChange}>
+            <DialogContent>
+                <DialogHeader>
+                    <DialogTitle>{item ? 'Edit' : 'Add'} Category</DialogTitle>
+                </DialogHeader>
+                <form onSubmit={handleSubmit(handleFormSubmit)}>
+                    <div className="grid gap-4 py-4">
+                        <div className="grid gap-2">
+                            <Label htmlFor="name">Category Name</Label>
+                            <Input id="name" {...register('name')} />
+                            {errors.name && <p className="text-sm text-destructive">{errors.name.message}</p>}
+                        </div>
+                    </div>
+                    <DialogFooter>
+                        <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
+                        <Button type="submit">{item ? 'Save Changes' : 'Add Category'}</Button>
+                    </DialogFooter>
+                </form>
+            </DialogContent>
+        </Dialog>
+    );
 }
 
 
 export default function CategoriesPage() {
-    const { categories, addCategory, updateCategory, deleteCategory } = useOrderStore();
+    const { categories, addCategory, updateCategory, deleteCategory } = useCategoriesStore();
     const router = useRouter();
-    
+
     const [searchTerm, setSearchTerm] = useState('');
     const [isFormOpen, setIsFormOpen] = useState(false);
     const [editingItem, setEditingItem] = useState<Category | null>(null);
-    
+
     const [isAlertOpen, setIsAlertOpen] = useState(false);
     const [itemToDelete, setItemToDelete] = useState<Category | null>(null);
 
@@ -135,8 +135,8 @@ export default function CategoriesPage() {
                     <p className="text-muted-foreground">Organize your products by creating and managing categories.</p>
                 </div>
             </div>
-            
-            <CategoryFormDialog 
+
+            <CategoryFormDialog
                 isOpen={isFormOpen}
                 onOpenChange={setIsFormOpen}
                 onSubmit={handleFormSubmit}
@@ -167,9 +167,9 @@ export default function CategoriesPage() {
                             Add Category
                         </Button>
                     </div>
-                     <div className="relative mt-2">
-                         <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                         <Input placeholder="Search categories..." className="pl-8" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+                    <div className="relative mt-2">
+                        <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                        <Input placeholder="Search categories..." className="pl-8" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
                     </div>
                 </CardHeader>
                 <CardContent>
@@ -201,11 +201,11 @@ export default function CategoriesPage() {
                                     </TableCell>
                                 </TableRow>
                             ))}
-                             {filteredCategories.length === 0 && (
+                            {filteredCategories.length === 0 && (
                                 <TableRow>
                                     <TableCell colSpan={3} className="text-center h-24">No categories found.</TableCell>
                                 </TableRow>
-                             )}
+                            )}
                         </TableBody>
                     </Table>
                 </CardContent>

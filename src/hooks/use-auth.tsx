@@ -44,7 +44,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     fetchSession();
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event: string, session: any) => {
       if (session?.user) {
         const { user: supabaseUser } = session;
         const newUserProfile: User = {
@@ -107,9 +108,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (error) throw error;
 
     if (data.user) {
-       // Optional: Create a user record in a 'users' table if you have one
-       // const { error: dbError } = await supabase.from('users').insert([{ id: data.user.id, email, role: 'Admin' }]);
-       // if (dbError) console.error("Error creating user record:", dbError);
+      // Optional: Create a user record in a 'users' table if you have one
+      // const { error: dbError } = await supabase.from('users').insert([{ id: data.user.id, email, role: 'Admin' }]);
+      // if (dbError) console.error("Error creating user record:", dbError);
     }
   };
 
@@ -128,7 +129,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       },
     });
     if (error) throw error;
-    
+
     // Local state update happens via onAuthStateChange
   };
 

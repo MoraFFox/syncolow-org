@@ -1,31 +1,29 @@
 
 "use client";
 
-import { Control, FieldErrors, UseFormRegister, UseFormSetValue, UseFormWatch, Controller, Path } from 'react-hook-form';
+import { Controller } from 'react-hook-form';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { MapPin, Trash2 } from 'lucide-react';
-import type { CompanyWizardFormData } from './company-wizard-schemas';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 import { ContactsSubForm } from './contacts-sub-form';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import type { BranchSubFormProps } from '@/types/forms';
 
-interface BranchSubFormProps {
-    index: number;
-    control: Control<CompanyWizardFormData>;
-    register: UseFormRegister<CompanyWizardFormData>;
-    errors: FieldErrors<CompanyWizardFormData>;
-    watch: UseFormWatch<CompanyWizardFormData>;
-    setValue: UseFormSetValue<CompanyWizardFormData>;
-    removeBranch: () => void;
-    openMapPicker: (type: 'branch' | 'warehouse', index: number) => void;
-}
-
-export function BranchSubForm({ index, control, register, errors, watch, setValue, removeBranch, openMapPicker }: BranchSubFormProps) {
+export function BranchSubForm({
+    index,
+    control,
+    register,
+    errors,
+    watch,
+    setValue,
+    removeBranch,
+    openMapPicker
+}: BranchSubFormProps) {
     const watchMachineOwned = watch(`branches.${index}.machineOwned`);
 
     return (
@@ -35,7 +33,7 @@ export function BranchSubForm({ index, control, register, errors, watch, setValu
                     <CardTitle>Branch #{index + 1}</CardTitle>
                     <CardDescription>Enter the details for this specific branch location.</CardDescription>
                 </div>
-                 <Button type="button" variant="ghost" size="icon" onClick={removeBranch} className="h-7 w-7 -mt-2 -mr-2">
+                <Button type="button" variant="ghost" size="icon" onClick={removeBranch} className="h-7 w-7 -mt-2 -mr-2">
                     <Trash2 className="h-4 w-4 text-destructive" />
                 </Button>
             </CardHeader>
@@ -44,23 +42,31 @@ export function BranchSubForm({ index, control, register, errors, watch, setValu
                     <div className="grid gap-2">
                         <Label>Branch Name</Label>
                         <Input {...register(`branches.${index}.name`)} />
-                        {errors.branches?.[index]?.name && <p className="text-sm text-destructive">{errors.branches[index]?.name?.message}</p>}
+                        {(errors.branches as Record<string, { name?: { message?: string } }>)?.[index]?.name && (
+                            <p className="text-sm text-destructive">
+                                {(errors.branches as Record<string, { name?: { message?: string } }>)[index]?.name?.message}
+                            </p>
+                        )}
                     </div>
-                     <div className="grid gap-2">
+                    <div className="grid gap-2">
                         <Label>Email</Label>
                         <Input type="email" {...register(`branches.${index}.email`)} />
-                         {errors.branches?.[index]?.email && <p className="text-sm text-destructive">{errors.branches[index]?.email?.message}</p>}
+                        {(errors.branches as Record<string, { email?: { message?: string } }>)?.[index]?.email && (
+                            <p className="text-sm text-destructive">
+                                {(errors.branches as Record<string, { email?: { message?: string } }>)[index]?.email?.message}
+                            </p>
+                        )}
                     </div>
                 </div>
-                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div className="grid gap-2">
                         <Label>Tax Number (Optional)</Label>
                         <Input {...register(`branches.${index}.taxNumber`)} />
                     </div>
                     <div className="grid gap-2">
-                         <Label>Delivery Schedule</Label>
+                        <Label>Delivery Schedule</Label>
                         <Controller
-                            name={`branches.${index}.region` as Path<CompanyWizardFormData>}
+                            name={`branches.${index}.region`}
                             control={control}
                             render={({ field }) => (
                                 <Select onValueChange={field.onChange} defaultValue={field.value}>
@@ -75,10 +81,10 @@ export function BranchSubForm({ index, control, register, errors, watch, setValu
                             )}
                         />
                     </div>
-                     <div className="grid gap-2">
+                    <div className="grid gap-2">
                         <Label>Area</Label>
                         <Controller
-                            name={`branches.${index}.area` as Path<CompanyWizardFormData>}
+                            name={`branches.${index}.area`}
                             control={control}
                             render={({ field }) => (
                                 <Select onValueChange={field.onChange} defaultValue={field.value}>
@@ -105,10 +111,10 @@ export function BranchSubForm({ index, control, register, errors, watch, setValu
                 <div className="grid gap-2">
                     <Label>Maintenance Location</Label>
                     <Controller
-                        name={`branches.${index}.maintenanceLocation` as Path<CompanyWizardFormData>}
+                        name={`branches.${index}.maintenanceLocation`}
                         control={control}
                         render={({ field }) => (
-                            <Select onValueChange={field.onChange} value={field.value || ''}>
+                            <Select onValueChange={field.onChange} value={(field.value as string) || ''}>
                                 <SelectTrigger>
                                     <SelectValue placeholder="Select maintenance location" />
                                 </SelectTrigger>
@@ -121,7 +127,7 @@ export function BranchSubForm({ index, control, register, errors, watch, setValu
                         )}
                     />
                 </div>
-                 <div className="grid gap-2">
+                <div className="grid gap-2">
                     <Label>Branch Location</Label>
                     <div className="relative">
                         <Input {...register(`branches.${index}.location`)} placeholder="Type address or click icon" className="pr-10" />
@@ -129,9 +135,13 @@ export function BranchSubForm({ index, control, register, errors, watch, setValu
                             <MapPin className="h-4 w-4" />
                         </Button>
                     </div>
-                    {errors.branches?.[index]?.location && <p className="text-sm text-destructive">{errors.branches?.[index]?.location?.message}</p>}
+                    {(errors.branches as Record<string, { location?: { message?: string } }>)?.[index]?.location && (
+                        <p className="text-sm text-destructive">
+                            {(errors.branches as Record<string, { location?: { message?: string } }>)?.[index]?.location?.message}
+                        </p>
+                    )}
                 </div>
-                
+
                 <Card>
                     <CardHeader>
                         <CardTitle>Machine Ownership</CardTitle>
@@ -144,19 +154,19 @@ export function BranchSubForm({ index, control, register, errors, watch, setValu
                                 render={({ field }) => (
                                     <Switch
                                         id={`machineOwned-${index}`}
-                                        checked={field.value}
+                                        checked={field.value as boolean}
                                         onCheckedChange={field.onChange}
                                     />
                                 )}
                             />
                             <Label htmlFor={`machineOwned-${index}`}>Client Owns the Machine</Label>
                         </div>
-                         {!watchMachineOwned && (
+                        {!watchMachineOwned && (
                             <>
                                 <div className="grid gap-2">
                                     <Label>Machine Status (Owned by SynergyFlow)</Label>
                                     <Controller
-                                        name={`branches.${index}.machineLeased` as Path<CompanyWizardFormData>}
+                                        name={`branches.${index}.machineLeased`}
                                         control={control}
                                         render={({ field }) => (
                                             <RadioGroup
@@ -181,11 +191,13 @@ export function BranchSubForm({ index, control, register, errors, watch, setValu
                                             id={`leaseMonthlyCost-${index}`}
                                             type="number"
                                             min="0"
-                                            {...register(`branches.${index}.leaseMonthlyCost` as Path<CompanyWizardFormData>, { valueAsNumber: true })}
+                                            {...register(`branches.${index}.leaseMonthlyCost`, { valueAsNumber: true })}
                                             placeholder="e.g. 1000"
                                         />
-                                        {errors.branches?.[index]?.leaseMonthlyCost && (
-                                            <p className="text-sm text-destructive">{errors.branches[index]?.leaseMonthlyCost?.message}</p>
+                                        {(errors.branches as Record<string, { leaseMonthlyCost?: { message?: string } }>)?.[index]?.leaseMonthlyCost && (
+                                            <p className="text-sm text-destructive">
+                                                {(errors.branches as Record<string, { leaseMonthlyCost?: { message?: string } }>)[index]?.leaseMonthlyCost?.message}
+                                            </p>
                                         )}
                                     </div>
                                 )}
@@ -193,9 +205,9 @@ export function BranchSubForm({ index, control, register, errors, watch, setValu
                         )}
                     </CardContent>
                 </Card>
-                
+
                 <Separator />
-                
+
                 <ContactsSubForm
                     control={control}
                     register={register}
@@ -207,7 +219,7 @@ export function BranchSubForm({ index, control, register, errors, watch, setValu
                 />
 
                 <Separator />
-                
+
                 <Card>
                     <CardHeader>
                         <CardTitle>Warehouse</CardTitle>
@@ -224,7 +236,7 @@ export function BranchSubForm({ index, control, register, errors, watch, setValu
                             </div>
                         </div>
 
-                         <ContactsSubForm
+                        <ContactsSubForm
                             control={control}
                             register={register}
                             errors={errors}

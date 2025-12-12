@@ -2,7 +2,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useOrderStore } from "@/store/use-order-store";
+import { useProductsStore } from "@/store/use-products-store";
 import { useManufacturerStore } from "@/store/use-manufacturer-store";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Command, CommandInput, CommandList, CommandEmpty, CommandGroup, CommandItem } from "@/components/ui/command";
@@ -18,7 +18,7 @@ export interface ProductPickerProps {
 }
 
 export function ProductPicker({ selectedProducts, onSelectionChange }: ProductPickerProps) {
-  const { products, loading: productsLoading } = useOrderStore();
+  const { products, loading: productsLoading } = useProductsStore();
   const { manufacturers, productsByManufacturer, loading: manufacturersLoading } = useManufacturerStore();
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
@@ -131,7 +131,7 @@ export function ProductPicker({ selectedProducts, onSelectionChange }: ProductPi
 
   // Get the count of selected products
   const selectedCount = selectedProducts.reduce((sum, item) => sum + item.quantity, 0);
-  
+
   const groupedAndFilteredProducts = groupProductsByManufacturer(filteredProducts);
   const manufacturerOrder = [
     ...manufacturers.map(m => m.id),
@@ -160,109 +160,108 @@ export function ProductPicker({ selectedProducts, onSelectionChange }: ProductPi
           />
           <CommandList>
             <CommandEmpty>No products found.</CommandEmpty>
-            
+
             {manufacturerOrder.map(manufacturerId => {
-                const manufacturer = getManufacturer(manufacturerId);
-                const currentProducts = groupedAndFilteredProducts[manufacturerId];
+              const manufacturer = getManufacturer(manufacturerId);
+              const currentProducts = groupedAndFilteredProducts[manufacturerId];
 
-                if (!currentProducts || currentProducts.length === 0) return null;
+              if (!currentProducts || currentProducts.length === 0) return null;
 
-                const manufacturerName = manufacturer?.name || 'Unassigned';
+              const manufacturerName = manufacturer?.name || 'Unassigned';
 
-                return (
-                  <CommandGroup
-                    key={manufacturerId}
-                    heading={
-                      <div className="flex items-center gap-2">
-                        {manufacturer?.icon && (
-                          <span className="text-lg">{manufacturer.icon}</span>
-                        )}
-                        <span
-                          className="font-medium"
-                          style={{ color: manufacturer?.color || "inherit" }}
-                        >
-                          {manufacturerName}
-                        </span>
-                      </div>
-                    }
-                  >
-                    {currentProducts.map((product) => {
-                      const selected = isProductSelected(product.id);
-                      const selectedItem = getSelectedProduct(product.id);
-                      
-                      return (
-                        <CommandItem
-                          key={product.id}
-                          value={product.id}
-                          onSelect={() => handleSelectProduct(product)}
-                          className={`flex flex-col items-start space-y-1 cursor-pointer ${
-                            selected ? "bg-accent" : ""
+              return (
+                <CommandGroup
+                  key={manufacturerId}
+                  heading={
+                    <div className="flex items-center gap-2">
+                      {manufacturer?.icon && (
+                        <span className="text-lg">{manufacturer.icon}</span>
+                      )}
+                      <span
+                        className="font-medium"
+                        style={{ color: manufacturer?.color || "inherit" }}
+                      >
+                        {manufacturerName}
+                      </span>
+                    </div>
+                  }
+                >
+                  {currentProducts.map((product) => {
+                    const selected = isProductSelected(product.id);
+                    const selectedItem = getSelectedProduct(product.id);
+
+                    return (
+                      <CommandItem
+                        key={product.id}
+                        value={product.id}
+                        onSelect={() => handleSelectProduct(product)}
+                        className={`flex flex-col items-start space-y-1 cursor-pointer ${selected ? "bg-accent" : ""
                           }`}
-                        >
-                          <div className="flex w-full items-center justify-between">
-                            <div className="flex flex-col">
-                              <span className="font-medium">{getProductDisplayName(product)}</span>
-                              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                                {product.sku && <span>SKU: {product.sku}</span>}
-                                <span className="text-xs">•</span>
-                                <span>${product.price.toFixed(2)}</span>
-                              </div>
-                            </div>
-                            <div className="flex items-center gap-1">
-                              <Badge
-                                variant="outline"
-                                className={getStockStatusColor(product.stock)}
-                              >
-                                <Package className="mr-1 h-3 w-3" />
-                                {product.stock}
-                              </Badge>
-                              {selected ? (
-                                <Check className="h-4 w-4 text-primary" />
-                              ) : (
-                                <Plus className="h-4 w-4 text-muted-foreground" />
-                              )}
+                      >
+                        <div className="flex w-full items-center justify-between">
+                          <div className="flex flex-col">
+                            <span className="font-medium">{getProductDisplayName(product)}</span>
+                            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                              {product.sku && <span>SKU: {product.sku}</span>}
+                              <span className="text-xs">•</span>
+                              <span>${product.price.toFixed(2)}</span>
                             </div>
                           </div>
-                          
-                          {selected && selectedItem && (
-                            <div className="flex items-center gap-2 mt-1">
-                              <Button
-                                type="button"
-                                size="icon"
-                                variant="outline"
-                                className="h-6 w-6"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  updateProductQuantity(product.id, selectedItem.quantity - 1);
-                                }}
-                              >
-                                <Minus className="h-3 w-3" />
-                              </Button>
-                              <span className="w-8 text-center text-sm">{selectedItem.quantity}</span>
-                              <Button
-                                type="button"
-                                size="icon"
-                                variant="outline"
-                                className="h-6 w-6"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  updateProductQuantity(product.id, selectedItem.quantity + 1);
-                                }}
-                              >
-                                <Plus className="h-3 w-3" />
-                              </Button>
-                              
-                              {product.stock < selectedItem.quantity && (
-                                <AlertTriangle className="h-3 w-3 text-amber-500 ml-1" />
-                              )}
-                            </div>
-                          )}
-                        </CommandItem>
-                      );
-                    })}
-                  </CommandGroup>
-                );
-              }
+                          <div className="flex items-center gap-1">
+                            <Badge
+                              variant="outline"
+                              className={getStockStatusColor(product.stock)}
+                            >
+                              <Package className="mr-1 h-3 w-3" />
+                              {product.stock}
+                            </Badge>
+                            {selected ? (
+                              <Check className="h-4 w-4 text-primary" />
+                            ) : (
+                              <Plus className="h-4 w-4 text-muted-foreground" />
+                            )}
+                          </div>
+                        </div>
+
+                        {selected && selectedItem && (
+                          <div className="flex items-center gap-2 mt-1">
+                            <Button
+                              type="button"
+                              size="icon"
+                              variant="outline"
+                              className="h-6 w-6"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                updateProductQuantity(product.id, selectedItem.quantity - 1);
+                              }}
+                            >
+                              <Minus className="h-3 w-3" />
+                            </Button>
+                            <span className="w-8 text-center text-sm">{selectedItem.quantity}</span>
+                            <Button
+                              type="button"
+                              size="icon"
+                              variant="outline"
+                              className="h-6 w-6"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                updateProductQuantity(product.id, selectedItem.quantity + 1);
+                              }}
+                            >
+                              <Plus className="h-3 w-3" />
+                            </Button>
+
+                            {product.stock < selectedItem.quantity && (
+                              <AlertTriangle className="h-3 w-3 text-amber-500 ml-1" />
+                            )}
+                          </div>
+                        )}
+                      </CommandItem>
+                    );
+                  })}
+                </CommandGroup>
+              );
+            }
             )}
           </CommandList>
         </Command>

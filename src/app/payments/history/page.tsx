@@ -17,17 +17,25 @@ import { format } from 'date-fns';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/lib/supabase';
+import type { Order } from '@/lib/types';
+
+// Extended order type for payments with additional payment fields
+interface PaymentHistoryOrder extends Order {
+  paidDate?: string;
+  paymentReference?: string;
+  paymentNotes?: string;
+}
 
 export default function PaymentHistoryPage() {
   const { companies } = useCompanyStore();
-  const [allOrders, setAllOrders] = useState<any[]>([]);
+  const [allOrders, setAllOrders] = useState<PaymentHistoryOrder[]>([]);
   const [loading, setLoading] = useState(true);
-  
+
   useEffect(() => {
     const loadAllOrders = async () => {
       setLoading(true);
       try {
-        let allData: any[] = [];
+        let allData: PaymentHistoryOrder[] = [];
         const seenIds = new Set<string>();
         let from = 0;
         const batchSize = 1000;
@@ -39,11 +47,11 @@ export default function PaymentHistoryPage() {
             .select('*')
             .order('orderDate', { ascending: false })
             .range(from, from + batchSize - 1);
-          
+
           if (error) throw error;
-          
+
           if (data && data.length > 0) {
-            const uniqueData = data.filter(order => {
+            const uniqueData = (data as PaymentHistoryOrder[]).filter((order: PaymentHistoryOrder) => {
               if (seenIds.has(order.id)) return false;
               seenIds.add(order.id);
               return true;
@@ -55,7 +63,7 @@ export default function PaymentHistoryPage() {
             hasMore = false;
           }
         }
-        
+
         setAllOrders(allData);
       } catch (e) {
         console.error('Error loading orders:', e);
@@ -64,7 +72,7 @@ export default function PaymentHistoryPage() {
     };
     loadAllOrders();
   }, []);
-  
+
   const [searchTerm, setSearchTerm] = useState('');
   const [companyFilter, setCompanyFilter] = useState<string>('all');
   const [dateFrom, setDateFrom] = useState<Date | undefined>();
@@ -78,20 +86,20 @@ export default function PaymentHistoryPage() {
 
   const filteredOrders = useMemo(() => {
     let filtered = [...paidOrders];
-    
+
     if (companyFilter !== 'all') {
       filtered = filtered.filter(o => o.companyId === companyFilter);
     }
-    
+
     if (searchTerm) {
       const search = searchTerm.toLowerCase();
-      filtered = filtered.filter(o => 
+      filtered = filtered.filter(o =>
         o.companyName?.toLowerCase().includes(search) ||
         o.id.toLowerCase().includes(search) ||
         o.paymentReference?.toLowerCase().includes(search)
       );
     }
-    
+
     if (dateFrom) {
       const fromStr = format(dateFrom, 'yyyy-MM-dd');
       filtered = filtered.filter(o => {
@@ -99,7 +107,7 @@ export default function PaymentHistoryPage() {
         return orderDateStr && orderDateStr >= fromStr;
       });
     }
-    
+
     if (dateTo) {
       const toStr = format(dateTo, 'yyyy-MM-dd');
       filtered = filtered.filter(o => {
@@ -107,15 +115,15 @@ export default function PaymentHistoryPage() {
         return orderDateStr && orderDateStr <= toStr;
       });
     }
-    
+
     if (amountMin) {
       filtered = filtered.filter(o => o.total >= parseFloat(amountMin));
     }
-    
+
     if (amountMax) {
       filtered = filtered.filter(o => o.total <= parseFloat(amountMax));
     }
-    
+
     return filtered.sort((a, b) => {
       const dateA = a.paidDate ? new Date(a.paidDate).getTime() : 0;
       const dateB = b.paidDate ? new Date(b.paidDate).getTime() : 0;
@@ -154,7 +162,7 @@ export default function PaymentHistoryPage() {
         o.paymentNotes || ''
       ].join(','))
     ].join('\n');
-    
+
     const blob = new Blob([csv], { type: 'text/csv' });
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -319,57 +327,57 @@ export default function PaymentHistoryPage() {
           {loading ? (
             <div className="text-center py-8 text-muted-foreground">Loading payment history...</div>
           ) : (
-          <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Order ID</TableHead>
-                  <TableHead>Company</TableHead>
-                  <TableHead>Branch</TableHead>
-                  <TableHead>Order Date</TableHead>
-                  <TableHead>Paid Date</TableHead>
-                  <TableHead className="text-right">Amount</TableHead>
-                  <TableHead>Reference</TableHead>
-                  <TableHead>Notes</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredOrders.map(order => (
-                  <TableRow key={order.id}>
-                    <TableCell>
-                      <Link href={`/orders/${order.id}`} className="text-primary hover:underline">
-                        #{order.id.slice(0, 7)}
-                      </Link>
-                    </TableCell>
-                    <TableCell>{order.companyName}</TableCell>
-                    <TableCell>{order.branchName}</TableCell>
-                    <TableCell>{format(new Date(order.orderDate), 'PP')}</TableCell>
-                    <TableCell>
-                      {order.paidDate ? format(new Date(order.paidDate), 'PP') : '-'}
-                    </TableCell>
-                    <TableCell className="text-right font-medium">
-                      ${order.total.toLocaleString('en-US', { maximumFractionDigits: 0 })}
-                    </TableCell>
-                    <TableCell>
-                      {order.paymentReference ? (
-                        <Badge variant="outline">{order.paymentReference}</Badge>
-                      ) : '-'}
-                    </TableCell>
-                    <TableCell className="max-w-xs truncate">
-                      {order.paymentNotes || '-'}
-                    </TableCell>
-                  </TableRow>
-                ))}
-                {filteredOrders.length === 0 && !loading && (
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
                   <TableRow>
-                    <TableCell colSpan={8} className="text-center h-24 text-muted-foreground">
-                      No payment records found
-                    </TableCell>
+                    <TableHead>Order ID</TableHead>
+                    <TableHead>Company</TableHead>
+                    <TableHead>Branch</TableHead>
+                    <TableHead>Order Date</TableHead>
+                    <TableHead>Paid Date</TableHead>
+                    <TableHead className="text-right">Amount</TableHead>
+                    <TableHead>Reference</TableHead>
+                    <TableHead>Notes</TableHead>
                   </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </div>
+                </TableHeader>
+                <TableBody>
+                  {filteredOrders.map(order => (
+                    <TableRow key={order.id}>
+                      <TableCell>
+                        <Link href={`/orders/${order.id}`} className="text-primary hover:underline">
+                          #{order.id.slice(0, 7)}
+                        </Link>
+                      </TableCell>
+                      <TableCell>{order.companyName}</TableCell>
+                      <TableCell>{order.branchName}</TableCell>
+                      <TableCell>{format(new Date(order.orderDate), 'PP')}</TableCell>
+                      <TableCell>
+                        {order.paidDate ? format(new Date(order.paidDate), 'PP') : '-'}
+                      </TableCell>
+                      <TableCell className="text-right font-medium">
+                        ${order.total.toLocaleString('en-US', { maximumFractionDigits: 0 })}
+                      </TableCell>
+                      <TableCell>
+                        {order.paymentReference ? (
+                          <Badge variant="outline">{order.paymentReference}</Badge>
+                        ) : '-'}
+                      </TableCell>
+                      <TableCell className="max-w-xs truncate">
+                        {order.paymentNotes || '-'}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                  {filteredOrders.length === 0 && !loading && (
+                    <TableRow>
+                      <TableCell colSpan={8} className="text-center h-24 text-muted-foreground">
+                        No payment records found
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </div>
           )}
         </CardContent>
       </Card>

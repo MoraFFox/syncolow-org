@@ -2,13 +2,13 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { useForm, useFieldArray, Controller, FormProvider } from "react-hook-form";
+import { useForm, useFieldArray } from "react-hook-form";
+import type { Control, UseFormRegister, FieldErrors, UseFormSetValue, UseFormWatch, FieldValues } from 'react-hook-form';
 import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
-import { ArrowLeft, ArrowRight, Loader2, MapPin } from 'lucide-react';
-import type { Company, MaintenanceVisit, Barista, Contact, Branch } from '@/lib/types';
+import { ArrowLeft, ArrowRight, Loader2 } from 'lucide-react';
+import type { Company, MaintenanceVisit, Barista, Branch } from '@/lib/types';
 import { LocationPickerDialog } from '@/app/clients/[companyId]/_components/location-picker-dialog';
 import { Progress } from '@/components/ui/progress';
 
@@ -25,29 +25,29 @@ interface CompanyWizardFormProps {
     onOpenChange: (isOpen: boolean) => void;
 }
 
-const TOTAL_STEPS = 4;
+const _TOTAL_STEPS = 4;
 
 export function CompanyWizardForm({ isOpen, onOpenChange }: CompanyWizardFormProps) {
     const [step, setStep] = useState(1);
     const { addCompanyAndRelatedData } = useCompanyStore();
     const [isSubmitting, setIsSubmitting] = useState(false);
-    
+
     const [isMapOpen, setIsMapOpen] = useState(false);
     const [editingAddress, setEditingAddress] = useState<{ type: 'company' | 'branch' | 'warehouse' | 'singleWarehouse', index?: number } | null>(null);
 
     const { register, handleSubmit, control, watch, setValue, getValues, trigger, reset, formState: { errors } } = useForm<CompanyWizardFormData>({
         resolver: zodResolver(companyWizardSchema),
-        defaultValues: { 
-            hasBranches: 'no', 
-            branches: [], 
-            contacts: [], 
+        defaultValues: {
+            hasBranches: 'no',
+            branches: [],
+            contacts: [],
             region: 'A',
             paymentMethod: 'transfer',
             paymentDueType: 'days_after_order',
             paymentDueDays: 30,
         },
     });
-    
+
     const { fields, replace, remove } = useFieldArray({ control, name: "branches" });
 
     const watchHasBranches = watch('hasBranches');
@@ -57,9 +57,9 @@ export function CompanyWizardForm({ isOpen, onOpenChange }: CompanyWizardFormPro
         if (watchHasBranches === 'yes' && watchBranchCount && watchBranchCount > 0) {
             const currentBranches = getValues('branches') || [];
             if (currentBranches.length !== watchBranchCount) {
-                const newBranches = Array.from({ length: watchBranchCount }, () => ({ 
+                const newBranches = Array.from({ length: watchBranchCount }, () => ({
                     name: '', email: '', location: '', machineOwned: false,
-                    baristas: [], maintenanceHistory: [], contacts: [], warehouseContacts: [], warehouseLocation: '' 
+                    baristas: [], maintenanceHistory: [], contacts: [], warehouseContacts: [], warehouseLocation: ''
                 }));
                 replace(newBranches);
             }
@@ -69,12 +69,12 @@ export function CompanyWizardForm({ isOpen, onOpenChange }: CompanyWizardFormPro
     }, [watchHasBranches, watchBranchCount, replace, getValues]);
 
     const nextStep = async () => {
-      let isValid = true;
-      if (step === 1) isValid = await trigger(["name", "email", "contacts"]);
-      if (step === 2) isValid = await trigger(["hasBranches"]);
-      if (step === 3 && getValues('hasBranches') === 'yes') isValid = await trigger(["branchCount"]);
-      
-      if(isValid) setStep(s => s + 1);
+        let isValid = true;
+        if (step === 1) isValid = await trigger(["name", "email", "contacts"]);
+        if (step === 2) isValid = await trigger(["hasBranches"]);
+        if (step === 3 && getValues('hasBranches') === 'yes') isValid = await trigger(["branchCount"]);
+
+        if (isValid) setStep(s => s + 1);
     };
     const prevStep = () => setStep(s => s - 1);
 
@@ -100,7 +100,7 @@ export function CompanyWizardForm({ isOpen, onOpenChange }: CompanyWizardFormPro
                 area: area,
             }];
         }
-        
+
         const companyData: Partial<Omit<Company, 'id' | 'isBranch' | 'parentCompanyId'>> = {
             name: name,
             email: email,
@@ -120,9 +120,10 @@ export function CompanyWizardForm({ isOpen, onOpenChange }: CompanyWizardFormPro
 
         const branchesWithDetails: (Omit<Partial<Branch>, 'baristas'> & { baristas?: Partial<Barista>[], maintenanceHistory?: Omit<MaintenanceVisit, 'id' | 'branchId'>[] })[] | undefined = finalBranches?.map(b => ({
             ...b,
-            maintenanceHistory: b.maintenanceHistory?.map(mh => ({...mh, date: mh.date.toISOString()})) as Omit<MaintenanceVisit, 'id' | 'branchId'>[],
+            leaseMonthlyCost: b.leaseMonthlyCost ?? undefined, // Convert null to undefined
+            maintenanceHistory: b.maintenanceHistory?.map(mh => ({ ...mh, date: mh.date.toISOString() })) as Omit<MaintenanceVisit, 'id' | 'branchId'>[],
         }));
-        
+
         try {
             await addCompanyAndRelatedData(companyData, branchesWithDetails);
             onOpenChange(false);
@@ -132,7 +133,7 @@ export function CompanyWizardForm({ isOpen, onOpenChange }: CompanyWizardFormPro
             setIsSubmitting(false);
         }
     };
-    
+
     const handleClose = (open: boolean) => {
         if (!open) {
             setStep(1);
@@ -140,7 +141,7 @@ export function CompanyWizardForm({ isOpen, onOpenChange }: CompanyWizardFormPro
         }
         onOpenChange(open);
     }
-    
+
     const openMapPicker = (type: 'company' | 'branch' | 'warehouse' | 'singleWarehouse', index?: number) => {
         setEditingAddress({ type, index });
         setIsMapOpen(true);
@@ -153,13 +154,13 @@ export function CompanyWizardForm({ isOpen, onOpenChange }: CompanyWizardFormPro
             } else if (editingAddress.type === 'branch' && editingAddress.index !== undefined) {
                 setValue(`branches.${editingAddress.index}.location`, newAddress, { shouldValidate: true, shouldDirty: true });
             } else if (editingAddress.type === 'warehouse' && editingAddress.index !== undefined) {
-                 setValue(`branches.${editingAddress.index}.warehouseLocation`, newAddress, { shouldValidate: true, shouldDirty: true });
+                setValue(`branches.${editingAddress.index}.warehouseLocation`, newAddress, { shouldValidate: true, shouldDirty: true });
             } else if (editingAddress.type === 'singleWarehouse') {
                 setValue('warehouseLocation', newAddress, { shouldValidate: true, shouldDirty: true });
             }
         }
     };
-    
+
     const getInitialAddressForMap = () => {
         if (!editingAddress) return '';
         if (editingAddress.type === 'company') return watch('location') || '';
@@ -169,7 +170,7 @@ export function CompanyWizardForm({ isOpen, onOpenChange }: CompanyWizardFormPro
                 return watch(`branches.${editingAddress.index}.location`);
             }
             if (editingAddress.type === 'warehouse') {
-                 return watch(`branches.${editingAddress.index}.warehouseLocation`) || '';
+                return watch(`branches.${editingAddress.index}.warehouseLocation`) || '';
             }
         }
         return '';
@@ -177,11 +178,19 @@ export function CompanyWizardForm({ isOpen, onOpenChange }: CompanyWizardFormPro
 
     const totalSteps = watchHasBranches === 'yes' ? 4 : 3;
     const progressValue = (step / totalSteps) * 100;
-    
+
+
     const renderStep = () => {
         switch (step) {
             case 1:
-                return <Step1_CompanyDetails control={control} register={register} errors={errors} openMapPicker={openMapPicker} setValue={setValue} watch={watch}/>;
+                return <Step1_CompanyDetails
+                    control={control as unknown as Control<FieldValues>}
+                    register={register as unknown as UseFormRegister<FieldValues>}
+                    errors={errors as FieldErrors<FieldValues>}
+                    openMapPicker={openMapPicker}
+                    setValue={setValue as unknown as UseFormSetValue<FieldValues>}
+                    watch={watch as unknown as UseFormWatch<FieldValues>}
+                />;
             case 2:
                 return <Step2_CompanyStructure control={control} />;
             case 3:
@@ -191,12 +200,12 @@ export function CompanyWizardForm({ isOpen, onOpenChange }: CompanyWizardFormPro
             default: return null;
         }
     }
-    
+
     const isFinalStep = step === totalSteps;
 
     return (
         <>
-            <LocationPickerDialog 
+            <LocationPickerDialog
                 isOpen={isMapOpen}
                 onOpenChange={setIsMapOpen}
                 initialAddress={getInitialAddressForMap()}
@@ -205,28 +214,28 @@ export function CompanyWizardForm({ isOpen, onOpenChange }: CompanyWizardFormPro
             <Dialog open={isOpen} onOpenChange={handleClose}>
                 <DialogContent className="max-w-4xl max-h-[90vh] flex flex-col">
                     <DialogHeader className="p-6 pb-0">
-                         <DialogTitle>Step {step}: {
-                             step === 1 ? 'Company Details' :
-                             step === 2 ? 'Company Structure' :
-                             step === 3 && watchHasBranches === 'yes' ? 'Branch Information' :
-                             step === 3 && watchHasBranches === 'no' ? 'Final Details' : 'Enter Branch Details'
-                         }</DialogTitle>
+                        <DialogTitle>Step {step}: {
+                            step === 1 ? 'Company Details' :
+                                step === 2 ? 'Company Structure' :
+                                    step === 3 && watchHasBranches === 'yes' ? 'Branch Information' :
+                                        step === 3 && watchHasBranches === 'no' ? 'Final Details' : 'Enter Branch Details'
+                        }</DialogTitle>
                         <DialogDescription>
-                            { step === 1 ? "Enter the main information for the parent company." :
-                              step === 2 ? "Does this company have separate branches or locations?" :
-                              step === 3 && watchHasBranches === 'yes' ? "How many branches does this company have?" :
-                              step === 3 && watchHasBranches === 'no' ? `Provide machine and warehouse details for ${getValues('name')}.` :
-                              `Provide the details for each of the ${fields.length} branches.`
+                            {step === 1 ? "Enter the main information for the parent company." :
+                                step === 2 ? "Does this company have separate branches or locations?" :
+                                    step === 3 && watchHasBranches === 'yes' ? "How many branches does this company have?" :
+                                        step === 3 && watchHasBranches === 'no' ? `Provide machine and warehouse details for ${getValues('name')}.` :
+                                            `Provide the details for each of the ${fields.length} branches.`
                             }
                         </DialogDescription>
                     </DialogHeader>
-                    
+
                     <Progress value={progressValue} className="mx-6 w-auto" />
 
                     <div className="flex-1 overflow-y-auto px-6 py-4">
                         {renderStep()}
                     </div>
-                    
+
 
                     <DialogFooter className="px-6 pb-6 pt-3 border-t">
                         <div className="w-full flex justify-between items-center">
@@ -234,7 +243,7 @@ export function CompanyWizardForm({ isOpen, onOpenChange }: CompanyWizardFormPro
                                 <ArrowLeft className="mr-2 h-4 w-4" />
                                 Back
                             </Button>
-                            
+
                             <div className="text-sm text-muted-foreground">
                                 Step {step} of {totalSteps}
                             </div>

@@ -45,8 +45,8 @@ export function TodayVisitsMap() {
 
   const markers = useMemo(() => {
     return (visitsData || [])
-      .filter((v: VisitWithCoords): v is VisitWithCoords & { coords: LatLngTuple } => v.coords !== null)
-      .map((v: VisitWithCoords) => ({ id: v.id, position: { lat: v.coords[0], lng: v.coords[1] }, content: `<strong>${v.clientName}</strong><br/>${v.address}` }));
+      .filter((v: VisitWithCoords) => v.coords !== null)
+      .map((v: VisitWithCoords) => ({ id: v.id, position: { lat: v.coords![0], lng: v.coords![1] }, content: `<strong>${v.clientName}</strong><br/>${v.address}` }));
   }, [visitsData]);
 
   useEffect(() => {

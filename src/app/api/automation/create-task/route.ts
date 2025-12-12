@@ -108,7 +108,7 @@ export async function POST(request: NextRequest) {
       taskData.due = new Date(dueDate).toISOString();
     }
 
-    const createdTask = await googleTasksService.createTask(tokens, taskList.id, taskData);
+    const createdTask = await googleTasksService.createTask(tokens, taskList.id!, taskData);
 
     logger.debug('Automation task created', { 
       taskId: createdTask.id, 

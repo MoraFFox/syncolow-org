@@ -3,6 +3,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useOrderStore } from '@/store/use-order-store';
+import { useProductsStore } from '@/store/use-products-store';
+import { useCategoriesStore } from '@/store/use-categories-store';
 import { CategoryAnalytics } from './_components/category-analytics';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, RefreshCw } from 'lucide-react';
@@ -17,16 +19,16 @@ export default function CategoryDetailsPage() {
   const params = useParams();
   const router = useRouter();
   const id = params.id as string;
-  
-  const { 
-    categories, 
-    products, 
-    analyticsOrders, 
+
+  const {
+    analyticsOrders,
     returns,
-    fetchOrdersByDateRange, 
+    fetchOrdersByDateRange,
     analyticsLoading,
     fetchInitialData
   } = useOrderStore();
+  const { products } = useProductsStore();
+  const { categories } = useCategoriesStore();
 
   const [isAnalyticsLoaded, setIsAnalyticsLoaded] = useState(false);
 
@@ -34,13 +36,13 @@ export default function CategoryDetailsPage() {
     fetchInitialData();
   }, [fetchInitialData]);
 
-  const category = useMemo(() => 
-    categories.find(c => c.id === id), 
-  [categories, id]);
+  const category = useMemo(() =>
+    categories.find(c => c.id === id),
+    [categories, id]);
 
-  const categoryProducts = useMemo(() => 
+  const categoryProducts = useMemo(() =>
     products.filter(p => p.category === category?.name),
-  [products, category]);
+    [products, category]);
 
   useEffect(() => {
     const loadAnalytics = async () => {
@@ -81,8 +83,8 @@ export default function CategoryDetailsPage() {
             <p className="text-muted-foreground">Category Analytics & Products</p>
           </div>
         </div>
-        <Button 
-          variant="outline" 
+        <Button
+          variant="outline"
           onClick={() => {
             setIsAnalyticsLoaded(false);
           }}
@@ -93,9 +95,9 @@ export default function CategoryDetailsPage() {
         </Button>
       </div>
 
-      <CategoryAnalytics 
-        category={category} 
-        products={categoryProducts} 
+      <CategoryAnalytics
+        category={category}
+        products={categoryProducts}
         orders={analyticsOrders}
         returns={returns}
       />

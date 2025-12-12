@@ -1,6 +1,6 @@
 "use client";
 
-import type { Control, UseFormRegister } from 'react-hook-form';
+import type { FieldValues } from 'react-hook-form';
 import { Controller, useFieldArray } from "react-hook-form";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -18,11 +18,20 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { MapPin, PlusCircle, Trash2 } from "lucide-react";
 import { ContactsSubForm } from "../contacts-sub-form";
 import type { CompanyFormProps } from '@/types/forms';
-import type { Company } from '@/lib/types';
+import type { FieldError } from 'react-hook-form';
+
+/** Helper to safely get error message from FieldErrors */
+function getErrorMessage(error: unknown): string | undefined {
+  if (!error) return undefined;
+  if (typeof error === 'object' && error !== null && 'message' in error) {
+    return (error as FieldError).message;
+  }
+  return undefined;
+}
 
 interface CustomDatesFieldProps {
-  control: Control<Company>;
-  register: UseFormRegister<Company>;
+  control: CompanyFormProps['control'];
+  register: CompanyFormProps['register'];
 }
 
 function CustomDatesField({ control, register }: CustomDatesFieldProps) {
@@ -107,7 +116,7 @@ export function Step1_CompanyDetails(props: CompanyFormProps) {
             placeholder='e.g. The Coffee House'
           />
           {errors.name && (
-            <p className='text-sm text-destructive'>{errors.name.message}</p>
+            <p className='text-sm text-destructive'>{getErrorMessage(errors.name)}</p>
           )}
         </div>
         <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
@@ -115,7 +124,7 @@ export function Step1_CompanyDetails(props: CompanyFormProps) {
             <Label htmlFor='email'>Email</Label>
             <Input id='email' type='email' {...register("email")} />
             {errors.email && (
-              <p className='text-sm text-destructive'>{errors.email.message}</p>
+              <p className='text-sm text-destructive'>{getErrorMessage(errors.email)}</p>
             )}
           </div>
           <div className='grid gap-2'>
@@ -123,7 +132,7 @@ export function Step1_CompanyDetails(props: CompanyFormProps) {
             <Input id='taxNumber' {...register("taxNumber")} />
             {errors.taxNumber && (
               <p className='text-sm text-destructive'>
-                {errors.taxNumber.message}
+                {getErrorMessage(errors.taxNumber)}
               </p>
             )}
           </div>
@@ -273,7 +282,7 @@ export function Step1_CompanyDetails(props: CompanyFormProps) {
           <Button
             type='button'
             variant='outline'
-            onClick={() => openMapPicker("company")}
+            onClick={() => openMapPicker?.("company")}
           >
             <MapPin className='mr-2 h-4 w-4' />
             {watch("location") ? "Change Location" : "Set Location on Map"}
@@ -285,7 +294,7 @@ export function Step1_CompanyDetails(props: CompanyFormProps) {
           )}
           {errors.location && (
             <p className='text-sm text-destructive'>
-              {errors.location.message}
+              {getErrorMessage(errors.location)}
             </p>
           )}
         </div>
@@ -367,7 +376,7 @@ export function Step1_CompanyDetails(props: CompanyFormProps) {
                 />
                 {errors.paymentDueDays && (
                   <p className='text-sm text-destructive'>
-                    {errors.paymentDueDays.message}
+                    {getErrorMessage(errors.paymentDueDays)}
                   </p>
                 )}
               </div>
@@ -385,7 +394,7 @@ export function Step1_CompanyDetails(props: CompanyFormProps) {
                 />
                 {errors.paymentDueDate && (
                   <p className='text-sm text-destructive'>
-                    {errors.paymentDueDate.message}
+                    {getErrorMessage(errors.paymentDueDate)}
                   </p>
                 )}
               </div>

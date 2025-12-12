@@ -77,7 +77,7 @@ export const useProductsStore = create<ProductsState>((set, get) => ({
       const { data: allProducts } = await supabase.from('products').select('*');
       const searchLower = searchTerm.toLowerCase();
       const filtered = (allProducts || []).filter(
-        (product) =>
+        (product: Product) =>
           (product.name && product.name.toLowerCase().includes(searchLower)) ||
           (product.variantName && product.variantName.toLowerCase().includes(searchLower)) ||
           (product.description && product.description.toLowerCase().includes(searchLower)) ||

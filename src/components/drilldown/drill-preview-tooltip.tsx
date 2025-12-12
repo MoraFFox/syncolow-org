@@ -23,7 +23,7 @@ export function DrillPreviewTooltip() {
   const { toast } = useToast();
   const isMobile = useIsMobile();
   const { goToDetail } = useDrillDown();
-  
+
   // Swipe handlers for mobile
   const swipeHandlers = useSwipe({
     onSwipeDown: () => {
@@ -36,28 +36,28 @@ export function DrillPreviewTooltip() {
       }
     }
   });
-  
+
   // Use React Query for cached async preview data
   const { data: asyncData, isLoading, error, refetch } = useDrillPreviewData(kind, payload, isOpen);
-  
+
   // Minimum loading duration (200ms) before showing content
   React.useEffect(() => {
     if (!isOpen) {
       setShowContent(false);
       return;
     }
-    
+
     const minLoadTime = 200;
     const startTime = Date.now();
-    
+
     if (!isLoading) {
       const elapsed = Date.now() - startTime;
       const remaining = Math.max(0, minLoadTime - elapsed);
-      
+
       const timer = setTimeout(() => {
         setShowContent(true);
       }, remaining);
-      
+
       return () => clearTimeout(timer);
     }
   }, [isOpen, isLoading]);
@@ -68,7 +68,7 @@ export function DrillPreviewTooltip() {
 
   // Auto-pin after 3 seconds with CSS transition (respects quietMode)
   const { settings } = useDrillDownStore();
-  
+
   React.useEffect(() => {
     // Skip auto-pin in quiet mode
     if (!isOpen || !kind || !payload || settings.quietMode) {
@@ -97,14 +97,14 @@ export function DrillPreviewTooltip() {
   }, [isOpen, kind, payload, pinPreview, pinnedPreviews.length, hidePreview, toast, settings.quietMode]);
 
   if (!mounted) return null;
-  
+
   // Don't show tooltip if THIS SPECIFIC item is already pinned
   const isCurrentItemPinned = pinnedPreviews.some(pinned => {
     const pinnedId = (pinned.payload as Record<string, unknown>)?.id || (pinned.payload as Record<string, unknown>)?.value;
     const currentId = (payload as Record<string, unknown>)?.id || (payload as Record<string, unknown>)?.value;
     return pinned.kind === kind && pinnedId === currentId;
   });
-  
+
   if (isCurrentItemPinned) return null;
 
   // Calculate position with boundary detection
@@ -145,17 +145,17 @@ export function DrillPreviewTooltip() {
         {isOpen && kind && payload && (
           <>
             {/* Backdrop for mobile */}
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               className="fixed inset-0 bg-black/20 z-[9998]"
               onClick={hidePreview}
             />
-            
+
             {/* Bottom Sheet */}
-            <motion.div 
-              style={style} 
+            <motion.div
+              style={style}
               initial={{ y: "100%" }}
               animate={{ y: 0 }}
               exit={{ y: "100%" }}
@@ -170,22 +170,22 @@ export function DrillPreviewTooltip() {
                 <div className="w-12 h-1.5 bg-muted-foreground/20 rounded-full" />
               </div>
 
-              <DrillCard 
-                title={`${kind} Insight`} 
+              <DrillCard
+                title={`${kind} Insight`}
                 kind={kind}
                 className="border-0 shadow-none w-full max-h-[70vh] overflow-y-auto"
                 isMobile={true}
               >
-                <DrillContentRenderer 
-                  kind={kind} 
+                <DrillContentRenderer
+                  kind={kind}
                   payload={payload}
                   isLoading={isLoading}
                   error={error}
                   asyncData={asyncData}
                 />
-                
+
                 <DrillActions kind={kind} payload={payload} />
-                
+
                 {/* Mobile Hint */}
                 <div className="text-[10px] text-muted-foreground text-center mt-4 pb-4">
                   Swipe up for details • Swipe down to dismiss
@@ -202,8 +202,8 @@ export function DrillPreviewTooltip() {
   return createPortal(
     <AnimatePresence>
       {isOpen && kind && payload && coords && (
-        <motion.div 
-          style={style} 
+        <motion.div
+          style={style}
           initial={{ opacity: 0, scale: 0.95, y: 10 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 10 }}
@@ -219,31 +219,31 @@ export function DrillPreviewTooltip() {
             ) : error ? (
               <div className="flex flex-col items-center justify-center py-6 gap-3">
                 <span className="text-sm text-destructive">Failed to load preview</span>
-                <button 
-                  onClick={() => refetch()} 
+                <button
+                  onClick={() => refetch()}
                   className="text-xs text-primary hover:underline pointer-events-auto"
                 >
                   Retry
                 </button>
               </div>
             ) : (
-              <DrillContentRenderer 
-                kind={kind} 
-                payload={payload} 
-                isLoading={false} 
-                error={null} 
-                asyncData={asyncData} 
+              <DrillContentRenderer
+                kind={kind}
+                payload={payload}
+                isLoading={false}
+                error={null}
+                asyncData={asyncData}
               />
             )}
-            
+
             <DrillActions kind={kind} payload={payload} />
-            
+
             {/* Auto-pin progress bar */}
             <div className="mt-2 pt-2 border-t space-y-1">
               <div className="h-1 bg-muted rounded-full overflow-hidden">
-                <div 
+                <div
                   className="h-full bg-primary ease-linear"
-                  style={{ 
+                  style={{
                     width: `${pinProgress}%`,
                     transitionProperty: 'width',
                     transitionDuration: pinProgress === 0 ? '0ms' : '3000ms'

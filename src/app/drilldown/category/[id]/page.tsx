@@ -17,23 +17,22 @@ import {
   BarChart3,
 } from "lucide-react";
 import { useOrderStore } from "@/store/use-order-store";
+import { useProductsStore } from "@/store/use-products-store";
+import { useCategoriesStore } from "@/store/use-categories-store";
 import { formatCurrency } from "@/lib/utils";
 import { DrillTarget } from "@/components/drilldown/drill-target";
 import { CategoryAnalytics } from "@/app/products/categories/[id]/_components/category-analytics";
+import type { Product, Category, Order, Return } from "@/lib/types";
 
 export default function CategoryDrillDownPage() {
   const router = useRouter();
   const params = useParams();
   const id = params.id as string;
 
-  const {
-    categories,
-    products: allProducts,
-    orders: analyticsOrders,
-    returns,
-    fetchInitialData,
-    loading: storeLoading,
-  } = useOrderStore();
+  const { analyticsOrders, returns, loading: ordersLoading, fetchInitialData } = useOrderStore();
+  const { products: allProducts, loading: productsLoading } = useProductsStore();
+  const { categories, loading: categoriesLoading } = useCategoriesStore();
+  const storeLoading = ordersLoading || productsLoading || categoriesLoading;
 
   const [loading, setLoading] = useState(true);
 
@@ -55,7 +54,7 @@ export default function CategoryDrillDownPage() {
     relevantReturns,
     topProducts,
   } = useMemo(() => {
-    const category = categories.find((c) => c.id === id);
+    const category = categories.find((c: Category) => c.id === id);
 
     if (!category)
       return {
@@ -67,8 +66,8 @@ export default function CategoryDrillDownPage() {
         topProducts: [],
       };
 
-    const products = allProducts.filter((p) => p.category === category.name);
-    const productIds = new Set(products.map((p) => p.id));
+    const products = allProducts.filter((p: Product) => p.category === category.name);
+    const productIds = new Set(products.map((p: Product) => p.id));
 
     const relevantOrders = analyticsOrders
       .filter(
@@ -82,7 +81,7 @@ export default function CategoryDrillDownPage() {
       );
 
     const relevantReturns = returns
-      ? returns.filter((r) => relevantOrders.some((o) => o.id === r.orderId))
+      ? returns.filter((r: Return) => relevantOrders.some((o: Order) => o.id === r.orderId))
       : [];
 
     const totalRevenue = relevantOrders.reduce((sum, order) => {
@@ -319,8 +318,8 @@ export default function CategoryDrillDownPage() {
                           product.stock > 50
                             ? "default"
                             : product.stock > 10
-                            ? "secondary"
-                            : "destructive"
+                              ? "secondary"
+                              : "destructive"
                         }
                         className='shrink-0 text-[10px]'
                       >
