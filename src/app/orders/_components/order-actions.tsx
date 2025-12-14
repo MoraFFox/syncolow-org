@@ -4,7 +4,7 @@
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger, DropdownMenuPortal, DropdownMenuTrigger, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
-import { MoreHorizontal, PlusCircle, Search, Upload, Printer, Trash2, LayoutGrid, List, FileSpreadsheet, Filter, Loader2 } from 'lucide-react';
+import { MoreHorizontal, PlusCircle, Search, Upload, Printer, Trash2, LayoutGrid, List, FileSpreadsheet, Filter, FileText } from 'lucide-react';
 import type { Order } from '@/lib/types';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 
@@ -23,6 +23,7 @@ interface OrderActionsProps {
   viewMode: 'list' | 'kanban';
   onViewModeChange: (mode: 'list' | 'kanban') => void;
   onOpenAdvancedSearch: () => void;
+  onGenerateReport: () => void;
   isSearching?: boolean;
 }
 
@@ -41,6 +42,7 @@ export function OrderActions({
   viewMode,
   onViewModeChange,
   onOpenAdvancedSearch,
+  onGenerateReport,
   isSearching = false,
 }: OrderActionsProps) {
   const orderStatuses: Order['status'][] = ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled'];
@@ -75,6 +77,10 @@ export function OrderActions({
               <DropdownMenuItem onSelect={onPrintTodaysOrders}>
                 <Printer className="h-4 w-4 mr-2" />
                 Print Today's Orders
+              </DropdownMenuItem>
+              <DropdownMenuItem onSelect={onGenerateReport}>
+                <FileText className="h-4 w-4 mr-2" />
+                Generate Daily Reports
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem onSelect={onRemoveAll} className="text-destructive">
@@ -117,13 +123,13 @@ export function OrderActions({
             ))}
           </DropdownMenuContent>
         </DropdownMenu>
-         <ToggleGroup type="single" value={viewMode} onValueChange={(value: 'list' | 'kanban') => value && onViewModeChange(value)}>
-            <ToggleGroupItem value="list" aria-label="List view">
-                <List className="h-4 w-4" />
-            </ToggleGroupItem>
-            <ToggleGroupItem value="kanban" aria-label="Kanban view">
-                <LayoutGrid className="h-4 w-4" />
-            </ToggleGroupItem>
+        <ToggleGroup type="single" value={viewMode} onValueChange={(value: 'list' | 'kanban') => value && onViewModeChange(value)}>
+          <ToggleGroupItem value="list" aria-label="List view">
+            <List className="h-4 w-4" />
+          </ToggleGroupItem>
+          <ToggleGroupItem value="kanban" aria-label="Kanban view">
+            <LayoutGrid className="h-4 w-4" />
+          </ToggleGroupItem>
         </ToggleGroup>
         {selectedRowCount > 0 && viewMode === 'list' && (
           <DropdownMenu>

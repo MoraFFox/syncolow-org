@@ -395,6 +395,20 @@ export default function SettingsPage() {
         </CardContent>
       </Card>
 
+      <Card>
+        <CardHeader>
+          <CardTitle>Daily Reports</CardTitle>
+          <CardDescription>
+            Configure automated daily reports for delivery and warehouse teams.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Button asChild>
+            <Link href='/settings/reports'>Manage Reports</Link>
+          </Button>
+        </CardContent>
+      </Card>
+
       <Suspense fallback={<Card><CardHeader><Skeleton className="h-6 w-48" /></CardHeader><CardContent><Skeleton className="h-20 w-full" /></CardContent></Card>}>
         <PaymentMigration />
       </Suspense>

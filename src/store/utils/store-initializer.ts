@@ -6,6 +6,7 @@ import { CacheKeyFactory } from '@/lib/cache/key-factory';
 import { useCompanyStore } from '../use-company-store';
 import { useMaintenanceStore } from '../use-maintenance-store';
 import { useManufacturerStore } from '../use-manufacturer-store';
+import { useProductsStore } from '../use-products-store';
 import type { Product } from '@/lib/types';
 
 export async function initializeAllStores() {
@@ -125,6 +126,13 @@ export async function initializeAllStores() {
       loading: false,
     });
 
+    useProductsStore.setState({
+      products: products || [],
+      productsOffset: 50,
+      productsHasMore: (products?.length || 0) === 50,
+      loading: false,
+    });
+
     return {
       visits: visits || [],
       categories: categories || [],
@@ -138,6 +146,7 @@ export async function initializeAllStores() {
     useCompanyStore.setState({ loading: false });
     useMaintenanceStore.setState({ loading: false });
     useManufacturerStore.setState({ loading: false, productsByManufacturer: {} });
+    useProductsStore.setState({ loading: false });
     throw error;
   }
 }

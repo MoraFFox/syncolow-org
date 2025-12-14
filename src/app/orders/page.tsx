@@ -3,12 +3,10 @@
 
 import { useState, useMemo, useEffect, Suspense } from 'react';
 import { useDebouncedCallback } from 'use-debounce';
-import { useDebounce } from 'use-debounce';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { createRoot } from 'react-dom/client';
 import { useOrderStore } from '@/store/use-order-store';
 import { useCompanyStore } from '@/store/use-company-store';
-import { useMaintenanceStore } from '@/store/use-maintenance-store';
 import { Button } from '@/components/ui/button';
 import {
   AlertDialog,
@@ -25,7 +23,6 @@ import { useAuth } from '@/hooks/use-auth';
 import Loading from '../loading';
 import OrderForm from './_components/order-form';
 import type { Order } from '@/lib/types';
-import { Card, CardContent } from '@/components/ui/card';
 import { useSettingsStore } from '@/store/use-settings-store';
 import { CsvImporterDialog } from './_components/csv-importer-dialog';
 import { toast } from '@/hooks/use-toast';
@@ -40,7 +37,6 @@ import { searchOrders, type OrderSearchFilters } from '@/lib/advanced-search';
 import { ErrorBoundary } from '@/components/error-boundary';
 
 function OrdersPageContent() {
-  const router = useRouter();
   const searchParams = useSearchParams();
 
   const { orders, loading: storeLoading, ordersLoading, ordersHasMore, fetchOrders, fetchOrdersWithFilters, searchOrdersByText, loadMoreOrders, updateOrderStatus, deleteOrder, deleteAllOrders } = useOrderStore();
@@ -174,7 +170,7 @@ function OrdersPageContent() {
   const handleDeleteAllConfirm = async () => {
     try {
       await deleteAllOrders();
-    } catch (error) {
+    } catch (_error) {
       toast({
         title: "Error Deleting Orders",
         description: "Failed to delete all orders. Please try again.",
@@ -219,6 +215,72 @@ function OrdersPageContent() {
       document.body.removeChild(printContainer);
     }, 500);
   }
+
+  const handleGenerateReport = async () => {
+    try {
+      toast({
+        title: "Generating Reports...",
+        description: "Please wait while we generate the daily reports.",
+      });
+
+      const response = await fetch('/api/reports/daily', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sendEmail: false }),
+      });
+
+      const result = await response.json();
+
+      if (!result.success) {
+        throw new Error(result.error || 'Failed to generate reports');
+      }
+
+      // Helper to download base64 pdf
+      const downloadPdf = (base64: string, filename: string) => {
+        const link = document.createElement('a');
+        link.href = `data:application/pdf;base64,${base64}`;
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      };
+
+      let downloadedCount = 0;
+
+      if (result.deliveryReport) {
+        downloadPdf(result.deliveryReport.base64, result.deliveryReport.filename);
+        downloadedCount++;
+      }
+
+      if (result.warehouseReport) {
+        // Small delay to ensure both downloads start
+        setTimeout(() => {
+          downloadPdf(result.warehouseReport.base64, result.warehouseReport.filename);
+        }, 500);
+        downloadedCount++;
+      }
+
+      if (downloadedCount > 0) {
+        toast({
+          title: "Reports Generated",
+          description: `Successfully generated and downloaded ${downloadedCount} report(s).`,
+        });
+      } else {
+        toast({
+          title: "No Reports",
+          description: "No orders found for today to generate reports.",
+          variant: "default",
+        });
+      }
+
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to generate reports",
+        variant: "destructive",
+      });
+    }
+  };
 
   const handleRowSelectionChange = (id: string, isSelected: boolean) => {
     const newSet = new Set(selectedRowKeys);
@@ -299,6 +361,7 @@ function OrdersPageContent() {
         viewMode={viewMode}
         onViewModeChange={setLocalViewMode}
         onOpenAdvancedSearch={() => setIsAdvancedSearchOpen(true)}
+        onGenerateReport={handleGenerateReport}
         isSearching={isLoadingSearch}
       />
 

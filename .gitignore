@@ -74,14 +74,34 @@ logs
 .cache
 .turbo
 
-# temporary output/debug files
-*_output.txt
-*_errors.txt
-trace_output/
+# Vitest
+vitest.config.*.timestamp*
 
-# incremental tsconfig files (keep main tsconfig.json only)
-tsconfig.*.json
-!tsconfig.json
+# Supabase
+supabase/.temp/
 
-# Indexing cache
-Indexing/
+# Temporary files
+*.tmp
+*.temp
+*~
+
+# Backup files
+*.bak
+*.backup
+*.orig
+
+# Lock files (optional - uncomment if you want to ignore)
+# package-lock.json
+# yarn.lock
+# pnpm-lock.yaml
+
+# Generated files (keep commented unless needed)
+# *.generated.ts
+
+# Large media files (uncomment if needed)
+# *.mp4
+# *.mov
+# *.zip
+
+# Local scripts (uncomment if you have local-only scripts)
+# scripts/local/
