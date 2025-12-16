@@ -25,6 +25,8 @@ interface OrderActionsProps {
   onOpenAdvancedSearch: () => void;
   onGenerateReport: () => void;
   isSearching?: boolean;
+  showArchived: boolean;
+  onToggleArchived: () => void;
 }
 
 export function OrderActions({
@@ -44,6 +46,8 @@ export function OrderActions({
   onOpenAdvancedSearch,
   onGenerateReport,
   isSearching = false,
+  showArchived,
+  onToggleArchived,
 }: OrderActionsProps) {
   const orderStatuses: Order['status'][] = ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled'];
 
@@ -123,6 +127,15 @@ export function OrderActions({
             ))}
           </DropdownMenuContent>
         </DropdownMenu>
+
+        <Button
+          variant={showArchived ? "secondary" : "outline"}
+          onClick={onToggleArchived}
+          className="w-full sm:w-auto"
+        >
+          {showArchived ? "View Active" : "View Archive"}
+        </Button>
+
         <ToggleGroup type="single" value={viewMode} onValueChange={(value: 'list' | 'kanban') => value && onViewModeChange(value)}>
           <ToggleGroupItem value="list" aria-label="List view">
             <List className="h-4 w-4" />

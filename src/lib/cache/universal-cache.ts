@@ -80,15 +80,17 @@ export class UniversalCache implements IUniversalCache {
 
   /**
    * Invalidate cache entries.
+   * When a string is passed, it will match against both the namespace (key[0])
+   * and the entity name (key[2]) to allow invalidating all queries for an entity type.
    */
   async invalidate(keyOrTag: CacheKey | string): Promise<void> {
     if (typeof keyOrTag === 'string') {
-      // Invalidate by Tag/Namespace
-      // We assume the tag is the first element of the key (namespace)
+      // Invalidate by Tag - matches against namespace (key[0]) or entity (key[2])
       await this.queryClient.invalidateQueries({
         predicate: (query) => {
           const key = query.queryKey as unknown as CacheKey;
-          return key[0] === keyOrTag;
+          // Match against namespace (first element) or entity name (third element)
+          return key[0] === keyOrTag || key[2] === keyOrTag;
         }
       });
     } else {

@@ -4,8 +4,9 @@
  * for Delivery and Warehouse teams. Can be called from API routes or Edge Functions.
  */
 
-import { supabase } from '@/lib/supabase';
-import { format, startOfDay, endOfDay } from 'date-fns';
+import { supabaseAdmin as supabase } from '@/lib/supabase';
+import { format } from 'date-fns';
+import { toZonedTime, fromZonedTime } from 'date-fns-tz';
 import type { Order, Company } from './types';
 import {
   generateDeliveryReportBase64,
@@ -17,6 +18,9 @@ import {
 } from './pdf-warehouse-report';
 import { getClientConsumption } from './consumption-analytics';
 import { logger } from './logger';
+
+// Application timezone (Cairo, UTC+2)
+const APP_TIMEZONE = 'Africa/Cairo';
 
 /**
  * Report recipient configuration
@@ -70,28 +74,70 @@ const DEFAULT_RECIPIENTS: ReportRecipients = {
 /**
  * Fetches today's orders for reporting
  *
- * @param reportDate - The date to fetch orders for (defaults to today)
- * @returns Array of orders with deliveryDate matching the report date
+ * @param reportDate - The date to fetch orders for (defaults to today in Cairo timezone)
+ * @returns Array of orders with deliveryDate matching the report date (Cairo time)
  */
 export async function fetchOrdersForDate(reportDate: Date = new Date()): Promise<Order[]> {
-  const dayStart = startOfDay(reportDate);
-  const dayEnd = endOfDay(reportDate);
+  // Convert reportDate to Cairo timezone to determine the local day
+  const zonedDate = toZonedTime(reportDate, APP_TIMEZONE);
+  
+  // Format as YYYY-MM-DD in Cairo timezone
+  const dateString = format(zonedDate, 'yyyy-MM-dd');
+  
+  // Create start of day (midnight) and end of day in Cairo timezone as ISO strings
+  // Then convert to UTC using fromZonedTime
+  const startOfDayCairoStr = `${dateString}T00:00:00`;
+  const endOfDayCairoStr = `${dateString}T23:59:59.999`;
+  
+  // Parse as if in Cairo timezone and get UTC equivalent
+  const dayStartUTC = fromZonedTime(startOfDayCairoStr, APP_TIMEZONE);
+  const dayEndUTC = fromZonedTime(endOfDayCairoStr, APP_TIMEZONE);
+
+  logger.debug('Fetching orders for date range (Cairo timezone)', {
+    component: 'daily-report-service',
+    action: 'fetchOrdersForDate',
+    reportDate: reportDate.toISOString(),
+    dateString,
+    dayStartUTC: dayStartUTC.toISOString(),
+    dayEndUTC: dayEndUTC.toISOString(),
+  });
+
+
+  // DEBUG: Temporary console.error for visibility
+  console.error('[REPORT DEBUG] Date calculation:', {
+    reportDate: reportDate.toISOString(),
+    dateString,
+    dayStartUTC: dayStartUTC.toISOString(),
+    dayEndUTC: dayEndUTC.toISOString(),
+  });
 
   const { data: orders, error } = await supabase
     .from('orders')
     .select('*')
-    .gte('deliveryDate', dayStart.toISOString())
-    .lte('deliveryDate', dayEnd.toISOString())
+    .gte('deliveryDate', dayStartUTC.toISOString())
+    .lte('deliveryDate', dayEndUTC.toISOString())
     .order('area', { ascending: true })
     .order('companyName', { ascending: true });
 
   if (error) {
+    console.error('[REPORT DEBUG] Supabase error:', error);
     logger.error(error, {
       component: 'daily-report-service',
       action: 'fetchOrdersForDate',
     });
     return [];
   }
+
+  console.error('[REPORT DEBUG] Query result:', {
+    orderCount: orders?.length || 0,
+    firstOrder: orders?.[0] ? { id: orders[0].id, deliveryDate: orders[0].deliveryDate } : null,
+  });
+
+  logger.debug('Orders fetched for report', {
+    component: 'daily-report-service',
+    action: 'fetchOrdersForDate',
+    orderCount: orders?.length || 0,
+  });
 
   return (orders || []) as Order[];
 }

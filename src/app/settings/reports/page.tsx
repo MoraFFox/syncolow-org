@@ -1,5 +1,6 @@
 "use client";
 
+import { supabase } from "@/lib/supabase";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -36,29 +37,60 @@ export default function ReportSettingsPage() {
     const [newWarehouseEmail, setNewWarehouseEmail] = useState("");
     const [loading, setLoading] = useState(false);
 
-    // Load settings from localStorage on mount (mock persistence)
+    // Load settings from Supabase on mount
     useEffect(() => {
-        const saved = localStorage.getItem("reportSettings");
-        if (saved) {
+        async function loadSettings() {
             try {
-                setSettings(JSON.parse(saved));
+                const { data, error } = await supabase
+                    .from('system_settings')
+                    .select('value')
+                    .eq('key', 'daily_reports')
+                    .single();
+
+                if (error && error.code !== 'PGRST116') { // Ignore 0 rows error
+                    console.error("Error fetching settings:", error);
+                }
+
+                if (data?.value) {
+                    setSettings(data.value);
+                }
             } catch (e) {
-                console.error("Failed to parse report settings", e);
+                console.error("Failed to load report settings", e);
             }
         }
+        loadSettings();
     }, []);
 
-    const saveSettings = () => {
+    const saveSettings = async () => {
         setLoading(true);
-        // Simulate API call
-        setTimeout(() => {
-            localStorage.setItem("reportSettings", JSON.stringify(settings));
-            setLoading(false);
+        try {
+            const { data: { user } } = await supabase.auth.getUser();
+
+            const { error } = await supabase
+                .from('system_settings')
+                .upsert({
+                    key: 'daily_reports',
+                    value: settings,
+                    description: 'Configuration for Daily Delivery and Warehouse reports',
+                    updated_by: user?.id,
+                    updated_at: new Date().toISOString()
+                });
+
+            if (error) throw error;
+
             toast({
                 title: "Settings Saved",
                 description: "Daily report configuration has been updated.",
             });
-        }, 800);
+        } catch (error: any) {
+            toast({
+                title: "Save Failed",
+                description: error.message,
+                variant: "destructive",
+            });
+        } finally {
+            setLoading(false);
+        }
     };
 
     const addEmail = (type: 'delivery' | 'warehouse') => {

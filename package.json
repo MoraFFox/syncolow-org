@@ -52,6 +52,7 @@
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
     "date-fns": "^3.6.0",
+    "date-fns-tz": "^3.2.0",
     "dotenv": "^16.4.5",
     "embla-carousel-react": "^8.6.0",
     "framer-motion": "^12.23.25",
@@ -111,6 +112,7 @@
     "postcss": "^8",
     "prettier": "^3.7.4",
     "prettier-plugin-tailwindcss": "^0.7.2",
+    "shadcn": "^3.6.1",
     "tailwindcss": "^3.4.1",
     "typescript": "5.7.2",
     "vitest": "^4.0.12"

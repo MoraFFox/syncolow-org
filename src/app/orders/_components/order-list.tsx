@@ -1,7 +1,7 @@
 
 "use client";
 
-import Link from 'next/link';
+
 import {
   Table,
   TableBody,
@@ -33,27 +33,27 @@ interface OrderListProps {
 }
 
 const getStatusVariant = (status: string) => {
-    switch (status) {
-      case 'Delivered':
-      case 'Paid':
-        return 'default';
-      case 'Processing':
-      case 'Shipped':
-      case 'Pending':
-        return 'secondary';
-      case 'Cancelled':
-      case 'Overdue':
-        return 'destructive';
-      default:
-        return 'outline';
-    }
+  switch (status) {
+    case 'Delivered':
+    case 'Paid':
+      return 'default';
+    case 'Processing':
+    case 'Shipped':
+    case 'Pending':
+      return 'secondary';
+    case 'Cancelled':
+    case 'Overdue':
+      return 'destructive';
+    default:
+      return 'outline';
+  }
 };
 
 const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-    }).format(amount);
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+  }).format(amount);
 };
 
 
@@ -75,13 +75,13 @@ export function OrderList({
     if (order.isPotentialClient) {
       return order.temporaryCompanyName || 'Unknown Client';
     }
-    
+
     const company = companies.find(c => c.id === order.companyId);
     return company?.name || order.companyName || 'Unknown Client';
   };
 
   const renderMobileView = () => (
-     <div className="grid grid-cols-1 gap-4 md:hidden">
+    <div className="grid grid-cols-1 gap-4 md:hidden">
       {orders.map((order) => (
         <Card key={order.id}>
           <CardContent className="p-4 flex flex-col gap-2">
@@ -156,10 +156,10 @@ export function OrderList({
   );
 
   const renderDesktopView = () => (
-     <Card className="hidden md:block">
-        <CardContent className="p-0 overflow-visible">
-          <div className="overflow-x-auto">
-            <Table>
+    <Card className="hidden md:block">
+      <CardContent className="p-0 overflow-visible">
+        <div className="overflow-x-auto">
+          <Table>
             <TableHeader>
               <TableRow>
                 <TableHead className="w-[50px]">
@@ -172,8 +172,8 @@ export function OrderList({
                 <TableHead>Order ID</TableHead>
                 <TableHead>Client</TableHead>
                 <TableHead>Date</TableHead>
+                <TableHead>Delivery Date</TableHead>
                 <TableHead>Status</TableHead>
-                <TableHead>Payment Status</TableHead>
                 <TableHead className="text-right">Total</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
@@ -202,6 +202,9 @@ export function OrderList({
                     </DrillTarget>
                   </TableCell>
                   <TableCell className="cursor-pointer" onClick={() => router.push(`/orders/${order.id}`)}>{format(new Date(order.orderDate), 'PPP')}</TableCell>
+                  <TableCell className="cursor-pointer" onClick={() => router.push(`/orders/${order.id}`)}>
+                    {order.deliveryDate ? format(new Date(order.deliveryDate), 'PPP') : <span className="text-muted-foreground">-</span>}
+                  </TableCell>
                   <TableCell>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
@@ -219,9 +222,6 @@ export function OrderList({
                         ))}
                       </DropdownMenuContent>
                     </DropdownMenu>
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant={getStatusVariant(order.paymentStatus || 'Pending')} className="capitalize">{order.paymentStatus || 'Pending'}</Badge>
                   </TableCell>
                   <TableCell className="text-right cursor-pointer" onClick={() => router.push(`/orders/${order.id}`)}>{formatCurrency(order.total)}</TableCell>
                   <TableCell className="text-right">
@@ -250,12 +250,12 @@ export function OrderList({
                   </TableCell>
                 </TableRow>
               ))}
-               {orders.length === 0 && <TableRow><TableCell colSpan={8} className="text-center h-24">No orders found.</TableCell></TableRow>}
+              {orders.length === 0 && <TableRow><TableCell colSpan={8} className="text-center h-24">No orders found.</TableCell></TableRow>}
             </TableBody>
           </Table>
-          </div>
-        </CardContent>
-     </Card>
+        </div>
+      </CardContent>
+    </Card>
   );
 
   return (

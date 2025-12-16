@@ -45,11 +45,13 @@ export async function initializeAllStores() {
         if (error) throw error;
         return data;
       }),
-      universalCache.get(CacheKeyFactory.list('areas'), async () => {
+      // Bypass cache for areas to ensure delivery schedules are always up-to-date
+      // This fixes the issue where stale areas or schedules persist in the dropdown
+      (async () => {
         const { data, error } = await supabase.from('areas').select('*');
         if (error) throw error;
         return data;
-      }),
+      })(),
       universalCache.get(CacheKeyFactory.list('maintenance'), async () => {
         const { data, error } = await supabase.from('maintenance').select('*');
         if (error) throw error;

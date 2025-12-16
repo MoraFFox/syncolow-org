@@ -53,36 +53,39 @@ export function Step1_ClientDetails({ companies }: Step1ClientDetailsProps) {
   const isPotentialClient = watch("isPotentialClient");
   const selectedBranchId = watch("branchId");
   const selectedAreaName = watch("area");
-  const selectedRegion = watch("region");
+  const _selectedRegion = watch("region");
 
   const clientOptions = useMemo(() => {
     return companies;
   }, [companies]);
 
+  // Effect to populate defaults from client when selected
+  // Only runs on initial client selection, not on subsequent area/region changes
   useEffect(() => {
     if (!isPotentialClient && selectedBranchId) {
       const client = companies.find((c) => c.id === selectedBranchId);
       if (client) {
-        if (client.area)
+        // Set area from client if client has one configured
+        // This will trigger the area->region sync effect below
+        if (client.area) {
           setValue("area", client.area, { shouldValidate: true });
-        if (client.region && !selectedRegion)
-          setValue("region", client.region, { shouldValidate: true });
+        }
+        // Note: We DON'T set region from client.region here anymore
+        // The region should be determined by the AREA's deliverySchedule
       }
     }
-  }, [
-    isPotentialClient,
-    selectedBranchId,
-    companies,
-    setValue,
-    selectedRegion,
-  ]);
+  }, [isPotentialClient, selectedBranchId, companies, setValue]);
 
+  // Effect to sync region with the selected area's deliverySchedule
+  // This is the AUTHORITATIVE source for region - always overrides when area changes
   useEffect(() => {
-    const selectedArea = areas.find((a) => a.name === selectedAreaName);
-    if (selectedArea) {
-      setValue("region", selectedArea.deliverySchedule, {
-        shouldValidate: true,
-      });
+    if (selectedAreaName) {
+      const selectedArea = areas.find((a) => a.name === selectedAreaName);
+      if (selectedArea) {
+        setValue("region", selectedArea.deliverySchedule, {
+          shouldValidate: true,
+        });
+      }
     }
   }, [selectedAreaName, areas, setValue]);
 
@@ -191,8 +194,8 @@ export function Step1_ClientDetails({ companies }: Step1ClientDetailsProps) {
                     : null;
                   const parentCompany = selectedClient?.isBranch
                     ? companies.find(
-                        (c) => c.id === selectedClient.parentCompanyId
-                      )
+                      (c) => c.id === selectedClient.parentCompanyId
+                    )
                     : selectedClient;
 
                   return (
@@ -209,7 +212,7 @@ export function Step1_ClientDetails({ companies }: Step1ClientDetailsProps) {
                           >
                             {field.value
                               ? companies.find((c) => c.id === field.value)
-                                  ?.name
+                                ?.name
                               : "Select client"}
                             <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
                           </Button>
@@ -299,8 +302,8 @@ export function Step1_ClientDetails({ companies }: Step1ClientDetailsProps) {
                   <SelectTrigger
                     className={cn(
                       !!field.value &&
-                        field.value !== "Custom" &&
-                        "rounded-b-none"
+                      field.value !== "Custom" &&
+                      "rounded-b-none"
                     )}
                   >
                     <SelectValue placeholder='Select Schedule' />

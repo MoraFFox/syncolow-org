@@ -3,7 +3,7 @@
 
 import { useState, useMemo, useEffect, Suspense } from 'react';
 import { useDebouncedCallback } from 'use-debounce';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { createRoot } from 'react-dom/client';
 import { useOrderStore } from '@/store/use-order-store';
 import { useCompanyStore } from '@/store/use-company-store';
@@ -27,7 +27,7 @@ import { useSettingsStore } from '@/store/use-settings-store';
 import { CsvImporterDialog } from './_components/csv-importer-dialog';
 import { toast } from '@/hooks/use-toast';
 import { CancellationDialog } from './_components/cancellation-dialog';
-import { useIsMobile } from '@/hooks/use-mobile';
+
 import { DailyOrdersReport } from './_components/daily-orders-report';
 import { OrderList } from './_components/order-list';
 import { OrderActions } from './_components/order-actions';
@@ -44,11 +44,12 @@ function OrdersPageContent() {
   const { paginationLimit } = useSettingsStore();
   const [viewMode, setLocalViewMode] = useState<'list' | 'kanban'>('list');
 
-  const isMobile = useIsMobile();
+
   const { loading: authLoading } = useAuth();
 
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
+  const [showArchived, setShowArchived] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
   const [isLoadingSearch, setIsLoadingSearch] = useState(false);
   const [isOrderFormOpen, setIsOrderFormOpen] = useState(false);
@@ -70,9 +71,9 @@ function OrdersPageContent() {
   useEffect(() => {
     const loadOrders = async () => {
       if (hasAdvancedFilters) {
-        await fetchOrders(10000);
+        await fetchOrders(10000); // Advanced search fetches all locally for now (can be optimized later)
       } else if (canUseServerFilter) {
-        const filters: any = {};
+        const filters: any = { showArchived };
         if (['Pending', 'Processing', 'Shipped', 'Delivered'].includes(statusFilter)) {
           filters.status = statusFilter;
         } else if (['Paid', 'Pending'].includes(statusFilter)) {
@@ -80,17 +81,18 @@ function OrdersPageContent() {
         }
         await fetchOrdersWithFilters(paginationLimit, filters);
       } else if (!hasActiveSearch) {
-        await fetchOrders(paginationLimit);
+        // Default View: Use filters to enforce Active/Archive logic
+        await fetchOrdersWithFilters(paginationLimit, { showArchived });
       }
     };
     loadOrders();
-  }, [fetchOrders, fetchOrdersWithFilters, paginationLimit, hasAdvancedFilters, hasActiveSearch, canUseServerFilter, statusFilter]);
+  }, [fetchOrders, fetchOrdersWithFilters, paginationLimit, hasAdvancedFilters, hasActiveSearch, canUseServerFilter, statusFilter, showArchived]);
 
   const debouncedSearch = useDebouncedCallback(async (term: string) => {
     if (!term.trim() || term.trim().length < 2) {
       setIsSearching(false);
       setIsLoadingSearch(false);
-      await fetchOrders(paginationLimit);
+      // Effect will trigger reload
       return;
     }
     setIsLoadingSearch(true);
@@ -121,7 +123,17 @@ function OrdersPageContent() {
 
     if (Object.keys(advancedFilters).length > 0) {
       results = searchOrders(results, advancedFilters);
-    } else if (!hasActiveSearch && !canUseServerFilter) {
+    }
+
+    // Filter by Archive Status (Active vs Archived)
+    // Archived = Delivered AND Paid
+    results = results.filter(order => {
+      const isArchived = order.status === 'Delivered' && order.paymentStatus === 'Paid';
+      if (showArchived) return isArchived;
+      return !isArchived;
+    });
+
+    if (!hasActiveSearch && !canUseServerFilter) {
       results = results.filter(order => {
         if (statusFilter === 'Cancelled') {
           return order.status === 'Cancelled';
@@ -140,7 +152,7 @@ function OrdersPageContent() {
     }
 
     return results.sort((a, b) => new Date(b.orderDate).getTime() - new Date(a.orderDate).getTime());
-  }, [orders, statusFilter, advancedFilters, hasActiveSearch, canUseServerFilter]);
+  }, [orders, statusFilter, advancedFilters, hasActiveSearch, canUseServerFilter, showArchived]);
 
   const handleLoadMore = async () => {
     await loadMoreOrders(paginationLimit);
@@ -363,6 +375,8 @@ function OrdersPageContent() {
         onOpenAdvancedSearch={() => setIsAdvancedSearchOpen(true)}
         onGenerateReport={handleGenerateReport}
         isSearching={isLoadingSearch}
+        showArchived={showArchived}
+        onToggleArchived={() => setShowArchived((prev) => !prev)}
       />
 
       <OrderForm isOpen={isOrderFormOpen} onOpenChange={setIsOrderFormOpen} />

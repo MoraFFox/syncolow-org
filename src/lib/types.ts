@@ -145,6 +145,7 @@ export interface Order {
   branchName?: string;
   orderDate: string; // ISO 8601 date string
   deliveryDate?: string | null; // ISO 8601 date string
+  deliverySchedule?: 'A' | 'B'; // Delivery schedule used to calculate deliveryDate
   paymentDueDate?: string | null; // ISO 8601 date string
   status: 'Pending' | 'Processing' | 'Shipped' | 'Delivered' | 'Cancelled' | 'Delivery Failed';
   paymentStatus: 'Paid' | 'Pending' | 'Overdue';

@@ -65,14 +65,14 @@ function getDeliveryAddress(
   company: Company | undefined
 ): string {
   const location = branch?.location || company?.location;
-  if (!location) return 'Address not available';
+  if (!location) return 'N/A';
 
   if (location.includes('google.com/maps') || location.includes('goo.gl')) {
-    return `📍 Maps Link`;
+    return 'Maps Link';
   }
 
-  // Truncate long addresses
-  return location.length > 50 ? location.substring(0, 47) + '...' : location;
+  // Truncate long addresses - keep shorter for PDF
+  return location.length > 35 ? location.substring(0, 32) + '...' : location;
 }
 
 /**
@@ -203,26 +203,34 @@ export function generateWarehouseReportPDF(
     const activityStatus = getActivityStatus(company);
 
     // Order header box
-    doc.setFillColor(240, 240, 240);
-    doc.rect(14, startY - 3, 182, 20, 'F');
+    doc.setFillColor(245, 245, 245);
+    doc.rect(14, startY - 3, 182, 18, 'F');
 
-    // Order ID and Client Name
+    // Order ID and Client Name (row 1)
     doc.setFontSize(10);
     doc.setFont('helvetica', 'bold');
+    const clientName = order.companyName || 'Unknown';
+    const truncatedClient = clientName.length > 25 ? clientName.substring(0, 22) + '...' : clientName;
     doc.text(`Order #${order.id.substring(0, 8)}`, 16, startY + 2);
-    doc.text(order.companyName || 'Unknown Client', 60, startY + 2);
+    doc.text(truncatedClient, 55, startY + 2);
 
-    // Status indicators
+    // Status indicators (row 1, right side)
     doc.setFont('helvetica', 'normal');
-    doc.setFontSize(9);
-    doc.text(deliveryStatus.status, 140, startY + 2);
-    doc.text(activityStatus.status, 170, startY + 2);
-
-    // Second row: Contact and Address
     doc.setFontSize(8);
-    doc.text(`📞 ${getPrimaryPhone(targetEntity?.contacts)}`, 16, startY + 10);
-    doc.text(`✉️ ${targetEntity?.email || 'N/A'}`, 60, startY + 10);
-    doc.text(`📍 ${getDeliveryAddress(branch, company)}`, 110, startY + 10);
+    doc.text(`#${order.id.substring(0, 6)}`, 105, startY + 2);
+    doc.text(deliveryStatus.status.replace(/[✅❌⏳]/g, '').trim(), 130, startY + 2);
+    doc.text(activityStatus.status.replace(/[🟢🔴🟡]/g, '').trim(), 165, startY + 2);
+
+    // Row 2: Contact info
+    doc.setFontSize(7);
+    const phone = getPrimaryPhone(targetEntity?.contacts);
+    const email = targetEntity?.email || 'N/A';
+    const truncatedEmail = email.length > 25 ? email.substring(0, 22) + '...' : email;
+    const address = getDeliveryAddress(branch, company);
+    
+    doc.text(`Tel: ${phone}`, 16, startY + 9);
+    doc.text(`Email: ${truncatedEmail}`, 70, startY + 9);
+    doc.text(`Addr: ${address}`, 130, startY + 9);
 
     // If not delivered, show reason
     if (deliveryStatus.reason) {

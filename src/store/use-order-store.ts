@@ -68,6 +68,7 @@ interface AppState {
   ordersOffset: number;
   ordersHasMore: boolean;
   ordersLoading: boolean;
+  activeFilters: { status?: string; paymentStatus?: string; companyId?: string; branchId?: string; showArchived?: boolean } | null;
   analyticsLoading: boolean;
   currentFetchId: string | null;
 
@@ -75,7 +76,7 @@ interface AppState {
   fetchOrders: (limitCount: number) => Promise<void>;
   fetchOrdersWithFilters: (
     limitCount: number,
-    filters: { status?: string; paymentStatus?: string; companyId?: string; branchId?: string }
+    filters: { status?: string; paymentStatus?: string; companyId?: string; branchId?: string; showArchived?: boolean }
   ) => Promise<void>;
   searchOrdersByText: (searchTerm: string) => Promise<void>;
   loadMoreOrders: (limitCount: number) => Promise<void>;
@@ -144,6 +145,7 @@ interface AppState {
 export const useOrderStore = create<AppState>((set, get) => ({
   orders: [],
   analyticsOrders: [],
+  activeFilters: null,
   returns: [],
   notifications: [],
   visits: [],
@@ -176,7 +178,7 @@ export const useOrderStore = create<AppState>((set, get) => ({
   },
 
   fetchOrders: async (limitCount) => {
-    set({ ordersLoading: true });
+    set({ ordersLoading: true, activeFilters: null });
     try {
       const orders = await universalCache.get(
         CacheKeyFactory.list('orders', { limit: limitCount }),
@@ -203,39 +205,45 @@ export const useOrderStore = create<AppState>((set, get) => ({
   },
 
   fetchOrdersWithFilters: async (limitCount, filters) => {
-    set({ ordersLoading: true });
+    set({ ordersLoading: true, activeFilters: filters });
     try {
-      const orders = await universalCache.get(
-        CacheKeyFactory.list('orders', { limit: limitCount, ...filters }),
-        async () => {
-          let query = supabase.from("orders").select("*");
+      // Always fetch fresh data for filtered queries (no cache)
+      // This ensures filters like "Pending" always show the latest orders
+      let query = supabase.from("orders").select("*");
 
-          if (filters.status && filters.status !== "All") {
-            query = query.eq("status", filters.status);
-          }
-          if (filters.paymentStatus && filters.paymentStatus !== "All") {
-            query = query.eq("paymentStatus", filters.paymentStatus);
-          }
-          if (filters.companyId) {
-            query = query.eq("companyId", filters.companyId);
-          }
-          if (filters.branchId) {
-            query = query.eq("branchId", filters.branchId);
-          }
+      if (filters.status && filters.status !== "All") {
+        query = query.eq("status", filters.status);
+      }
+      if (filters.paymentStatus && filters.paymentStatus !== "All") {
+        query = query.eq("paymentStatus", filters.paymentStatus);
+      }
+      if (filters.companyId) {
+        query = query.eq("companyId", filters.companyId);
+      }
+      if (filters.branchId) {
+        query = query.eq("branchId", filters.branchId);
+      }
+      
+      // Archive Logic
+      if (filters.showArchived) {
+          // Show ONLY Delivered & Paid
+          query = query.eq('status', 'Delivered').eq('paymentStatus', 'Paid');
+      } else {
+          // Show ONLY Active (NOT (Delivered & Paid))
+          // Logic: (status != Delivered) OR (paymentStatus != Paid)
+          query = query.or('status.neq.Delivered,paymentStatus.neq.Paid');
+      }
 
-          const { data, error } = await query
-            .order("orderDate", { ascending: false })
-            .range(0, limitCount - 1);
-          
-          if (error) throw error;
-          return data;
-        }
-      );
+      const { data, error } = await query
+        .order("orderDate", { ascending: false })
+        .range(0, limitCount - 1);
+      
+      if (error) throw error;
 
       set({
-        orders: orders || [],
+        orders: data || [],
         ordersOffset: limitCount,
-        ordersHasMore: (orders?.length || 0) === limitCount,
+        ordersHasMore: (data?.length || 0) === limitCount,
         ordersLoading: false,
       });
     } catch {
@@ -269,6 +277,7 @@ export const useOrderStore = create<AppState>((set, get) => ({
         orders: filtered,
         ordersOffset: 0,
         ordersHasMore: false,
+        activeFilters: null
       });
     } catch {
       // Error handled silently
@@ -276,16 +285,48 @@ export const useOrderStore = create<AppState>((set, get) => ({
   },
 
   loadMoreOrders: async (limitCount) => {
-    const { ordersOffset, ordersHasMore } = get();
-    if (!ordersHasMore) return;
+    const { ordersOffset, ordersHasMore, activeFilters } = get();
+    console.warn('[loadMoreOrders] Called with:', { limitCount, ordersOffset, ordersHasMore, activeFilters });
+    if (!ordersHasMore) {
+      console.warn('[loadMoreOrders] Aborting: ordersHasMore is false');
+      return;
+    }
 
     set({ ordersLoading: true });
     try {
-      const { data: newOrders } = await supabase
-        .from("orders")
-        .select("*")
+      let query = supabase.from("orders").select("*");
+
+      if (activeFilters) {
+        if (activeFilters.status && activeFilters.status !== "All") {
+          query = query.eq("status", activeFilters.status);
+        }
+        if (activeFilters.paymentStatus && activeFilters.paymentStatus !== "All") {
+          query = query.eq("paymentStatus", activeFilters.paymentStatus);
+        }
+        if (activeFilters.companyId) {
+          query = query.eq("companyId", activeFilters.companyId);
+        }
+        if (activeFilters.branchId) {
+          query = query.eq("branchId", activeFilters.branchId);
+        }
+        
+        if (activeFilters.showArchived) {
+            query = query.eq('status', 'Delivered').eq('paymentStatus', 'Paid');
+        } else {
+            query = query.or('status.neq.Delivered,paymentStatus.neq.Paid');
+        }
+      }
+
+      const { data: newOrders, error } = await query
         .order("orderDate", { ascending: false })
         .range(ordersOffset, ordersOffset + limitCount - 1);
+
+      console.warn('[loadMoreOrders] Fetched:', { count: newOrders?.length, error });
+
+      if (error) {
+        console.warn('[loadMoreOrders] Query error:', error);
+        throw error;
+      }
 
       set(
         produce((state: AppState) => {
@@ -297,18 +338,41 @@ export const useOrderStore = create<AppState>((set, get) => ({
           state.ordersOffset = ordersOffset + limitCount;
           state.ordersHasMore = (newOrders?.length || 0) === limitCount;
           state.ordersLoading = false;
+          console.warn('[loadMoreOrders] State updated:', { newOrdersCount: uniqueNewOrders.length, newOffset: state.ordersOffset, hasMore: state.ordersHasMore });
         })
       );
-    } catch {
+    } catch (err) {
+      console.warn('[loadMoreOrders] Error caught:', err);
       set({ ordersLoading: false });
     }
   },
 
   refreshOrders: async () => {
     const limitCount = get().orders.length || 20;
-    // AnalyticsCache.clearAll();
-    await universalCache.invalidate(['app', 'list', 'orders'] as any);
-    await get().fetchOrders(limitCount);
+    // Invalidate all order-related cache entries by using string tag
+    // This ensures all cached order queries (with different params) are cleared
+    await universalCache.invalidate('orders');
+    
+    // Force a fresh fetch directly from the database, bypassing the cache
+    set({ ordersLoading: true });
+    try {
+      const { data, error } = await supabase
+        .from("orders")
+        .select("*")
+        .order("orderDate", { ascending: false })
+        .range(0, limitCount - 1);
+      
+      if (error) throw error;
+      
+      set({
+        orders: data || [],
+        ordersOffset: limitCount,
+        ordersHasMore: (data?.length || 0) === limitCount,
+        ordersLoading: false,
+      });
+    } catch {
+      set({ ordersLoading: false });
+    }
   },
 
   currentFetchId: null,
@@ -418,8 +482,8 @@ export const useOrderStore = create<AppState>((set, get) => ({
         await syncOrderToSearch(updatedOrder as Order);
     }
     
-    // Invalidate cache
-    await universalCache.invalidate(['app', 'list', 'orders'] as any);
+    // Invalidate cache using entity tag
+    await universalCache.invalidate('orders');
     
     // Invalidate drilldown preview
     try {
@@ -469,8 +533,7 @@ export const useOrderStore = create<AppState>((set, get) => ({
     if (notes) updateData.paymentNotes = notes;
 
     await supabase.from("orders").update(updateData).in("id", orderIds);
-    // AnalyticsCache.clearAll();
-    await universalCache.invalidate(['app', 'list', 'orders'] as any);
+    // refreshOrders handles cache invalidation internally
     await get().refreshOrders();
     await get().updatePaymentScores();
     toast({
@@ -559,8 +622,7 @@ export const useOrderStore = create<AppState>((set, get) => ({
       await get().updatePaymentScores(companyId);
     }
     
-    // Invalidate cache
-    await universalCache.invalidate(['app', 'list', 'orders'] as any);
+    // Note: refreshOrders above already invalidates the cache
     
     // Invalidate drilldown preview
     try {
@@ -633,8 +695,13 @@ export const useOrderStore = create<AppState>((set, get) => ({
       throw new Error(`Orders suspended for ${parentCompany.name}`);
     }
 
+    // Determine region - use form value, fall back to client's region, then default to 'A'
+    const effectiveRegion: "A" | "B" = 
+      (region === "A" || region === "B") ? region : 
+      (client?.region === "A" || client?.region === "B") ? client.region : "A";
+
     const deliveryDate = calculateNextDeliveryDate(
-      region as "A" | "B",
+      effectiveRegion,
       orderDate
     );
     const expectedPaymentDate = parentCompany
@@ -662,6 +729,8 @@ export const useOrderStore = create<AppState>((set, get) => ({
       branchId: !isPotentialClient ? branchId : null,
       orderDate: orderDate.toISOString(),
       deliveryDate: deliveryDate.toISOString(),
+      // NOTE: Add 'deliverySchedule' column to Supabase orders table to enable this:
+      // deliverySchedule: effectiveRegion,
       paymentDueDate: (orderCore.paymentDueDate as Date | undefined)?.toISOString() || null,
       status: "Pending",
       paymentStatus: "Pending",
@@ -707,15 +776,14 @@ export const useOrderStore = create<AppState>((set, get) => ({
     if (error) throw error;
     const createdOrder = orderData as Order;
     await syncOrderToSearch(createdOrder);
-    await get().refreshOrders();
     
     // Update payment scores for the specific company only
     if (createdOrder.companyId) {
       await get().updatePaymentScores(createdOrder.companyId);
     }
 
-    // Invalidate cache
-    await universalCache.invalidate(['app', 'list', 'orders'] as any);
+    // Refresh orders list (this handles cache invalidation internally)
+    await get().refreshOrders();
 
     toast({
       title: "Order Created successfully!",
