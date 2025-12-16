@@ -15,6 +15,9 @@ export interface UserSettings {
   notification_types: Record<string, boolean>;
   created_at?: string;
   updated_at?: string;
+  view_mode?: string; // Density: 'Comfortable', 'Compact' etc
+  orders_view_mode?: 'list' | 'grid'; // Layout preference
+  pagination_limit?: number;
 }
 
 interface UseUserSettingsReturn {
@@ -31,7 +34,10 @@ const DEFAULT_SETTINGS: Omit<UserSettings, 'user_id'> = {
   digest_frequency: 'disabled',
   quiet_hours_start: '22:00',
   quiet_hours_end: '07:00',
-  notification_types: {}
+  notification_types: {},
+  view_mode: 'Comfortable',
+  orders_view_mode: 'list',
+  pagination_limit: 20
 };
 
 /**

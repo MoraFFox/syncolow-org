@@ -20,8 +20,8 @@ interface OrderActionsProps {
   selectedRowCount: number;
   searchTerm: string;
   statusFilter: string;
-  viewMode: 'list' | 'kanban';
-  onViewModeChange: (mode: 'list' | 'kanban') => void;
+  viewMode: 'list' | 'grid';
+  onViewModeChange: (mode: 'list' | 'grid') => void;
   onOpenAdvancedSearch: () => void;
   onGenerateReport: () => void;
   isSearching?: boolean;
@@ -136,14 +136,15 @@ export function OrderActions({
           {showArchived ? "View Active" : "View Archive"}
         </Button>
 
-        <ToggleGroup type="single" value={viewMode} onValueChange={(value: 'list' | 'kanban') => value && onViewModeChange(value)}>
+        <ToggleGroup type="single" value={viewMode} onValueChange={(value: 'list' | 'grid') => value && onViewModeChange(value)}>
           <ToggleGroupItem value="list" aria-label="List view">
             <List className="h-4 w-4" />
           </ToggleGroupItem>
-          <ToggleGroupItem value="kanban" aria-label="Kanban view">
+          <ToggleGroupItem value="grid" aria-label="Grid view">
             <LayoutGrid className="h-4 w-4" />
           </ToggleGroupItem>
         </ToggleGroup>
+
         {selectedRowCount > 0 && viewMode === 'list' && (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>

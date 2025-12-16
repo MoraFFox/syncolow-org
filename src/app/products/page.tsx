@@ -62,6 +62,7 @@ function ProductsPageContent() {
     deleteAllProducts,
     loading: productsLoading,
     loadRemainingProducts,
+    loadAllProducts,
   } = useProductsStore();
   const { categories } = useCategoriesStore();
   const { manufacturers, loading: manufacturersLoading } =
@@ -84,6 +85,18 @@ function ProductsPageContent() {
   const [selectedManufacturer, setSelectedManufacturer] = useState<Manufacturer | null>(null);
   const [productToDelete, setProductToDelete] = useState<Product | null>(null);
   const [isAlertOpen, setIsAlertOpen] = useState(false);
+
+  // Load all products on initial mount
+  useEffect(() => {
+    const loadInitial = async () => {
+      // Only load if we don't have all products yet (initial state has 50 or less)
+      if (products.length <= 50 && !hasLoadedAll) {
+        await loadAllProducts();
+        setHasLoadedAll(true);
+      }
+    };
+    loadInitial();
+  }, []);
 
 
 
@@ -132,7 +145,9 @@ function ProductsPageContent() {
     if (!term.trim()) {
       setIsSearching(false);
       setIsLoadingMore(false);
-      await useProductsStore.getState().loadRemainingProducts();
+      // searchProducts now properly reloads all products when term is empty
+      await useProductsStore.getState().searchProducts('');
+      setHasLoadedAll(true);
       return;
     }
     setIsLoadingMore(true);

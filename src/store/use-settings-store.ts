@@ -17,10 +17,12 @@ export type NotificationSettings = {
 
 interface SettingsState {
   viewMode: ViewMode;
+  ordersViewMode: 'list' | 'grid';
   paginationLimit: number;
   notificationSettings: NotificationSettings;
   setPaginationLimit: (limit: number) => void;
   setViewMode: (mode: ViewMode) => void;
+  setOrdersViewMode: (mode: 'list' | 'grid') => void;
   toggleNotificationType: (type: NotificationType) => void;
 }
 
@@ -48,10 +50,12 @@ export const useSettingsStore = create<SettingsState>()(
   persist(
     (set) => ({
       viewMode: 'Comfortable',
+      ordersViewMode: 'list',
       paginationLimit: 20,
       notificationSettings: defaultNotificationSettings,
       setPaginationLimit: (limit) => set({ paginationLimit: limit }),
       setViewMode: (mode) => set({ viewMode: mode }),
+      setOrdersViewMode: (mode) => set({ ordersViewMode: mode }),
       toggleNotificationType: (type: NotificationType) =>
         set((state) => ({
           notificationSettings: {

@@ -24,14 +24,15 @@ import Loading from '../loading';
 import OrderForm from './_components/order-form';
 import type { Order } from '@/lib/types';
 import { useSettingsStore } from '@/store/use-settings-store';
+import { useUserSettings } from '@/hooks/use-user-settings';
 import { CsvImporterDialog } from './_components/csv-importer-dialog';
 import { toast } from '@/hooks/use-toast';
 import { CancellationDialog } from './_components/cancellation-dialog';
 
 import { DailyOrdersReport } from './_components/daily-orders-report';
 import { OrderList } from './_components/order-list';
+import { OrderGrid } from './_components/order-grid';
 import { OrderActions } from './_components/order-actions';
-import { KanbanBoard } from './_components/kanban-board';
 import { AdvancedSearchDialog } from './_components/advanced-search-dialog';
 import { searchOrders, type OrderSearchFilters } from '@/lib/advanced-search';
 import { ErrorBoundary } from '@/components/error-boundary';
@@ -41,8 +42,26 @@ function OrdersPageContent() {
 
   const { orders, loading: storeLoading, ordersLoading, ordersHasMore, fetchOrders, fetchOrdersWithFilters, searchOrdersByText, loadMoreOrders, updateOrderStatus, deleteOrder, deleteAllOrders } = useOrderStore();
   const { companies } = useCompanyStore();
-  const { paginationLimit } = useSettingsStore();
-  const [viewMode, setLocalViewMode] = useState<'list' | 'kanban'>('list');
+  const { paginationLimit, ordersViewMode, setOrdersViewMode } = useSettingsStore();
+
+  const { settings, saveSettings } = useUserSettings();
+
+  // Sync DB settings to Store
+  useEffect(() => {
+    if (settings?.orders_view_mode && settings.orders_view_mode !== ordersViewMode) {
+      setOrdersViewMode(settings.orders_view_mode);
+    }
+  }, [settings, setOrdersViewMode]); // Removed ordersViewMode dependency to prevent race/loops
+
+  // Sync Store changes to DB
+  useEffect(() => {
+    // Only save if we have a valid setting and user is logged in (implied by saveSettings availability)
+    // We check if it matches settings to avoid redundant saves, but settings might be stale.
+    // Simple save is safer.
+    if (ordersViewMode && settings?.orders_view_mode !== ordersViewMode) {
+      saveSettings({ orders_view_mode: ordersViewMode });
+    }
+  }, [ordersViewMode, saveSettings, settings]);
 
 
   const { loading: authLoading } = useAuth();
@@ -370,8 +389,8 @@ function OrdersPageContent() {
         selectedRowCount={selectedRowKeys.size}
         searchTerm={searchTerm}
         statusFilter={statusFilter}
-        viewMode={viewMode}
-        onViewModeChange={setLocalViewMode}
+        viewMode={ordersViewMode}
+        onViewModeChange={setOrdersViewMode}
         onOpenAdvancedSearch={() => setIsAdvancedSearchOpen(true)}
         onGenerateReport={handleGenerateReport}
         isSearching={isLoadingSearch}
@@ -388,34 +407,42 @@ function OrdersPageContent() {
         currentFilters={advancedFilters}
       />
 
-      {viewMode === 'list' || viewMode === 'kanban' ? (
-        <>
-          <ErrorBoundary>
-            <OrderList
-              orders={filteredOrders}
-              companies={companies}
-              selectedRowKeys={selectedRowKeys}
-              onRowSelectionChange={handleRowSelectionChange}
-              onSelectAll={handleSelectAll}
-              onUpdateStatus={updateOrderStatus}
-              onCancelOrder={handleOpenCancelDialog}
-              onDeleteOrder={setOrderToDelete}
-            />
-          </ErrorBoundary>
-
-          {ordersHasMore && !hasAdvancedFilters && !hasActiveSearch && (
-            <div className="mt-4 flex justify-center">
-              <Button onClick={handleLoadMore} disabled={ordersLoading}>
-                {ordersLoading ? 'Loading...' : 'Load More'}
-              </Button>
-            </div>
-          )}
-        </>
-      ) : (
+      {ordersViewMode === 'list' && (
         <ErrorBoundary>
-          <KanbanBoard orders={filteredOrders} onStatusChange={updateOrderStatus} />
+          <OrderList
+            orders={filteredOrders}
+            companies={companies}
+            selectedRowKeys={selectedRowKeys}
+            onRowSelectionChange={handleRowSelectionChange}
+            onSelectAll={handleSelectAll}
+            onUpdateStatus={updateOrderStatus}
+            onCancelOrder={handleOpenCancelDialog}
+            onDeleteOrder={setOrderToDelete}
+          />
         </ErrorBoundary>
       )}
+
+      {ordersViewMode === 'grid' && (
+        <ErrorBoundary>
+          <OrderGrid
+            orders={filteredOrders}
+            companies={companies}
+            onUpdateStatus={updateOrderStatus}
+            onCancelOrder={handleOpenCancelDialog}
+            onDeleteOrder={setOrderToDelete}
+          />
+        </ErrorBoundary>
+      )}
+
+      {ordersViewMode === 'list' && ordersHasMore && !hasAdvancedFilters && !hasActiveSearch && (
+        <div className="mt-4 flex justify-center">
+          <Button onClick={handleLoadMore} disabled={ordersLoading}>
+            {ordersLoading ? 'Loading...' : 'Load More'}
+          </Button>
+        </div>
+      )}
+
+
     </div>
   );
 }

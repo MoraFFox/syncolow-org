@@ -16,6 +16,7 @@ interface ProductsState {
   productsHasMore: boolean;
   loading: boolean;
 
+  loadAllProducts: () => Promise<void>;
   loadRemainingProducts: () => Promise<void>;
   searchProducts: (searchTerm: string) => Promise<void>;
   filterProductsByCategory: (category: string) => Promise<void>;
@@ -30,6 +31,23 @@ export const useProductsStore = create<ProductsState>((set, get) => ({
   productsOffset: 0,
   productsHasMore: true,
   loading: false,
+
+  loadAllProducts: async () => {
+    set({ loading: true });
+    try {
+      const { data, error } = await supabase.from('products').select('*');
+      if (error) throw error;
+      set({
+        products: data || [],
+        productsOffset: data?.length || 0,
+        productsHasMore: false,
+        loading: false,
+      });
+    } catch (error) {
+      set({ loading: false });
+      handleStoreError(error, { component: 'ProductsStore', action: 'loadAllProducts' });
+    }
+  },
 
   loadRemainingProducts: async () => {
     try {
@@ -55,21 +73,8 @@ export const useProductsStore = create<ProductsState>((set, get) => ({
 
   searchProducts: async (searchTerm: string) => {
     if (!searchTerm.trim()) {
-      set({ loading: true });
-      try {
-        const products = await universalCache.get(
-          CacheKeyFactory.list('products', { limit: 50, offset: 0 }),
-          async () => {
-            const { data, error } = await supabase.from('products').select('*').range(0, 49);
-            if (error) throw error;
-            return data;
-          }
-        );
-        set({ products: products || [], productsOffset: 50, productsHasMore: (products?.length || 0) === 50, loading: false });
-      } catch (error) {
-        set({ loading: false });
-        handleStoreError(error, { component: 'ProductsStore', action: 'searchProducts' });
-      }
+      // When search is cleared, load all products instead of just 50
+      await get().loadAllProducts();
       return;
     }
 
