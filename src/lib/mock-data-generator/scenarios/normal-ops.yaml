@@ -1,0 +1,30 @@
+name: normal-ops
+description: Standard business operations with typical patterns
+
+entityRates:
+  users: 20
+  companies: 100
+  branchRatio: 0.3
+  products: 200
+  ordersPerDay: 50
+  maintenanceVisitsPerWeek: 10
+
+distributions:
+  orderStatus:
+    Pending: 0.1
+    Processing: 0
+    Shipped: 0.15
+    Delivered: 0.7
+    Cancelled: 0.05
+    Delivery Failed: 0
+  paymentStatus:
+    Paid: 0.8
+    Pending: 0.15
+    Overdue: 0.05
+  productPopularity: zipf
+  regionDistribution:
+    A: 0.6
+    B: 0.4
+  deliveryDelays: 0.1
+
+anomalyRate: 0.05

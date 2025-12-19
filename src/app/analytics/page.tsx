@@ -13,7 +13,7 @@ const YearComparisonChart = lazy(() => import("./_components/year-comparison-cha
 const RevenueForecastChart = lazy(() => import("./_components/revenue-forecast-chart").then(m => ({ default: m.RevenueForecastChart })));
 const InventoryReport = lazy(() => import("./_components/inventory-report").then(m => ({ default: m.InventoryReport })));
 const CustomerReport = lazy(() => import("./_components/customer-report").then(m => ({ default: m.CustomerReport })));
-import { differenceInMilliseconds, differenceInDays, parseISO, format, subMonths, subDays, parse, startOfMonth, endOfMonth, isWithinInterval, startOfDay, endOfDay, eachDayOfInterval } from "date-fns";
+import { differenceInMilliseconds, differenceInDays, parseISO, format, subMonths, subDays, parse, isWithinInterval, startOfDay, endOfDay, eachDayOfInterval } from "date-fns";
 import { useCompanyStore } from "@/store/use-company-store";
 import { useMaintenanceStore } from "@/store/use-maintenance-store";
 import { RevenueDeepDiveDialog } from "./_components/revenue-deep-dive-dialog";
@@ -30,14 +30,11 @@ export default function AnalyticsPage() {
     const { maintenanceVisits } = useMaintenanceStore();
     const [isRevenueDialogOpen, setIsRevenueDialogOpen] = useState(false);
     const [lastUpdated, setLastUpdated] = useState(new Date());
-    const [isCalculating, setIsCalculating] = useState(false);
     const [dateRange, setDateRange] = useState<{ from: string, to: string }>({
         from: format(subMonths(new Date(), 5), 'yyyy-MM-dd'),
         to: format(new Date(), 'yyyy-MM-dd')
     });
-
     const analytics = useMemo(() => {
-        setIsCalculating(true);
         const fromDate = parse(dateRange.from, 'yyyy-MM-dd', new Date());
         const toDate = parse(dateRange.to, 'yyyy-MM-dd', new Date());
         const start = startOfDay(fromDate);
@@ -55,8 +52,8 @@ export default function AnalyticsPage() {
             isWithinInterval(new Date(o.orderDate), { start: prevStart, end: prevEnd })
         );
 
-        const revenue = filteredOrders.reduce((acc, o) => acc + o.total, 0);
-        const prevRevenue = prevOrders.reduce((acc, o) => acc + o.total, 0);
+        const revenue = filteredOrders.reduce((acc, o) => acc + (o.grandTotal || o.total || 0), 0);
+        const prevRevenue = prevOrders.reduce((acc, o) => acc + (o.grandTotal || o.total || 0), 0);
         const revenueChange = prevRevenue > 0 ? ((revenue - prevRevenue) / prevRevenue) * 100 : 0;
 
         const stockValue = products.reduce((acc, p) => acc + (p.price || 0) * p.stock, 0);
@@ -67,10 +64,10 @@ export default function AnalyticsPage() {
 
         const outstandingReceivables = filteredOrders
             .filter(o => o.paymentStatus === 'Pending' || o.paymentStatus === 'Overdue')
-            .reduce((acc, o) => acc + o.total, 0);
+            .reduce((acc, o) => acc + (o.grandTotal || o.total || 0), 0);
         const prevReceivables = prevOrders
             .filter(o => o.paymentStatus === 'Pending' || o.paymentStatus === 'Overdue')
-            .reduce((acc, o) => acc + o.total, 0);
+            .reduce((acc, o) => acc + (o.grandTotal || o.total || 0), 0);
         const receivablesChange = prevReceivables > 0 ? ((outstandingReceivables - prevReceivables) / prevReceivables) * 100 : 0;
 
         let totalDeliveryMilliseconds = 0;
@@ -203,7 +200,7 @@ export default function AnalyticsPage() {
             const dayEnd = endOfDay(day);
             return analyticsOrders
                 .filter(o => isWithinInterval(new Date(o.orderDate), { start: dayStart, end: dayEnd }))
-                .reduce((sum, o) => sum + o.total, 0);
+                .reduce((sum, o) => sum + (o.grandTotal || o.total || 0), 0);
         });
 
         const customerSparkline = last7Days.map(day => {
@@ -242,9 +239,6 @@ export default function AnalyticsPage() {
         }
     }, [analyticsOrders, companies, products, maintenanceVisits, dateRange]);
 
-    useEffect(() => {
-        setIsCalculating(false);
-    }, [analytics]);
 
     useEffect(() => {
         setLastUpdated(new Date());
@@ -269,7 +263,13 @@ export default function AnalyticsPage() {
 
     const handleRefresh = useCallback(() => {
         setLastUpdated(new Date());
-    }, []);
+        // Force refresh data
+        const from = new Date(`${dateRange.from}T00:00:00`);
+        const to = new Date(`${dateRange.to}T23:59:59.999`);
+        from.setDate(from.getDate() - 1);
+        to.setDate(to.getDate() + 1);
+        fetchOrdersByDateRange(from.toISOString(), to.toISOString(), true);
+    }, [dateRange, fetchOrdersByDateRange]);
 
     const handleDateRangeChange = useCallback((range: { from: string; to: string }) => {
         setDateRange(range);
@@ -315,6 +315,8 @@ export default function AnalyticsPage() {
                         </div>
                     </div>
                 </div>
+
+
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4 print-break-inside-avoid">
                     <KpiCard

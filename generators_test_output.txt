@@ -1,0 +1,93 @@
+
+[1m[46m RUN [49m[22m [36mv4.0.15 [39m[90mD:/My projects/firebase-orginal[39m
+
+[90mstdout[2m | src/lib/mock-data-generator/__tests__/generators.test.ts[2m > [22m[2mUserGenerator[2m > [22m[2mgenerates the correct number of users
+[22m[39m[users] Generated 10/10 (100%)
+
+[90mstdout[2m | src/lib/mock-data-generator/__tests__/generators.test.ts[2m > [22m[2mUserGenerator[2m > [22m[2mgenerates users with required fields
+[22m[39m[users] Generated 5/5 (100%)
+
+[90mstdout[2m | src/lib/mock-data-generator/__tests__/generators.test.ts[2m > [22m[2mUserGenerator[2m > [22m[2mgenerates unique IDs for each user
+[22m[39m[users] Generated 50/50 (100%)
+
+[90mstdout[2m | src/lib/mock-data-generator/__tests__/generators.test.ts[2m > [22m[2mUserGenerator[2m > [22m[2mrespects role distribution
+[22m[39m[users] Generated 100/100 (100%)
+
+[90mstdout[2m | src/lib/mock-data-generator/__tests__/generators.test.ts[2m > [22m[2mCompanyGenerator[2m > [22m[2mgenerates the correct number of companies
+[22m[39m[companies] Generated 10/10 (100%)
+
+[90mstdout[2m | src/lib/mock-data-generator/__tests__/generators.test.ts[2m > [22m[2mCompanyGenerator[2m > [22m[2mgenerates companies with Egyptian-specific data
+[22m[39m[companies] Generated 5/5 (100%)
+
+[90mstdout[2m | src/lib/mock-data-generator/__tests__/generators.test.ts[2m > [22m[2mCompanyGenerator[2m > [22m[2mgenerates branches for companies
+[22m[39m[companies] Generated 10/10 (100%)
+
+[90mstdout[2m | src/lib/mock-data-generator/__tests__/generators.test.ts[2m > [22m[2mProductGenerator[2m > [22m[2mgenerates the correct number of products
+[22m[39m[products] Generated 20/20 (100%)
+
+[90mstdout[2m | src/lib/mock-data-generator/__tests__/generators.test.ts[2m > [22m[2mProductGenerator[2m > [22m[2mgenerates products with valid pricing
+[22m[39m[products] Generated 10/10 (100%)
+
+[90mstdout[2m | src/lib/mock-data-generator/__tests__/generators.test.ts[2m > [22m[2mProductGenerator[2m > [22m[2mgenerates products with popularity ranks
+[22m[39m[products] Generated 50/50 (100%)
+
+[90mstdout[2m | src/lib/mock-data-generator/__tests__/generators.test.ts[2m > [22m[2mOrderGenerator[2m > [22m[2mgenerates orders with valid references
+[22m[39m[companies] Generated 5/5 (100%)
+
+[90mstdout[2m | src/lib/mock-data-generator/__tests__/generators.test.ts[2m > [22m[2mOrderGenerator[2m > [22m[2mgenerates orders with valid references
+[22m[39m[products] Generated 20/20 (100%)
+
+[90mstdout[2m | src/lib/mock-data-generator/__tests__/generators.test.ts[2m > [22m[2mOrderGenerator[2m > [22m[2mgenerates orders with valid references
+[22m[39m[orders] Generated 10/10 (100%)
+
+[90mstdout[2m | src/lib/mock-data-generator/__tests__/generators.test.ts[2m > [22m[2mOrderGenerator[2m > [22m[2mgenerates orders with correct totals
+[22m[39m[companies] Generated 5/5 (100%)
+
+[90mstdout[2m | src/lib/mock-data-generator/__tests__/generators.test.ts[2m > [22m[2mOrderGenerator[2m > [22m[2mgenerates orders with correct totals
+[22m[39m[products] Generated 20/20 (100%)
+
+[90mstdout[2m | src/lib/mock-data-generator/__tests__/generators.test.ts[2m > [22m[2mOrderGenerator[2m > [22m[2mgenerates orders with correct totals
+[22m[39m[orders] Generated 5/5 (100%)
+
+[90mstdout[2m | src/lib/mock-data-generator/__tests__/generators.test.ts[2m > [22m[2mOrderGenerator[2m > [22m[2mgenerates status history for orders
+[22m[39m[companies] Generated 5/5 (100%)
+
+[90mstdout[2m | src/lib/mock-data-generator/__tests__/generators.test.ts[2m > [22m[2mOrderGenerator[2m > [22m[2mgenerates status history for orders
+[22m[39m[products] Generated 20/20 (100%)
+
+[90mstdout[2m | src/lib/mock-data-generator/__tests__/generators.test.ts[2m > [22m[2mOrderGenerator[2m > [22m[2mgenerates status history for orders
+[22m[39m[orders] Generated 10/10 (100%)
+
+ [31mΓ¥»[39m src/lib/mock-data-generator/__tests__/generators.test.ts [2m([22m[2m26 tests[22m[2m | [22m[31m3 failed[39m[2m)[22m[32m 142[2mms[22m[39m
+     [32mΓ£ô[39m generates the correct number of users[32m 20[2mms[22m[39m
+     [32mΓ£ô[39m generates users with required fields[32m 4[2mms[22m[39m
+     [32mΓ£ô[39m generates unique IDs for each user[32m 6[2mms[22m[39m
+     [32mΓ£ô[39m respects role distribution[32m 11[2mms[22m[39m
+     [32mΓ£ô[39m generates the correct number of companies[32m 10[2mms[22m[39m
+[31m     [31m├ù[31m generates companies with Egyptian-specific data[39m[32m 12[2mms[22m[39m
+     [32mΓ£ô[39m generates branches for companies[32m 6[2mms[22m[39m
+     [32mΓ£ô[39m generates the correct number of products[32m 5[2mms[22m[39m
+[31m     [31m├ù[31m generates products with valid pricing[39m[32m 3[2mms[22m[39m
+[31m     [31m├ù[31m generates products with popularity ranks[39m[32m 6[2mms[22m[39m
+     [32mΓ£ô[39m generates orders with valid references[32m 16[2mms[22m[39m
+     [32mΓ£ô[39m generates orders with correct totals[32m 6[2mms[22m[39m
+     [32mΓ£ô[39m generates status history for orders[32m 7[2mms[22m[39m
+     [32mΓ£ô[39m loads built-in scenarios[32m 1[2mms[22m[39m
+     [32mΓ£ô[39m validates scenario profiles[32m 4[2mms[22m[39m
+     [32mΓ£ô[39m throws for unknown scenarios[32m 1[2mms[22m[39m
+     [32mΓ£ô[39m creates custom scenarios from base[32m 1[2mms[22m[39m
+     [32mΓ£ô[39m checks environment correctly[32m 3[2mms[22m[39m
+     [32mΓ£ô[39m validates schema isolation[32m 2[2mms[22m[39m
+     [32mΓ£ô[39m validates record limits[32m 3[2mms[22m[39m
+     [32mΓ£ô[39m tracks progress correctly[32m 2[2mms[22m[39m
+     [32mΓ£ô[39m emits progress events[32m 1[2mms[22m[39m
+     [32mΓ£ô[39m calculates estimated time remaining[32m 0[2mms[22m[39m
+     [32mΓ£ô[39m generates Zipf distribution correctly[32m 2[2mms[22m[39m
+     [32mΓ£ô[39m generates normal distribution within expected range[32m 1[2mms[22m[39m
+     [32mΓ£ô[39m selects from weighted distribution[32m 2[2mms[22m[39m
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[31m3 failed[39m[22m[2m | [22m[1m[32m23 passed[39m[22m[90m (26)[39m
+[2m   Start at [22m 00:14:10
+[2m   Duration [22m 2.93s[2m (transform 320ms, setup 268ms, import 982ms, tests 142ms, environment 1.21s)[22m
+

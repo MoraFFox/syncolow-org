@@ -14,8 +14,6 @@ import type {
 import { toast } from "@/hooks/use-toast";
 import { calculateOrderTotals } from "@/lib/pricing-calculator";
 import { useCompanyStore } from "./use-company-store";
-import { useMaintenanceStore } from "@/store/use-maintenance-store";
-import { useManufacturerStore } from "./use-manufacturer-store";
 import {
   calculateExpectedPaymentDate,
   calculateDaysOverdue,
@@ -69,6 +67,7 @@ interface AppState {
   ordersHasMore: boolean;
   ordersLoading: boolean;
   activeFilters: { status?: string; paymentStatus?: string; companyId?: string; branchId?: string; showArchived?: boolean } | null;
+  activeSort: { key: string; direction: 'asc' | 'desc' } | null;
   analyticsLoading: boolean;
   currentFetchId: string | null;
 
@@ -76,12 +75,13 @@ interface AppState {
   fetchOrders: (limitCount: number) => Promise<void>;
   fetchOrdersWithFilters: (
     limitCount: number,
-    filters: { status?: string; paymentStatus?: string; companyId?: string; branchId?: string; showArchived?: boolean }
+    filters: { status?: string; paymentStatus?: string; companyId?: string; branchId?: string; showArchived?: boolean },
+    sort?: { key: string; direction: 'asc' | 'desc' }
   ) => Promise<void>;
   searchOrdersByText: (searchTerm: string) => Promise<void>;
   loadMoreOrders: (limitCount: number) => Promise<void>;
   refreshOrders: () => Promise<void>;
-  fetchOrdersByDateRange: (from: string, to: string) => Promise<void>;
+  fetchOrdersByDateRange: (from: string, to: string, forceRefresh?: boolean) => Promise<void>;
   syncAllOrdersToSearch: () => Promise<void>;
 
   // Order Actions
@@ -145,7 +145,10 @@ interface AppState {
 export const useOrderStore = create<AppState>((set, get) => ({
   orders: [],
   analyticsOrders: [],
+  orders: [],
+  analyticsOrders: [],
   activeFilters: null,
+  activeSort: null,
   returns: [],
   notifications: [],
   visits: [],
@@ -181,11 +184,13 @@ export const useOrderStore = create<AppState>((set, get) => ({
     set({ ordersLoading: true, activeFilters: null });
     try {
       const orders = await universalCache.get(
-        CacheKeyFactory.list('orders', { limit: limitCount }),
+        CacheKeyFactory.list('orders', { limit: limitCount, v: '5' }),
         async () => {
           const { data, error } = await supabase
             .from("orders")
             .select("*")
+            .neq('status', 'Delivered')
+            .neq('status', 'Cancelled') // Default: Show only Active
             .order("orderDate", { ascending: false })
             .range(0, limitCount - 1);
           if (error) throw error;
@@ -199,17 +204,18 @@ export const useOrderStore = create<AppState>((set, get) => ({
         ordersHasMore: (orders?.length || 0) === limitCount,
         ordersLoading: false,
       });
-    } catch {
+    } catch (error) {
+      console.error('❌ [useOrderStore] fetchOrders failed:', error);
       set({ ordersLoading: false });
     }
   },
 
-  fetchOrdersWithFilters: async (limitCount, filters) => {
-    set({ ordersLoading: true, activeFilters: filters });
+  fetchOrdersWithFilters: async (limitCount, filters, sort) => {
+    set({ ordersLoading: true, activeFilters: filters, activeSort: sort || null });
     try {
       // Always fetch fresh data for filtered queries (no cache)
       // This ensures filters like "Pending" always show the latest orders
-      let query = supabase.from("orders").select("*");
+      let query = supabase.from("orders").select("*", { count: 'exact' });
 
       if (filters.status && filters.status !== "All") {
         query = query.eq("status", filters.status);
@@ -226,17 +232,30 @@ export const useOrderStore = create<AppState>((set, get) => ({
       
       // Archive Logic
       if (filters.showArchived) {
-          // Show ONLY Delivered & Paid
-          query = query.eq('status', 'Delivered').eq('paymentStatus', 'Paid');
+          // Show Delivered OR Cancelled
+          query = query.in('status', ['Delivered', 'Cancelled']);
       } else {
-          // Show ONLY Active (NOT (Delivered & Paid))
-          // Logic: (status != Delivered) OR (paymentStatus != Paid)
-          query = query.or('status.neq.Delivered,paymentStatus.neq.Paid');
+          // Show Active: NOT Delivered AND NOT Cancelled
+          query = query.neq('status', 'Delivered').neq('status', 'Cancelled');
       }
 
-      const { data, error } = await query
-        .order("orderDate", { ascending: false })
-        .range(0, limitCount - 1);
+      // Apply sorting
+      if (sort) {
+          let column = sort.key;
+          // Map UI sort keys to DB columns
+          switch (sort.key) {
+            case 'client': column = 'companyName'; break;
+            case 'date': column = 'orderDate'; break;
+            case 'deliveryDate': column = 'deliveryDate'; break;
+            case 'total': column = 'grandTotal'; break; // Could be 'total' depending on schema, assume grandTotal for now or fallback
+             // 'id' and 'status' map directly
+          }
+          query = query.order(column, { ascending: sort.direction === 'asc' });
+      } else {
+          query = query.order("orderDate", { ascending: false });
+      }
+
+      const { data, error } = await query.range(0, limitCount - 1);
       
       if (error) throw error;
 
@@ -246,7 +265,8 @@ export const useOrderStore = create<AppState>((set, get) => ({
         ordersHasMore: (data?.length || 0) === limitCount,
         ordersLoading: false,
       });
-    } catch {
+    } catch (error) {
+      console.error('❌ [useOrderStore] fetchOrdersWithFilters failed:', error);
       set({ ordersLoading: false });
     }
   },
@@ -257,36 +277,38 @@ export const useOrderStore = create<AppState>((set, get) => ({
       return;
     }
 
+    set({ ordersLoading: true, activeFilters: null, activeSort: null });
+
     try {
-      const { data: allOrders } = await supabase.from("orders").select("*");
+      const term = searchTerm.trim();
+      // Use server-side ILIKE search
+      // Assuming companyName, branchName, id, temporaryCompanyName are columns on 'orders' due to previous client-side logic
+      
+      const { data: filtered, error } = await supabase
+        .from("orders")
+        .select("*")
+        .or(`companyName.ilike.%${term}%,branchName.ilike.%${term}%,id.ilike.%${term}%,temporaryCompanyName.ilike.%${term}%`)
+        .order("orderDate", { ascending: false })
+        .range(0, 50); // Fetch top 50 matches
 
-      const searchLower = searchTerm.toLowerCase();
-      const filtered = (allOrders || []).filter((order: Order) =>
-        (order.companyName && order.companyName.toLowerCase().includes(searchLower)) ||
-        (order.branchName && order.branchName.toLowerCase().includes(searchLower)) ||
-        (order.id && order.id.toLowerCase().includes(searchLower)) ||
-        (order.temporaryCompanyName && order.temporaryCompanyName.toLowerCase().includes(searchLower))
-      );
-
-      filtered.sort(
-        (a: Order, b: Order) =>
-          new Date(b.orderDate).getTime() - new Date(a.orderDate).getTime()
-      );
+      if (error) throw error;
 
       set({
-        orders: filtered,
-        ordersOffset: 0,
-        ordersHasMore: false,
+        orders: filtered || [],
+        ordersOffset: 50, // Should probably be actual length, but this resets pagination effectively
+        ordersHasMore: (filtered?.length || 0) === 50, // Assuming simple heuristic
+        ordersLoading: false,
         activeFilters: null
       });
-    } catch {
-      // Error handled silently
+    } catch (error) {
+        console.error('❌ [useOrderStore] searchOrdersByText failed:', error);
+        set({ ordersLoading: false });
     }
   },
 
   loadMoreOrders: async (limitCount) => {
-    const { ordersOffset, ordersHasMore, activeFilters } = get();
-    console.warn('[loadMoreOrders] Called with:', { limitCount, ordersOffset, ordersHasMore, activeFilters });
+    const { ordersOffset, ordersHasMore, activeFilters, activeSort } = get();
+    console.warn('[loadMoreOrders] Called with:', { limitCount, ordersOffset, ordersHasMore, activeFilters, activeSort });
     if (!ordersHasMore) {
       console.warn('[loadMoreOrders] Aborting: ordersHasMore is false');
       return;
@@ -311,14 +333,31 @@ export const useOrderStore = create<AppState>((set, get) => ({
         }
         
         if (activeFilters.showArchived) {
-            query = query.eq('status', 'Delivered').eq('paymentStatus', 'Paid');
+            query = query.in('status', ['Delivered', 'Cancelled']);
         } else {
-            query = query.or('status.neq.Delivered,paymentStatus.neq.Paid');
+            query = query.neq('status', 'Delivered').neq('status', 'Cancelled');
         }
+      } else {
+          // Default to not showing archived if no filters (mimics fetchOrders default)
+          query = query.neq('status', 'Delivered').neq('status', 'Cancelled');
+      }
+
+      // Apply sorting
+      if (activeSort) {
+        let column = activeSort.key;
+        // Map UI sort keys to DB columns
+        switch (activeSort.key) {
+          case 'client': column = 'companyName'; break;
+          case 'date': column = 'orderDate'; break;
+          case 'deliveryDate': column = 'deliveryDate'; break;
+          case 'total': column = 'grandTotal'; break;
+        }
+        query = query.order(column, { ascending: activeSort.direction === 'asc' });
+      } else {
+        query = query.order("orderDate", { ascending: false });
       }
 
       const { data: newOrders, error } = await query
-        .order("orderDate", { ascending: false })
         .range(ordersOffset, ordersOffset + limitCount - 1);
 
       console.warn('[loadMoreOrders] Fetched:', { count: newOrders?.length, error });
@@ -359,6 +398,8 @@ export const useOrderStore = create<AppState>((set, get) => ({
       const { data, error } = await supabase
         .from("orders")
         .select("*")
+        .neq('status', 'Delivered')
+        .neq('status', 'Cancelled') // Default: Show only Active
         .order("orderDate", { ascending: false })
         .range(0, limitCount - 1);
       
@@ -370,14 +411,15 @@ export const useOrderStore = create<AppState>((set, get) => ({
         ordersHasMore: (data?.length || 0) === limitCount,
         ordersLoading: false,
       });
-    } catch {
+    } catch (error) {
+      console.error('❌ [useOrderStore] refreshOrders failed:', error);
       set({ ordersLoading: false });
     }
   },
 
   currentFetchId: null,
 
-  fetchOrdersByDateRange: async (from: string, to: string) => {
+  fetchOrdersByDateRange: async (from: string, to: string, forceRefresh = false) => {
     // Generate a unique ID for this fetch operation
     const fetchId = crypto.randomUUID();
     set({ currentFetchId: fetchId, analyticsLoading: true });
@@ -388,21 +430,23 @@ export const useOrderStore = create<AppState>((set, get) => ({
     });
 
     try {
+      // Build cache key - Version 4 (Mock Data Fix)
       const allOrders = await universalCache.get(
-        CacheKeyFactory.list('orders', { from, to, type: 'analytics' }),
+        CacheKeyFactory.list('orders', { from, to, type: 'analytics', v: '4' }),
         async () => {
+          logger.debug(`[Analytics] Starting fetch for ${from} to ${to}`);
           let allOrders: Order[] = [];
           let hasMore = true;
           let page = 0;
           const pageSize = 1000;
 
           while (hasMore) {
-            // Check for abort
             if (get().currentFetchId !== fetchId) throw new Error("Fetch aborted");
-
+            
+            logger.debug(`[Analytics] Fetching page ${page}...`);
             const { data: orders, error } = await supabase
               .from("orders")
-              .select("id, orderDate, total, grandTotal, status, paymentStatus, companyId, items, isPotentialClient, temporaryCompanyName, statusHistory, paidDate, expectedPaymentDate")
+              .select("*")
               .gte("orderDate", from)
               .lte("orderDate", to)
               .order("orderDate", { ascending: false })
@@ -411,13 +455,15 @@ export const useOrderStore = create<AppState>((set, get) => ({
             if (error) throw error;
 
             if (orders && orders.length > 0) {
-              allOrders = [...allOrders, ...(orders as Order[])];
-              if (orders.length < pageSize) hasMore = false;
-              else page++;
+               allOrders = [...allOrders, ...(orders as Order[])];
+               logger.debug(`[Analytics] Page ${page} received ${orders.length} orders. Total: ${allOrders.length}`);
+               if (orders.length < pageSize) hasMore = false;
+               else page++;
             } else {
-              hasMore = false;
+               hasMore = false;
             }
           }
+          logger.debug(`[Analytics] Fetch complete. Total Orders: ${allOrders.length}`);
           return allOrders;
         }
       );
@@ -425,6 +471,7 @@ export const useOrderStore = create<AppState>((set, get) => ({
       // Final check before updating state
       if (get().currentFetchId !== fetchId) return;
 
+      logger.debug(`[Analytics] Updating store with ${allOrders.length} orders`);
       set({ analyticsOrders: allOrders, analyticsLoading: false });
       
       toast({

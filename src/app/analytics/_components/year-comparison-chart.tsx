@@ -26,10 +26,10 @@ export function YearComparisonChart() {
         const currentYearStart = startOfYear(now);
         const lastYearStart = startOfYear(subYears(now, 1));
         const currentYearEnd = endOfYear(now);
-        
+
         const fromISO = `${format(lastYearStart, 'yyyy-MM-dd')}T00:00:00.000Z`;
         const toISO = `${format(currentYearEnd, 'yyyy-MM-dd')}T23:59:59.999Z`;
-        
+
         let allOrders: Order[] = [];
         let hasMore = true;
         let page = 0;
@@ -38,7 +38,7 @@ export function YearComparisonChart() {
         while (hasMore) {
           const { data: chunk, error } = await supabase
             .from('orders')
-            .select('id, orderDate, total, status')
+            .select('id, orderDate, total, grandTotal, status')
             .gte('orderDate', fromISO)
             .lte('orderDate', toISO)
             .order('orderDate', { ascending: false })
@@ -64,7 +64,7 @@ export function YearComparisonChart() {
       }
       setLoading(false);
     };
-    
+
     fetchYearData();
   }, []);
 
@@ -85,9 +85,9 @@ export function YearComparisonChart() {
       const monthKey = format(orderDate, 'MMM');
 
       if (orderDate >= currentYearStart && orderDate <= currentYearEnd) {
-        currentYearData[monthKey] = (currentYearData[monthKey] || 0) + order.total;
+        currentYearData[monthKey] = (currentYearData[monthKey] || 0) + (order.total || order.grandTotal || 0);
       } else if (orderDate >= lastYearStart && orderDate <= lastYearEnd) {
-        lastYearData[monthKey] = (lastYearData[monthKey] || 0) + order.total;
+        lastYearData[monthKey] = (lastYearData[monthKey] || 0) + (order.total || order.grandTotal || 0);
       }
     });
 

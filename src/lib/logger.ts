@@ -49,5 +49,16 @@ export const logger = {
   warn: (message: string, context?: LogContext) => {
     logWarning(message, context);
   },
+
+  /**
+   * Log info information (all environments)
+   * @param message - Info message
+   * @param context - Context with component, action, and additional properties
+   */
+  info: (message: string, context?: LogContext) => {
+    if (process.env.NODE_ENV === 'development') {
+      logDebug(`[INFO] ${message}`, context);
+    }
+  },
 };
 

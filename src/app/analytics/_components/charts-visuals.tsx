@@ -72,7 +72,6 @@ interface ChartsVisualsProps {
 export function ChartsVisuals({ dateRange }: ChartsVisualsProps) {
     const { analyticsOrders } = useOrderStore();
     const { products } = useProductsStore();
-    const { companies } = useCompanyStore();
     const { goToDetail, showPreview, hidePreview } = useDrillDown();
 
     const filteredOrders = useMemo(() => {
@@ -101,7 +100,7 @@ export function ChartsVisuals({ dateRange }: ChartsVisualsProps) {
         // Use the pre-filtered orders for this calculation
         filteredOrders.forEach(order => {
             const orderMonth = format(new Date(order.orderDate), 'yyyy-MM');
-            monthlyRevenue[orderMonth] = (monthlyRevenue[orderMonth] || 0) + order.total;
+            monthlyRevenue[orderMonth] = (monthlyRevenue[orderMonth] || 0) + (order.total || order.grandTotal || 0);
         });
 
         const months = eachMonthOfInterval({ start, end });
@@ -139,39 +138,7 @@ export function ChartsVisuals({ dateRange }: ChartsVisualsProps) {
 
     }, [filteredOrders]);
 
-    const customerSegmentsData = useMemo(() => {
 
-        if (filteredOrders.length === 0) {
-            return [
-                { name: 'New Customers', value: 0, fill: 'hsl(var(--chart-1))' },
-                { name: 'Repeat Customers', value: 0, fill: 'hsl(var(--chart-2))' }
-            ]
-        }
-
-        const ordersByClient = filteredOrders.reduce((acc, order) => {
-            if (order.companyId) {
-                acc[order.companyId] = (acc[order.companyId] || 0) + 1;
-            }
-            return acc;
-        }, {} as Record<string, number>);
-
-        let newCustomers = 0;
-        let repeatCustomers = 0;
-
-        for (const companyId of Object.keys(ordersByClient)) {
-            if (ordersByClient[companyId] > 1) {
-                repeatCustomers++;
-            } else {
-                newCustomers++;
-            }
-        }
-
-        return [
-            { name: 'New Customers', value: newCustomers, fill: 'hsl(var(--chart-1))' },
-            { name: 'Repeat Customers', value: repeatCustomers, fill: 'hsl(var(--chart-2))' }
-        ]
-
-    }, [filteredOrders]);
 
     const stockOverviewData = useMemo(() => {
         return [...products]
@@ -196,7 +163,7 @@ export function ChartsVisuals({ dateRange }: ChartsVisualsProps) {
             if (!monthlyData[orderMonth]) {
                 monthlyData[orderMonth] = { revenue: 0, orders: 0 };
             }
-            monthlyData[orderMonth].revenue += order.total;
+            monthlyData[orderMonth].revenue += (order.total || order.grandTotal || 0);
             monthlyData[orderMonth].orders += 1;
         });
 
@@ -243,13 +210,13 @@ export function ChartsVisuals({ dateRange }: ChartsVisualsProps) {
                     acc[order.companyId] = { orders: 0, revenue: 0 };
                 }
                 acc[order.companyId].orders += 1;
-                acc[order.companyId].revenue += order.total;
+                acc[order.companyId].revenue += (order.total || order.grandTotal || 0);
             }
             return acc;
         }, {} as Record<string, { orders: number; revenue: number }>);
 
         const allOrders = analyticsOrders.filter(o => o.status !== 'Cancelled');
-        const avgRevenue = allOrders.reduce((sum, o) => sum + o.total, 0) / Math.max(allOrders.length, 1);
+        const avgRevenue = allOrders.reduce((sum, o) => sum + (o.total || o.grandTotal || 0), 0) / Math.max(allOrders.length, 1);
 
         let newCustomers = 0;
         let repeatCustomers = 0;
@@ -373,7 +340,8 @@ export function ChartsVisuals({ dateRange }: ChartsVisualsProps) {
                                         type="monotone"
                                         stroke="var(--color-revenue)"
                                         strokeWidth={2}
-                                        dot={false}
+                                        dot={{ r: 4 }}
+                                        activeDot={{ r: 6 }}
                                     />
                                 </LineChart>
                             </ChartContainer>
@@ -589,7 +557,8 @@ export function ChartsVisuals({ dateRange }: ChartsVisualsProps) {
                                         type="monotone"
                                         stroke="var(--color-revenue)"
                                         strokeWidth={2}
-                                        dot={false}
+                                        dot={{ r: 4 }}
+                                        activeDot={{ r: 6 }}
                                     />
                                 </LineChart>
                             </ChartContainer>

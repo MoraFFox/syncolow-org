@@ -3,7 +3,6 @@
 
 import { useState, useMemo, useEffect, Suspense } from 'react';
 import { useDebouncedCallback } from 'use-debounce';
-import { useSearchParams } from 'next/navigation';
 import { createRoot } from 'react-dom/client';
 import { useOrderStore } from '@/store/use-order-store';
 import { useCompanyStore } from '@/store/use-company-store';
@@ -19,7 +18,6 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { isToday } from 'date-fns';
-import { useAuth } from '@/hooks/use-auth';
 import Loading from '../loading';
 import OrderForm from './_components/order-form';
 import type { Order } from '@/lib/types';
@@ -34,13 +32,18 @@ import { OrderList } from './_components/order-list';
 import { OrderGrid } from './_components/order-grid';
 import { OrderActions } from './_components/order-actions';
 import { AdvancedSearchDialog } from './_components/advanced-search-dialog';
-import { searchOrders, type OrderSearchFilters } from '@/lib/advanced-search';
+import type { OrderSearchFilters } from '@/lib/advanced-search';
 import { ErrorBoundary } from '@/components/error-boundary';
 
-function OrdersPageContent() {
-  const searchParams = useSearchParams();
+export type SortConfig = {
+  key: string;
+  direction: 'asc' | 'desc';
+};
 
+function OrdersPageContent() {
   const { orders, loading: storeLoading, ordersLoading, ordersHasMore, fetchOrders, fetchOrdersWithFilters, searchOrdersByText, loadMoreOrders, updateOrderStatus, deleteOrder, deleteAllOrders } = useOrderStore();
+
+  const loading = storeLoading;
   const { companies } = useCompanyStore();
   const { paginationLimit, ordersViewMode, setOrdersViewMode } = useSettingsStore();
 
@@ -63,9 +66,6 @@ function OrdersPageContent() {
     }
   }, [ordersViewMode, saveSettings, settings]);
 
-
-  const { loading: authLoading } = useAuth();
-
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
   const [showArchived, setShowArchived] = useState(false);
@@ -84,28 +84,14 @@ function OrdersPageContent() {
   const [advancedFilters, setAdvancedFilters] = useState<OrderSearchFilters>({});
   const hasAdvancedFilters = Object.keys(advancedFilters).length > 0;
 
-  const hasActiveSearch = isSearching && searchTerm.trim().length >= 2;
-  const canUseServerFilter = !hasActiveSearch && statusFilter !== 'All' && statusFilter !== 'Overdue' && statusFilter !== 'Cancelled';
+  const [sortConfig, setSortConfig] = useState<SortConfig>({ key: 'date', direction: 'desc' });
 
-  useEffect(() => {
-    const loadOrders = async () => {
-      if (hasAdvancedFilters) {
-        await fetchOrders(10000); // Advanced search fetches all locally for now (can be optimized later)
-      } else if (canUseServerFilter) {
-        const filters: any = { showArchived };
-        if (['Pending', 'Processing', 'Shipped', 'Delivered'].includes(statusFilter)) {
-          filters.status = statusFilter;
-        } else if (['Paid', 'Pending'].includes(statusFilter)) {
-          filters.paymentStatus = statusFilter;
-        }
-        await fetchOrdersWithFilters(paginationLimit, filters);
-      } else if (!hasActiveSearch) {
-        // Default View: Use filters to enforce Active/Archive logic
-        await fetchOrdersWithFilters(paginationLimit, { showArchived });
-      }
-    };
-    loadOrders();
-  }, [fetchOrders, fetchOrdersWithFilters, paginationLimit, hasAdvancedFilters, hasActiveSearch, canUseServerFilter, statusFilter, showArchived]);
+  const handleSort = (key: string) => {
+    setSortConfig((current) => {
+      const newDirection = current.key === key && current.direction === 'desc' ? 'asc' : 'desc';
+      return { key, direction: newDirection as 'asc' | 'desc' };
+    });
+  };
 
   const debouncedSearch = useDebouncedCallback(async (term: string) => {
     if (!term.trim() || term.trim().length < 2) {
@@ -128,50 +114,40 @@ function OrdersPageContent() {
     debouncedSearch(term);
   };
 
-  useEffect(() => {
-    const filter = searchParams.get('filter');
-    if (filter === 'overdue') {
-      setStatusFilter('Overdue');
-    }
-  }, [searchParams]);
+  const hasActiveSearch = isSearching && searchTerm.trim().length >= 2;
+  const canUseServerFilter = !hasActiveSearch && statusFilter !== 'All' && statusFilter !== 'Overdue' && statusFilter !== 'Cancelled';
 
-  const loading = storeLoading || authLoading;
+  useEffect(() => {
+    const loadOrders = async () => {
+      // If we have an active search, sorting is handled by searchOrdersByText (currently default, should ideally accept sort)
+      // But for now, let's focus on non-search scenarios or when filters change
+
+      if (hasAdvancedFilters) {
+        await fetchOrders(10000);
+      } else if (canUseServerFilter) {
+        const filters: any = { showArchived };
+        if (['Pending', 'Processing', 'Shipped', 'Delivered'].includes(statusFilter)) {
+          filters.status = statusFilter;
+        } else if (['Paid', 'Pending'].includes(statusFilter)) {
+          filters.paymentStatus = statusFilter;
+        }
+        await fetchOrdersWithFilters(paginationLimit, filters, sortConfig);
+      } else if (!hasActiveSearch) {
+        await fetchOrdersWithFilters(paginationLimit, { showArchived }, sortConfig);
+      }
+    };
+    loadOrders();
+  }, [fetchOrders, fetchOrdersWithFilters, paginationLimit, hasAdvancedFilters, hasActiveSearch, canUseServerFilter, statusFilter, showArchived, sortConfig]);
+  // Actually, keeping sortConfig in deps is better if we just set state, but we want to avoid double fetches if other deps change.
+  // Best pattern: handleSort sets state AND fetches? Or useEffect handles it?
+  // If I used useEffect for everything, I would just setSortConfig and let effect run.
+  // But handleSort logic above sets state and calls fetch.
+  // Let's rely on the useEffect to trigger fetch when sortConfig changes, and remove explicit fetch from handleSort.
+
 
   const filteredOrders = useMemo(() => {
-    let results = orders;
-
-    if (Object.keys(advancedFilters).length > 0) {
-      results = searchOrders(results, advancedFilters);
-    }
-
-    // Filter by Archive Status (Active vs Archived)
-    // Archived = Delivered AND Paid
-    results = results.filter(order => {
-      const isArchived = order.status === 'Delivered' && order.paymentStatus === 'Paid';
-      if (showArchived) return isArchived;
-      return !isArchived;
-    });
-
-    if (!hasActiveSearch && !canUseServerFilter) {
-      results = results.filter(order => {
-        if (statusFilter === 'Cancelled') {
-          return order.status === 'Cancelled';
-        }
-
-        if (order.status === 'Cancelled') {
-          return false;
-        }
-
-        const statusMatch = statusFilter === 'All'
-          || order.status === statusFilter
-          || order.paymentStatus === statusFilter;
-
-        return statusMatch;
-      });
-    }
-
-    return results.sort((a, b) => new Date(b.orderDate).getTime() - new Date(a.orderDate).getTime());
-  }, [orders, statusFilter, advancedFilters, hasActiveSearch, canUseServerFilter, showArchived]);
+    return orders;
+  }, [orders]);
 
   const handleLoadMore = async () => {
     await loadMoreOrders(paginationLimit);
@@ -418,6 +394,8 @@ function OrdersPageContent() {
             onUpdateStatus={updateOrderStatus}
             onCancelOrder={handleOpenCancelDialog}
             onDeleteOrder={setOrderToDelete}
+            sortConfig={sortConfig}
+            onSort={handleSort}
           />
         </ErrorBoundary>
       )}

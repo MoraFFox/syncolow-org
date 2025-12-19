@@ -11,7 +11,7 @@ interface UniversalCacheDB extends DBSchema {
 }
 
 const DB_NAME = 'universal-cache-db';
-const DB_VERSION = 1;
+const DB_VERSION = 2; // Bump version to force schema recreation
 const STORE_NAME = 'universal-cache';
 
 export class IndexedDBStorage {
@@ -21,6 +21,11 @@ export class IndexedDBStorage {
     if (typeof window !== 'undefined') {
       this.dbPromise = openDB<UniversalCacheDB>(DB_NAME, DB_VERSION, {
         upgrade(db) {
+          // Robust handling: If store exists (e.g. from version 1), delete it to ensure clean state
+          if (db.objectStoreNames.contains(STORE_NAME)) {
+            db.deleteObjectStore(STORE_NAME);
+          }
+          
           const store = db.createObjectStore(STORE_NAME, { keyPath: 'key' });
           store.createIndex('by-timestamp', 'metadata.updatedAt');
         },

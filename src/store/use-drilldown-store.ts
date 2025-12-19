@@ -177,7 +177,7 @@ export const useDrillDownStore = create<DrillDownState>((set, get) => ({
   // Settings State
   settings: {
     hoverDelay: 500,
-    previewsEnabled: true,
+    previewsEnabled: false,
     visualStyle: "normal",
     quietMode: false,
     previewSize: "normal",

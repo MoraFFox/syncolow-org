@@ -1,0 +1,37 @@
+name: peak-season
+description: High-volume holiday/peak season simulation
+
+entityRates:
+  users: 30
+  companies: 150
+  branchRatio: 0.4
+  products: 250
+  ordersPerDay: 150
+  maintenanceVisitsPerWeek: 25
+
+distributions:
+  orderStatus:
+    Pending: 0.15
+    Processing: 0.05
+    Shipped: 0.2
+    Delivered: 0.55
+    Cancelled: 0.05
+    Delivery Failed: 0
+  paymentStatus:
+    Paid: 0.6
+    Pending: 0.3
+    Overdue: 0.1
+  productPopularity: zipf
+  regionDistribution:
+    A: 0.55
+    B: 0.45
+  deliveryDelays: 0.2
+
+anomalyRate: 0.15
+
+anomalyConfig:
+  rate: 0.15
+  types:
+    - delivery_delay
+    - payment_delay
+  clustering: spread

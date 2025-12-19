@@ -1,0 +1,40 @@
+name: anomaly-heavy
+description: Stress testing with high anomaly rate for robustness validation
+
+entityRates:
+  users: 20
+  companies: 100
+  branchRatio: 0.3
+  products: 200
+  ordersPerDay: 50
+  maintenanceVisitsPerWeek: 15
+
+distributions:
+  orderStatus:
+    Pending: 0.2
+    Processing: 0.05
+    Shipped: 0.15
+    Delivered: 0.45
+    Cancelled: 0.1
+    Delivery Failed: 0.05
+  paymentStatus:
+    Paid: 0.4
+    Pending: 0.3
+    Overdue: 0.3
+  productPopularity: zipf
+  regionDistribution:
+    A: 0.6
+    B: 0.4
+  deliveryDelays: 0.3
+
+anomalyRate: 0.4
+
+anomalyConfig:
+  rate: 0.4
+  types:
+    - payment_delay
+    - delivery_delay
+    - order_cancellation
+    - maintenance_failure
+    - stock_shortage
+  clustering: spread

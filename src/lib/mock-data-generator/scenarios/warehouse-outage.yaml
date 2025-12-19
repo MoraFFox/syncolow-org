@@ -1,0 +1,43 @@
+name: warehouse-outage
+description: Simulates warehouse disruption with severe delivery delays
+
+entityRates:
+  users: 20
+  companies: 100
+  branchRatio: 0.3
+  products: 200
+  ordersPerDay: 30
+  maintenanceVisitsPerWeek: 5
+
+distributions:
+  orderStatus:
+    Pending: 0.5
+    Processing: 0.3
+    Shipped: 0.05
+    Delivered: 0.1
+    Cancelled: 0.05
+    Delivery Failed: 0
+  paymentStatus:
+    Paid: 0.3
+    Pending: 0.5
+    Overdue: 0.2
+  productPopularity: uniform
+  regionDistribution:
+    A: 0.5
+    B: 0.5
+  deliveryDelays: 0.7
+
+anomalyRate: 0.6
+
+anomalyConfig:
+  rate: 0.6
+  types:
+    - delivery_delay
+    - stock_shortage
+    - order_cancellation
+  clustering: burst
+
+overrides:
+  orderValueRange:
+    min: 100
+    max: 20000
