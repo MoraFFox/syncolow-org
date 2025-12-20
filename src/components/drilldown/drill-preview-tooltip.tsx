@@ -2,6 +2,7 @@
 
 import * as React from 'react';
 import { createPortal } from 'react-dom';
+import { cn } from '@/lib/utils';
 import { useDrillDownStore } from '@/store/use-drilldown-store';
 import { useDrillSettings } from '@/store/use-drill-settings';
 import { useDrillUserData } from '@/store/use-drill-user-data';
@@ -212,21 +213,33 @@ export function DrillPreviewTooltip() {
       {isOpen && kind && payload && coords && (
         <motion.div
           style={style}
-          initial={{ opacity: 0, scale: 0.95, y: 10 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.95, y: 10 }}
-          transition={{ duration: 0.15, ease: "easeOut" }}
-          className="drill-preview-container"
+          initial={{ opacity: 0, scale: 0.9, y: 8, filter: "blur(4px)" }}
+          animate={{ opacity: 1, scale: 1, y: 0, filter: "blur(0px)" }}
+          exit={{ opacity: 0, scale: 0.9, y: 4, filter: "blur(2px)" }}
+          transition={{
+            type: "spring",
+            stiffness: 400,
+            damping: 25,
+            mass: 0.8
+          }}
+          className={cn(
+            "drill-preview-container origin-top-left",
+            settings.previewTheme === 'glass' && "backdrop-blur-md bg-background/80"
+          )}
         >
           <DrillCard
             title={`${kind} Insight`}
             kind={kind}
-            className="shadow-2xl border-2"
+            className={cn(
+              "shadow-[0_8px_30px_rgb(0,0,0,0.12)] border",
+              settings.previewTheme === 'glass' ? "bg-transparent border-white/20 dark:border-white/10" : "bg-popover",
+              settings.previewTheme === 'solid' && "bg-background border-2 border-primary/20"
+            )}
             headerActions={
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-6 w-6 hover:bg-muted/50 text-muted-foreground hover:text-foreground"
+                className="h-6 w-6 hover:bg-muted/50 text-muted-foreground hover:text-foreground transition-colors"
                 onClick={(e) => {
                   e.stopPropagation();
                   pinPreview(kind, payload);
@@ -240,18 +253,23 @@ export function DrillPreviewTooltip() {
             }
           >
             {!showContent || isLoading ? (
-              <div className="flex flex-col items-center justify-center py-8 gap-2">
-                <div className="animate-spin h-5 w-5 border-2 border-primary border-t-transparent rounded-full" />
-                <span className="text-xs text-muted-foreground">Loading preview...</span>
+              <div className="flex flex-col items-center justify-center py-8 gap-3">
+                <div className="relative">
+                  <div className="animate-spin h-6 w-6 border-2 border-primary/30 border-t-primary rounded-full" />
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="h-1.5 w-1.5 bg-primary rounded-full animate-pulse" />
+                  </div>
+                </div>
+                <span className="text-[10px] uppercase tracking-wider text-muted-foreground animate-pulse">Analyzing...</span>
               </div>
             ) : error ? (
               <div className="flex flex-col items-center justify-center py-6 gap-3">
-                <span className="text-sm text-destructive">Failed to load preview</span>
+                <span className="text-sm text-destructive font-medium">Unable to load data</span>
                 <button
                   onClick={() => refetch()}
-                  className="text-xs text-primary hover:underline pointer-events-auto"
+                  className="text-xs text-primary hover:underline pointer-events-auto font-medium"
                 >
-                  Retry
+                  Try Again
                 </button>
               </div>
             ) : (
@@ -267,8 +285,8 @@ export function DrillPreviewTooltip() {
             <DrillActions kind={kind} payload={payload} />
 
             {/* Auto-pin progress bar */}
-            <div className="mt-2 pt-2 border-t space-y-1">
-              <div className="h-1 bg-muted rounded-full overflow-hidden">
+            <div className="mt-3 pt-2 border-t border-border/50 space-y-1.5">
+              <div className="h-0.5 bg-muted rounded-full overflow-hidden w-full">
                 <div
                   className="h-full bg-primary ease-linear"
                   style={{
@@ -278,15 +296,17 @@ export function DrillPreviewTooltip() {
                   }}
                 />
               </div>
-              <div className="text-[10px] text-muted-foreground text-center flex items-center justify-center gap-1">
-                {!isLoading && asyncData && (
-                  <span className="inline-block w-1.5 h-1.5 rounded-full bg-green-500" title="Cached data" />
-                )}
-                {pinProgress < 100 ? 'Pinning in 3s...' : 'Click for full details'}
-              </div>
-              <div className="text-[10px] text-muted-foreground text-center flex items-center justify-center gap-1.5 mt-1">
-                <Command className="h-2.5 w-2.5" />
-                <span>+Click to open in new tab</span>
+              <div className="flex items-center justify-between text-[10px] text-muted-foreground">
+                <div className="flex items-center gap-1.5">
+                  {!isLoading && asyncData && (
+                    <span className="flex h-1.5 w-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.4)]" />
+                  )}
+                  <span>{pinProgress < 100 ? 'Hold to pin' : 'Pinned'}</span>
+                </div>
+                <div className="flex items-center gap-1 opacity-75">
+                  <Command className="h-2 w-2" />
+                  <span>Click to open</span>
+                </div>
               </div>
             </div>
           </DrillCard>

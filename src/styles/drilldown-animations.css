@@ -72,16 +72,18 @@
 @keyframes drill-preview-in {
   from {
     opacity: 0;
-    transform: translateY(8px) scale(0.95);
+    transform: translateY(8px) scale(0.96);
+    filter: blur(2px);
   }
   to {
     opacity: 1;
     transform: translateY(0) scale(1);
+    filter: blur(0);
   }
 }
 
 .drill-preview-enter {
-  animation: drill-preview-in 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  animation: drill-preview-in 0.35s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 /* Mobile Bottom Sheet Animations */
@@ -96,23 +98,23 @@
   }
 
   .drill-preview-mobile-enter {
-    animation: slideUpFromBottom 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+    animation: slideUpFromBottom 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   .drill-preview-mobile-exit {
     transform: translateY(100%);
-    transition: transform 0.2s ease-in;
+    transition: transform 0.25s cubic-bezier(0.5, 0, 1, 1);
   }
 }
 
 /* Backdrop Animation */
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from { opacity: 0; backdrop-filter: blur(0px); }
+  to { opacity: 1; backdrop-filter: blur(1px); }
 }
 
 .drill-backdrop-enter {
-  animation: fadeIn 0.2s ease-out forwards;
+  animation: fadeIn 0.3s ease-out forwards;
 }
 
 /* Touch feedback for mobile */
@@ -153,13 +155,17 @@
  * Shows the expanded hit area when showHitAreaIndicator setting is enabled
  * This is toggled via a class on the body or drilled container
  */
-.show-drill-hit-areas .drill-target-expanded::after {
+/* 
+ * Debug Visual Indicator 
+ * Shows the expanded hit area when showHitAreaIndicator setting is enabled
+ */
+.drill-target-debug.drill-target-expanded::after {
   background-color: rgba(255, 0, 0, 0.1);
   border: 1px dashed rgba(255, 0, 0, 0.3);
 }
 
 /* Hover effect on the hit area itself to verify capturing */
-.show-drill-hit-areas .drill-target-expanded:hover::after {
+.drill-target-debug.drill-target-expanded:hover::after {
   background-color: rgba(255, 0, 0, 0.15);
 }
 

@@ -1,4 +1,5 @@
 import { useRef, useCallback, useEffect, useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { useDrillSettings } from '@/store/use-drill-settings';
 import { useDrillUserData } from '@/store/use-drill-user-data';
 import { useDrillDown } from '@/hooks/use-drilldown';
@@ -12,6 +13,7 @@ import {
 } from '@/lib/drilldown-types';
 import { validateDrillPayload } from '@/lib/drilldown/validation';
 import { drillAnalytics } from '@/lib/drill-analytics';
+import { DRILL_REGISTRY } from '@/lib/drilldown/registry';
 
 export const DATA_DRILL_HIT_PADDING = "data-drill-hit-padding";
 
@@ -34,6 +36,7 @@ export function useDrillHover(isEnabled: boolean = true) {
   const { showPreview, hidePreview } = useDrillDown();
   const { onboarding } = useDrillUserData();
   const hasSeenFirstInteractionHint = onboarding.hasSeenFirstInteractionHint;
+  const queryClient = useQueryClient();
 
   // Hint State
   const [showHint, setShowHint] = useState(false);
@@ -271,12 +274,12 @@ export function useDrillHover(isEnabled: boolean = true) {
     if (!drillData) return;
 
     // Handle Analytics for Hit Area
-    if (Math.random() > 0.9) { // Sampled analytics
-         const customPadding = target.getAttribute(DATA_DRILL_HIT_PADDING);
-         const hitPadding = customPadding ? parseInt(customPadding, 10) : settingsRef.current.hitAreaPadding;
-         const entityId = (drillData.payload as any).id || 'unknown';
-         
-         const rect = target.getBoundingClientRect();
+     if (Math.random() > 0.9) { // Sampled analytics
+          const customPadding = target.getAttribute(DATA_DRILL_HIT_PADDING);
+          const hitPadding = customPadding ? parseInt(customPadding, 10) : settingsRef.current.hitAreaPadding;
+          const entityId = String((drillData.payload as Record<string, unknown>).id || 'unknown');
+          
+          const rect = target.getBoundingClientRect();
          const isOutsideOriginal =
             e.clientX < rect.left ||
             e.clientX > rect.right ||
@@ -312,13 +315,32 @@ export function useDrillHover(isEnabled: boolean = true) {
       firstHoverRef.current = false;
     }
 
-    // Schedule Preview
+      // Schedule Preview
     if (!hoverTimerRef.current) {
       const isHighVelocity = velocityRef.current > 800;
       let effectiveDelay = isHighVelocity ? hoverDelay + 300 : hoverDelay;
       
       if (expandedHitArea && proximityDistance > 0) {
         effectiveDelay = calculateProximityDelay(effectiveDelay, proximityDistance, proximityThreshold);
+      }
+
+      // Prefetch data if we are likely to show the preview
+      // (Low velocity or we are directly over the target)
+      if (drillData && (!isHighVelocity || proximityDistance === 0)) {
+         const registryEntry = DRILL_REGISTRY[drillData.kind];
+         if (registryEntry?.fetchPreviewData) {
+            // We use the same query key structure as useDrillPreviewData
+            queryClient.prefetchQuery({
+               queryKey: ['drill-preview', drillData.kind, drillData.payload],
+               queryFn: async () => {
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  return registryEntry.fetchPreviewData!(drillData.payload as any);
+               },
+               staleTime: 60000 // 1 minute default stale time for prefetch
+            }).catch(() => {
+               // Ignore prefetch errors, real fetch will handle them
+            });
+         }
       }
 
       hoverTimerRef.current = setTimeout(() => {

@@ -109,6 +109,16 @@ export const drillAnalytics = new class DrillAnalytics {
 
   private saveToStorage() {
     if (typeof window === 'undefined') return;
+    
+    // Defer storage writes to idle time to avoid blocking interactions
+    if ('requestIdleCallback' in window) {
+      window.requestIdleCallback(() => this.performSave(), { timeout: 2000 });
+    } else {
+      setTimeout(() => this.performSave(), 100);
+    }
+  }
+
+  private performSave() {
     try {
       localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.events.slice(-this.MAX_EVENTS)));
       localStorage.setItem(this.PERFORMANCE_KEY, JSON.stringify(this.performanceMetrics.slice(-this.MAX_EVENTS)));

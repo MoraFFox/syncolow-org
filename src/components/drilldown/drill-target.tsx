@@ -128,7 +128,8 @@ export function DrillTarget({
 
     if (isLite) {
       // Try to extract ID
-      const id = (payload as any).id || (payload as any).value;
+      const safePayload = payload as Record<string, unknown>;
+      const id = safePayload.id || safePayload.value;
       if (id) {
         return JSON.stringify({ id }); // Minimal payload
       }
@@ -141,6 +142,7 @@ export function DrillTarget({
       className={cn(
         "drill-target",
         isExpandedHitArea && "drill-target-expanded",
+        settings.showHitAreaIndicator && "drill-target-debug",
         !disabled && "cursor-pointer transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
         !disabled && effectiveVariant === 'primary' && "drill-target-primary",
         !disabled && effectiveVariant === 'secondary' && "drill-target-secondary",
