@@ -49,6 +49,7 @@ export function useDrillHover(isEnabled: boolean = true) {
   // Refs for tracking state
   const currentHoverTargetRef = useRef<HTMLElement | null>(null);
   const hoverTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const prefetchTimerRef = useRef<NodeJS.Timeout | null>(null);
   const velocityRef = useRef<number>(0);
   const lastMousePosRef = useRef<{ x: number; y: number; time: number } | null>(null);
   const lastVelocityCalcRef = useRef<number>(0);
@@ -68,6 +69,7 @@ export function useDrillHover(isEnabled: boolean = true) {
     return () => {
       if (hoverTimerRef.current) clearTimeout(hoverTimerRef.current);
       if (hintTimerRef.current) clearTimeout(hintTimerRef.current);
+      if (prefetchTimerRef.current) clearTimeout(prefetchTimerRef.current);
     };
   }, []);
 
@@ -252,6 +254,10 @@ export function useDrillHover(isEnabled: boolean = true) {
         clearTimeout(hoverTimerRef.current);
         hoverTimerRef.current = null;
       }
+      if (prefetchTimerRef.current) {
+        clearTimeout(prefetchTimerRef.current);
+        prefetchTimerRef.current = null;
+      }
       currentHoverTargetRef.current = target;
       
       // Clear pending hint timer
@@ -324,23 +330,30 @@ export function useDrillHover(isEnabled: boolean = true) {
         effectiveDelay = calculateProximityDelay(effectiveDelay, proximityDistance, proximityThreshold);
       }
 
-      // Prefetch data if we are likely to show the preview
-      // (Low velocity or we are directly over the target)
+      // -- Stage 1: Prefetch Schedule --
+      // Only schedule prefetch if we haven't already prefetched this exact target recently
+      // and we are not moving at high velocity.
+      const PREFETCH_DELAY = 60; 
+      
       if (drillData && (!isHighVelocity || proximityDistance === 0)) {
-         const registryEntry = DRILL_REGISTRY[drillData.kind];
-         if (registryEntry?.fetchPreviewData) {
-            // We use the same query key structure as useDrillPreviewData
-            queryClient.prefetchQuery({
-               queryKey: ['drill-preview', drillData.kind, drillData.payload],
-               queryFn: async () => {
-                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                  return registryEntry.fetchPreviewData!(drillData.payload as any);
-               },
-               staleTime: 60000 // 1 minute default stale time for prefetch
-            }).catch(() => {
-               // Ignore prefetch errors, real fetch will handle them
-            });
-         }
+          // We use a small timeout to debounce the prefetch
+          // This prevents firing requests for every row if the user scrubs the table quickly
+          const prefetchTimerId = setTimeout(() => {
+             const registryEntry = DRILL_REGISTRY[drillData.kind];
+             if (registryEntry?.fetchPreviewData) {
+                queryClient.prefetchQuery({
+                   queryKey: ['drill-preview', drillData.kind, drillData.payload],
+                   queryFn: async () => {
+                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                      return registryEntry.fetchPreviewData!(drillData.payload as any);
+                   },
+                   staleTime: 60000 
+                }).catch(() => {});
+             }
+          }, PREFETCH_DELAY);
+
+          if (prefetchTimerRef.current) clearTimeout(prefetchTimerRef.current);
+          prefetchTimerRef.current = prefetchTimerId;
       }
 
       hoverTimerRef.current = setTimeout(() => {

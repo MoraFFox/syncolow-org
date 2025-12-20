@@ -92,7 +92,23 @@ export function DrillPreviewTooltip() {
 
     const pinTimeout = setTimeout(() => {
       if (pinnedPreviews.length < 3) {
-        pinPreview(kind, payload);
+        // Calculate position for auto-pin
+        const PADDING = 15;
+        const TOOLTIP_WIDTH = 288;
+        const TOOLTIP_HEIGHT = 200;
+        let left = (coords?.x || 0) + PADDING;
+        let top = (coords?.y || 0) + PADDING;
+
+        if (typeof window !== 'undefined' && coords) {
+          if (left + TOOLTIP_WIDTH > window.innerWidth) {
+            left = coords.x - TOOLTIP_WIDTH - PADDING;
+          }
+          if (top + TOOLTIP_HEIGHT > window.innerHeight) {
+            top = coords.y - TOOLTIP_HEIGHT - PADDING;
+          }
+        }
+
+        pinPreview(kind, payload, { x: left, y: top });
         hidePreview();
         toast({ title: 'Preview pinned automatically' });
       }
@@ -103,7 +119,7 @@ export function DrillPreviewTooltip() {
       clearTimeout(pinTimeout);
       setPinProgress(0);
     };
-  }, [isOpen, kind, payload, pinPreview, pinnedPreviews.length, hidePreview, toast, settings.quietMode]);
+  }, [isOpen, kind, payload, coords, pinPreview, pinnedPreviews.length, hidePreview, toast, settings.quietMode]);
 
   if (!mounted) return null;
 
@@ -242,7 +258,7 @@ export function DrillPreviewTooltip() {
                 className="h-6 w-6 hover:bg-muted/50 text-muted-foreground hover:text-foreground transition-colors"
                 onClick={(e) => {
                   e.stopPropagation();
-                  pinPreview(kind, payload);
+                  pinPreview(kind, payload, { x: left, y: top });
                   hidePreview();
                   toast({ title: 'Preview pinned' });
                 }}
