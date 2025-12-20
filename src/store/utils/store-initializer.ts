@@ -10,6 +10,7 @@ import { useProductsStore } from '../use-products-store';
 import type { Product } from '@/lib/types';
 
 export async function initializeAllStores() {
+  console.log('[StoreInitializer] Starting initializeAllStores...');
   try {
     const [
       visits,
@@ -97,6 +98,12 @@ export async function initializeAllStores() {
         return data;
       }
     );
+
+    console.log('[StoreInitializer] Data loaded:', { 
+      productsCount: products?.length || 0, 
+      areasCount: areas?.length || 0,
+      companiesCount: companies?.length || 0
+    });
 
     const productsByManufacturer = (products || []).reduce((acc: Record<string, Product[]>, product: Product) => {
       const key = product.manufacturerId || 'unassigned';

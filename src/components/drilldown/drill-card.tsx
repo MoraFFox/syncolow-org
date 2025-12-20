@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { useDrillDownStore } from '@/store/use-drilldown-store';
+import { useDrillSettings } from '@/store/use-drill-settings';
 import { DrillKind } from '@/lib/drilldown-types';
 
 interface DrillCardProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'title'> {
@@ -31,7 +31,7 @@ const getThemeStyles = (kind?: DrillKind | string | null, theme?: string) => {
         return "border-white/20 dark:border-white/10";
     }
   }
-  
+
   // Solid theme: Opaque backgrounds, no blur
   if (theme === 'solid') {
     if (!kind) return "border-border bg-background";
@@ -48,7 +48,7 @@ const getThemeStyles = (kind?: DrillKind | string | null, theme?: string) => {
         return "border-border bg-background";
     }
   }
-  
+
   // Default theme
   if (!kind) return "border-primary/20";
   switch (kind) {
@@ -67,7 +67,7 @@ const getThemeStyles = (kind?: DrillKind | string | null, theme?: string) => {
 
 const getHeaderGradient = (kind?: DrillKind | string | null) => {
   if (!kind) return "";
-  
+
   switch (kind) {
     case 'company': case 'customer': case 'feedback': case 'notification':
       return "bg-gradient-to-r from-blue-500/10 to-transparent text-blue-700 dark:text-blue-300";
@@ -92,25 +92,25 @@ const getBaseStyles = (theme?: string) => {
   return "shadow-xl bg-popover/95 backdrop-blur supports-[backdrop-filter]:bg-popover/80";
 };
 
-export function DrillCard({ 
-  title, 
+export function DrillCard({
+  title,
   kind,
-  headerActions, 
-  onHeaderMouseDown, 
-  children, 
+  headerActions,
+  onHeaderMouseDown,
+  children,
   className,
   isMobile: propIsMobile,
-  ...props 
+  ...props
 }: DrillCardProps) {
   const isMobileHook = useIsMobile();
-  const { settings } = useDrillDownStore();
+  const { settings } = useDrillSettings();
   const isMobile = propIsMobile ?? isMobileHook;
   const themeStyles = getThemeStyles(kind, settings.previewTheme);
   const headerGradient = getHeaderGradient(kind);
   const baseStyles = getBaseStyles(settings.previewTheme);
 
   return (
-    <Card 
+    <Card
       className={cn(
         baseStyles,
         themeStyles,
@@ -119,7 +119,7 @@ export function DrillCard({
       )}
       {...props}
     >
-      <CardHeader 
+      <CardHeader
         className={cn(
           "flex flex-row items-center justify-between space-y-0",
           isMobile ? "p-3 pb-2" : "p-3 pb-2",

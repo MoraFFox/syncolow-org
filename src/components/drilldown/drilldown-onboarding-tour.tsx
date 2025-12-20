@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import { createPortal } from 'react-dom';
-import { useDrillDownStore } from '@/store/use-drilldown-store';
+import { useDrillUserData } from '@/store/use-drill-user-data';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Button } from '@/components/ui/button';
@@ -76,12 +76,12 @@ const tourSteps: TourStep[] = [
 
 export function DrilldownOnboardingTour() {
   const {
-    hasSeenOnboarding,
+    onboarding,
     markOnboardingComplete,
     dismissTour,
     markTourStepComplete,
-    completedTourSteps,
-  } = useDrillDownStore();
+  } = useDrillUserData();
+  const { hasSeenOnboarding, completedTourSteps } = onboarding;
   const [currentStepIndex, setCurrentStepIndex] = React.useState(0);
   const [isOpen, setIsOpen] = React.useState(false);
   const [targetElement, setTargetElement] = React.useState<HTMLElement | null>(null);

@@ -2,7 +2,7 @@
 
 import { Button } from '@/components/ui/button';
 import { Bookmark } from 'lucide-react';
-import { useDrillDownStore } from '@/store/use-drilldown-store';
+import { useDrillUserData } from '@/store/use-drill-user-data';
 import { DrillKind, DrillPayload } from '@/lib/drilldown-types';
 import { useToast } from '@/hooks/use-toast';
 
@@ -13,7 +13,7 @@ interface BookmarkButtonProps {
 }
 
 export function BookmarkButton({ label, kind, payload }: BookmarkButtonProps) {
-  const { addBookmark, bookmarks } = useDrillDownStore();
+  const { addBookmark, bookmarks } = useDrillUserData();
   const { toast } = useToast();
 
   const isBookmarked = bookmarks.some(
@@ -25,7 +25,7 @@ export function BookmarkButton({ label, kind, payload }: BookmarkButtonProps) {
       toast({ title: 'Already bookmarked', description: 'This item is already in your bookmarks' });
       return;
     }
-    
+
     addBookmark(label, kind, payload);
     toast({ title: 'Bookmarked', description: `${label} added to bookmarks` });
   };

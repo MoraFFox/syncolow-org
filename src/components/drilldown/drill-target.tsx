@@ -4,7 +4,8 @@ import * as React from "react";
 import { Slot } from "@radix-ui/react-slot";
 import { cn } from "@/lib/utils";
 import { ExternalLink } from "lucide-react";
-import { useDrillDownStore } from "@/store/use-drilldown-store";
+
+import { useDrillSettings } from "@/store/use-drill-settings";
 import { DrillKind, DrillPayload, DrillMode, DATA_DRILL_KIND, DATA_DRILL_PAYLOAD, DATA_DRILL_MODE, DATA_DRILL_DISABLED } from "@/lib/drilldown-types";
 
 interface DrillTargetProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -18,6 +19,8 @@ interface DrillTargetProps extends React.HTMLAttributes<HTMLDivElement> {
   showIcon?: boolean;
   /** Custom aria-label for screen readers. Defaults to kind + name/id */
   ariaLabel?: string;
+  /** If true, only serializes ID to DOM (lightweight). Requires renderer to support async loading. */
+  lite?: boolean;
 }
 
 /**
@@ -84,10 +87,11 @@ export function DrillTarget({
   ariaLabel,
   expandHitArea,
   hitAreaPadding,
+  lite,
   ...props
 }: DrillTargetProps & { expandHitArea?: boolean; hitAreaPadding?: number }) {
   const Comp = asChild ? Slot : "div";
-  const { settings } = useDrillDownStore();
+  const { settings } = useDrillSettings();
 
   const effectiveVariant = variant || (
     settings.visualStyle === 'prominent' ? 'primary' :
@@ -112,6 +116,26 @@ export function DrillTarget({
     children
   );
 
+  // Determine payload to write to DOM
+  const domPayload = React.useMemo(() => {
+    // If explicitly in lite mode, or if the payload is large by some heuristic?
+    // For now, let's rely on explicit prop.
+    // We already support `payload` containing just ID if the type allows it.
+    // The "lite" prop would force stripping it down to ID only even if full payload is passed.
+
+    // Check if we want to enforce lite mode (e.g. for large lists)
+    const isLite = lite;
+
+    if (isLite) {
+      // Try to extract ID
+      const id = (payload as any).id || (payload as any).value;
+      if (id) {
+        return JSON.stringify({ id }); // Minimal payload
+      }
+    }
+    return JSON.stringify(payload);
+  }, [payload, lite]);
+
   return (
     <Comp
       className={cn(
@@ -126,7 +150,7 @@ export function DrillTarget({
       data-drill-variant={effectiveVariant}
       data-drill-target=""
       {...{ [DATA_DRILL_KIND]: kind }}
-      {...{ [DATA_DRILL_PAYLOAD]: JSON.stringify(payload) }}
+      {...{ [DATA_DRILL_PAYLOAD]: domPayload }}
       {...(mode !== 'page' && { [DATA_DRILL_MODE]: mode })}
       {...(disabled && { [DATA_DRILL_DISABLED]: "" })}
       {...(hitAreaPadding !== undefined && { "data-drill-hit-padding": hitAreaPadding })}

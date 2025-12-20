@@ -1,6 +1,6 @@
 "use client";
 
-import { useDrillDownStore } from "@/store/use-drilldown-store";
+import { useDrillSettings } from "@/store/use-drill-settings";
 import { useState } from "react";
 import {
     Card,
@@ -36,7 +36,7 @@ export function InterfaceSettings() {
         setHitAreaPadding,
         setProximityThreshold,
         toggleHitAreaIndicator
-    } = useDrillDownStore();
+    } = useDrillSettings();
 
     const [isHelpDialogOpen, setIsHelpDialogOpen] = useState(false);
 

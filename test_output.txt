@@ -1,93 +1,24 @@
 
+> synergyflow-erp@0.1.0 test
+> vitest run src/components/ui/product-picker.test.tsx
+
+
 [1m[46m RUN [49m[22m [36mv4.0.15 [39m[90mD:/My projects/firebase-orginal[39m
 
-┘í┘ó:┘á┘ó:┘í┘¿ ╪╡ [vite] (client) warning: Duplicate member "orders" in class body
-75 |    private products: MockProduct[] = [];
-76 |    private orders: MockOrder[] = [];
-77 |    private orders: MockOrder[] = [];
-   |            ^
-78 |    private maintenanceVisits: MockMaintenanceVisit[] = [];
-79 |    private inventoryMovements: InventoryMovement[] = [];
 
-  Plugin: vite:esbuild
-  File: D:/My projects/firebase-orginal/src/lib/mock-data-generator/orchestrator.ts
-[90mstdout[2m | src/lib/mock-data-generator/__tests__/persistence.test.ts[2m > [22m[2mMockDataOrchestrator Persistence[2m > [22m[2mpersists all entities including new schema additions
-[22m[39m[users] Generated 2/2 (100%)
+ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ» Failed Suites 1 ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»
 
-[90mstdout[2m | src/lib/mock-data-generator/__tests__/persistence.test.ts[2m > [22m[2mMockDataOrchestrator Persistence[2m > [22m[2mpersists all entities including new schema additions
-[22m[39m[companies] Generated 10/10 (100%)
-
-[90mstdout[2m | src/lib/mock-data-generator/__tests__/persistence.test.ts[2m > [22m[2mMockDataOrchestrator Persistence[2m > [22m[2mpersists all entities including new schema additions
-[22m[39m[products] Generated 20/20 (100%)
-
-[90mstdout[2m | src/lib/mock-data-generator/__tests__/persistence.test.ts[2m > [22m[2mMockDataOrchestrator Persistence[2m > [22m[2mpersists all entities including new schema additions
-[22m[39m[maintenance_visits] Generated 1/1 (100%)
-
-[90mstdout[2m | src/lib/mock-data-generator/__tests__/persistence.test.ts[2m > [22m[2mMockDataOrchestrator Persistence[2m > [22m[2mpersists all entities including new schema additions
-[22m[39mTables called: [
-  [90mundefined[39m,
-  [32m'users'[39m,
-  [32m'companies'[39m,
-  [32m'products'[39m,
-  [32m'orders'[39m,
-  [32m'maintenance'[39m,
-  [32m'inventory_movements'[39m,
-  [32m'shipments'[39m,
-  [32m'delivery_attempts'[39m,
-  [32m'payments'[39m,
-  [32m'audit_logs'[39m
-]
-Record Counts: {
-  users: [33m2[39m,
-  companies: [33m10[39m,
-  branches: [33m5[39m,
-  addresses: [33m20[39m,
-  products: [33m20[39m,
-  orders: [33m4[39m,
-  orderItems: [33m13[39m,
-  inventory: [33m12[39m,
-  shipments: [33m4[39m,
-  payments: [33m2[39m,
-  discounts: [33m0[39m,
-  returns: [33m0[39m,
-  refunds: [33m0[39m,
-  maintenanceVisits: [33m1[39m,
-  auditLogs: [33m26[39m
-}
-Tables Called: [
-  [90mundefined[39m,
-  [32m'users'[39m,
-  [32m'companies'[39m,
-  [32m'products'[39m,
-  [32m'orders'[39m,
-  [32m'maintenance'[39m,
-  [32m'inventory_movements'[39m,
-  [32m'shipments'[39m,
-  [32m'delivery_attempts'[39m,
-  [32m'payments'[39m,
-  [32m'audit_logs'[39m
-]
-
- [31mΓ¥»[39m src/lib/mock-data-generator/__tests__/persistence.test.ts [2m([22m[2m1 test[22m[2m | [22m[31m1 failed[39m[2m)[22m[32m 70[2mms[22m[39m
-[31m     [31m├ù[31m persists all entities including new schema additions[39m[32m 68[2mms[22m[39m
-
-ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ» Failed Tests 1 ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»
-
- FAIL  src/lib/mock-data-generator/__tests__/persistence.test.ts > MockDataOrchestrator Persistence > persists all entities including new schema additions
-AssertionError: expected [ undefined, 'users', ΓÇª(9) ] to include 'discounts'
- Γ¥» src/lib/mock-data-generator/__tests__/persistence.test.ts:85:30
-     83|         expect(tablesCalled).toContain('shipments');
-     84|         expect(tablesCalled).toContain('payments');
-     85|         expect(tablesCalled).toContain('discounts');
-       |                              ^
-     86|         expect(tablesCalled).toContain('refunds');
-     87|         // baristas are part of companies gen, might be 0 if no branchΓÇª
+ FAIL  src/components/ui/product-picker.test.tsx [ src/components/ui/product-picker.test.tsx ]
+Error: Cannot find module '@testing-library/dom'
+Require stack:
+- D:\My projects\firebase-orginal\node_modules\@testing-library\react\dist\pure.js
+ Γ¥» Object.<anonymous> node_modules/@testing-library/react/dist/pure.js:46:12
 
 ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»[1/1]ΓÄ»
 
 
 [2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
-[2m      Tests [22m [1m[31m1 failed[39m[22m[90m (1)[39m
-[2m   Start at [22m 00:02:16
-[2m   Duration [22m 3.12s[2m (transform 483ms, setup 266ms, import 1.11s, tests 70ms, environment 1.33s)[22m
+[2m      Tests [22m [2mno tests[22m
+[2m   Start at [22m 22:56:25
+[2m   Duration [22m 3.79s[2m (transform 136ms, setup 388ms, import 0ms, tests 0ms, environment 1.85s)[22m
 

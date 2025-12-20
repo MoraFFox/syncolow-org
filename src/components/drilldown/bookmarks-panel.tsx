@@ -1,7 +1,6 @@
 "use client";
 
-import { useEffect } from 'react';
-import { useDrillDownStore } from '@/store/use-drilldown-store';
+import { useDrillUserData } from '@/store/use-drill-user-data';
 import { DrillTarget } from './drill-target';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
@@ -10,11 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
 export function BookmarksPanel() {
-  const { bookmarks, removeBookmark, loadBookmarks } = useDrillDownStore();
-
-  useEffect(() => {
-    loadBookmarks();
-  }, [loadBookmarks]);
+  const { bookmarks, removeBookmark } = useDrillUserData();
 
   return (
     <Popover>

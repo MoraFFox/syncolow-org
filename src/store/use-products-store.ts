@@ -36,6 +36,11 @@ export const useProductsStore = create<ProductsState>((set, get) => ({
     set({ loading: true });
     try {
       const { data, error } = await supabase.from('products').select('*');
+      console.log('useProductsStore: loadAllProducts result:', { 
+        count: data?.length, 
+        error: error?.message,
+        firstProduct: data?.[0]?.name 
+      });
       if (error) throw error;
       set({
         products: data || [],

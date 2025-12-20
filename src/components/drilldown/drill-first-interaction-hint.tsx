@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import { createPortal } from 'react-dom';
-import { useDrillDownStore } from '@/store/use-drilldown-store';
+import { useDrillUserData } from '@/store/use-drill-user-data';
 import { Lightbulb } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -16,7 +16,8 @@ export function DrillFirstInteractionHint({
   targetElement,
   onDismiss,
 }: DrillFirstInteractionHintProps) {
-  const { hasSeenFirstInteractionHint, markFirstInteractionHintSeen } = useDrillDownStore();
+  const { onboarding, markFirstInteractionHintSeen } = useDrillUserData();
+  const { hasSeenFirstInteractionHint } = onboarding;
   const [mounted, setMounted] = React.useState(false);
   const [dismissed, setDismissed] = React.useState(false);
 
@@ -102,7 +103,7 @@ export function DrillFirstInteractionHint({
           bottom: '-4px',
         }}
       />
-      
+
       <Lightbulb className="h-4 w-4 text-primary flex-shrink-0" />
       <span className="flex-1">Hover to preview details, click to open full view</span>
       <Button

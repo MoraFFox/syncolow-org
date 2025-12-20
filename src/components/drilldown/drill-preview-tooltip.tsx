@@ -3,19 +3,27 @@
 import * as React from 'react';
 import { createPortal } from 'react-dom';
 import { useDrillDownStore } from '@/store/use-drilldown-store';
+import { useDrillSettings } from '@/store/use-drill-settings';
+import { useDrillUserData } from '@/store/use-drill-user-data';
 import { useDrillPreviewData } from '@/hooks/use-drill-preview-data';
 import { useToast } from '@/hooks/use-toast';
 import { DrillCard } from './drill-card';
 import { DrillContentRenderer } from './drill-content-renderer';
 import { DrillActions } from './drill-actions';
-import { Command } from 'lucide-react';
+import { Command, Pin } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useSwipe } from '@/hooks/use-swipe';
 import { useDrillDown } from '@/hooks/use-drilldown';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export function DrillPreviewTooltip() {
-  const { preview, pinPreview, pinnedPreviews, hidePreview } = useDrillDownStore();
+  const { preview, hidePreview } = useDrillDownStore();
+  const { pinPreview, pinnedPreviews: rawPinnedPreviews } = useDrillUserData();
+  const pinnedPreviews = rawPinnedPreviews || [];
+
+  if (!preview) return null;
+
   const { isOpen, kind, payload, coords } = preview;
   const [mounted, setMounted] = React.useState(false);
   const [pinProgress, setPinProgress] = React.useState(0);
@@ -67,7 +75,7 @@ export function DrillPreviewTooltip() {
   }, []);
 
   // Auto-pin after 3 seconds with CSS transition (respects quietMode)
-  const { settings } = useDrillDownStore();
+  const { settings } = useDrillSettings();
 
   React.useEffect(() => {
     // Skip auto-pin in quiet mode
@@ -210,7 +218,27 @@ export function DrillPreviewTooltip() {
           transition={{ duration: 0.15, ease: "easeOut" }}
           className="drill-preview-container"
         >
-          <DrillCard title={`${kind} Insight`} kind={kind} className="shadow-2xl border-2">
+          <DrillCard
+            title={`${kind} Insight`}
+            kind={kind}
+            className="shadow-2xl border-2"
+            headerActions={
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-6 w-6 hover:bg-muted/50 text-muted-foreground hover:text-foreground"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  pinPreview(kind, payload);
+                  hidePreview();
+                  toast({ title: 'Preview pinned' });
+                }}
+                title="Pin preview"
+              >
+                <Pin className="h-3.5 w-3.5" />
+              </Button>
+            }
+          >
             {!showContent || isLoading ? (
               <div className="flex flex-col items-center justify-center py-8 gap-2">
                 <div className="animate-spin h-5 w-5 border-2 border-primary border-t-transparent rounded-full" />

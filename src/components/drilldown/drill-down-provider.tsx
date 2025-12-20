@@ -1,17 +1,15 @@
 "use client";
 
-import { useEffect } from 'react';
-import { useDrillDownStore } from '@/store/use-drilldown-store';
+import { useDrillUserData } from '@/store/use-drill-user-data';
 import { ComparePanel } from './compare-panel';
 import { PinnedPreview } from './pinned-preview';
 import { GlobalDrillListener } from './global-drill-listener';
 
 export function DrillDownProvider() {
-  const { pinnedPreviews, unpinPreview, loadPinnedPreviews } = useDrillDownStore();
+  const { pinnedPreviews, unpinPreview } = useDrillUserData();
 
-  useEffect(() => {
-    loadPinnedPreviews();
-  }, [loadPinnedPreviews]);
+  // Persist middleware handles loading automatically on mount
+
 
   return (
     <>

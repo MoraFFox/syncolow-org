@@ -5,11 +5,12 @@ import { useState, useEffect } from "react";
 import { useProductsStore } from "@/store/use-products-store";
 import { useManufacturerStore } from "@/store/use-manufacturer-store";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Command, CommandInput, CommandList, CommandEmpty, CommandGroup, CommandItem } from "@/components/ui/command";
+import { Command, CommandInput, CommandList, CommandGroup, CommandItem } from "@/components/ui/command";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Loader2, Check, Plus, Minus, Package, AlertTriangle } from "lucide-react";
+import { useAuth } from "@/hooks/use-auth";
 import type { Product, OrderItem, Manufacturer } from "@/lib/types";
 
 export interface ProductPickerProps {
@@ -18,27 +19,65 @@ export interface ProductPickerProps {
 }
 
 export function ProductPicker({ selectedProducts, onSelectionChange }: ProductPickerProps) {
-  const { products, loading: productsLoading } = useProductsStore();
-  const { manufacturers, productsByManufacturer, loading: manufacturersLoading } = useManufacturerStore();
+  const { user } = useAuth();
+  const { products, loading: productsLoading, loadAllProducts } = useProductsStore();
+  const { manufacturers, loading: manufacturersLoading, fetchManufacturersAndProducts } = useManufacturerStore();
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
 
+  // Load data if empty
+  useEffect(() => {
+    if (products.length === 0 && !productsLoading) {
+      loadAllProducts();
+    }
+    if (manufacturers.length === 0 && !manufacturersLoading) {
+      fetchManufacturersAndProducts();
+    }
+  }, []);
+
   // Effect to filter products based on search term
   useEffect(() => {
-    if (!search.trim()) {
+    console.log('ProductPicker User:', user?.email || 'Guest');
+    console.log('ProductPicker Search:', search);
+    console.log('ProductPicker Total Products:', products.length);
+    if (products.length > 0) {
+      console.log('Sample Product:', products[0].name, products[0].id);
+    }
+    console.log('ProductPicker Loading State:', { productsLoading, manufacturersLoading });
+
+    if (!search || !search.trim()) {
       setFilteredProducts(products);
       return;
     }
 
-    const searchLower = search.toLowerCase();
-    const filtered = products.filter(
-      (product) =>
-        product.name.toLowerCase().includes(searchLower) ||
-        (product.description && product.description.toLowerCase().includes(searchLower)) ||
-        (product.sku && product.sku.toLowerCase().includes(searchLower))
-    );
+    const searchLower = search.toLowerCase().trim();
+    const searchTerms = searchLower.split(/\s+/).filter(Boolean);
 
+    const filtered = products.filter((product) => {
+      const name = (product.name || "").toLowerCase();
+      const description = (product.description || "").toLowerCase();
+      const sku = (product.sku || "").toLowerCase();
+      const variantName = (product.variantName || "").toLowerCase();
+
+      // For single character search, just check if it's included anywhere
+      if (searchLower.length === 1) {
+        const matched = name.includes(searchLower) ||
+          sku.includes(searchLower) ||
+          variantName.includes(searchLower);
+        return matched;
+      }
+
+      // For longer search, all terms should be found (across any field)
+      return searchTerms.every(term =>
+        name.includes(term) ||
+        description.includes(term) ||
+        sku.includes(term) ||
+        variantName.includes(term)
+      );
+    });
+
+    console.log('ProductPicker Filtered Count:', filtered.length);
     setFilteredProducts(filtered);
   }, [search, products]);
 
@@ -133,10 +172,16 @@ export function ProductPicker({ selectedProducts, onSelectionChange }: ProductPi
   const selectedCount = selectedProducts.reduce((sum, item) => sum + item.quantity, 0);
 
   const groupedAndFilteredProducts = groupProductsByManufacturer(filteredProducts);
-  const manufacturerOrder = [
+  console.log('ProductPicker Grouped Keys:', Object.keys(groupedAndFilteredProducts));
+  console.log('ProductPicker Manufacturers:', manufacturers.map(m => m.id));
+
+  // Create an order that includes all manufacturers present in the data
+  const dataManufacturerIds = Object.keys(groupedAndFilteredProducts);
+  const manufacturerOrder = Array.from(new Set([
     ...manufacturers.map(m => m.id),
-    'unassigned'
-  ];
+    'unassigned',
+    ...dataManufacturerIds
+  ]));
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -152,14 +197,18 @@ export function ProductPicker({ selectedProducts, onSelectionChange }: ProductPi
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-[400px] p-0" align="start">
-        <Command>
+        <Command shouldFilter={false}>
           <CommandInput
             placeholder="Search products..."
             value={search}
             onValueChange={setSearch}
           />
           <CommandList>
-            <CommandEmpty>No products found.</CommandEmpty>
+            {filteredProducts.length === 0 && (
+              <div className="py-6 text-center text-sm text-muted-foreground">
+                No products found.
+              </div>
+            )}
 
             {manufacturerOrder.map(manufacturerId => {
               const manufacturer = getManufacturer(manufacturerId);

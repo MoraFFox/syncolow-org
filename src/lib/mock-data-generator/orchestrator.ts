@@ -35,8 +35,6 @@ import type {
   MockBranch,
   MockProduct,
   MockOrder,
-  MockProduct,
-  MockOrder,
   MockMaintenanceVisit,
   InventoryMovement,
   Shipment,
@@ -73,7 +71,6 @@ export class MockDataOrchestrator {
   private companies: MockCompany[] = [];
   private branches: MockBranch[] = [];
   private products: MockProduct[] = [];
-  private orders: MockOrder[] = [];
   private orders: MockOrder[] = [];
   private maintenanceVisits: MockMaintenanceVisit[] = [];
   private inventoryMovements: InventoryMovement[] = [];
@@ -709,6 +706,13 @@ export class MockDataOrchestrator {
    */
   getProgress() {
     return this.progressTracker.getProgress();
+  }
+
+  /**
+   * Get the progress tracker instance (for adding listeners)
+   */
+  getProgressTracker() {
+    return this.progressTracker;
   }
 
   /**

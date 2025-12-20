@@ -145,8 +145,7 @@ interface AppState {
 export const useOrderStore = create<AppState>((set, get) => ({
   orders: [],
   analyticsOrders: [],
-  orders: [],
-  analyticsOrders: [],
+
   activeFilters: null,
   activeSort: null,
   returns: [],

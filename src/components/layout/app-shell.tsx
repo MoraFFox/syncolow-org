@@ -16,7 +16,7 @@ import { OfflineBanner } from "./offline-banner";
 import { useOfflineQueue } from "@/hooks/use-offline-queue";
 import { useServiceWorker } from "@/hooks/use-service-worker";
 import { DrilldownOnboardingTour } from "@/components/drilldown/drilldown-onboarding-tour";
-import { useDrillDownStore } from "@/store/use-drilldown-store";
+import { useDrillUserData } from "@/store/use-drill-user-data";
 import { useNotificationComputation } from "@/hooks/use-notification-computation";
 import { useAppShellAuth } from "@/hooks/use-app-shell-auth";
 import { useDialogState } from "@/hooks/use-dialog-state";
@@ -45,7 +45,10 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     pathname.startsWith(route)
   );
 
-  const { hasSeenOnboarding, tourDismissedAt } = useDrillDownStore();
+  const {
+    onboarding,
+  } = useDrillUserData();
+  const { hasSeenOnboarding, tourDismissedAt } = onboarding;
   const [showTour, setShowTour] = useState(false);
 
   const dialogState = useDialogState();

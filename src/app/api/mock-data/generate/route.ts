@@ -4,7 +4,8 @@ import { MockDataOrchestrator } from '@/lib/mock-data-generator/orchestrator';
 import { SafetyGuard, getSafeMockDataClient } from '@/lib/mock-data-generator/safety-guard';
 import { getScenarioManager } from '@/lib/mock-data-generator/scenarios/scenario-manager';
 import { logger } from '@/lib/logger';
-import type { MockGeneratorConfig } from '@/lib/mock-data-generator/types';
+import type { MockGeneratorConfig, GenerationProgress } from '@/lib/mock-data-generator/types';
+import type { ProgressEvent } from '@/lib/mock-data-generator/progress-tracker';
 
 // In-memory fallback for immediate status checks before DB sync
 // (Optional, strictly we could rely on DB, but this bridges the gap)
@@ -118,7 +119,7 @@ export async function POST(request: NextRequest) {
     // 2. Attach Listener for DB Updates
     // Throttle updates to avoid spamming DB
     let lastUpdate = Date.now();
-    orchestrator.getProgressTracker().addListener(async (progress, event) => {
+    orchestrator.getProgressTracker().addListener(async (progress: GenerationProgress, event: ProgressEvent) => {
         const now = Date.now();
         if (event.type === 'entity_completed' || event.type === 'batch_completed' || (now - lastUpdate > 2000)) {
             lastUpdate = now;
