@@ -32,10 +32,7 @@ export function InterfaceSettings() {
         toggleQuietMode,
         setPreviewSize,
         setPreviewTheme,
-        toggleExpandedHitArea,
-        setHitAreaPadding,
-        setProximityThreshold,
-        toggleHitAreaIndicator
+
     } = useDrillSettings();
 
     const [isHelpDialogOpen, setIsHelpDialogOpen] = useState(false);
@@ -194,85 +191,7 @@ export function InterfaceSettings() {
                         </p>
                     </div>
 
-                    {/* Hit Area & Proximity Settings */}
-                    <div className="pt-4 border-t border-border space-y-4">
-                        <h4 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
-                            Hit Area & Proximity
-                        </h4>
 
-                        {/* Expanded Hit Area Toggle */}
-                        <div className='flex items-center justify-between'>
-                            <div className='space-y-0.5'>
-                                <Label>Expanded Hit Areas</Label>
-                                <p className='text-sm text-muted-foreground'>
-                                    Increase the clickable area around drill targets for easier interaction.
-                                </p>
-                            </div>
-                            <Switch
-                                checked={settings.expandedHitArea}
-                                onCheckedChange={toggleExpandedHitArea}
-                            />
-                        </div>
-
-                        {/* Hit Area Padding Slider */}
-                        <div className='space-y-2'>
-                            <div className='flex items-center justify-between'>
-                                <Label>Hit Area Padding</Label>
-                                <span className='text-sm text-muted-foreground'>
-                                    {settings.hitAreaPadding}px
-                                </span>
-                            </div>
-                            <Slider
-                                value={[settings.hitAreaPadding]}
-                                onValueChange={([value]) => setHitAreaPadding(value)}
-                                min={0}
-                                max={32}
-                                step={2}
-                                disabled={!settings.expandedHitArea}
-                                className='w-full'
-                            />
-                            <p className='text-xs text-muted-foreground'>
-                                Control how far the hit area extends beyond the element.
-                            </p>
-                        </div>
-
-                        {/* Hit Area Indicator (Debug) */}
-                        <div className='flex items-center justify-between'>
-                            <div className='space-y-0.5'>
-                                <Label>Debug Hit Areas</Label>
-                                <p className='text-sm text-muted-foreground'>
-                                    Show visual indicators for the expanded hit areas.
-                                </p>
-                            </div>
-                            <Switch
-                                checked={settings.showHitAreaIndicator}
-                                onCheckedChange={toggleHitAreaIndicator}
-                                disabled={!settings.expandedHitArea}
-                            />
-                        </div>
-
-                        {/* Proximity Threshold Slider */}
-                        <div className='space-y-2'>
-                            <div className='flex items-center justify-between'>
-                                <Label>Proximity Sensitivity</Label>
-                                <span className='text-sm text-muted-foreground'>
-                                    {settings.proximityThreshold}px
-                                </span>
-                            </div>
-                            <Slider
-                                value={[settings.proximityThreshold]}
-                                onValueChange={([value]) => setProximityThreshold(value)}
-                                min={0}
-                                max={100}
-                                step={4}
-                                disabled={!settings.expandedHitArea}
-                                className='w-full'
-                            />
-                            <p className='text-xs text-muted-foreground'>
-                                Distance at which the "magnetic" hover effect begins.
-                            </p>
-                        </div>
-                    </div>
                 </CardContent>
             </Card>
 

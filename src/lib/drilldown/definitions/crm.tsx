@@ -105,25 +105,25 @@ export const companyConfig: DrillConfig<"company"> = {
     <div className='space-y-1'>
       {/* Header with Payment Score */}
       <div className="flex justify-between items-start pb-2 border-b border-border/50">
-         <div>
-            <div className='text-[10px] text-muted-foreground uppercase tracking-wider font-semibold mb-1'>
-              Client Profile
-            </div>
-            <div className='font-bold text-lg leading-tight mb-1'>
-              {data.name}
-            </div>
-            <div className="flex gap-2">
-               <Badge variant="outline" className="text-[10px] h-5">{data.metadata?.tier as string || "Silver"}</Badge>
-               <Badge variant={(data.metadata?.status as string) === 'Active' ? 'default' : 'secondary'} className="text-[10px] h-5 bg-green-100 text-green-700 hover:bg-green-100 border-green-200">
-                  {data.metadata?.status as string || "Active"}
-               </Badge>
-            </div>
-         </div>
+        <div>
+          <div className='text-[10px] text-muted-foreground uppercase tracking-wider font-semibold mb-1'>
+            Client Profile
+          </div>
+          <div className='font-bold text-lg leading-tight mb-1'>
+            {data.name}
+          </div>
+          <div className="flex gap-2">
+            <Badge variant="outline" className="text-[10px] h-5">{data.metadata?.tier as string || "Silver"}</Badge>
+            <Badge variant={(data.metadata?.status as string) === 'Active' ? 'default' : 'secondary'} className="text-[10px] h-5 bg-green-100 text-green-700 hover:bg-green-100 border-green-200">
+              {data.metadata?.status as string || "Active"}
+            </Badge>
+          </div>
+        </div>
       </div>
 
       <div className="py-3">
-        <PaymentScoreIndicator 
-          score={data.paymentScore} 
+        <PaymentScoreIndicator
+          score={data.paymentScore}
           daysToPay={data.daysToPayAvg}
           onTimePercentage={data.onTimePercentage}
           status={data.paymentStatus}
@@ -133,10 +133,10 @@ export const companyConfig: DrillConfig<"company"> = {
       {/* Revenue Trend */}
       <PreviewSection title="Revenue Trend (6m)" icon={<TrendingUp className="h-3 w-3" />}>
         <div className="h-12 w-full">
-          <MicroChart 
-            data={data.revenueTrend || []} 
-            type="area" 
-            height={48} 
+          <MicroChart
+            data={data.revenueTrend || []}
+            type="area"
+            height={48}
             width={280}
             color="#16a34a"
             fill
@@ -161,7 +161,7 @@ export const companyConfig: DrillConfig<"company"> = {
           valueClassName={data.outstandingBalance > 0 ? "text-red-600" : "text-green-600"}
         />
       </div>
-      
+
       {/* Recent Activity */}
       {data.recentOrders && data.recentOrders.length > 0 && (
         <PreviewSection title="Recent Orders" icon={<Clock className="h-3 w-3" />} compact>
@@ -182,23 +182,23 @@ export const companyConfig: DrillConfig<"company"> = {
 
       {/* Contact Info */}
       <PreviewSection title="Contact" icon={<User className="h-3 w-3" />} compact collapsible={false}>
-         <div className="flex items-center gap-3 text-xs">
-            <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-               <User className="h-4 w-4" />
+        <div className="flex items-center gap-3 text-xs">
+          <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+            <User className="h-4 w-4" />
+          </div>
+          <div>
+            <div className="font-medium">{data.contactInfo?.email || "Jane Doe (Manager)"}</div>
+            <div className="text-muted-foreground flex gap-2 mt-0.5">
+              <span className="flex items-center gap-1"><Mail className="h-3 w-3" /> Email</span>
+              <span className="flex items-center gap-1"><Phone className="h-3 w-3" /> Call</span>
             </div>
-            <div>
-               <div className="font-medium">{data.contactInfo?.email || "Jane Doe (Manager)"}</div>
-               <div className="text-muted-foreground flex gap-2 mt-0.5">
-                  <span className="flex items-center gap-1"><Mail className="h-3 w-3" /> Email</span>
-                  <span className="flex items-center gap-1"><Phone className="h-3 w-3" /> Call</span>
-               </div>
-            </div>
-         </div>
+          </div>
+        </div>
       </PreviewSection>
     </div>
   ),
   getRelatedEntities: async () => {
-      return [];
+    return [];
   }
 };
 
@@ -217,7 +217,7 @@ export const orderConfig: DrillConfig<"order"> = {
       label: "Invoice",
       icon: <FileText className='h-3 w-3' />,
       onClick: async () => {
-         await simulateAction("Generating Invoice PDF");
+        await simulateAction("Generating Invoice PDF");
       },
     },
   ],
@@ -261,7 +261,7 @@ export const orderConfig: DrillConfig<"order"> = {
             #{payload.id}
           </div>
           <div className="text-xs text-muted-foreground">
-             {data.metadata?.createdAt ? formatDate(data.metadata.createdAt as string) : "Recently ordered"}
+            {data.metadata?.createdAt ? formatDate(data.metadata.createdAt as string) : "Recently ordered"}
           </div>
         </div>
         <Badge
@@ -274,7 +274,7 @@ export const orderConfig: DrillConfig<"order"> = {
           {data.status}
         </Badge>
       </div>
-      
+
       {/* Visual Progress Stepper */}
       <OrderStepper status={(["Pending", "Processing", "Shipped", "Delivered", "Cancelled"].includes(data.status) ? data.status : "Pending") as OrderStatus} />
 
@@ -311,13 +311,13 @@ export const orderConfig: DrillConfig<"order"> = {
       )}
 
       <div className='space-y-2.5 pt-2 border-t border-border/50'>
-        {payload.total !== undefined && (
+        {(payload.total !== undefined || data.total !== undefined) && (
           <div className='flex justify-between items-center gap-2'>
             <span className='text-xs text-muted-foreground font-medium'>
               Amount
             </span>
             <span className='font-bold text-base'>
-              {formatCurrency(payload.total)}
+              {formatCurrency(data.total !== undefined ? data.total : (payload.total || 0))}
             </span>
           </div>
         )}
@@ -333,15 +333,15 @@ export const orderConfig: DrillConfig<"order"> = {
             {data.payment?.status || "Pending"}
           </Badge>
         </div>
-        
+
         {/* Logistics Info */}
         <div className="bg-muted/30 p-2 rounded text-xs flex justify-between items-center">
-            <span className="text-muted-foreground flex items-center gap-1">
-              <Truck className="h-3 w-3" /> {data.delivery?.trackingNumber ? "FedEx" : "Pending"}
-            </span>
-            <span className="text-primary hover:underline cursor-pointer flex items-center gap-1">
-               {data.delivery?.estimatedDate ? `Est: ${formatDate(data.delivery.estimatedDate)}` : "Track"}
-            </span>
+          <span className="text-muted-foreground flex items-center gap-1">
+            <Truck className="h-3 w-3" /> {data.delivery?.trackingNumber ? "FedEx" : "Pending"}
+          </span>
+          <span className="text-primary hover:underline cursor-pointer flex items-center gap-1">
+            {data.delivery?.estimatedDate ? `Est: ${formatDate(data.delivery.estimatedDate)}` : "Track"}
+          </span>
         </div>
       </div>
     </div>
@@ -373,8 +373,8 @@ export const feedbackConfig: DrillConfig<"feedback"> = {
               payload.sentiment === "positive"
                 ? "default"
                 : payload.sentiment === "negative"
-                ? "destructive"
-                : "secondary"
+                  ? "destructive"
+                  : "secondary"
             }
             className='text-[10px] gap-1'
           >
@@ -424,13 +424,12 @@ export const feedbackConfig: DrillConfig<"feedback"> = {
             <MessageSquare className='h-3 w-3 text-muted-foreground' />
           )}
           <span
-            className={`text-xs font-medium capitalize ${
-              data.sentiment === "positive"
-                ? "text-green-600"
-                : data.sentiment === "negative"
+            className={`text-xs font-medium capitalize ${data.sentiment === "positive"
+              ? "text-green-600"
+              : data.sentiment === "negative"
                 ? "text-red-600"
                 : "text-muted-foreground"
-            }`}
+              }`}
           >
             {data.sentiment} Sentiment
           </span>
@@ -446,21 +445,21 @@ export const feedbackConfig: DrillConfig<"feedback"> = {
       {/* Sentiment Trend */}
       <PreviewSection title="Sentiment History" icon={<TrendingUp className="h-3 w-3" />} compact>
         <div className="h-8 w-full">
-           <MicroChart 
-             data={data.sentimentTrend || [3, 4, 5, 4, 5]} 
-             type="bar" 
-             height={32} 
-             width={280}
-             color={data.sentiment === 'positive' ? '#16a34a' : data.sentiment === 'negative' ? '#dc2626' : '#94a3b8'}
-           />
+          <MicroChart
+            data={data.sentimentTrend || [3, 4, 5, 4, 5]}
+            type="bar"
+            height={32}
+            width={280}
+            color={data.sentiment === 'positive' ? '#16a34a' : data.sentiment === 'negative' ? '#dc2626' : '#94a3b8'}
+          />
         </div>
       </PreviewSection>
 
       {/* Response Time */}
       {data.responseTime && (
         <div className="flex justify-between items-center text-xs border-t border-border/50 pt-2">
-           <span className="text-muted-foreground">Response Time</span>
-           <span className="font-medium">{data.responseTime}h avg</span>
+          <span className="text-muted-foreground">Response Time</span>
+          <span className="font-medium">{data.responseTime}h avg</span>
         </div>
       )}
     </div>
@@ -516,8 +515,8 @@ export const notificationConfig: DrillConfig<"notification"> = {
                 payload.priority === "critical"
                   ? "destructive"
                   : payload.priority === "warning"
-                  ? "secondary"
-                  : "outline"
+                    ? "secondary"
+                    : "outline"
               }
               className='h-5 px-1.5 text-[10px] uppercase'
             >
@@ -575,8 +574,8 @@ export const notificationConfig: DrillConfig<"notification"> = {
               data.priority === "critical"
                 ? "destructive"
                 : data.priority === "warning"
-                ? "secondary"
-                : "outline"
+                  ? "secondary"
+                  : "outline"
             }
           >
             {data.priority}
@@ -595,18 +594,18 @@ export const notificationConfig: DrillConfig<"notification"> = {
             Related {data.relatedEntity.type}
           </span>
           <div className="flex items-center gap-2">
-             <div className="font-medium">{data.relatedEntity.name}</div>
-             {data.relatedEntity.status && <Badge variant="outline" className="text-[10px] h-4 px-1">{data.relatedEntity.status}</Badge>}
+            <div className="font-medium">{data.relatedEntity.name}</div>
+            {data.relatedEntity.status && <Badge variant="outline" className="text-[10px] h-4 px-1">{data.relatedEntity.status}</Badge>}
           </div>
         </div>
       )}
-      
+
       {/* Similar Notifications */}
       {data.similarCount > 0 && (
-         <div className="flex items-center gap-2 text-xs text-muted-foreground bg-blue-500/5 p-1.5 rounded">
-            <AlertTriangle className="h-3 w-3" />
-            <span>{data.similarCount} similar notifications this week</span>
-         </div>
+        <div className="flex items-center gap-2 text-xs text-muted-foreground bg-blue-500/5 p-1.5 rounded">
+          <AlertTriangle className="h-3 w-3" />
+          <span>{data.similarCount} similar notifications this week</span>
+        </div>
       )}
     </div>
   ),

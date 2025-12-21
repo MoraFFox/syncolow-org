@@ -18,22 +18,26 @@ import { useSwipe } from '@/hooks/use-swipe';
 import { useDrillDown } from '@/hooks/use-drilldown';
 import { motion, AnimatePresence } from 'framer-motion';
 
+
+
 export function DrillPreviewTooltip() {
+  // 1. All Hooks Must Be Unconditional
   const { preview, hidePreview } = useDrillDownStore();
   const { pinPreview, pinnedPreviews: rawPinnedPreviews } = useDrillUserData();
-  const pinnedPreviews = rawPinnedPreviews || [];
-
-  if (!preview) return null;
-
-  const { isOpen, kind, payload, coords } = preview;
-  const [mounted, setMounted] = React.useState(false);
-  const [pinProgress, setPinProgress] = React.useState(0);
-  const [showContent, setShowContent] = React.useState(false);
+  const { settings } = useDrillSettings();
   const { toast } = useToast();
   const isMobile = useIsMobile();
   const { goToDetail } = useDrillDown();
 
-  // Swipe handlers for mobile
+  const pinnedPreviews = rawPinnedPreviews || [];
+  const [mounted, setMounted] = React.useState(false);
+  const [pinProgress, setPinProgress] = React.useState(0);
+  const [showContent, setShowContent] = React.useState(false);
+
+  // Safely extract values (even if preview is null)
+  const { isOpen = false, kind, payload, coords } = preview || {};
+
+  // Swipe handlers
   const swipeHandlers = useSwipe({
     onSwipeDown: () => {
       if (isMobile) hidePreview();
@@ -46,10 +50,38 @@ export function DrillPreviewTooltip() {
     }
   });
 
-  // Use React Query for cached async preview data
-  const { data: asyncData, isLoading, error, refetch } = useDrillPreviewData(kind, payload, isOpen);
+  // Data Fetching (Enabled only when valid)
+  // Ensure we pass meaningful values or undefined, but hook order is constant
+  const { data: asyncData, isLoading, error, refetch } = useDrillPreviewData(
+    kind || 'company', // Fallback to avoid type errors, enabled flag handles logic
+    payload || {},
+    !!(isOpen && kind && payload)
+  );
 
-  // Minimum loading duration (200ms) before showing content
+  // Layout Logic
+  const layoutConfig = React.useMemo(() => {
+    switch (kind) {
+      case 'company':
+      case 'branch':
+        return { width: 400, height: 160, variant: 'banner', className: 'rounded-xl' };
+      case 'product':
+      case 'barista':
+      case 'customer':
+        return { width: 240, height: 320, variant: 'poster', className: 'rounded-2xl' };
+      case 'notification':
+      case 'feedback':
+        return { width: 220, height: 220, variant: 'diamond', className: 'rounded-[2rem]' }; // distinct shape
+      default:
+        return { width: 288, height: 200, variant: 'default', className: 'rounded-lg' };
+    }
+  }, [kind]);
+
+  // Effects
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Minimum Loading Time Effect
   React.useEffect(() => {
     if (!isOpen) {
       setShowContent(false);
@@ -71,48 +103,40 @@ export function DrillPreviewTooltip() {
     }
   }, [isOpen, isLoading]);
 
+  // Auto-pin Effect
   React.useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  // Auto-pin after 3 seconds with CSS transition (respects quietMode)
-  const { settings } = useDrillSettings();
-
-  React.useEffect(() => {
-    // Skip auto-pin in quiet mode
     if (!isOpen || !kind || !payload || settings.quietMode) {
       setPinProgress(0);
       return;
     }
 
-    // Trigger animation to start transition
     const timer = setTimeout(() => {
       setPinProgress(100);
     }, 50);
 
     const pinTimeout = setTimeout(() => {
       if (pinnedPreviews.length < 3) {
-        // Calculate position for auto-pin
+        // Simple positioning logic duplicated safely
         const PADDING = 15;
-        const TOOLTIP_WIDTH = 288;
-        const TOOLTIP_HEIGHT = 200;
+        let w = 288;
+        let h = 200;
+        if (['company', 'branch'].includes(kind)) { w = 400; h = 160; }
+        else if (['product', 'barista', 'customer'].includes(kind)) { w = 240; h = 320; }
+        else if (['notification', 'feedback'].includes(kind)) { w = 220; h = 220; }
+
         let left = (coords?.x || 0) + PADDING;
         let top = (coords?.y || 0) + PADDING;
 
         if (typeof window !== 'undefined' && coords) {
-          if (left + TOOLTIP_WIDTH > window.innerWidth) {
-            left = coords.x - TOOLTIP_WIDTH - PADDING;
-          }
-          if (top + TOOLTIP_HEIGHT > window.innerHeight) {
-            top = coords.y - TOOLTIP_HEIGHT - PADDING;
-          }
+          if (left + w > window.innerWidth) left = coords.x - w - PADDING;
+          if (top + h > window.innerHeight) top = coords.y - h - PADDING;
         }
 
         pinPreview(kind, payload, { x: left, y: top });
         hidePreview();
         toast({ title: 'Preview pinned automatically' });
       }
-    }, 3050); // Slightly longer than transition to ensure it completes visually
+    }, 3050);
 
     return () => {
       clearTimeout(timer);
@@ -121,20 +145,26 @@ export function DrillPreviewTooltip() {
     };
   }, [isOpen, kind, payload, coords, pinPreview, pinnedPreviews.length, hidePreview, toast, settings.quietMode]);
 
+  // 2. Logic / Early Returns AFTER Hooks
   if (!mounted) return null;
+  if (!preview) return null; // Now safer
+  if (!kind || !payload) return null;
 
-  // Don't show tooltip if THIS SPECIFIC item is already pinned
+  // Check pinned status
   const isCurrentItemPinned = pinnedPreviews.some(pinned => {
-    const pinnedId = (pinned.payload as Record<string, unknown>)?.id || (pinned.payload as Record<string, unknown>)?.value;
-    const currentId = (payload as Record<string, unknown>)?.id || (payload as Record<string, unknown>)?.value;
+    // Safe access with defaults
+    const pPayload = pinned.payload as Record<string, unknown> || {};
+    const cPayload = payload as Record<string, unknown> || {};
+    const pinnedId = pPayload.id || pPayload.value;
+    const currentId = cPayload.id || cPayload.value;
     return pinned.kind === kind && pinnedId === currentId;
   });
 
   if (isCurrentItemPinned) return null;
 
-  // Calculate position with boundary detection
-  const TOOLTIP_WIDTH = 288; // w-72
-  const TOOLTIP_HEIGHT = 200;
+  // 3. Render
+  const TOOLTIP_WIDTH = layoutConfig.width;
+  const TOOLTIP_HEIGHT = layoutConfig.height;
   const PADDING = 15;
 
   let left = (coords?.x || 0) + PADDING;
@@ -161,15 +191,14 @@ export function DrillPreviewTooltip() {
     left,
     top,
     zIndex: 9999,
-    pointerEvents: 'none', // Pass through clicks on desktop
+    pointerEvents: 'none',
   };
 
   if (isMobile) {
     return createPortal(
       <AnimatePresence>
-        {isOpen && kind && payload && (
+        {isOpen && (
           <>
-            {/* Backdrop for mobile */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -178,7 +207,6 @@ export function DrillPreviewTooltip() {
               onClick={hidePreview}
             />
 
-            {/* Bottom Sheet */}
             <motion.div
               style={style}
               initial={{ y: "100%" }}
@@ -190,7 +218,6 @@ export function DrillPreviewTooltip() {
               onTouchMove={swipeHandlers.onTouchMove}
               onTouchEnd={swipeHandlers.onTouchEnd}
             >
-              {/* Swipe Indicator */}
               <div className="w-full flex justify-center pt-3 pb-1">
                 <div className="w-12 h-1.5 bg-muted-foreground/20 rounded-full" />
               </div>
@@ -211,7 +238,6 @@ export function DrillPreviewTooltip() {
 
                 <DrillActions kind={kind} payload={payload} />
 
-                {/* Mobile Hint */}
                 <div className="text-[10px] text-muted-foreground text-center mt-4 pb-4">
                   Swipe up for details • Swipe down to dismiss
                 </div>
@@ -226,20 +252,20 @@ export function DrillPreviewTooltip() {
 
   return createPortal(
     <AnimatePresence>
-      {isOpen && kind && payload && coords && (
+      {isOpen && coords && (
         <motion.div
           style={style}
           initial={{ opacity: 0, scale: 0.9, y: 8, filter: "blur(4px)" }}
           animate={{ opacity: 1, scale: 1, y: 0, filter: "blur(0px)" }}
           exit={{ opacity: 0, scale: 0.9, y: 4, filter: "blur(2px)" }}
-          transition={{
-            type: "spring",
-            stiffness: 400,
-            damping: 25,
-            mass: 0.8
-          }}
+          transition={
+            settings.quietMode
+              ? { duration: 0.15, ease: "easeOut" }
+              : { type: "spring", stiffness: 400, damping: 25, mass: 0.8 }
+          }
           className={cn(
             "drill-preview-container origin-top-left",
+            layoutConfig.className,
             settings.previewTheme === 'glass' && "backdrop-blur-md bg-background/80"
           )}
         >
@@ -247,7 +273,8 @@ export function DrillPreviewTooltip() {
             title={`${kind} Insight`}
             kind={kind}
             className={cn(
-              "shadow-[0_8px_30px_rgb(0,0,0,0.12)] border",
+              "shadow-[0_8px_30px_rgb(0,0,0,0.12)] border h-full",
+              layoutConfig.className,
               settings.previewTheme === 'glass' ? "bg-transparent border-white/20 dark:border-white/10" : "bg-popover",
               settings.previewTheme === 'solid' && "bg-background border-2 border-primary/20"
             )}
@@ -300,7 +327,6 @@ export function DrillPreviewTooltip() {
 
             <DrillActions kind={kind} payload={payload} />
 
-            {/* Auto-pin progress bar */}
             <div className="mt-3 pt-2 border-t border-border/50 space-y-1.5">
               <div className="h-0.5 bg-muted rounded-full overflow-hidden w-full">
                 <div

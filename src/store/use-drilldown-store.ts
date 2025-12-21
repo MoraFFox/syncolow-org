@@ -44,6 +44,13 @@ interface DrillDownState {
     payload: DrillPayload | null;
   };
 
+  // Spotlight State (Predictive Focus)
+  spotlight: {
+    active: boolean;
+    kind: DrillKind | null;
+    matchingId: string | null;
+  };
+
 
 
 
@@ -61,6 +68,9 @@ interface DrillDownState {
 
   openPeek: (kind: DrillKind, payload: DrillPayload) => void;
   closePeek: () => void;
+
+  setSpotlight: (kind: DrillKind, matchingId: string) => void;
+  clearSpotlight: () => void;
 
   // History Actions
   pushHistory: (item: DrillHistoryItem) => void;
@@ -102,6 +112,13 @@ export const useDrillDownStore = create<DrillDownState>((set, get) => ({
     payload: null,
   },
 
+  // Spotlight State
+  spotlight: {
+    active: false,
+    kind: null,
+    matchingId: null,
+  },
+
   // History State
   history: [],
   historyIndex: -1,
@@ -130,6 +147,9 @@ export const useDrillDownStore = create<DrillDownState>((set, get) => ({
 
   openPeek: (kind, payload) => set({ peek: { isOpen: true, kind, payload } }),
   closePeek: () => set({ peek: { isOpen: false, kind: null, payload: null } }),
+
+  setSpotlight: (kind, matchingId) => set({ spotlight: { active: true, kind, matchingId } }),
+  clearSpotlight: () => set({ spotlight: { active: false, kind: null, matchingId: null } }),
 
   pushHistory: (item) =>
     set((state) => {

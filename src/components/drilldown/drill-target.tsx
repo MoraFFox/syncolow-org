@@ -4,11 +4,13 @@ import * as React from "react";
 import { Slot } from "@radix-ui/react-slot";
 import { cn } from "@/lib/utils";
 import { ExternalLink } from "lucide-react";
+import { motion } from "framer-motion";
 
 import { useDrillSettings } from "@/store/use-drill-settings";
+import { useDrillDownStore } from "@/store/use-drilldown-store";
 import { DrillKind, DrillPayload, DrillMode, DATA_DRILL_KIND, DATA_DRILL_PAYLOAD, DATA_DRILL_MODE, DATA_DRILL_DISABLED } from "@/lib/drilldown-types";
 
-interface DrillTargetProps extends React.HTMLAttributes<HTMLDivElement> {
+interface DrillTargetProps extends React.HTMLAttributes<HTMLElement> {
   kind: DrillKind;
   payload: DrillPayload;
   mode?: DrillMode;
@@ -90,8 +92,35 @@ export function DrillTarget({
   lite,
   ...props
 }: DrillTargetProps & { expandHitArea?: boolean; hitAreaPadding?: number }) {
-  const Comp = asChild ? Slot : "div";
   const { settings } = useDrillSettings();
+
+  // Spotlight Logic (Predictive Focus)
+  const setSpotlight = useDrillDownStore(s => s.setSpotlight);
+  const clearSpotlight = useDrillDownStore(s => s.clearSpotlight);
+
+  // Optimized selector to check if this item should be dimmed
+  const isDimmed = useDrillDownStore(state => {
+    if (!state.spotlight.active) return false;
+
+    // Safety check
+    if (!state.spotlight.active) return false;
+
+    const { kind: sKind, matchingId } = state.spotlight;
+    if (!sKind || !matchingId) return false;
+
+    // 1. Exact Match (Self)
+    // We treat payload as uncertain, so safe access
+    const p = payload as Record<string, unknown>;
+    const myId = p.id || p.value;
+    if (kind === sKind && myId === matchingId) return false;
+
+    // 2. Child Match (I belong to the focused entity)
+    const myCompanyId = p.companyId;
+    if (sKind === 'company' && myCompanyId === matchingId) return false;
+
+    // Default: Dim it
+    return true;
+  });
 
   const effectiveVariant = variant || (
     settings.visualStyle === 'prominent' ? 'primary' :
@@ -137,8 +166,33 @@ export function DrillTarget({
     return JSON.stringify(payload);
   }, [payload, lite]);
 
+  const handleMouseEnter = () => {
+    // Trigger spotlight if we are a "Parent" entity (Company)
+    if (kind === 'company') {
+      const id = (payload as { id?: string }).id;
+      if (id) {
+        setSpotlight('company', id);
+      }
+    }
+  };
+
+  const handleMouseLeave = () => {
+    // Clear spotlight if we triggered it
+    if (kind === 'company') {
+      clearSpotlight();
+    }
+  };
+
+  // Create MotionComponent dynamically based on asChild
+  // We use key=asChild to force recreation if prop changes
+  const MotionComp = React.useMemo(() => motion(asChild ? Slot : "div"), [asChild]);
+
+  // Filter out `onDrag` family to avoid Framer Motion type conflicts
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { onDrag, onDragStart, onDragEnd, onAnimationStart, ...safeProps } = props;
+
   return (
-    <Comp
+    <MotionComp
       className={cn(
         "drill-target",
         isExpandedHitArea && "drill-target-expanded",
@@ -147,6 +201,7 @@ export function DrillTarget({
         !disabled && effectiveVariant === 'primary' && "drill-target-primary",
         !disabled && effectiveVariant === 'secondary' && "drill-target-secondary",
         !disabled && effectiveVariant === 'subtle' && "drill-target-subtle",
+        isDimmed && "opacity-30 blur-[1px] grayscale transition-all duration-300", // Spotlight effect
         className
       )}
       data-drill-variant={effectiveVariant}
@@ -167,15 +222,27 @@ export function DrillTarget({
           e.preventDefault();
           (e.target as HTMLElement).click();
         }
+        props.onKeyDown?.(e);
+      }}
+      onMouseMove={(e) => {
+        props.onMouseMove?.(e);
+      }}
+      onMouseEnter={(e) => {
+        handleMouseEnter();
+        props.onMouseEnter?.(e);
+      }}
+      onMouseLeave={(e) => {
+        handleMouseLeave();
+        props.onMouseLeave?.(e);
       }}
       style={{
-        ...props.style,
+        ...safeProps.style,
         // Set CSS variable for hit padding if expanded
         ...(isExpandedHitArea ? { "--hit-padding": `${effectiveHitPadding}px` } as React.CSSProperties : {})
       }}
-      {...props}
+      {...(safeProps as any)}
     >
       {content}
-    </Comp>
+    </MotionComp>
   );
 }

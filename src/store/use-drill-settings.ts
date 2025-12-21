@@ -15,6 +15,7 @@ export interface DrilldownSettings {
   hitAreaPadding: number;
   proximityThreshold: number;
   showHitAreaIndicator: boolean;
+
 }
 
 interface DrillSettingsState {
@@ -33,6 +34,7 @@ interface DrillSettingsState {
   setHitAreaPadding: (padding: number) => void;
   setProximityThreshold: (threshold: number) => void;
   toggleHitAreaIndicator: () => void;
+
 }
 
 const DEFAULT_SETTINGS: DrilldownSettings = {
@@ -47,6 +49,7 @@ const DEFAULT_SETTINGS: DrilldownSettings = {
   hitAreaPadding: 8,
   proximityThreshold: 16,
   showHitAreaIndicator: false,
+
 };
 
 export const useDrillSettings = create<DrillSettingsState>()(
@@ -104,6 +107,8 @@ export const useDrillSettings = create<DrillSettingsState>()(
             showHitAreaIndicator: !state.settings.showHitAreaIndicator,
           },
         })),
+
+
     }),
     {
       name: "drill-settings",

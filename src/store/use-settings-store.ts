@@ -50,7 +50,7 @@ export const useSettingsStore = create<SettingsState>()(
   persist(
     (set) => ({
       viewMode: 'Comfortable',
-      ordersViewMode: 'list',
+      ordersViewMode: 'grid',
       paginationLimit: 20,
       notificationSettings: defaultNotificationSettings,
       setPaginationLimit: (limit) => set({ paginationLimit: limit }),

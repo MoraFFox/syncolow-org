@@ -12,6 +12,7 @@ interface UserDrillDataState {
   }>;
   pinPreview: (kind: DrillKind, payload: DrillPayload, position?: { x: number; y: number }) => void;
   unpinPreview: (id: string) => void;
+  updatePinPosition: (id: string, x: number, y: number) => void;
 
   // Bookmarks
   bookmarks: Array<{
@@ -56,6 +57,11 @@ export const useDrillUserData = create<UserDrillDataState>()(
       }),
       unpinPreview: (id) => set((state) => ({
         pinnedPreviews: state.pinnedPreviews.filter(p => p.id !== id)
+      })),
+      updatePinPosition: (id, x, y) => set((state) => ({
+        pinnedPreviews: state.pinnedPreviews.map(p => 
+          p.id === id ? { ...p, position: { x, y } } : p
+        )
       })),
 
       // Bookmarks

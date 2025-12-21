@@ -40,7 +40,7 @@ export async function POST(req: NextRequest) {
         if (id) {
           const { data: order, error } = await supabaseAdmin
             .from("orders")
-            .select("*, items:order_items(*)") 
+            .select("*")
             .eq("id", id)
             .single();
 
@@ -48,15 +48,28 @@ export async function POST(req: NextRequest) {
             data = {
               id: order.id,
               status: order.status,
-              paymentStatus: order.paymentStatus,
+              paymentStatus: order.paymentStatus || order.payment_status, // Handle snake_case fallback
               total: order.grandTotal || order.total,
-              createdAt: order.orderDate,
+              createdAt: order.createdAt || order.orderDate, // Handle mixed casing
               deliveryDate: order.deliveryDate,
+              items: order.items?.map((item: any) => ({
+                name: item.productName || item.name || "Unknown Product",
+                quantity: item.quantity,
+                price: item.price
+              })) || [],
               itemsCount: order.items?.length || 0,
-              itemsSummary: order.items?.length 
-                ? `${order.items.length} items` 
+              itemsSummary: order.items?.length
+                ? `${order.items.length} items`
                 : "No items info"
             };
+
+            // Derive a mocks timeline if missing
+            if (!data.timeline) {
+              data.timeline = [
+                { title: "Order Placed", date: order.createdAt || order.orderDate, status: "completed" },
+                ...(order.status === 'Delivered' ? [{ title: "Delivered", date: order.deliveryDate, status: "completed" }] : [])
+              ];
+            }
           }
         }
         break;
@@ -75,9 +88,9 @@ export async function POST(req: NextRequest) {
           .from("orders")
           .select("grandTotal")
           .gte("orderDate", new Date(new Date().setDate(new Date().getDate() - 30)).toISOString()); // Last 30 days
-        
+
         const totalRev = revenueOrders?.reduce((sum: number, o: { grandTotal?: number }) => sum + (o.grandTotal || 0), 0) || 0;
-        
+
         data = {
           totalRevenue: totalRev,
           trend: 0, // trend calculation requires comparison with previous period
@@ -90,22 +103,22 @@ export async function POST(req: NextRequest) {
 
       case "payment":
         if (id) {
-           // Assuming ID passed is an Order ID for payment context, or a payment ID
-           const { data: orderP, error: errorP } = await supabaseAdmin
-             .from("orders")
-             .select("*, company:companies(name)")
-             .eq("id", id)
-             .single();
-           
-           if (!errorP && orderP) {
-             data = {
-               amount: orderP.grandTotal,
-               daysToPayment: 0, // Logic needed to diff dates
-               unpaidOrdersCount: 0,
-               company: { name: orderP.company?.name || "Unknown" },
-               order: { grandTotal: orderP.grandTotal, paymentMethod: orderP.paymentMethod }
-             };
-           }
+          // Assuming ID passed is an Order ID for payment context, or a payment ID
+          const { data: orderP, error: errorP } = await supabaseAdmin
+            .from("orders")
+            .select("*, company:companies(name)")
+            .eq("id", id)
+            .single();
+
+          if (!errorP && orderP) {
+            data = {
+              amount: orderP.grandTotal,
+              daysToPayment: 0, // Logic needed to diff dates
+              unpaidOrdersCount: 0,
+              company: { name: orderP.company?.name || "Unknown" },
+              order: { grandTotal: orderP.grandTotal, paymentMethod: orderP.paymentMethod }
+            };
+          }
         }
         break;
 
@@ -127,9 +140,9 @@ export async function POST(req: NextRequest) {
               costBreakdown: { labor: visit.laborCost || 0, parts: 0 },
               // Mock timeline for now as it's not in standard schema usually
               timeline: [
-                  { title: "Requested", time: "09:00 AM", status: "completed" },
-                  { title: "Technician Arrived", time: "10:15 AM", status: "completed" },
-                  { title: "Service Completed", time: "11:30 AM", status: visit.status === 'Completed' ? "completed" : "pending" },
+                { title: "Requested", time: "09:00 AM", status: "completed" },
+                { title: "Technician Arrived", time: "10:15 AM", status: "completed" },
+                { title: "Service Completed", time: "11:30 AM", status: visit.status === 'Completed' ? "completed" : "pending" },
               ]
             };
           }
@@ -163,87 +176,87 @@ export async function POST(req: NextRequest) {
           data = await getBranchPreview(id);
         }
         break;
-        
+
       case "manufacturer":
         if (id) {
-           const { data: mfr, error } = await supabaseAdmin
-             .from("manufacturers")
-             .select("*")
-             .eq("id", id)
-             .single();
-           if (!error && mfr) {
-             data = {
-               name: mfr.name,
-               productCount: 0, // count products
-               revenue: 0,
-               topProducts: []
-             };
-           }
+          const { data: mfr, error } = await supabaseAdmin
+            .from("manufacturers")
+            .select("*")
+            .eq("id", id)
+            .single();
+          if (!error && mfr) {
+            data = {
+              name: mfr.name,
+              productCount: 0, // count products
+              revenue: 0,
+              topProducts: []
+            };
+          }
         }
         break;
 
       case "category":
-         // Categories might not have a table, often just a field in products
-         // Or a separate table. We'll assume a field in products for now and just return payload name + mock stats
-         data = {
-            name: payload.name || "Category",
-            revenue: 0,
-            topProducts: []
-         };
-         break;
+        // Categories might not have a table, often just a field in products
+        // Or a separate table. We'll assume a field in products for now and just return payload name + mock stats
+        data = {
+          name: payload.name || "Category",
+          revenue: 0,
+          topProducts: []
+        };
+        break;
 
       case "inventory":
-         // Aggregate
-         const { count: lowStock } = await supabaseAdmin.from("products").select("*", { count: 'exact', head: true }).lt("stock", 10);
-         data = {
-            lowStockCount: lowStock || 0,
-            incomingCount: 0,
-            totalValuation: 0,
-            skuCount: 0
-         };
-         break;
+        // Aggregate
+        const { count: lowStock } = await supabaseAdmin.from("products").select("*", { count: 'exact', head: true }).lt("stock", 10);
+        data = {
+          lowStockCount: lowStock || 0,
+          incomingCount: 0,
+          totalValuation: 0,
+          skuCount: 0
+        };
+        break;
 
       case "customer":
-         // Aggregate
-         const { count: totalCustomers } = await supabaseAdmin.from("companies").select("*", { count: 'exact', head: true });
-         data = {
-            totalCustomers: totalCustomers || 0,
-            growthRate: 0,
-            newCustomers: 0,
-            churnRate: 0
-         };
-         break;
-         
+        // Aggregate
+        const { count: totalCustomers } = await supabaseAdmin.from("companies").select("*", { count: 'exact', head: true });
+        data = {
+          totalCustomers: totalCustomers || 0,
+          growthRate: 0,
+          newCustomers: 0,
+          churnRate: 0
+        };
+        break;
+
       case "notification":
-         if(id) {
-            const { data: notif } = await supabaseAdmin.from("notifications").select("*").eq("id", id).single();
-            if(notif) {
-                data = notif;
-            }
-         }
-         break;
-         
+        if (id) {
+          const { data: notif } = await supabaseAdmin.from("notifications").select("*").eq("id", id).single();
+          if (notif) {
+            data = notif;
+          }
+        }
+        break;
+
       case "feedback":
-         if(id) {
-            const { data: fb } = await supabaseAdmin.from("feedback").select("*").eq("id", id).single();
-            if(fb) {
-                data = {
-                    ...fb,
-                    clientName: "Client", // Join needed or fetch
-                    sentiment: fb.sentiment || 'neutral'
-                };
-            }
-         }
-         break;
+        if (id) {
+          const { data: fb } = await supabaseAdmin.from("feedback").select("*").eq("id", id).single();
+          if (fb) {
+            data = {
+              ...fb,
+              clientName: "Client", // Join needed or fetch
+              sentiment: fb.sentiment || 'neutral'
+            };
+          }
+        }
+        break;
 
       default:
         data = { ...payload };
     }
 
     if (!data) {
-        // Fallback to mock data if DB returns nothing (graceful degradation)
-        // Or simple empty state
-        return NextResponse.json({ ...payload, note: "Data not found in DB" });
+      // Fallback to mock data if DB returns nothing (graceful degradation)
+      // Or simple empty state
+      return NextResponse.json({ ...payload, note: "Data not found in DB" });
     }
 
     return NextResponse.json(data);
