@@ -1,6 +1,8 @@
 "use client";
 
 import { useSettingsStore, ViewMode } from "@/store/use-settings-store";
+import { useUserSettings } from "@/hooks/use-user-settings";
+import { useEffect } from "react";
 import {
     Card,
     CardContent,
@@ -26,6 +28,19 @@ const viewModes: { name: ViewMode }[] = [
 export function GeneralSettings() {
     const { paginationLimit, viewMode, setPaginationLimit, setViewMode } =
         useSettingsStore();
+    const { settings, isLoading: settingsLoading } = useUserSettings();
+
+    // Sync DB settings to local store on mount
+    useEffect(() => {
+        if (settings) {
+            if (settings.view_mode && settings.view_mode !== viewMode) {
+                setViewMode(settings.view_mode as ViewMode);
+            }
+            if (settings.pagination_limit && settings.pagination_limit !== paginationLimit) {
+                setPaginationLimit(settings.pagination_limit);
+            }
+        }
+    }, [settings]); // Intentionally not including store setters to avoid loops
 
     return (
         <div className='flex flex-col gap-6'>
@@ -42,6 +57,7 @@ export function GeneralSettings() {
                         <Select
                             onValueChange={(value: ViewMode) => setViewMode(value)}
                             value={viewMode}
+                            disabled={settingsLoading}
                         >
                             <SelectTrigger className='w-full md:w-1/2'>
                                 <SelectValue placeholder='Select a view mode' />
@@ -74,6 +90,7 @@ export function GeneralSettings() {
                         <Select
                             value={String(paginationLimit)}
                             onValueChange={(value) => setPaginationLimit(Number(value))}
+                            disabled={settingsLoading}
                         >
                             <SelectTrigger className='w-full md:w-[180px]'>
                                 <SelectValue placeholder='Select a limit' />
