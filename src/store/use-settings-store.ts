@@ -70,7 +70,18 @@ export const useSettingsStore = create<SettingsState>()(
     {
       name: 'synergyflow-settings-storage',
       storage: createJSONStorage(() => localStorage),
+      // Version 2: Changed default ordersViewMode from 'list' to 'grid'
+      version: 2,
+      migrate: (persistedState: any, version) => {
+        // Migration from version 1 (or no version) to version 2
+        if (version < 2) {
+          // Set the new default for existing users
+          persistedState.ordersViewMode = 'grid';
+        }
+        return persistedState;
+      },
     }
   )
 );
+
 

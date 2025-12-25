@@ -31,10 +31,15 @@ export async function initializeAllStores() {
         if (error) throw error;
         return data;
       }),
-      universalCache.get(CacheKeyFactory.list('companies'), async () => {
+      universalCache.get(CacheKeyFactory.list('companies', { v: '2' }), async () => {
         const { data, error } = await supabase.from('companies').select('*').not('name', 'like', '[DELETED]%');
         if (error) throw error;
-        return data;
+
+        // Map isBranch property which is not in DB but required by UI
+        return data?.map((c: any) => ({
+          ...c,
+          isBranch: !!c.parentCompanyId
+        }));
       }),
       universalCache.get(CacheKeyFactory.list('baristas'), async () => {
         const { data, error } = await supabase.from('baristas').select('*');
@@ -79,7 +84,7 @@ export async function initializeAllStores() {
         return data;
       }),
       universalCache.get(CacheKeyFactory.list('taxes'), async () => {
-        const { data, error} = await supabase.from('taxes').select('*');
+        const { data, error } = await supabase.from('taxes').select('*');
         if (error) throw error;
         return data;
       }),
@@ -99,8 +104,8 @@ export async function initializeAllStores() {
       }
     );
 
-    console.log('[StoreInitializer] Data loaded:', { 
-      productsCount: products?.length || 0, 
+    console.log('[StoreInitializer] Data loaded:', {
+      productsCount: products?.length || 0,
       areasCount: areas?.length || 0,
       companiesCount: companies?.length || 0
     });

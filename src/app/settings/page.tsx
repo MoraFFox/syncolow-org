@@ -9,6 +9,7 @@ import { InterfaceSettings } from "./_components/interface-settings";
 import { NotificationsReportsSettings } from "./_components/notifications-reports-settings";
 import { AccountingSettings } from "./_components/accounting-settings";
 import { SystemSettings } from "./_components/system-settings";
+import { SalesAccountSettings } from "./_components/sales-account-settings";
 import {
   LayoutDashboard,
   Palette,
@@ -18,6 +19,7 @@ import {
   HardDrive,
   Save,
   Loader2,
+  Tag,
 } from "lucide-react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -32,6 +34,7 @@ const sidebarItems = [
   { title: "General", value: "general", icon: <LayoutDashboard className="h-4 w-4" /> },
   { title: "Interface", value: "interface", icon: <Palette className="h-4 w-4" /> },
   { title: "Notifications & Reports", value: "notifications", icon: <Bell className="h-4 w-4" /> },
+  { title: "Sales Accounts", value: "sales", icon: <Tag className="h-4 w-4" /> },
   { title: "Integrations", value: "integrations", icon: <Plug className="h-4 w-4" /> },
   { title: "Accounting", value: "accounting", icon: <Receipt className="h-4 w-4" /> },
   { title: "System", value: "system", icon: <HardDrive className="h-4 w-4" /> },
@@ -91,6 +94,7 @@ export default function SettingsPage() {
             {activeTab === "general" && <GeneralSettings />}
             {activeTab === "interface" && <InterfaceSettings />}
             {activeTab === "notifications" && <NotificationsReportsSettings />}
+            {activeTab === "sales" && <SalesAccountSettings />}
             {activeTab === "accounting" && <AccountingSettings />}
             {activeTab === "system" && <SystemSettings />}
             {activeTab === "integrations" && (

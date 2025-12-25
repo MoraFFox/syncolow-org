@@ -11,6 +11,7 @@ interface CategoriesState {
   categories: Category[];
   loading: boolean;
 
+  fetchCategories: () => Promise<void>;
   addCategory: (category: Omit<Category, 'id'>) => Promise<Category>;
   updateCategory: (categoryId: string, categoryData: Partial<Category>) => Promise<void>;
   deleteCategory: (categoryId: string) => Promise<void>;
@@ -19,6 +20,18 @@ interface CategoriesState {
 export const useCategoriesStore = create<CategoriesState>((set, get) => ({
   categories: [],
   loading: false,
+
+  fetchCategories: async () => {
+    set({ loading: true });
+    try {
+      const { data, error } = await supabase.from('categories').select('*').order('name');
+      if (error) throw error;
+      set({ categories: data as Category[], loading: false });
+    } catch (error) {
+      set({ loading: false });
+      handleStoreError(error, { component: 'CategoriesStore', action: 'fetchCategories' });
+    }
+  },
 
   addCategory: async (category) => {
     try {

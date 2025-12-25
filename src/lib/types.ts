@@ -16,7 +16,7 @@ export interface Contact {
 
 export interface Company {
   id: string;
-  name:string;
+  name: string;
   industry?: string;
   parentCompanyId?: string | null;
   isBranch: boolean;
@@ -61,7 +61,7 @@ export interface Company {
 }
 
 export interface Branch {
-  id:string;
+  id: string;
   companyId: string;
   name: string;
   contacts?: Contact[];
@@ -126,6 +126,15 @@ export interface Product {
   totalSold?: number;
   createdAt?: string;
   updatedAt?: string;
+}
+
+export interface SalesAccount {
+  id: string;      // Internal unique ID (UUID)
+  codes: string[]; // List of Department Codes (e.g., ["1016", "1017"])
+  name: string;    // Display Name (e.g., "Retail", "Hotels")
+  color: string;   // Hex color code for badges/analytics
+  description?: string;
+  isDefault?: boolean;
 }
 
 export interface Manufacturer {
@@ -209,10 +218,10 @@ export interface SparePart {
 }
 
 export interface MaintenanceService {
-    name: string;
-    cost: number;
-    quantity: number;
-    paidBy: 'Client' | 'Company';
+  name: string;
+  cost: number;
+  quantity: number;
+  paidBy: 'Client' | 'Company';
 }
 
 export interface MaintenanceVisit {
@@ -333,9 +342,9 @@ export interface AuditLog {
 }
 
 export interface MaintenanceEmployee {
-    id: string;
-    name: string;
-    phone: string;
+  id: string;
+  name: string;
+  phone: string;
 }
 
 export interface DeliveryArea {
@@ -365,6 +374,17 @@ export interface ImportRowError {
   };
 }
 
+export interface DuplicateDetail {
+  rowIndex: number;
+  invoiceNumber: string;
+  source: string;
+  hash: string;
+  companyName: string;
+  date?: string;
+  total?: number;
+  items?: string;
+}
+
 export interface ImportResult {
   success: boolean;
   importedCount: number;
@@ -372,6 +392,7 @@ export interface ImportResult {
   importedTotal?: number;
   importedSubtotal?: number;
   errors: ImportRowError[];
+  duplicates?: DuplicateDetail[];
 }
 
 export type NotificationType =

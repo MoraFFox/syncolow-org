@@ -23,6 +23,7 @@ import { AllOrders } from './all-orders';
 import { TopProducts } from './top-products';
 import { CompanyAlerts } from './company-alerts';
 import { LocationMap } from './location-map';
+import { ClientConsumptionAnalytics } from './client-consumption-analytics';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 
@@ -135,6 +136,7 @@ export default function CompanyDetails({ companyId }: { companyId: string }) {
           <TabsList className="w-full justify-start overflow-x-auto">
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="orders">Orders</TabsTrigger>
+            <TabsTrigger value="analytics">Analytics</TabsTrigger>
             <TabsTrigger value="maintenance">Maintenance</TabsTrigger>
             <TabsTrigger value="baristas">Baristas</TabsTrigger>
           </TabsList>
@@ -153,6 +155,9 @@ export default function CompanyDetails({ companyId }: { companyId: string }) {
           </TabsContent>
           <TabsContent value="orders" className="mt-6">
             <AllOrders orders={companyOrders} />
+          </TabsContent>
+          <TabsContent value="analytics" className="mt-6">
+            <ClientConsumptionAnalytics orders={companyOrders} />
           </TabsContent>
           <TabsContent value="maintenance" className="mt-6 space-y-6">
             <div className="overflow-x-auto">

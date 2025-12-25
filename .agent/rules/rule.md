@@ -1,5 +1,6 @@
 ---
-trigger: always_on
+trigger: model_decision
+description: with tasks that is heavy and need planing and thinking 
 ---
 
 # SYSTEM ROLE & BEHAVIORAL PROTOCOLS

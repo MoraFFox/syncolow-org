@@ -98,10 +98,13 @@ supabase/.temp/
 # Generated files (keep commented unless needed)
 # *.generated.ts
 
-# Large media files (uncomment if needed)
-# *.mp4
-# *.mov
-# *.zip
-
+Large media files (uncomment if needed)
+*.mp4
+*.mov
+*.zip
+*.pdf
+*.xlsx
+*.xls
+*.csv
 # Local scripts (uncomment if you have local-only scripts)
 # scripts/local/

@@ -2,18 +2,17 @@
 "use client";
 
 import { useState, useCallback, useMemo } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
+import { useDropzone } from 'react-dropzone';
 import { useOrderStore } from '@/store/use-order-store';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
-  DialogHeader,
   DialogTitle,
-  DialogFooter,
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+
 import { Progress } from '@/components/ui/progress';
 import { ChevronDown, CheckCircle2 } from 'lucide-react';
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from '@/components/ui/collapsible';
@@ -25,28 +24,39 @@ import {
   AlertTriangle,
   RefreshCw,
   Sparkles,
-  ArrowLeft,
   ArrowRight,
-  XCircle,
-  FileText,
-  Database,
   Download,
+  AlertCircle,
+  Plus,
+  FileText,
+  X,
 } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { importFlow } from '@/ai/flows/import-flow';
 import { ImportErrorList } from './ImportErrorList';
-import type { CsvRow, ImportRowError, ImportableEntityType, Company, Product } from '@/lib/types';
+import type { CsvRow, ImportRowError, ImportableEntityType, DuplicateDetail } from '@/lib/types';
 import { ImportResolutionForm } from './ImportResolutionForm';
-import { parseFile, detectDuplicates, calculateImportedOrderTotals } from '@/lib/file-import-utils';
+import { parseFile, calculateImportedOrderTotals } from '@/lib/file-import-utils';
 import ColumnMappingStep from './column-mapping-step';
 import { cn } from '@/lib/utils';
-import { supabase } from '@/lib/supabase';
+
 import { fixAllMissingEntities } from '@/lib/import-entity-fixer';
+
+// Performance constants
+const CHUNK_SIZE = 500; // Reduced from 1000 for smoother progress
+const SOFT_ROW_LIMIT = 10000; // Show warning
+const HARD_ROW_LIMIT = 50000; // Reject file
+
+import { useSalesAccountStore } from '@/store/use-sales-account-store';
+import { getDepartmentCode } from '@/lib/sales-account-utils';
+
+// ... imports
 
 type ImportStage =
   | 'upload'
   | 'parsing'
   | 'mapping'
+  | 'account_check' // NEW
   | 'validating'
   | 'duplicate_checking'
   | 'validation_failed'
@@ -78,32 +88,20 @@ export function CsvImporterDialog({
     companies: string[];
     products: string[];
   }>({ companies: [], products: [] });
-  const [importResult, setImportResult] = useState<{ importedCount: number; importedTotal?: number; skippedCount?: number } | null>(null);
+  const [importResult, setImportResult] = useState<{ importedCount: number; importedTotal?: number; skippedCount?: number; duplicates?: DuplicateDetail[] } | null>(null);
   const [fileName, setFileName] = useState('');
   const [originalData, setOriginalData] = useState<CsvRow[]>([]);
   const [resolvedErrors, setResolvedErrors] = useState<Set<number>>(new Set());
   const [errorToFix, setErrorToFix] = useState<ImportRowError | null>(null);
-  const [duplicatesInfo, setDuplicatesInfo] = useState<{
-    withinFile: { duplicateIndices: number[]; duplicateMap: Map<string, number[]> };
-    againstDatabase: { duplicateIndices: number[]; existingRecords: CsvRow[] };
-  } | null>(null);
-  const [showDuplicates, setShowDuplicates] = useState(false);
-  
   const [importProgress, setImportProgress] = useState(0);
   const [importStageDetails, setImportStageDetails] = useState('');
   const [detailedErrorLog, setDetailedErrorLog] = useState<string[]>([]);
   const [showErrorLog, setShowErrorLog] = useState(false);
-  const [criticalError, setCriticalError] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [errorLog, setErrorLog] = useState<{ timestamp: string; message: string; type?: string }[]>([]);
-  const [importResults, setImportResults] = useState<{
-    newOrders: any[];
-    updatedOrders: any[];
-    skippedOrders: any[];
-  } | null>(null);
-  
+
   const [mappedData, setMappedData] = useState<CsvRow[]>([]);
-  
+
   const resetState = useCallback(() => {
     setFile(null);
     setStage('upload');
@@ -123,245 +121,358 @@ export function CsvImporterDialog({
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = event.target.files?.[0];
     if (selectedFile) {
-        const ext = selectedFile.name.split('.').pop()?.toLowerCase();
-        const allowedTypes = fileType === 'csv' ? ['csv'] : ['xlsx', 'xls'];
-        if (ext && allowedTypes.includes(ext)) {
-            setFile(selectedFile);
-            setFileName(selectedFile.name);
-        } else {
-            toast({
-                title: 'Invalid file type',
-                description: `Please select a ${fileType === 'csv' ? 'CSV' : 'Excel (XLSX or XLS)'} file.`,
-                variant: 'destructive'
-            });
-        }
+      const ext = selectedFile.name.split('.').pop()?.toLowerCase();
+      const allowedTypes = fileType === 'csv' ? ['csv'] : ['xlsx', 'xls'];
+      if (ext && allowedTypes.includes(ext)) {
+        setFile(selectedFile);
+        setFileName(selectedFile.name);
+      } else {
+        toast({
+          title: 'Invalid file type',
+          description: `Please select a ${fileType === 'csv' ? 'CSV' : 'Excel (XLSX or XLS)'} file.`,
+          variant: 'destructive'
+        });
+      }
     } else {
-        setFile(null);
-        setFileName('');
+      setFile(null);
+      setFileName('');
     }
   };
 
-   const runImport = useCallback(async (dataToImport: CsvRow[], isRerun: boolean = false) => {
-     const CHUNK_SIZE = 1000; // Increased to improve performance, 50 was too conservative
-     
-     if (dataToImport.length > CHUNK_SIZE && !isRerun) {
-       // Split into chunks and process sequentially
-       setStage('importing');
-       let totalImported = 0;
-       let totalRevenue = 0;
-       let totalSkipped = 0;
-       let hasErrors = false;
-       
-       for (let i = 0; i < dataToImport.length; i += CHUNK_SIZE) {
-         const chunk = dataToImport.slice(i, i + CHUNK_SIZE);
-         setImportStageDetails(`Processing rows ${i + 1} to ${Math.min(i + CHUNK_SIZE, dataToImport.length)} of ${dataToImport.length}...`);
-         setImportProgress(Math.round((i / dataToImport.length) * 100));
-         
-         try {
-           const result = await importFlow({ entityType, data: chunk });
-           if (result.success) {
-             totalImported += result.importedCount;
-             totalRevenue += result.importedTotal || 0;
-             totalSkipped += result.skippedCount || 0;
-           } else {
-             // Handle errors but continue
-             const blockingErrors = result.errors?.filter(e => e.blocking) || [];
-             if (blockingErrors.length > 0) {
-               setErrors(prev => [...prev, ...blockingErrors]);
-               hasErrors = true;
-             }
-           }
-         } catch (error: any) {
-           toast({ title: 'Chunk import failed', description: error.message, variant: 'destructive' });
-           return false;
-         }
-       }
-       
-       // All chunks processed - show final results
-       setImportProgress(100);
-       setImportResult({ importedCount: totalImported, importedTotal: totalRevenue, skippedCount: totalSkipped });
-       
-       if (hasErrors) {
-         setStage('validation_failed');
-         return false;
-       }
+  const runImport = useCallback(async (dataToImport: CsvRow[], isRerun: boolean = false) => {
+    const IMPORT_CHUNK_SIZE = CHUNK_SIZE;
 
-       const skippedMsg = totalSkipped > 0 ? `, ${totalSkipped} duplicates skipped` : '';
-       const totalMsg = ` | Total: $${totalRevenue.toFixed(2)}`;
-       setDetailedErrorLog(prev => [...prev, `Import Successful: ${totalImported} ${entityType}s imported${skippedMsg}${totalMsg}`, `Time: ${new Date().toLocaleString()}`, '---']);
-       
-       setStage('import_complete');
-       
-       if (totalSkipped > 0) {
-         toast({ title: 'Import Complete', description: `${totalImported} imported, ${totalSkipped} duplicates skipped` });
-       }
-       return true;
-     }
-     // Single chunk or rerun
-     if (!isRerun) {
-       setStage('validating');
-       setImportProgress(0);
-       setImportStageDetails(`Validating ${entityType} data...`);
-     } else {
-       setStage('importing');
-       setImportProgress(0);
-       setImportStageDetails('Re-validating single row...');
-     }
-     
-     console.log('CLIENT: Data to import:', dataToImport.length, 'rows');
-     console.log('CLIENT: Data size:', JSON.stringify(dataToImport).length, 'bytes');
-     console.log('CLIENT: First row:', dataToImport[0]);
-     
-     // Switch to importing stage before calling importFlow
-     if (!isRerun) {
-       setStage('importing');
-       setImportStageDetails(`Importing ${dataToImport.length} ${entityType}s...`);
-     }
-     
-     try {
-       console.log('CLIENT: Calling importFlow...');
-       const result = await importFlow({ entityType, data: dataToImport });
-       console.log('CLIENT: importFlow returned:', result);
- 
-       // Show results even if all were skipped
-       setImportResult({ 
-         importedCount: result.importedCount,
-         importedTotal: result.importedTotal || 0,
-         skippedCount: result.skippedCount || 0
-       });
-       
-       const skippedMsg = result.skippedCount ? `, ${result.skippedCount} duplicates skipped` : '';
-       const totalMsg = result.importedTotal ? ` | Total: $${result.importedTotal.toFixed(2)}` : '';
-       setDetailedErrorLog(prev => [...prev, `Import Complete: ${result.importedCount} ${entityType}s imported${skippedMsg}${totalMsg}`, `Time: ${new Date().toLocaleString()}`, '---']);
-       
-       setStage('import_complete');
-       
-       if (result.skippedCount && result.skippedCount > 0) {
-         toast({ title: 'Import Complete', description: `${result.importedCount} imported, ${result.skippedCount} duplicates skipped` });
-       }
-       
-       if (result.success) {
-         return true;
-       } else {
-         if (result.errors?.[0]?.errorMessage?.startsWith('Server Error:')) {
-             const errorMessage = result.errors[0].errorMessage;
-             const errorType = 'Server Error';
-             toast({ title: 'A critical server error occurred', description: errorMessage, variant: 'destructive', duration: 20000 });
-             setDetailedErrorLog(prev => [...prev, `Server Error: ${errorMessage}`, `Type: ${errorType}`, `Time: ${new Date().toLocaleString()}`, '---']);
-             setErrorLog(prev => [...prev, {
-               timestamp: new Date().toLocaleString(),
-               message: `Server Error: ${errorMessage}`,
-               type: 'server-error'
-             }]);
-             setCriticalError(errorMessage);
-             setStage('upload');
-             return false;
-         }
- 
-         const blockingErrors = result.errors?.filter(e => e.blocking) || [];
-         
-         if (blockingErrors.length > 0) {
-           if (isRerun && dataToImport.length === 1) {
-             const errorDesc = `Could not import row ${dataToImport[0].rowIndex}. Reason: ${blockingErrors[0].errorMessage}`;
-             toast({ title: "Resolution Failed", description: errorDesc, variant: "destructive" });
-             setDetailedErrorLog(prev => [...prev, `Resolution Failed: ${errorDesc}`, `Time: ${new Date().toLocaleString()}`, '---']);
-             setErrorLog(prev => [...prev, {
-               timestamp: new Date().toLocaleString(),
-               message: `Resolution Failed: ${errorDesc}`,
-               type: 'resolution-error'
-             }]);
-             setStage('validation_failed');
-             return false;
-           }
+    if (dataToImport.length > IMPORT_CHUNK_SIZE && !isRerun) {
+      // Split into chunks and process sequentially
+      setStage('importing');
+      let totalImported = 0;
+      let totalRevenue = 0;
+      let totalSkipped = 0;
+      let hasErrors = false;
 
-           const currentResolved = new Set(resolvedErrors);
-           const newErrors = blockingErrors.filter(e => !currentResolved.has(e.rowIndex));
-           setErrors(prev => [...prev, ...newErrors]);
-           if (newErrors.length > 0) {
-               setStage('validation_failed');
-               newErrors.forEach(error => {
-                 setDetailedErrorLog(prev => [...prev, `Validation Error: Row ${error.rowIndex + 1}: ${error.errorMessage}`, `Time: ${new Date().toLocaleString()}`, '---']);
-                 setErrorLog(prev => [...prev, {
-                   timestamp: new Date().toLocaleString(),
-                   message: `Validation Error: Row ${error.rowIndex + 1}: ${error.errorMessage}`,
-                   type: 'validation-error'
-                 }]);
-               });
-           } else {
-               await runImport(originalData, true);
-           }
-         } else {
-             // Partial success - some imported, some errors
-             setImportResult({ 
-               importedCount: result.importedCount,
-               importedTotal: result.importedTotal || 0,
-               skippedCount: result.skippedCount || 0
-             });
-             setStage('import_complete');
-             setDetailedErrorLog(prev => [...prev, `Partial Import: ${result.importedCount} ${entityType}s imported`, `Time: ${new Date().toLocaleString()}`, '---']);
-             setErrorLog(prev => [...prev, {
-               timestamp: new Date().toLocaleString(),
-               message: `Partial Import: ${result.importedCount} ${entityType}s imported`,
-               type: 'partial-success'
-             }]);
-         }
-         return true;
-       }
-     } catch (e: any) {
-       const errorMessage = `Message: ${e.message}. Stack: ${e.stack}`;
-       toast({ title: 'Fatal Error During Import', description: errorMessage, variant: 'destructive', duration: 3000 });
-       setDetailedErrorLog(prev => [...prev, `Fatal Error: ${errorMessage}`, `Time: ${new Date().toLocaleString()}`, '---']);
-       setCriticalError(errorMessage);
-       setStage('upload');
-       return false;
-     }
-   }, [entityType, fetchInitialData, resolvedErrors, originalData]);
+      for (let i = 0; i < dataToImport.length; i += IMPORT_CHUNK_SIZE) {
+        const chunk = dataToImport.slice(i, i + IMPORT_CHUNK_SIZE);
+        setImportStageDetails(`Processing rows ${i + 1} to ${Math.min(i + IMPORT_CHUNK_SIZE, dataToImport.length)} of ${dataToImport.length}...`);
+        setImportProgress(Math.round((i / dataToImport.length) * 100));
 
-  const handleParseAndMap = useCallback(async () => {
-    if (!file) {
+        try {
+          const result = await importFlow({ entityType, data: chunk });
+          if (result.success) {
+            totalImported += result.importedCount;
+            totalRevenue += result.importedTotal || 0;
+            totalSkipped += result.skippedCount || 0;
+          } else {
+            // Handle errors but continue
+            const blockingErrors = result.errors?.filter(e => e.blocking) || [];
+            if (blockingErrors.length > 0) {
+              setErrors(prev => [...prev, ...blockingErrors]);
+              hasErrors = true;
+            }
+          }
+        } catch (error) {
+          toast({ title: 'Chunk import failed', description: (error as Error).message, variant: 'destructive' });
+          return false;
+        }
+      }
+
+      // All chunks processed - show final results
+      setImportProgress(100);
+      setImportResult({ importedCount: totalImported, importedTotal: totalRevenue, skippedCount: totalSkipped });
+
+      if (hasErrors) {
+        setStage('validation_failed');
+        return false;
+      }
+
+      const skippedMsg = totalSkipped > 0 ? `, ${totalSkipped} duplicates skipped` : '';
+      const totalMsg = ` | Total: $${totalRevenue.toFixed(2)}`;
+      setDetailedErrorLog(prev => [...prev, `Import Successful: ${totalImported} ${entityType}s imported${skippedMsg}${totalMsg}`, `Time: ${new Date().toLocaleString()}`, '---']);
+
+      setStage('import_complete');
+
+      if (totalSkipped > 0) {
+        toast({ title: 'Import Complete', description: `${totalImported} imported, ${totalSkipped} duplicates skipped` });
+      }
+      return true;
+    }
+    // Single chunk or rerun
+    if (!isRerun) {
+      setStage('validating');
+      setImportProgress(0);
+      setImportStageDetails(`Validating ${entityType} data...`);
+    } else {
+      setStage('importing');
+      setImportProgress(0);
+      setImportStageDetails('Re-validating single row...');
+    }
+
+    // console.log removed
+
+    // Switch to importing stage before calling importFlow
+    if (!isRerun) {
+      setStage('importing');
+      setImportStageDetails(`Importing ${dataToImport.length} ${entityType}s...`);
+    }
+
+    try {
+      const result = await importFlow({ entityType, data: dataToImport });
+
+      // Show results even if all were skipped
+      // Show results even if all were skipped
+      setImportResult({
+        importedCount: result.importedCount,
+        importedTotal: result.importedTotal || 0,
+        skippedCount: result.skippedCount || 0,
+        duplicates: result.duplicates
+      });
+
+      const skippedMsg = result.skippedCount ? `, ${result.skippedCount} duplicates skipped` : '';
+      const totalMsg = result.importedTotal ? ` | Total: $${result.importedTotal.toFixed(2)}` : '';
+      setDetailedErrorLog(prev => [...prev, `Import Complete: ${result.importedCount} ${entityType}s imported${skippedMsg}${totalMsg}`, `Time: ${new Date().toLocaleString()}`, '---']);
+
+      setStage('import_complete');
+
+      if (result.skippedCount && result.skippedCount > 0) {
+        toast({ title: 'Import Complete', description: `${result.importedCount} imported, ${result.skippedCount} duplicates skipped` });
+      }
+
+      if (result.success) {
+        return true;
+      } else {
+        if (result.errors?.[0]?.errorMessage?.startsWith('Server Error:')) {
+          const errorMessage = result.errors[0].errorMessage;
+          const errorType = 'Server Error';
+          toast({ title: 'A critical server error occurred', description: errorMessage, variant: 'destructive', duration: 20000 });
+          setDetailedErrorLog(prev => [...prev, `Server Error: ${errorMessage}`, `Type: ${errorType}`, `Time: ${new Date().toLocaleString()}`, '---']);
+          setErrorLog(prev => [...prev, {
+            timestamp: new Date().toLocaleString(),
+            message: `Server Error: ${errorMessage}`,
+            type: 'server-error'
+          }]);
+          setError(errorMessage);
+          setStage('upload');
+          return false;
+        }
+
+        const blockingErrors = result.errors?.filter(e => e.blocking) || [];
+
+        if (blockingErrors.length > 0) {
+          if (isRerun && dataToImport.length === 1) {
+            const errorDesc = `Could not import row ${dataToImport[0].rowIndex}. Reason: ${blockingErrors[0].errorMessage}`;
+            toast({ title: "Resolution Failed", description: errorDesc, variant: "destructive" });
+            setDetailedErrorLog(prev => [...prev, `Resolution Failed: ${errorDesc}`, `Time: ${new Date().toLocaleString()}`, '---']);
+            setErrorLog(prev => [...prev, {
+              timestamp: new Date().toLocaleString(),
+              message: `Resolution Failed: ${errorDesc}`,
+              type: 'resolution-error'
+            }]);
+            setStage('validation_failed');
+            return false;
+          }
+
+          const currentResolved = new Set(resolvedErrors);
+          const newErrors = blockingErrors.filter(e => !currentResolved.has(e.rowIndex));
+          setErrors(prev => [...prev, ...newErrors]);
+          if (newErrors.length > 0) {
+            setStage('validation_failed');
+            newErrors.forEach(error => {
+              setDetailedErrorLog(prev => [...prev, `Validation Error: Row ${error.rowIndex + 1}: ${error.errorMessage}`, `Time: ${new Date().toLocaleString()}`, '---']);
+              setErrorLog(prev => [...prev, {
+                timestamp: new Date().toLocaleString(),
+                message: `Validation Error: Row ${error.rowIndex + 1}: ${error.errorMessage}`,
+                type: 'validation-error'
+              }]);
+            });
+          } else {
+            await runImport(originalData, true);
+          }
+        } else {
+          // Partial success - some imported, some errors
+          setImportResult({
+            importedCount: result.importedCount,
+            importedTotal: result.importedTotal || 0,
+            skippedCount: result.skippedCount || 0
+          });
+          setStage('import_complete');
+          setDetailedErrorLog(prev => [...prev, `Partial Import: ${result.importedCount} ${entityType}s imported`, `Time: ${new Date().toLocaleString()}`, '---']);
+          setErrorLog(prev => [...prev, {
+            timestamp: new Date().toLocaleString(),
+            message: `Partial Import: ${result.importedCount} ${entityType}s imported`,
+            type: 'partial-success'
+          }]);
+        }
+        return true;
+      }
+    } catch (e) {
+      const errorMessage = `Message: ${(e as Error).message}. Stack: ${(e as Error).stack}`;
+      toast({ title: 'Fatal Error During Import', description: errorMessage, variant: 'destructive', duration: 3000 });
+      setDetailedErrorLog(prev => [...prev, `Fatal Error: ${errorMessage}`, `Time: ${new Date().toLocaleString()}`, '---']);
+      setError(errorMessage);
+      setStage('upload');
+      return false;
+    }
+  }, [entityType, fetchInitialData, resolvedErrors, originalData]);
+
+  /* -------------------------------------------------------------------------
+   * File Parsing & Drop Logic
+   * ----------------------------------------------------------------------- */
+  const handleParseAndMap = useCallback(async (arg?: File | unknown) => {
+    const fileOverride = arg instanceof File ? arg : undefined;
+    const f = fileOverride || file;
+    if (!f) {
       toast({ title: 'No file selected', variant: 'destructive' });
       return;
     }
     setStage('parsing');
     setErrors([]);
     setResolvedErrors(new Set());
-    
-    try {
-      const data = await parseFile(file);
-      if (data.length === 0) {
-        toast({ title: 'Empty or invalid file', variant: 'destructive' });
+
+    // Use setTimeout to allow the UI to update to 'parsing' state before the heavy blocking operation starts
+    setTimeout(async () => {
+      try {
+        const data = await parseFile(f);
+        if (data.length === 0) {
+          toast({ title: 'Empty or invalid file', variant: 'destructive' });
+          setStage('upload');
+          return;
+        }
+
+        // Check row limits for performance protection
+        if (data.length > HARD_ROW_LIMIT) {
+          toast({
+            title: 'File too large',
+            description: `This file has ${data.length.toLocaleString()} rows. Maximum allowed is ${HARD_ROW_LIMIT.toLocaleString()} rows. Please split into smaller files.`,
+            variant: 'destructive',
+            duration: 10000
+          });
+          setStage('upload');
+          return;
+        }
+
+        if (data.length > SOFT_ROW_LIMIT) {
+          toast({
+            title: 'Large file detected',
+            description: `This file has ${data.length.toLocaleString()} rows. Import may take 1-2 minutes. Processing will begin shortly.`,
+            variant: 'default',
+            duration: 5000
+          });
+        }
+
+        setOriginalData(data);
+        setStage('mapping');
+      } catch (error) {
+        const errorMessage = (error as Error).message || 'Failed to parse the file';
+        const errorType = (error as Error).name || 'Parsing Error';
+        setDetailedErrorLog(prev => [...prev, `Parsing Error: ${errorMessage}`, `Type: ${errorType}`, `Time: ${new Date().toLocaleString()}`, '---']);
+        setErrorLog(prev => [...prev, {
+          timestamp: new Date().toLocaleString(),
+          message: `Parsing Error: ${errorMessage}`,
+          type: 'parsing'
+        }]);
+        setError(errorMessage);
         setStage('upload');
-        return;
       }
-      setOriginalData(data);
-      setStage('mapping');
-    } catch (error: any) {
-      const errorMessage = error.message || 'Failed to parse the file';
-      const errorType = error.name || 'Parsing Error';
-      toast({
-        title: 'Parsing Error',
-        description: errorMessage,
-        variant: 'destructive'
-      });
-      setDetailedErrorLog(prev => [...prev, `Parsing Error: ${errorMessage}`, `Type: ${errorType}`, `Time: ${new Date().toLocaleString()}`, '---']);
-      setErrorLog(prev => [...prev, {
-        timestamp: new Date().toLocaleString(),
-        message: `Parsing Error: ${errorMessage}`,
-        type: 'parsing'
-      }]);
-      setCriticalError(errorMessage);
-      setStage('upload');
-    }
+    }, 100);
   }, [file]);
+
+  const onDrop = useCallback((acceptedFiles: File[]) => {
+    const selectedFile = acceptedFiles[0];
+    if (selectedFile) {
+      const ext = selectedFile.name.split('.').pop()?.toLowerCase();
+      const allowedTypes = fileType === 'csv' ? ['csv'] : ['xlsx', 'xls'];
+
+      if (ext && allowedTypes.includes(ext)) {
+        setFile(selectedFile);
+        setFileName(selectedFile.name);
+        handleParseAndMap(selectedFile);
+      } else {
+        toast({
+          title: 'Invalid file type',
+          description: `Please select a ${fileType === 'csv' ? 'CSV' : 'Excel (XLSX or XLS)'} file.`,
+          variant: 'destructive'
+        });
+      }
+    }
+  }, [fileType, handleParseAndMap]);
+
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    onDrop,
+    accept: fileType === 'csv' ? { 'text/csv': ['.csv'] } : { 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': ['.xlsx'], 'application/vnd.ms-excel': ['.xls'] },
+    multiple: false
+  });
+
+  /* -------------------------------------------------------------------------
+   * Sales Account Verification Logic
+   * ----------------------------------------------------------------------- */
+  const { addAccount, accounts, defaultAccountId, getAccountById } = useSalesAccountStore();
+  const [unknownAccounts, setUnknownAccounts] = useState<Set<string>>(new Set());
+  const [accountToCreate, setAccountToCreate] = useState<string | null>(null);
+  const [newAccountData, setNewAccountData] = useState({ name: '', color: '#3b82f6' });
+
+  const handleCreateAccount = (code: string) => {
+    if (!newAccountData.name) {
+      toast({ title: "Name is required", variant: "destructive" });
+      return;
+    }
+    addAccount({ codes: [code], name: newAccountData.name, color: newAccountData.color });
+    setUnknownAccounts(prev => {
+      const next = new Set(prev);
+      next.delete(code);
+      return next;
+    });
+    setAccountToCreate(null);
+    setNewAccountData({ name: '', color: '#3b82f6' });
+    toast({ title: "Account Created", description: `Sales Account ${code} created.` });
+  };
 
   const handleMappingComplete = (data: CsvRow[]) => {
     // Apply new pricing calculation: Total = ((Quantity × Unit Price) - Discount) × 1.14
     const dataWithCalculatedTotals = calculateImportedOrderTotals(data);
+
+    // Inject Default Sales Account if applicable
+    const defaultAccount = defaultAccountId ? getAccountById(defaultAccountId) : null;
+
+    // Check for unknown sales accounts
+    // Check for unknown sales accounts
+    const unknownCodes = new Set<string>();
+    if (entityType === 'order') {
+      dataWithCalculatedTotals.forEach(row => {
+        // "customerAccount" is the canonical key from user mapping
+        let accountCode = row['customerAccount'] || row['custAccount'] || row['account'];
+
+        // If missing and we have a default, use the default
+        const defaultAccountCode = defaultAccount ? defaultAccount.codes[0] : null;
+
+        if ((!accountCode || typeof accountCode !== 'string' || accountCode.trim().length === 0) && defaultAccountCode) {
+          accountCode = defaultAccountCode;
+          row['customerAccount'] = accountCode; // Inject into the row
+        }
+
+        if (accountCode && typeof accountCode === 'string' && accountCode.trim().length > 0) {
+          const normalizedRowCode = accountCode.trim();
+          const deptCode = getDepartmentCode(normalizedRowCode);
+
+          // Should match by specific department code if possible
+          const matchingAccount = accounts.find(acc => acc.codes.some(c => c === deptCode));
+
+          if (!matchingAccount && deptCode) {
+            unknownCodes.add(deptCode);
+          }
+        }
+      });
+    }
+
     setMappedData(dataWithCalculatedTotals);
-    setStage('validating');
-    setTimeout(() => runImport(dataWithCalculatedTotals), 100);
+
+    if (unknownCodes.size > 0) {
+      setUnknownAccounts(unknownCodes);
+      setStage('account_check');
+    } else {
+      setStage('validating');
+      setTimeout(() => runImport(dataWithCalculatedTotals), 100);
+    }
   };
-  
+
   const handleFixError = (error: ImportRowError) => {
     setErrorToFix(error);
     setStage('resolving');
@@ -379,7 +490,6 @@ export function CsvImporterDialog({
           const now = Date.now();
           // Throttle updates to every 100ms to prevent UI freezing
           if (now - lastUpdate > 100) {
-            console.log('[Fix All]', message);
             setImportStageDetails(message);
             lastUpdate = now;
           }
@@ -406,14 +516,14 @@ export function CsvImporterDialog({
     }
   };
 
-  const handleResolutionSubmit = async (originalError: ImportRowError, createdEntity: Company | Product) => {
+  const handleResolutionSubmit = async (originalError: ImportRowError) => {
     const errorIndex = originalError.rowIndex;
     setResolvedErrors(prev => new Set(prev).add(errorIndex));
     await runImport([originalError.originalData!], true);
     setErrorToFix(null);
     setStage('validation_failed');
   };
-  
+
   const handleDialogChange = (open: boolean) => {
     if (!open) {
       resetState();
@@ -422,7 +532,23 @@ export function CsvImporterDialog({
     }
     onOpenChange(open);
   };
-  
+
+  const handleDownloadTemplate = () => {
+    const headers = entityType === 'company'
+      ? 'Customer Name,Email,Phone,Address,City,State,Zip,Country,Code'
+      : 'Item Name,Item ID,Price,Category,Description,Unit,Tax Rate';
+
+    const blob = new Blob([headers], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${entityType}-import-template.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
   const allErrorsResolved = useMemo(() => {
     const blockingErrorIndexes = new Set(errors.filter(e => e.blocking).map(e => e.rowIndex));
     if (blockingErrorIndexes.size === 0) return false;
@@ -439,12 +565,6 @@ export function CsvImporterDialog({
             setStage('upload');
             setOriginalData([]);
           }}
-          onSaveMapping={(mapping) => {
-            // Handled in component
-          }}
-          onLoadMapping={(mapping) => {
-            return {};
-          }}
         />
       );
     }
@@ -460,161 +580,257 @@ export function CsvImporterDialog({
         />
       );
     }
-    
-    if (stage === 'upload' || stage === 'parsing' || stage === 'validating' || stage === 'duplicate_checking' || stage === 'importing') {
-       return (
-            <div className="flex flex-col items-center justify-center p-8 text-center space-y-4">
-              {(stage === 'upload') && (
-                <>
-                  <label htmlFor="csv-upload-dialog" className="w-full">
-                    <div className="flex flex-col items-center justify-center p-8 border-2 border-dashed rounded-lg cursor-pointer hover:bg-muted/50">
-                        <FileUp className="h-10 w-10 text-muted-foreground" />
-                        <span className="mt-2 text-sm text-muted-foreground">{fileName || `Click to select or drop a ${fileType === 'csv' ? 'CSV' : 'Excel'} file`}</span>
-                    </div>
-                    <Input id="csv-upload-dialog" type="file" accept={fileType === 'csv' ? '.csv' : '.xlsx,.xls'} onChange={handleFileChange} className="hidden" />
-                  </label>
-                </>
-              )}
-               {(stage !== 'upload') && (
-                 <div className="w-full max-w-md space-y-4">
-                    <div className="space-y-2">
-                      <div className="flex justify-between text-sm">
-                        <span className="font-medium">
-                          {stage === 'parsing' ? 'Parsing file...' :
-                           stage === 'validating' ? 'Validating data...' :
-                           stage === 'duplicate_checking' ? 'Checking for duplicates...' :
-                           stage === 'importing' ? 'Importing data...' : `${stage}...`}
-                        </span>
-                        <span>{importProgress}%</span>
-                      </div>
-                      <Progress value={importProgress} className="w-full" />
-                      {importStageDetails && (
-                        <p className="text-xs text-muted-foreground text-center">
-                          {importStageDetails}
-                        </p>
-                      )}
-                    </div>
-                    <div className="flex flex-col items-center">
-                      <Loader2 className="h-12 w-12 animate-spin text-primary mb-2" />
-                      <p className="text-lg text-muted-foreground capitalize">
-                        {stage === 'parsing' ? 'Parsing file...' :
-                         stage === 'validating' ? 'Validating data...' :
-                         stage === 'duplicate_checking' ? 'Checking for duplicates...' :
-                         stage === 'importing' ? 'Importing data...' : 'Processing...'}
-                      </p>
-                      <p className="text-sm text-muted-foreground mt-1">
-                        {stage === 'parsing' ? 'Analyzing file structure and extracting data...' :
-                         stage === 'validating' ? 'Checking data format and required fields...' :
-                         stage === 'duplicate_checking' ? 'Looking for duplicate entries...' :
-                         stage === 'importing' ? 'Adding data to the system...' : 'Please wait...'}
-                      </p>
-                    </div>
-                 </div>
-               )}
-            </div>
-        );
-    }
 
-    if (stage === 'validation_failed' && showDuplicates && duplicatesInfo) {
+    if (stage === 'account_check') {
       return (
-        <div className="space-y-6">
-          <div className="rounded-lg border bg-yellow-50 border-yellow-200 p-4 dark:bg-yellow-950/30 dark:border-yellow-800">
-            <div className="flex items-start">
-              <AlertTriangle className="h-4 w-4 mt-0.5 mr-3 text-yellow-600 dark:text-yellow-400" />
-              <div className="flex-1">
-                <h4 className="text-sm font-medium text-yellow-800 dark:text-yellow-200 mb-1">
-                  Duplicate Records Detected
-                </h4>
-                <p className="text-sm text-yellow-700 dark:text-yellow-300">
-                  We found potential duplicate records in your import. Please review the duplicates below and choose how to proceed.
-                </p>
-              </div>
+        <div className="space-y-4">
+          <div className="flex items-center gap-3 p-4 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-200 mb-6">
+            <AlertCircle className="h-5 w-5 text-amber-500 shrink-0" />
+            <p className="text-sm">
+              We found <strong>{unknownAccounts.size}</strong> new department codes (first 4 digits) in your file.
+              Please create them below to ensure proper categorization, or skip to use the system default.
+            </p>
+          </div>
+
+          <ScrollArea className="h-[300px] border border-zinc-800 rounded-xl p-4 bg-zinc-900/20">
+            <div className="space-y-3">
+              {Array.from(unknownAccounts).map(code => (
+                <div key={code} className="flex items-center justify-between p-3 border border-zinc-800 rounded-lg bg-zinc-900/40 hover:bg-zinc-900/60 transition-colors">
+                  <div className="flex items-center gap-3">
+                    <div className="bg-zinc-800 p-2 rounded font-mono text-sm font-bold w-16 text-center text-zinc-300 border border-zinc-700">
+                      {code}
+                    </div>
+                    <span className="text-sm text-zinc-500">New Department</span>
+                  </div>
+                  {accountToCreate === code ? (
+                    <div className="flex items-center gap-2 animate-in fade-in slide-in-from-right-5">
+                      <Input
+                        placeholder="Department Name"
+                        className="w-48 h-8 bg-zinc-950 border-zinc-700 focus:border-emerald-500"
+                        value={newAccountData.name}
+                        onChange={(e) => setNewAccountData({ ...newAccountData, name: e.target.value })}
+                        autoFocus
+                      />
+                      <div className="flex gap-1">
+                        {['#ef4444', '#3b82f6', '#22c55e', '#eab308'].map(c => (
+                          <button
+                            key={c}
+                            className={cn("w-6 h-6 rounded-full border border-zinc-700 transition-transform hover:scale-110", newAccountData.color === c ? "ring-2 ring-emerald-500 ring-offset-2 ring-offset-zinc-900" : "")}
+                            style={{ backgroundColor: c }}
+                            onClick={() => setNewAccountData({ ...newAccountData, color: c })}
+                          />
+                        ))}
+                      </div>
+                      <Button size="sm" onClick={() => handleCreateAccount(code)} className="bg-emerald-600 hover:bg-emerald-500 text-white border-0 h-8">Save</Button>
+                      <Button size="sm" variant="ghost" onClick={() => setAccountToCreate(null)} className="text-zinc-400 hover:text-white h-8">Cancel</Button>
+                    </div>
+                  ) : (
+                    <Button size="sm" variant="outline" onClick={() => {
+                      setAccountToCreate(code);
+                      setNewAccountData({ name: '', color: '#3b82f6' });
+                    }} className="border-zinc-700 bg-transparent hover:bg-zinc-800 text-zinc-300 hover:text-white h-8">
+                      <Plus className="h-4 w-4 mr-1" />
+                      Create
+                    </Button>
+                  )}
+                </div>
+              ))}
+              {unknownAccounts.size === 0 && (
+                <div className="flex flex-col items-center justify-center py-12 text-zinc-500">
+                  <CheckCircle2 className="h-12 w-12 text-emerald-500 mb-2" />
+                  <p>All accounts resolved!</p>
+                </div>
+              )}
             </div>
-          </div>
-          
-          <div className="space-y-4">
-            {duplicatesInfo.withinFile.duplicateIndices.length > 0 && (
-              <div className="border rounded-lg p-4 bg-blue-50 dark:bg-blue-950/20">
-                <h5 className="font-medium text-blue-800 dark:text-blue-200 mb-2 flex items-center">
-                  <FileText className="h-4 w-4 mr-2" />
-                  Duplicates Within File: {duplicatesInfo.withinFile.duplicateIndices.length} records
-                </h5>
-                <p className="text-sm text-blue-700 dark:text-blue-300 mb-3">
-                  The following rows appear to be duplicates of each other within the import file:
-                </p>
-                <ul className="text-sm space-y-1">
-                  {Array.from(duplicatesInfo.withinFile.duplicateMap.entries()).map(([key, indices]) => (
-                    <li key={key} className="bg-white dark:bg-gray-800 p-2 rounded border">
-                      <span className="font-medium">Rows: [{indices.join(', ')}]</span> - Potential duplicate group
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-            
-            {duplicatesInfo.againstDatabase.duplicateIndices.length > 0 && (
-              <div className="border rounded-lg p-4 bg-orange-50 dark:bg-orange-950/20">
-                <h5 className="font-medium text-orange-800 dark:text-orange-200 mb-2 flex items-center">
-                  <Database className="h-4 w-4 mr-2" />
-                  Duplicates Against Database: {duplicatesInfo.againstDatabase.duplicateIndices.length} records
-                </h5>
-                <p className="text-sm text-orange-700 dark:text-orange-300 mb-3">
-                  The following rows match records that already exist in the database:
-                </p>
-                <ul className="text-sm space-y-1">
-                  {duplicatesInfo.againstDatabase.existingRecords.map((record, idx) => {
-                    const originalIdx = duplicatesInfo.againstDatabase.duplicateIndices[idx];
-                    return (
-                      <li key={originalIdx} className="bg-white dark:bg-gray-800 p-2 rounded border">
-                        <span className="font-medium">Row {originalIdx + 1}:</span> Matches existing record for {record['Customer Name'] || record['CustomerName'] || 'N/A'} - {record['Item Name'] || record['ItemName'] || 'N/A'}
-                      </li>
-                    );
-                  })}
-                </ul>
-              </div>
-            )}
-          </div>
-          
-          <div className="flex flex-col sm:flex-row gap-3 pt-4">
-            <Button
-              variant="outline"
-              onClick={() => {
-                setShowDuplicates(false);
-                runImport(originalData);
-              }}
-              className="flex-1"
-            >
-              <ArrowRight className="h-4 w-4 mr-2" />
-              Import Anyway (Keep Duplicates)
-            </Button>
-            <Button
-              variant="secondary"
-              onClick={() => {
-                setStage('upload');
-                setShowDuplicates(false);
-              }}
-              className="flex-1"
-            >
-              <XCircle className="h-4 w-4 mr-2" />
+          </ScrollArea>
+
+          <div className="flex justify-end gap-2 pt-2 border-t border-zinc-800/50">
+            <Button variant="ghost" onClick={() => {
+              setStage('upload');
+              setUnknownAccounts(new Set());
+            }} className="text-zinc-400 hover:text-white hover:bg-zinc-800">
               Cancel Import
+            </Button>
+            <Button variant="default" onClick={() => {
+              setStage('validating');
+              setTimeout(() => runImport(mappedData), 100);
+            }} className="bg-emerald-600 hover:bg-emerald-500 text-white shadow-[0_0_20px_rgba(5,150,105,0.2)]">
+              {unknownAccounts.size > 0 ? "Skip Remaining (Use Default)" : "Continue Import"}
+              <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
           </div>
         </div>
       );
     }
 
+    if (stage === 'upload' || stage === 'parsing' || stage === 'validating' || stage === 'duplicate_checking' || stage === 'importing') {
+      switch (stage) {
+        case 'upload':
+          return (
+            <div className="h-full flex flex-col items-center justify-center p-12 relative animate-in fade-in duration-500">
+
+              <div
+                {...getRootProps()}
+                className={cn(
+                  "w-full max-w-2xl aspect-video rounded-2xl border-2 border-dashed transition-all duration-300 relative group cursor-pointer overflow-hidden backdrop-blur-sm",
+                  isDragActive
+                    ? "border-emerald-400 bg-emerald-500/10 shadow-[0_0_50px_rgba(16,185,129,0.2)] scale-[1.01]"
+                    : "border-zinc-800/50 bg-zinc-900/30 hover:border-zinc-600 hover:bg-zinc-900/50 hover:shadow-2xl"
+                )}
+              >
+                {/* Scanning Line Animation on Hover */}
+                <div className="absolute inset-0 bg-gradient-to-b from-transparent via-emerald-500/5 to-transparent h-[200%] w-full translate-y-[-50%] group-hover:translate-y-[0%] transition-transform duration-1000 ease-in-out pointer-events-none opacity-0 group-hover:opacity-100" />
+
+                <div className="absolute inset-0 flex flex-col items-center justify-center gap-6 p-8">
+                  <input {...getInputProps()} />
+
+                  <div className={cn(
+                    "h-20 w-20 rounded-2xl flex items-center justify-center transition-all duration-300 shadow-xl",
+                    isDragActive ? "bg-emerald-500 text-black rotate-12 scale-110" : "bg-zinc-900 text-zinc-400 group-hover:bg-zinc-800 group-hover:text-emerald-400"
+                  )}>
+                    <FileUp className="h-8 w-8" />
+                  </div>
+
+                  <div className="space-y-2 text-center relative z-10">
+                    <h3 className={cn(
+                      "text-xl font-light tracking-tight transition-colors",
+                      isDragActive ? "text-emerald-400" : "text-zinc-200"
+                    )}>
+                      {isDragActive ? "Release to Initiate Upload" : "Drop Data File Here"}
+                    </h3>
+                    <p className="text-zinc-500 font-mono text-xs tracking-wide">
+                      SUPPORTED FORMATS: .CSV, .XLSX, .XLS (MAX {HARD_ROW_LIMIT.toLocaleString()} ROWS)
+                    </p>
+                  </div>
+
+                  <div className="flex gap-4 mt-4">
+                    <Button variant="outline" className="border-zinc-700 bg-zinc-900/50 text-zinc-300 hover:text-white hover:bg-zinc-800 hover:border-zinc-600 transition-all">
+                      Select File
+                    </Button>
+                    <Button variant="outline" onClick={handleDownloadTemplate} className="border-zinc-700 bg-zinc-900/50 text-zinc-300 hover:text-white hover:bg-zinc-800 hover:border-zinc-600 transition-all font-mono text-xs">
+                      <Download className="mr-2 h-3.5 w-3.5" />
+                      TEMPLATE.CSV
+                    </Button>
+                  </div>
+                </div>
+
+                {/* Corner Accents */}
+                <div className="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-zinc-700 group-hover:border-emerald-500/50 transition-colors rounded-tl-xl m-2" />
+                <div className="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-zinc-700 group-hover:border-emerald-500/50 transition-colors rounded-tr-xl m-2" />
+                <div className="absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2 border-zinc-700 group-hover:border-emerald-500/50 transition-colors rounded-bl-xl m-2" />
+                <div className="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-zinc-700 group-hover:border-emerald-500/50 transition-colors rounded-br-xl m-2" />
+              </div>
+
+              <div className="mt-8 text-center">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-zinc-900/80 border border-zinc-800 text-[10px] text-zinc-500 font-mono">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500/50 animate-pulse" />
+                  SYSTEM READY // WAITING FOR INPUT
+                </div>
+              </div>
+            </div>
+          );
+        case 'parsing':
+          return (
+            <div className="h-full flex flex-col items-center justify-center relative overflow-hidden">
+              {/* Ambient Grid for depth */}
+              <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_50%,#000_70%,transparent_100%)] pointer-events-none" />
+
+              {/* Cyber Loader */}
+              <div className="relative mb-8">
+                {/* Outer rotating ring */}
+                <motion.div
+                  className="absolute inset-[-24px] rounded-full border border-emerald-500/30 border-dashed"
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
+                />
+                {/* Inner reverse ring */}
+                <motion.div
+                  className="absolute inset-[-12px] rounded-full border border-emerald-500/20"
+                  animate={{ rotate: -360 }}
+                  transition={{ duration: 5, repeat: Infinity, ease: "linear" }}
+                  style={{ borderTopColor: 'transparent', borderBottomColor: 'transparent' }}
+                />
+
+                {/* Core Icon */}
+                <div className="bg-zinc-900/80 backdrop-blur-xl p-8 rounded-full border border-emerald-500/50 shadow-[0_0_50px_-10px_rgba(16,185,129,0.3)] relative z-10 flex items-center justify-center">
+                  <Loader2 className="h-12 w-12 text-emerald-400 animate-spin" />
+                </div>
+              </div>
+
+              {/* Text Area */}
+              <div className="text-center space-y-3 relative z-10">
+                <h3 className="text-2xl font-mono tracking-[0.2em] text-white font-bold uppercase flex items-center gap-3 justify-center">
+                  <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse shadow-[0_0_10px_rgba(16,185,129,0.8)]" />
+                  System Analysis
+                  <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse shadow-[0_0_10px_rgba(16,185,129,0.8)]" />
+                </h3>
+                <div className="flex flex-col items-center gap-1">
+                  <p className="text-emerald-400/80 font-mono text-sm tracking-widest">
+                    PROCESSING DATA STREAM
+                  </p>
+                  <p className="text-zinc-500 text-xs font-mono">
+                    {fileName ? `TARGET: ${fileName.toUpperCase()}` : 'WAITING FOR INPUT...'}
+                  </p>
+                </div>
+              </div>
+            </div>
+          );
+        default:
+          return (
+            <div className="w-full max-w-md space-y-4">
+              <div className="space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span className="font-medium">
+                    {stage === 'parsing' ? 'Parsing file...' :
+                      stage === 'validating' ? 'Validating data...' :
+                        stage === 'duplicate_checking' ? 'Checking for duplicates...' :
+                          stage === 'importing' ? 'Importing data...' : `${stage}...`}
+                  </span>
+                  <span>{importProgress}%</span>
+                </div>
+                <Progress value={importProgress} className="w-full" />
+                {importStageDetails && (
+                  <p className="text-xs text-muted-foreground text-center">
+                    {importStageDetails}
+                  </p>
+                )}
+              </div>
+              <div className="flex flex-col items-center">
+                <Loader2 className="h-12 w-12 animate-spin text-primary mb-2" />
+                <p className="text-lg text-muted-foreground capitalize">
+                  {stage === 'parsing' ? 'Parsing file...' :
+                    stage === 'validating' ? 'Validating data...' :
+                      stage === 'duplicate_checking' ? 'Checking for duplicates...' :
+                        stage === 'importing' ? 'Importing data...' : 'Processing...'}
+                </p>
+                <p className="text-sm text-muted-foreground mt-1">
+                  {stage === 'parsing' ? 'Analyzing file structure and extracting data...' :
+                    stage === 'validating' ? 'Checking data format and required fields...' :
+                      stage === 'duplicate_checking' ? 'Looking for duplicate entries...' :
+                        stage === 'importing' ? 'Adding data to the system...' : 'Please wait...'}
+                </p>
+              </div>
+            </div>
+          )
+      }
+
+    }
+
+
+
     if (stage === 'validation_failed') {
       const missingEntityErrors = errors.filter(e => e.errorType === 'missing-entity' && e.blocking);
       const hasMissingEntities = missingEntityErrors.length > 0;
-      
+
       return (
         <div className="space-y-6">
           {hasMissingEntities && (
             <div className="flex justify-end">
-              <Button 
-                onClick={handleFixAll} 
+              <Button
+                onClick={handleFixAll}
                 disabled={isFixingAll}
                 variant="default"
+                className="bg-emerald-600 hover:bg-emerald-500 text-white shadow-[0_0_20px_rgba(5,150,105,0.2)]"
               >
                 {isFixingAll ? (
                   <>
@@ -636,26 +852,28 @@ export function CsvImporterDialog({
             resolvedErrors={resolvedErrors}
           />
           {allErrorsResolved && (
-            <div className="mt-6 flex flex-col items-center gap-4 p-4 border-2 border-dashed rounded-lg bg-green-50 dark:bg-green-950/50">
-               <CheckCircle className="h-8 w-8 text-green-500" />
-               <h3 className="font-semibold">All errors addressed!</h3>
-               <p className="text-sm text-muted-foreground">You can now run the final import.</p>
-              <Button onClick={() => runImport(originalData, true)}>
+            <div className="mt-6 flex flex-col items-center gap-4 p-6 border-2 border-dashed border-emerald-500/30 rounded-xl bg-emerald-500/5 animate-in fade-in zoom-in-95">
+              <CheckCircle className="h-12 w-12 text-emerald-500 shadow-emerald-500/50 drop-shadow-md" />
+              <div className="text-center">
+                <h3 className="font-semibold text-lg text-emerald-400">All errors addressed!</h3>
+                <p className="text-sm text-zinc-400">You can now run the final import.</p>
+              </div>
+              <Button onClick={() => runImport(originalData, true)} className="bg-emerald-600 hover:bg-emerald-500 text-white min-w-[200px]">
                 <RefreshCw className="mr-2 h-4 w-4" />
                 Run Final Import
               </Button>
             </div>
           )}
-          
-          <div className="border rounded-lg p-4 bg-blue-50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-800">
-            <h4 className="font-medium text-blue-800 dark:text-blue-200 mb-2 flex items-center">
-              <Sparkles className="h-4 w-4 mr-2" />
+
+          <div className="border border-blue-500/20 rounded-xl p-4 bg-blue-900/10">
+            <h4 className="font-medium text-blue-300 mb-2 flex items-center">
+              <Sparkles className="h-4 w-4 mr-2 text-blue-400" />
               Need Help?
             </h4>
-            <p className="text-sm text-blue-700 dark:text-blue-300 mb-3">
+            <p className="text-sm text-blue-400/80 mb-3">
               Common import issues and how to resolve them:
             </p>
-            <ul className="text-sm text-blue-700 dark:text-blue-300 space-y-2 list-disc pl-5">
+            <ul className="text-sm text-blue-300 space-y-2 list-disc pl-5 marker:text-blue-500">
               <li><strong>Missing required fields:</strong> Ensure all mandatory columns ({entityType === 'company' ? 'Customer Name, Email, Phone' : 'Item Name, Price, Category'}) are present in your CSV/Excel file</li>
               <li><strong>Invalid data formats:</strong> Check that dates, prices, and other fields match the expected format (e.g., prices should be numeric values)</li>
               <li><strong>Duplicate records:</strong> Remove duplicate entries or choose to import anyway if duplicates are acceptable</li>
@@ -665,19 +883,18 @@ export function CsvImporterDialog({
               <li><strong>Large file size:</strong> Try splitting your file into smaller batches for better performance</li>
             </ul>
           </div>
-          
-          <div className="mt-6 border rounded-lg overflow-hidden">
-            <div className="w-full px-4 py-3 bg-muted/30 flex items-center justify-between">
+
+          <div className="mt-6 border border-zinc-800 rounded-lg overflow-hidden bg-zinc-900/30">
+            <div className="w-full px-4 py-3 bg-zinc-900/50 flex items-center justify-between border-b border-zinc-800">
               <button
-                className="flex items-center text-left font-medium hover:text-primary transition-colors"
+                className="flex items-center text-left font-medium text-zinc-300 hover:text-white transition-colors"
                 onClick={() => setShowErrorLog(!showErrorLog)}
               >
-                <FileText className="h-4 w-4 mr-2" />
+                <FileText className="h-4 w-4 mr-2 text-zinc-500" />
                 Detailed Error Log
                 <ChevronDown
-                  className={`h-4 w-4 ml-2 transition-transform duration-200 ${
-                    showErrorLog ? 'rotate-180' : ''
-                  }`}
+                  className={`h-4 w-4 ml-2 transition-transform duration-200 ${showErrorLog ? 'rotate-180' : ''
+                    }`}
                 />
               </button>
               <Button
@@ -693,34 +910,34 @@ export function CsvImporterDialog({
                   a.click();
                   URL.revokeObjectURL(url);
                 }}
+                className="text-zinc-400 hover:text-white hover:bg-zinc-800"
               >
                 <Download className="h-4 w-4 mr-2" />
                 Download Log
               </Button>
             </div>
             {showErrorLog && (
-              <div className="max-h-60 overflow-y-auto border-t bg-muted/10 p-4">
+              <div className="max-h-60 overflow-y-auto bg-zinc-950 p-4 font-mono text-xs">
                 {detailedErrorLog.length > 0 ? (
-                  <div className="space-y-2">
+                  <div className="space-y-1">
                     {detailedErrorLog.map((logEntry, index) => (
                       <div
                         key={index}
-                        className={`text-xs p-2 rounded ${
-                          logEntry.includes('Error:')
-                            ? 'bg-red-50 dark:bg-red-950/30 text-red-700 dark:text-red-300'
-                            : logEntry.includes('Time:') || logEntry.includes('Time:')
-                              ? 'bg-gray-50 dark:bg-gray-900/30 text-gray-500 dark:text-gray-400 font-mono'
-                              : logEntry.includes('Success:') || logEntry.includes('Complete:')
-                                ? 'bg-green-50 dark:bg-green-950/30 text-green-700 dark:text-green-300'
-                                : 'bg-muted/30'
-                        }`}
+                        className={`p-2 rounded border ${logEntry.includes('Error:')
+                          ? 'bg-red-950/20 border-red-900/30 text-red-400'
+                          : logEntry.includes('Time:')
+                            ? 'bg-zinc-900/50 border-zinc-800 text-zinc-500'
+                            : logEntry.includes('Success:') || logEntry.includes('Complete:')
+                              ? 'bg-emerald-950/20 border-emerald-900/30 text-emerald-400'
+                              : 'bg-zinc-900 border-zinc-800 text-zinc-400'
+                          }`}
                       >
                         {logEntry}
                       </div>
                     ))}
                   </div>
                 ) : (
-                  <p className="text-sm text-muted-foreground italic">No detailed logs available yet.</p>
+                  <p className="text-zinc-500 italic text-center py-4">No detailed logs available yet.</p>
                 )}
               </div>
             )}
@@ -731,139 +948,162 @@ export function CsvImporterDialog({
 
     if (stage === 'import_complete' && importResult) {
       const hasAutoGenerated = autoGeneratedEntities.companies.length > 0 || autoGeneratedEntities.products.length > 0;
-      
+
       return (
         <div className="space-y-6">
-          <Alert variant="default" className="bg-green-50 border-green-200 text-green-800 dark:bg-green-950 dark:border-green-800 dark:text-green-300">
-            <CheckCircle className="h-4 w-4 !text-green-600" />
-            <AlertTitle>Import Complete!</AlertTitle>
-            <AlertDescription className="text-green-700 dark:text-green-400">
-              <p>Successfully imported {importResult.importedCount} {entityType}(s).</p>
-              <p className="mt-2 text-sm">The imported data has been added to your {entityType.toLowerCase()} list and is now available in the system.</p>
-              {hasAutoGenerated && (
-                <p className="mt-2 text-sm font-medium">
-                  {autoGeneratedEntities.companies.length > 0 && `${autoGeneratedEntities.companies.length} companies `}
-                  {autoGeneratedEntities.products.length > 0 && `${autoGeneratedEntities.products.length} products `}
-                  were auto-generated and need more information.
-                </p>
-              )}
-            </AlertDescription>
-          </Alert>
-          
+          <div className="rounded-xl border bg-emerald-500/10 border-emerald-500/20 p-4">
+            <div className="flex items-start">
+              <CheckCircle className="h-5 w-5 mt-0.5 mr-3 text-emerald-500" />
+              <div className="flex-1">
+                <h4 className="text-lg font-medium text-emerald-400 mb-2">Import Complete!</h4>
+                <div className="text-emerald-300/80 space-y-2 text-sm">
+                  <p>Successfully imported <strong>{importResult.importedCount}</strong> {entityType}(s).</p>
+                  <p>The imported data has been added to your {entityType.toLowerCase()} list and is now available in the system.</p>
+                  {hasAutoGenerated && (
+                    <p className="font-medium text-emerald-300 mt-2">
+                      {autoGeneratedEntities.companies.length > 0 && `${autoGeneratedEntities.companies.length} companies `}
+                      {autoGeneratedEntities.products.length > 0 && `${autoGeneratedEntities.products.length} products `}
+                      were auto-generated and need more information.
+                    </p>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+
           {hasAutoGenerated && (
-            <Alert className="bg-yellow-50 border-yellow-200 dark:bg-yellow-950/30 dark:border-yellow-800">
-              <AlertTriangle className="h-4 w-4 text-yellow-600" />
-              <AlertTitle className="text-yellow-800 dark:text-yellow-200">Auto-Generated Entities Need Attention</AlertTitle>
-              <AlertDescription className="text-yellow-700 dark:text-yellow-300">
-                <p className="mb-2">The following entities were automatically created with minimal information:</p>
-                {autoGeneratedEntities.companies.length > 0 && (
-                  <div className="mb-2">
-                    <p className="font-medium">Companies ({autoGeneratedEntities.companies.length}):</p>
-                    <ul className="list-disc list-inside text-sm">
-                      {autoGeneratedEntities.companies.map((name, idx) => (
-                        <li key={idx}>{name}</li>
-                      ))}
-                    </ul>
+            <div className="rounded-xl border bg-amber-500/10 border-amber-500/20 p-4">
+              <div className="flex items-start">
+                <AlertTriangle className="h-5 w-5 mt-0.5 mr-3 text-amber-500" />
+                <div className="flex-1">
+                  <h4 className="font-medium text-amber-400 mb-2">Auto-Generated Entities Need Attention</h4>
+                  <div className="text-amber-300/80 text-sm space-y-2">
+                    <p className="mb-2">The following entities were automatically created with minimal information:</p>
+                    {autoGeneratedEntities.companies.length > 0 && (
+                      <div className="mb-2">
+                        <p className="font-medium text-amber-300">Companies ({autoGeneratedEntities.companies.length}):</p>
+                        <ul className="list-disc list-inside bg-amber-950/20 p-2 rounded mt-1">
+                          {autoGeneratedEntities.companies.map((name, idx) => (
+                            <li key={idx}>{name}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                    {autoGeneratedEntities.products.length > 0 && (
+                      <div>
+                        <p className="font-medium text-amber-300">Products ({autoGeneratedEntities.products.length}):</p>
+                        <ul className="list-disc list-inside bg-amber-950/20 p-2 rounded mt-1">
+                          {autoGeneratedEntities.products.map((name, idx) => (
+                            <li key={idx}>{name}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                    <p className="mt-2 font-medium">Please update these entities with complete information.</p>
                   </div>
-                )}
-                {autoGeneratedEntities.products.length > 0 && (
-                  <div>
-                    <p className="font-medium">Products ({autoGeneratedEntities.products.length}):</p>
-                    <ul className="list-disc list-inside text-sm">
-                      {autoGeneratedEntities.products.map((name, idx) => (
-                        <li key={idx}>{name}</li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-                <p className="mt-2 text-sm">Please update these entities with complete information.</p>
-              </AlertDescription>
-            </Alert>
+                </div>
+              </div>
+            </div>
           )}
-          
+
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div className="border rounded-lg p-4 bg-white dark:bg-gray-800">
-              <h4 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Total Imported</h4>
-              <p className="text-2xl font-bold text-green-600 dark:text-green-400">{importResult.importedCount}</p>
+            <div className="border border-zinc-800 rounded-xl p-4 bg-zinc-900/50">
+              <h4 className="text-sm font-medium text-zinc-500 mb-1">Total Imported</h4>
+              <p className="text-2xl font-bold text-emerald-400">{importResult.importedCount}</p>
             </div>
             {importResult.skippedCount !== undefined && importResult.skippedCount > 0 && (
-              <div className="border rounded-lg p-4 bg-white dark:bg-gray-800">
-                <h4 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Duplicates Skipped</h4>
-                <p className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">{importResult.skippedCount}</p>
+              <div className="border border-zinc-800 rounded-xl p-4 bg-zinc-900/50">
+                <h4 className="text-sm font-medium text-zinc-500 mb-1">Duplicates Skipped</h4>
+                <p className="text-2xl font-bold text-amber-400">{importResult.skippedCount}</p>
               </div>
             )}
             {importResult.importedTotal !== undefined && (
-              <div className="border rounded-lg p-4 bg-white dark:bg-gray-800">
-                <h4 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Total Revenue</h4>
-                <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">${importResult.importedTotal.toFixed(2)}</p>
+              <div className="border border-zinc-800 rounded-xl p-4 bg-zinc-900/50">
+                <h4 className="text-sm font-medium text-zinc-500 mb-1">Total Revenue</h4>
+                <p className="text-2xl font-bold text-blue-400">${importResult.importedTotal.toFixed(2)}</p>
               </div>
             )}
-            <div className="border rounded-lg p-4 bg-white dark:bg-gray-800">
-              <h4 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Status</h4>
-              <p className="text-2xl font-bold text-purple-600 dark:text-purple-400">Success</p>
+            <div className="border border-zinc-800 rounded-xl p-4 bg-zinc-900/50">
+              <h4 className="text-sm font-medium text-zinc-500 mb-1">Status</h4>
+              <p className="text-2xl font-bold text-emerald-400">Success</p>
             </div>
           </div>
-          
-          <div className="border rounded-lg p-4 bg-blue-50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-800">
-            <h4 className="font-medium text-blue-800 dark:text-blue-200 mb-2 flex items-center">
-              <Sparkles className="h-4 w-4 mr-2" />
+
+          <div className="border border-blue-500/20 rounded-xl p-4 bg-blue-900/10">
+            <h4 className="font-medium text-blue-300 mb-2 flex items-center">
+              <Sparkles className="h-4 w-4 mr-2 text-blue-400" />
               What's Next?
             </h4>
-            <ul className="text-sm text-blue-700 dark:text-blue-300 space-y-1 list-disc pl-5">
+            <ul className="text-sm text-blue-300/80 space-y-1 list-disc pl-5 marker:text-blue-500">
               <li>The imported {entityType.toLowerCase()} data is now visible in the main {entityType.toLowerCase()} list</li>
               <li>Any orders associated with these {entityType.toLowerCase()} have been updated with the new information</li>
               <li>If you need to make adjustments, you can edit the {entityType.toLowerCase()} directly from the list view</li>
             </ul>
           </div>
-          
-          <div className="border rounded-lg p-4 bg-emerald-50 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-800">
-            <h4 className="font-medium text-emerald-800 dark:text-emerald-200 mb-2 flex items-center">
-              <CheckCircle2 className="h-4 w-4 mr-2" />
+
+          <div className="border border-emerald-500/20 rounded-xl p-4 bg-emerald-900/10">
+            <h4 className="font-medium text-emerald-300 mb-2 flex items-center">
+              <CheckCircle2 className="h-4 w-4 mr-2 text-emerald-400" />
               Success Notification
             </h4>
-            <p className="text-sm text-emerald-700 dark:text-emerald-300 mb-3">
-              Your import was successful! Here are some key points to note:
-            </p>
-            <ul className="text-sm text-emerald-700 dark:text-emerald-300 space-y-1 list-disc pl-5">
-              <li>All {importResult.importedCount} {entityType}(s) have been successfully added to your system</li>
-              <li>Related records have been updated automatically</li>
-              <li>Data integrity has been maintained throughout the process</li>
-              <li>The import has been logged for audit purposes</li>
-            </ul>
+            <div className="text-sm text-emerald-300/80 space-y-2">
+              <p>Your import was successful! Here are some key points to note:</p>
+              <ul className="list-disc pl-5 marker:text-emerald-500">
+                <li>All {importResult.importedCount} {entityType}(s) have been successfully added to your system</li>
+                <li>Related records have been updated automatically</li>
+                <li>Data integrity has been maintained throughout the process</li>
+                <li>The import has been logged for audit purposes</li>
+              </ul>
+            </div>
+            {importResult.skippedCount !== undefined && importResult.skippedCount > 0 && importResult.duplicates && (
+              <div className="mt-4 pt-3 border-t border-emerald-500/20">
+                <p className="text-sm text-emerald-200 mb-2 font-medium">
+                  Detailed log of skipped duplicate orders is available:
+                </p>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    if (!importResult.duplicates) return;
+                    const csvContent = "Row (Source),Invoice,Company,Date,Total,Duplicates Source,Items\n" +
+                      importResult.duplicates.map(d =>
+                        `${d.rowIndex},${d.invoiceNumber},"${d.companyName}",${d.date},${d.total},"${d.source}","${d.items}"`
+                      ).join("\n");
+
+                    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                    const url = URL.createObjectURL(blob);
+                    const link = document.createElement("a");
+                    link.setAttribute("href", url);
+                    link.setAttribute("download", `import_duplicates_log_${new Date().toISOString().slice(0, 10)}.csv`);
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                  }}
+                  className="bg-zinc-900 hover:bg-emerald-900/30 text-emerald-400 border-emerald-500/30 hover:border-emerald-500/50"
+                >
+                  <Download className="h-4 w-4 mr-2" />
+                  Download Duplicates Log (CSV)
+                </Button>
+              </div>
+            )}
           </div>
         </div>
       );
     }
 
-    if (stage === 'success') {
-      return (
-        <div className="w-full max-w-md space-y-4">
-          <div className="flex justify-center">
-            <div className="rounded-full bg-green-100 p-3">
-              <CheckCircle2 className="h-12 w-12 text-green-600" />
-            </div>
-          </div>
-          <div className="text-center space-y-2">
-            <h3 className="text-lg font-semibold text-green-600">Import Successful!</h3>
-            <p className="text-muted-foreground">
-              {`Successfully imported ${importResults?.newOrders?.length || 0} new orders, ${importResults?.updatedOrders?.length || 0} updated orders, and ${importResults?.skippedOrders?.length || 0} skipped orders.`}
-            </p>
-          </div>
-        </div>
-      );
-    }
-    
+
+
     if (stage === 'error') {
       return (
         <div className="w-full max-w-md space-y-4">
           <div className="flex justify-center">
-            <div className="rounded-full bg-destructive/20 p-3">
-              <AlertTriangle className="h-12 w-12 text-destructive" />
+            <div className="rounded-full bg-red-500/10 p-4 border border-red-500/20 shadow-[0_0_30px_rgba(239,68,68,0.2)] animate-in zoom-in-50 duration-500">
+              <AlertTriangle className="h-16 w-16 text-red-500" />
             </div>
           </div>
           <div className="text-center space-y-2">
-            <h3 className="text-lg font-semibold text-destructive">Import Failed</h3>
-            <p className="text-muted-foreground">
+            <h3 className="text-xl font-semibold text-red-400">Import Failed</h3>
+            <p className="text-zinc-400">
               {error || 'An error occurred during import. Please check the details below.'}
             </p>
           </div>
@@ -897,83 +1137,157 @@ export function CsvImporterDialog({
     return null;
   };
 
-  
-    return (
-      <Dialog open={isOpen} onOpenChange={handleDialogChange}>
-        <DialogContent className="max-w-3xl max-h-[90vh] flex flex-col">
-          <DialogHeader>
-             {stage === 'resolving' ? null : (
-               <>
-                 <DialogTitle>Import {entityType} data from {fileType === 'csv' ? 'CSV' : 'Excel'}</DialogTitle>
-                 {stage !== 'upload' && stage !== 'import_complete' && stage !== 'success' && stage !== 'error' && (
-                   <div className="flex items-center gap-2 text-sm text-muted-foreground mt-2">
-                     <div className={cn(
-                       "flex items-center gap-1",
-                       stage === 'parsing' && "text-primary font-medium"
-                     )}>
-                       <div className={cn(
-                         "h-2 w-2 rounded-full",
-                         stage === 'parsing' ? "bg-primary" : "bg-muted-foreground"
-                       )} />
-                       Parse
-                     </div>
-                     <div className="h-px w-4 bg-muted-foreground" />
-                     <div className={cn(
-                       "flex items-center gap-1",
-                       stage === 'mapping' && "text-primary font-medium"
-                     )}>
-                       <div className={cn(
-                         "h-2 w-2 rounded-full",
-                         stage === 'mapping' ? "bg-primary" : "bg-muted-foreground"
-                       )} />
-                       Map Columns
-                     </div>
-                     <div className="h-px w-4 bg-muted-foreground" />
-                     <div className={cn(
-                       "flex items-center gap-1",
-                       (stage === 'validating' || stage === 'validation_failed') && "text-primary font-medium"
-                     )}>
-                       <div className={cn(
-                         "h-2 w-2 rounded-full",
-                         (stage === 'validating' || stage === 'validation_failed') ? "bg-primary" : "bg-muted-foreground"
-                       )} />
-                       Validate
-                     </div>
-                     <div className="h-px w-4 bg-muted-foreground" />
-                     <div className={cn(
-                       "flex items-center gap-1",
-                       stage === 'importing' && "text-primary font-medium"
-                     )}>
-                       <div className={cn(
-                         "h-2 w-2 rounded-full",
-                         stage === 'importing' ? "bg-primary" : "bg-muted-foreground"
-                       )} />
-                       Import
-                     </div>
-                   </div>
-                 )}
-               </>
-             )}
-          </DialogHeader>
-          <div className="flex-1 overflow-y-auto pr-6 -mr-6">
-            {renderContent()}
-          </div>
-          <DialogFooter className="pt-4 border-t gap-2">
-             {stage === 'upload' && (
-                  <>
-                      <Button variant="outline" onClick={() => handleDialogChange(false)}>Cancel</Button>
-                      <Button onClick={handleParseAndMap} disabled={!file}>Validate & Map Columns</Button>
-                  </>
-             )}
-              {(stage === 'validation_failed' || stage === 'import_complete' || stage === 'success' || stage === 'error') && (
-                   <Button variant="outline" onClick={() => handleDialogChange(false)}>
-                      {stage === 'import_complete' ? 'Finish' : stage === 'success' ? 'Done' : stage === 'error' ? 'Close' : 'Close'}
-                  </Button>
-              )}
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-    );
-  }
+  // Helper to get step index for progress bar
+  const getStepIndex = (s: ImportStage) => {
+    switch (s) {
+      case 'upload': return 0;
+      case 'parsing': return 1;
+      case 'mapping': return 2;
+      case 'account_check': return 2;
+      case 'validating': return 3;
+      case 'duplicate_checking': return 3;
+      case 'importing': return 4;
+      case 'success': return 5;
+      case 'import_complete': return 5;
+      default: return 0;
+    }
+  };
 
-    
+  const steps = ['Upload', 'Parse', 'Map Columns', 'Validate', 'Import', 'Done'];
+  const currentStepIndex = getStepIndex(stage);
+
+  return (
+    <Dialog open={isOpen} onOpenChange={handleDialogChange}>
+      <DialogContent className="max-w-7xl h-[85vh] flex flex-col p-0 gap-0 overflow-hidden border border-white/10 bg-zinc-950 shadow-2xl text-zinc-100 sm:rounded-2xl [&>button]:hidden font-sans ring-1 ring-white/5">
+
+        {/* Header Section - 'Holographic' Glass Header */}
+        <div className="border-b border-white/5 bg-zinc-950/40 p-6 pb-0 shrink-0 relative overflow-hidden">
+          {/* Scanline decoration */}
+          <div className="absolute inset-0 bg-[linear-gradient(to_right,transparent_0%,rgba(255,255,255,0.03)_50%,transparent_100%)] translate-x-[-100%] animate-[shimmer_2s_infinite] pointer-events-none" />
+
+          <div className="flex items-start justify-between mb-8 relative z-10">
+            <div className="flex flex-col gap-1">
+              <div className="flex items-center gap-2 mb-1">
+                <span className="text-[10px] font-mono text-emerald-500/80 uppercase tracking-widest border border-emerald-500/20 px-1.5 py-0.5 rounded bg-emerald-500/5">
+                  SYS.IMPORT.V3
+                </span>
+                <span className="text-[10px] font-mono text-zinc-600 uppercase tracking-widest">
+                   // {entityType.toUpperCase()}
+                </span>
+              </div>
+              <DialogTitle className="text-2xl font-light tracking-tight text-white flex items-center gap-3">
+                Import Data
+                <span className="h-1 w-1 rounded-full bg-emerald-500 animate-pulse" />
+              </DialogTitle>
+              <div className="text-sm text-zinc-400 font-light max-w-md">
+                Upload and map your <span className="text-zinc-200 font-medium">{fileType === 'csv' ? 'CSV' : 'Excel'}</span> files to the inventory database.
+              </div>
+            </div>
+            <Button variant="ghost" size="icon" onClick={() => handleDialogChange(false)} className="text-zinc-500 hover:text-white hover:bg-white/5 rounded-full ring-1 ring-inset ring-transparent hover:ring-white/10 transition-all">
+              <X className="h-5 w-5" />
+            </Button>
+          </div>
+
+          {/* Technical Progress Tracker */}
+          <div className="flex items-end justify-between px-2 pb-4 relative z-10 mt-6">
+            <div className="flex gap-2 w-full">
+              {steps.map((label, i) => {
+                const isActive = i === currentStepIndex;
+                const isCompleted = i < currentStepIndex;
+
+                return (
+                  <div key={label} className="flex-1 flex flex-col gap-2 group">
+                    <div className="flex justify-between items-end px-1">
+                      <span className={cn(
+                        "text-[10px] uppercase tracking-wider font-mono transition-colors duration-300",
+                        isActive ? "text-emerald-400" : isCompleted ? "text-zinc-400" : "text-zinc-700"
+                      )}>
+                        {`0${i + 1} ${label}`}
+                      </span>
+                    </div>
+                    <div className="h-1 w-full bg-zinc-900 rounded-full overflow-hidden relative">
+                      {/* Background Track */}
+                      <div className={cn(
+                        "absolute inset-0 transition-all duration-500",
+                        isActive ? "bg-zinc-800" : isCompleted ? "bg-emerald-900/40" : "bg-zinc-900"
+                      )} />
+
+                      {/* Active Fill */}
+                      {(isActive || isCompleted) && (
+                        <motion.div
+                          initial={{ x: '-100%' }}
+                          animate={{ x: isCompleted ? '0%' : '-30%' }}
+                          className={cn(
+                            "absolute inset-y-0 left-0 w-full rounded-full transition-all duration-300",
+                            isCompleted ? "bg-emerald-500" : "bg-emerald-500/50"
+                          )}
+                        />
+                      )}
+
+                      {/* Active Pulse (Only for current step) */}
+                      {isActive && (
+                        <motion.div
+                          className="absolute inset-y-0 left-0 w-1/3 bg-emerald-400/80 blur-[2px]"
+                          animate={{ x: ['-100%', '300%'] }}
+                          transition={{ repeat: Infinity, duration: 1.5, ease: "linear" }}
+                        />
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+
+        {/* Main Content Area - with Grid Background */}
+        <div className="flex-1 overflow-hidden relative bg-zinc-950 isolate">
+          {/* Subtle Grid Pattern */}
+          <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808008_1px,transparent_1px),linear-gradient(to_bottom,#80808008_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none -z-10" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_800px_at_50%_-30%,rgba(16,185,129,0.06),transparent)] pointer-events-none -z-10" />
+
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={stage}
+              initial={{ opacity: 0, y: 10, filter: 'blur(4px)' }}
+              animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+              exit={{ opacity: 0, y: -10, filter: 'blur(4px)' }}
+              transition={{ duration: 0.3, ease: "easeOut" }}
+              className="h-full overflow-y-auto p-6 scrollbar-thin scrollbar-thumb-zinc-800 scrollbar-track-transparent"
+            >
+              {renderContent()}
+            </motion.div>
+          </AnimatePresence>
+        </div>
+
+        {/* Footer Actions */}
+        <div className="p-6 border-t border-zinc-800 bg-zinc-900/80 backdrop-blur-md flex justify-end gap-3 z-10 shrink-0">
+          {stage === 'upload' && (
+            <>
+              <Button variant="ghost" onClick={() => handleDialogChange(false)} className="text-zinc-400 hover:text-white hover:bg-zinc-800">Cancel</Button>
+              <Button
+                onClick={handleParseAndMap}
+                disabled={!file}
+                className="bg-emerald-600 hover:bg-emerald-500 text-white shadow-[0_0_20px_rgba(5,150,105,0.3)] border-0 transition-all hover:scale-105"
+              >
+                Validate & Map Columns <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            </>
+          )}
+          {(stage === 'validation_failed' || stage === 'import_complete' || stage === 'success' || stage === 'error') && (
+            <Button
+              variant="outline"
+              onClick={() => handleDialogChange(false)}
+              className="border-zinc-700 text-zinc-300 hover:bg-zinc-800 hover:text-white"
+            >
+              {stage === 'import_complete' ? 'Finish' : stage === 'success' ? 'Done' : 'Close'}
+            </Button>
+          )}
+        </div>
+
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+

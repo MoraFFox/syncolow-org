@@ -79,8 +79,12 @@ function CategoryFormDialog({ isOpen, onOpenChange, onSubmit, item }: CategoryFo
 
 
 export default function CategoriesPage() {
-    const { categories, addCategory, updateCategory, deleteCategory } = useCategoriesStore();
+    const { categories, addCategory, updateCategory, deleteCategory, fetchCategories } = useCategoriesStore();
     const router = useRouter();
+
+    React.useEffect(() => {
+        fetchCategories();
+    }, [fetchCategories]);
 
     const [searchTerm, setSearchTerm] = useState('');
     const [isFormOpen, setIsFormOpen] = useState(false);

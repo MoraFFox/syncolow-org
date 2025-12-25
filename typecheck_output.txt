@@ -1,0 +1,7 @@
+
+> synergyflow-erp@0.1.0 typecheck
+> tsc --noEmit
+
+src/app/orders/_components/csv-importer-dialog.tsx(578,24): error TS2304: Cannot find name 'Plus'.
+src/app/orders/_components/csv-importer-dialog.tsx(749,18): error TS2304: Cannot find name 'FileText'.
+src/app/orders/_components/csv-importer-dialog.tsx(1034,16): error TS2304: Cannot find name 'X'.

@@ -22,7 +22,6 @@ import Loading from '../loading';
 import OrderForm from './_components/order-form';
 import type { Order } from '@/lib/types';
 import { useSettingsStore } from '@/store/use-settings-store';
-import { useUserSettings } from '@/hooks/use-user-settings';
 import { CsvImporterDialog } from './_components/csv-importer-dialog';
 import { toast } from '@/hooks/use-toast';
 import { CancellationDialog } from './_components/cancellation-dialog';
@@ -47,24 +46,10 @@ function OrdersPageContent() {
   const { companies } = useCompanyStore();
   const { paginationLimit, ordersViewMode, setOrdersViewMode } = useSettingsStore();
 
-  const { settings, saveSettings } = useUserSettings();
-
-  // Sync DB settings to Store
-  useEffect(() => {
-    if (settings?.orders_view_mode && settings.orders_view_mode !== ordersViewMode) {
-      setOrdersViewMode(settings.orders_view_mode);
-    }
-  }, [settings, setOrdersViewMode]); // Removed ordersViewMode dependency to prevent race/loops
-
-  // Sync Store changes to DB
-  useEffect(() => {
-    // Only save if we have a valid setting and user is logged in (implied by saveSettings availability)
-    // We check if it matches settings to avoid redundant saves, but settings might be stale.
-    // Simple save is safer.
-    if (ordersViewMode && settings?.orders_view_mode !== ordersViewMode) {
-      saveSettings({ orders_view_mode: ordersViewMode });
-    }
-  }, [ordersViewMode, saveSettings, settings]);
+  // Note: ordersViewMode is managed locally by Zustand persist.
+  // The default is 'grid' (set in use-settings-store.ts).
+  // Changes are persisted to DB via Settings page "Save All Settings" button.
+  // We intentionally do NOT sync from DB here to avoid overriding the local default.
 
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
