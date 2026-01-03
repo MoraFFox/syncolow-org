@@ -17,15 +17,15 @@ export function DelayAnalytics() {
     const visitsWithDelay = completedVisits.filter(v => {
       // Check if delay data exists directly
       if (v.delayDays && v.delayDays > 0) return true;
-      
+
       // Fallback to calculating from dates
       if (!v.scheduledDate || !v.actualArrivalDate) return false;
-      
+
       const scheduled = typeof v.scheduledDate === 'string' ? parseISO(v.scheduledDate) : v.scheduledDate;
       const actual = typeof v.actualArrivalDate === 'string' ? parseISO(v.actualArrivalDate) : v.actualArrivalDate;
-      
+
       if (!isValid(scheduled) || !isValid(actual)) return false;
-      
+
       return differenceInDays(actual, scheduled) > 0;
     });
     console.log('Visits with delay:', visitsWithDelay.length);
@@ -34,30 +34,30 @@ export function DelayAnalytics() {
       // Check if delay data exists directly
       if (v.delayDays && v.delayDays > 3) return true;
       if (v.isSignificantDelay) return true;
-      
+
       // Fallback to calculating from dates
       if (!v.scheduledDate || !v.actualArrivalDate) return false;
-      
+
       const scheduled = typeof v.scheduledDate === 'string' ? parseISO(v.scheduledDate) : v.scheduledDate;
       const actual = typeof v.actualArrivalDate === 'string' ? parseISO(v.actualArrivalDate) : v.actualArrivalDate;
-      
+
       if (!isValid(scheduled) || !isValid(actual)) return false;
-      
+
       return differenceInDays(actual, scheduled) > 3;
     });
 
     const totalDelayDays = visitsWithDelay.reduce((sum, v) => {
       // Use stored delay data if available
       if (v.delayDays && v.delayDays > 0) return sum + v.delayDays;
-      
+
       // Fallback to calculating from dates
       if (!v.scheduledDate || !v.actualArrivalDate) return sum;
-      
+
       const scheduled = typeof v.scheduledDate === 'string' ? parseISO(v.scheduledDate) : v.scheduledDate;
       const actual = typeof v.actualArrivalDate === 'string' ? parseISO(v.actualArrivalDate) : v.actualArrivalDate;
-      
+
       if (!isValid(scheduled) || !isValid(actual)) return sum;
-      
+
       return sum + differenceInDays(actual, scheduled);
     }, 0);
 
@@ -72,7 +72,7 @@ export function DelayAnalytics() {
       return acc;
     }, {} as Record<string, number>);
 
-    const topDelayReason = Object.entries(delayReasons).sort(([,a], [,b]) => b - a)[0];
+    const topDelayReason = Object.entries(delayReasons).sort(([, a], [, b]) => b - a)[0];
 
     // Technician performance
     const technicianDelays = visitsWithDelay.reduce((acc, v) => {
@@ -82,7 +82,7 @@ export function DelayAnalytics() {
       return acc;
     }, {} as Record<string, number>);
 
-    const worstTechnician = Object.entries(technicianDelays).sort(([,a], [,b]) => b - a)[0];
+    const worstTechnician = Object.entries(technicianDelays).sort(([, a], [, b]) => b - a)[0];
 
     return {
       totalVisits: completedVisits.length,

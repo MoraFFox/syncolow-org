@@ -9,16 +9,16 @@ import { Button } from "@/components/ui/button"
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "@/components/ui/command"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 
-interface ComboboxProps {
-    options: { label: string; value: string }[];
-    value?: string;
-    onChange: (value: string) => void;
-    placeholder?: string;
-    searchPlaceholder?: string;
-    emptyText?: string;
+interface ComboboxProps extends Omit<React.HTMLAttributes<HTMLButtonElement>, 'onChange' | 'value'> {
+  options: { label: string; value: string }[];
+  value?: string;
+  onChange: (value: string) => void;
+  placeholder?: string;
+  searchPlaceholder?: string;
+  emptyText?: string;
 }
 
-export function Combobox({ options, value, onChange, placeholder, searchPlaceholder, emptyText }: ComboboxProps) {
+export function Combobox({ options, value, onChange, placeholder, searchPlaceholder, emptyText, className, ...props }: ComboboxProps) {
   const [open, setOpen] = React.useState(false)
 
   return (
@@ -28,7 +28,8 @@ export function Combobox({ options, value, onChange, placeholder, searchPlacehol
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className="w-full justify-between"
+          className={cn("w-full justify-between", className)}
+          {...props}
         >
           {value
             ? options.find((option) => option.value === value)?.label

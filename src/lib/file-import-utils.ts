@@ -1,9 +1,9 @@
 
-import { read, utils } from 'xlsx';
-import Papa from 'papaparse';
 import { CsvRow } from './types';
 import { calculateTotal, calculateOrderTotals } from './pricing-calculator';
 import { supabase } from '@/lib/supabase';
+import { logger } from '@/lib/logger';
+import { mapHeaderToCanonical } from './import-schema';
 
 // Re-export from import-schema for convenient access
 export {
@@ -124,7 +124,7 @@ export function parseExcelFile(file: File): Promise<CsvRow[]> {
  * This function transforms the XLSX data structure to match the system's expected format
  * Enhanced with comprehensive synonym matching from import-schema.
  */
-import { HEADER_SYNONYMS, mapHeaderToCanonical } from './import-schema';
+// HEADER_SYNONYMS and mapHeaderToCanonical are re-exported above from import-schema
 
 // ... (keep usage, remove require)
 
@@ -133,13 +133,6 @@ export function mapXlsxToOrderFormat(rows: CsvRow[]): CsvRow[] {
     // First, try to auto-map import-schema utils
     const canonicalRow: CsvRow = {};
 
-
-    // DEBUG: Log first row keys and checking Synonyms
-    if (rows.indexOf(row) === 0) {
-      console.log('[IMPORT DEBUG] Raw Keys in mapXlsx:', Object.keys(row));
-      console.log('[IMPORT DEBUG] HEADER_SYNONYMS loaded?', !!HEADER_SYNONYMS, 'Keys:', Object.keys(HEADER_SYNONYMS || {}).length);
-      console.log('[IMPORT DEBUG] Check Inv. No mapping:', mapHeaderToCanonical ? mapHeaderToCanonical('Inv. No') : 'Function missing');
-    }
 
     // Map each header to its canonical form
     for (const [rawHeader, value] of Object.entries(row)) {
@@ -187,7 +180,8 @@ export function mapXlsxToOrderFormat(rows: CsvRow[]): CsvRow[] {
 }
 
 /**
- * Validates CSV file data according to expected order format
+ * Validates CSV file data according to expected order format.
+ * Uses canonical header mapping so synonyms like "Inv. Qty" satisfy the quantity requirement.
  */
 export function validateCsvData(rows: CsvRow[]): { isValid: boolean; errors: string[] } {
   const errors: string[] = [];
@@ -196,30 +190,54 @@ export function validateCsvData(rows: CsvRow[]): { isValid: boolean; errors: str
     return { isValid: false, errors: ['CSV file is empty'] };
   }
 
-  // Check for required fields in CSV format
-  const requiredFields = ['Customer Name', 'Cust Account', 'Item Name', 'Quantity', 'Price'];
   const firstRow = rows[0];
+  const rawHeaders = Object.keys(firstRow);
 
-  for (const field of requiredFields) {
-    if (!firstRow.hasOwnProperty(field)) {
+  // Map raw headers to canonical field keys
+  const canonicalFieldsFound = new Set<string>();
+  for (const rawHeader of rawHeaders) {
+    const canonical = mapHeaderToCanonical(rawHeader);
+    if (canonical) {
+      canonicalFieldsFound.add(canonical);
+    }
+  }
+
+  // Required canonical fields (matching REQUIRED_IMPORT_FIELDS from import-schema)
+  const requiredCanonicalFields = ['customerName', 'itemName', 'quantity', 'price'];
+
+  for (const field of requiredCanonicalFields) {
+    if (!canonicalFieldsFound.has(field)) {
       errors.push(`Missing required field: ${field}`);
     }
   }
+
+  // Helper to get value from row using canonical field key
+  const getCanonicalValue = (row: CsvRow, canonicalKey: string): string | undefined => {
+    for (const [rawHeader, value] of Object.entries(row)) {
+      if (mapHeaderToCanonical(rawHeader) === canonicalKey) {
+        return value?.toString();
+      }
+    }
+    return undefined;
+  };
 
   // Validate data types and formats
   for (let i = 0; i < rows.length; i++) {
     const row = rows[i];
 
-    // Validate numeric fields
-    if (row['Quantity'] && isNaN(Number(row['Quantity']))) {
+    // Validate numeric fields using canonical lookup
+    const quantity = getCanonicalValue(row, 'quantity');
+    if (quantity && isNaN(Number(quantity))) {
       errors.push(`Row ${i + 1}: Quantity must be a number`);
     }
 
-    if (row['Price'] && isNaN(Number(row['Price']))) {
+    const price = getCanonicalValue(row, 'price');
+    if (price && isNaN(Number(price))) {
       errors.push(`Row ${i + 1}: Price must be a number`);
     }
 
-    if (row['Amount'] && isNaN(Number(row['Amount']))) {
+    const lineTotal = getCanonicalValue(row, 'lineTotal');
+    if (lineTotal && isNaN(Number(lineTotal))) {
       errors.push(`Row ${i + 1}: Amount must be a number`);
     }
   }
@@ -354,44 +372,78 @@ export function detectDuplicatesWithinFile(rows: CsvRow[]): { duplicateIndices: 
  * Detects duplicates against existing database records
  * This function checks if the records in the import file already exist in the database
  */
-export async function detectDuplicatesAgainstDatabase(rows: CsvRow[]): Promise<{ duplicateIndices: number[]; existingRecords: CsvRow[] }> {
-  // Get all existing orders from the database
-  const { data: orders } = await supabase.from('orders').select('*');
-
-  const existingOrders: any[] = orders || [];
-
+export async function detectDuplicatesAgainstDatabase(rows: CsvRow[]): Promise<{ duplicateIndices: number[]; existingRecords: CsvRow[]; error?: string }> {
   const duplicateIndices: number[] = [];
   const existingRecords: CsvRow[] = [];
 
-  // For each row in the import file, check if it already exists in the database
-  for (let i = 0; i < rows.length; i++) {
-    const row = rows[i];
+  if (rows.length === 0) {
+    return { duplicateIndices, existingRecords };
+  }
 
-    // Create a unique key based on customer name, item name, quantity, and price
-    const customerName = (row['Customer Name'] || row['CustomerName'] || '').toLowerCase().trim();
-    const itemName = (row['Item Name'] || row['ItemName'] || row['Product Name'] || row['ProductName'] || '').toLowerCase().trim();
-    const quantity = (row['Inv. Qty'] || row['Quantity'] || row['Qty'] || row['quantity'] || '').toString();
-    const price = (row['Price'] || row['Unit Price'] || row['UnitPrice'] || row['price'] || '').toString();
-
-    // Check if this combination exists in the existing orders
-    const isDuplicate = existingOrders.some(order => {
-      // Check if the order contains an item with the same product name, quantity, and price
-      if (order.companyName?.toLowerCase().trim() === customerName &&
-        Array.isArray(order.items) &&
-        order.items.some((item: any) =>
-          item.productName?.toLowerCase().trim() === itemName &&
-          item.quantity?.toString() === quantity &&
-          item.price?.toString() === price
-        )) {
-        return true;
-      }
-      return false;
-    });
-
-    if (isDuplicate) {
-      duplicateIndices.push(i);
-      existingRecords.push(row);
+  // Extract unique company names from import candidates for filtering
+  const importCompanyNames = new Set<string>();
+  for (const row of rows) {
+    const customerName = (row['Customer Name'] || row['CustomerName'] || '').toString().toLowerCase().trim();
+    if (customerName) {
+      importCompanyNames.add(customerName);
     }
+  }
+
+  try {
+    // Fetch only needed columns and filter by company names from import candidates
+    const { data: orders, error } = await supabase
+      .from('orders')
+      .select('companyName, items')
+      .filter('companyName', 'in', `(${Array.from(importCompanyNames).map(n => `"${n}"`).join(',')})`);
+
+    if (error) {
+      logger.error(error, {
+        component: 'file-import-utils',
+        action: 'detectDuplicatesAgainstDatabase',
+        importRowCount: rows.length,
+      });
+      return { duplicateIndices, existingRecords, error: `Database query failed: ${error.message}` };
+    }
+
+    const existingOrders: Array<{ companyName?: string; items?: Array<{ productName?: string; quantity?: number; price?: number }> }> = orders || [];
+
+    // For each row in the import file, check if it already exists in the database
+    for (let i = 0; i < rows.length; i++) {
+      const row = rows[i];
+
+      // Create a unique key based on customer name, item name, quantity, and price
+      const customerName = (row['Customer Name'] || row['CustomerName'] || '').toString().toLowerCase().trim();
+      const itemName = (row['Item Name'] || row['ItemName'] || row['Product Name'] || row['ProductName'] || '').toString().toLowerCase().trim();
+      const quantity = (row['Inv. Qty'] || row['Quantity'] || row['Qty'] || row['quantity'] || '').toString();
+      const price = (row['Price'] || row['Unit Price'] || row['UnitPrice'] || row['price'] || '').toString();
+
+      // Check if this combination exists in the existing orders
+      const isDuplicate = existingOrders.some(order => {
+        // Check if the order contains an item with the same product name, quantity, and price
+        if (order.companyName?.toLowerCase().trim() === customerName &&
+          Array.isArray(order.items) &&
+          order.items.some((item) =>
+            item.productName?.toLowerCase().trim() === itemName &&
+            item.quantity?.toString() === quantity &&
+            item.price?.toString() === price
+          )) {
+          return true;
+        }
+        return false;
+      });
+
+      if (isDuplicate) {
+        duplicateIndices.push(i);
+        existingRecords.push(row);
+      }
+    }
+  } catch (err) {
+    logger.error(err, {
+      component: 'file-import-utils',
+      action: 'detectDuplicatesAgainstDatabase',
+      importRowCount: rows.length,
+    });
+    return { duplicateIndices, existingRecords, error: 'Unexpected error during duplicate detection' };
   }
 
   return {

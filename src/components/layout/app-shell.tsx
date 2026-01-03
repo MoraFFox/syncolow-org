@@ -78,6 +78,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     dialogState.setIsMaintenanceFormOpen(false);
   };
 
+  const isTechMode = pathname === "/maintenance/tech" || pathname.startsWith("/maintenance/tech/");
+
   if (shouldShowLoader) {
     return (
       <div className='flex items-center justify-center h-screen'>
@@ -86,8 +88,13 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     );
   }
 
-  if (isPublicRoute) {
-    return <>{children}</>;
+  if (isPublicRoute || isTechMode) {
+    return (
+      <>
+        <OfflineBanner />
+        {children}
+      </>
+    );
   }
 
   if (isMobile) {

@@ -404,7 +404,7 @@ Create `.lintstagedrc.json`:
 ```json
 {
   "scripts": {
-    "dev": "next dev --turbopack -p 9002",
+    "dev": "next dev --turbopack -p 3001",
     "build": "next build",
     "start": "next start",
     "lint": "eslint --ext .js,.jsx,.ts,.tsx --max-warnings=0 .",

@@ -6,11 +6,12 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { withTraceContext } from '@/lib/with-trace-context';
 import { ExportConfigSchema } from '@/lib/mock-data-generator/config/schemas';
 import { SafetyGuard } from '@/lib/mock-data-generator/safety-guard';
 import { logger } from '@/lib/logger';
 
-export async function POST(request: NextRequest) {
+export const POST = withTraceContext(async (request: NextRequest) => {
   try {
     const body = await request.json();
 
@@ -39,7 +40,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    logger.info('[API] Starting mock data export', { format, entities });
+    logger.info('[API] Starting mock data export', { data: { format, entities } });
 
     // Get safe Supabase client
     const supabase = safetyGuard.createSafeSupabaseClient();
@@ -71,13 +72,13 @@ export async function POST(request: NextRequest) {
         const { data, error } = await query.limit(10000);
 
         if (error) {
-          logger.warn(`[API] Failed to export ${entity}`, { error });
+          logger.warn(`[API] Failed to export ${entity}`, { data: { error } });
           exportData[entity] = [];
         } else {
           exportData[entity] = data ?? [];
         }
       } catch (error) {
-        logger.warn(`[API] Error exporting ${entity}`, { error });
+        logger.warn(`[API] Error exporting ${entity}`, { data: { error } });
         exportData[entity] = [];
       }
     }
@@ -87,16 +88,16 @@ export async function POST(request: NextRequest) {
       case 'json':
         const jsonContent = includeMetadata
           ? {
-              metadata: {
-                exportedAt: new Date().toISOString(),
-                format: 'json',
-                entityCount: Object.fromEntries(
-                  Object.entries(exportData).map(([k, v]) => [k, v.length])
-                ),
-                dateRange,
-              },
-              data: exportData,
-            }
+            metadata: {
+              exportedAt: new Date().toISOString(),
+              format: 'json',
+              entityCount: Object.fromEntries(
+                Object.entries(exportData).map(([k, v]) => [k, v.length])
+              ),
+              dateRange,
+            },
+            data: exportData,
+          }
           : exportData;
 
         return new NextResponse(JSON.stringify(jsonContent, null, 2), {
@@ -159,11 +160,11 @@ export async function POST(request: NextRequest) {
         );
     }
   } catch (error) {
-    logger.error('[API] Export endpoint error', { error });
+    logger.error('[API] Export endpoint error', { data: { error } });
 
     return NextResponse.json(
       { error: 'Internal server error', message: error instanceof Error ? error.message : String(error) },
       { status: 500 }
     );
   }
-}
+});

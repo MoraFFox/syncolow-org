@@ -6,10 +6,11 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { withTraceContext } from '@/lib/with-trace-context';
 import { getSafeMockDataClient } from '@/lib/mock-data-generator/safety-guard';
 import { logger } from '@/lib/logger';
 
-export async function GET(request: NextRequest) {
+export const GET = withTraceContext(async (request: NextRequest) => {
   try {
     const { searchParams } = new URL(request.url);
     const jobId = searchParams.get('jobId');
@@ -22,12 +23,12 @@ export async function GET(request: NextRequest) {
     }
 
     const supabase = getSafeMockDataClient();
-    
+
     const { data: job, error } = await supabase
-        .from('jobs')
-        .select('*')
-        .eq('id', jobId)
-        .single();
+      .from('jobs')
+      .select('*')
+      .eq('id', jobId)
+      .single();
 
     if (error || !job) {
       return NextResponse.json(
@@ -39,7 +40,7 @@ export async function GET(request: NextRequest) {
     // Map DB fields to response format
     // DB columns: status, progress, result, error, created_at, updated_at
     // Response expects: status, startedAt, progress: { ... }
-    
+
     return NextResponse.json({
       jobId,
       status: job.status, // pending, running, completed, failed
@@ -48,17 +49,17 @@ export async function GET(request: NextRequest) {
         status: job.status === 'running' ? 'generating' : job.status,
         progressPercent: job.progress, // 0-100
         // We might imply other progress details from result if available or just return basic info
-        details: job.result, 
+        details: job.result,
         error: job.error,
         updatedAt: job.updated_at,
       },
     });
   } catch (error) {
-    logger.error('[API] Status endpoint error', { error });
+    logger.error('[API] Status endpoint error', { data: { error } });
 
     return NextResponse.json(
       { error: 'Internal server error', message: error instanceof Error ? error.message : String(error) },
       { status: 500 }
     );
   }
-}
+});

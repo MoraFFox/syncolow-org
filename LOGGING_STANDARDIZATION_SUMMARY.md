@@ -127,6 +127,9 @@ logger.error(error: unknown, context?: { component?: string; action?: string })
 
 // Warning logging (all environments)
 logger.warn(message: string, context?: { component?: string })
+
+// Info logging (all environments)
+logger.info(message: string, context?: { component?: string; action?: string })
 ```
 
 ### Usage Examples
@@ -140,7 +143,45 @@ logger.error(error, { component: 'OrderForm', action: 'submit' });
 
 // Warning with context
 logger.warn('Deprecated API used', { component: 'ProductList' });
+
+// Info with context (logs in all environments)
+logger.info('User logged in', { component: 'Auth', userId: '123' });
 ```
+
+### Production vs Development Output
+
+| Environment | Format | Description |
+|-------------|--------|-------------|
+| **Development** | Emoji console groups | Human-readable with `📍`, `⚡`, `💬` prefixes |
+| **Production** | Structured JSON | Machine-parseable with `level`, `timestamp`, `message` fields |
+
+### Sensitive Field Redaction
+
+The logger automatically redacts sensitive fields to prevent PII leakage:
+
+- `password`, `token`, `secret`, `apiKey`, `authorization`, `cookie`, `session`
+
+Example:
+```typescript
+// Input
+logger.error(error, { data: { username: 'user@example.com', password: 'secret123' } });
+
+// Production output
+{ "level": "error", "data": { "username": "user@example.com", "password": "[REDACTED]" } }
+```
+
+### Safe Serialization
+
+Context data is safely serialized to prevent errors with circular references or BigInt:
+
+```typescript
+const circular = { name: 'test' };
+circular.self = circular; // Circular reference
+
+// Does not throw - logs "[unserializable context]" for the data field
+logger.error(error, { data: circular });
+```
+
 
 ## Impact Assessment
 

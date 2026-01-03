@@ -110,7 +110,7 @@ npm run build
 ### Performance Testing
 ```bash
 # Lighthouse
-npx lighthouse http://localhost:9002
+npx lighthouse http://localhost:3001
 
 # Web Vitals
 npm run dev

@@ -45,10 +45,10 @@ export function KpiCard({
     expandHitArea
 }: KpiCardProps) {
     const getTrendColor = () => {
-        if (trendDirection === 'neutral') return 'text-muted-foreground';
-        if (trendDirection === 'up') return isPositiveTrend ? 'text-green-600 dark:text-green-500' : 'text-red-600 dark:text-red-500';
-        if (trendDirection === 'down') return isPositiveTrend ? 'text-red-600 dark:text-red-500' : 'text-green-600 dark:text-green-500';
-        return 'text-muted-foreground';
+        if (trendDirection === 'neutral') return 'text-zinc-500';
+        if (trendDirection === 'up') return isPositiveTrend ? 'text-emerald-500' : 'text-rose-500';
+        if (trendDirection === 'down') return isPositiveTrend ? 'text-rose-500' : 'text-emerald-500';
+        return 'text-zinc-500';
     };
 
     const getTrendIcon = () => {
@@ -85,22 +85,22 @@ export function KpiCard({
 
     const cardContent = (
         <Card
-            className={cn(className, (onClick || drillKind) && "cursor-pointer hover:bg-accent/50 transition-colors")}
+            className={cn(className, (onClick || drillKind) && "cursor-pointer hover:bg-zinc-900/50 transition-colors")}
             onClick={onClick} // Keep original onClick if provided, DrillTarget handles its own click
         >
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <div className="flex items-center gap-1">
-                    <CardTitle className="text-sm font-medium min-w-0 truncate">
+                    <CardTitle className="text-xs font-medium font-mono uppercase tracking-widest text-zinc-400 min-w-0 truncate">
                         {title}
                     </CardTitle>
                     {tooltip && (
                         <TooltipProvider>
                             <Tooltip>
                                 <TooltipTrigger asChild>
-                                    <Info className="h-3 w-3 text-muted-foreground cursor-help" />
+                                    <Info className="h-3 w-3 text-zinc-500 hover:text-zinc-300 cursor-help transition-colors" />
                                 </TooltipTrigger>
-                                <TooltipContent className="max-w-xs">
-                                    <p className="text-sm">{tooltip}</p>
+                                <TooltipContent className="max-w-xs bg-zinc-950 border-zinc-800 text-zinc-300">
+                                    <p className="text-xs font-mono">{tooltip}</p>
                                 </TooltipContent>
                             </Tooltip>
                         </TooltipProvider>
@@ -111,9 +111,9 @@ export function KpiCard({
             <CardContent>
                 <div className="flex items-end justify-between gap-2">
                     <div className="flex-1">
-                        <div className="text-2xl font-bold min-w-0 truncate">{value}</div>
+                        <div className="text-2xl font-bold font-mono text-zinc-100 min-w-0 truncate">{value}</div>
                         {trend && (
-                            <div className={cn("text-xs min-w-0 truncate flex items-center gap-1 mt-1", getTrendColor())}>
+                            <div className={cn("text-xs font-mono min-w-0 truncate flex items-center gap-1 mt-1", getTrendColor())}>
                                 {trendDirection && getTrendIcon()}
                                 <span>{trend}</span>
                             </div>
@@ -123,18 +123,24 @@ export function KpiCard({
                         <div className="h-12 w-20">
                             <ResponsiveContainer width="100%" height="100%">
                                 <AreaChart data={sparklineData.map((value, index) => ({ value, index }))}>
+                                    <defs>
+                                        <linearGradient id={`gradient-${title}`} x1="0" y1="0" x2="0" y2="1">
+                                            <stop offset="5%" stopColor={isPositiveTrend ? '#10b981' : '#f43f5e'} stopOpacity={0.3} />
+                                            <stop offset="95%" stopColor={isPositiveTrend ? '#10b981' : '#f43f5e'} stopOpacity={0} />
+                                        </linearGradient>
+                                    </defs>
                                     <Area
                                         type="monotone"
                                         dataKey="value"
-                                        stroke={trendDirection === 'up' && isPositiveTrend ? 'hsl(var(--chart-1))' : trendDirection === 'down' && !isPositiveTrend ? 'hsl(var(--chart-1))' : 'hsl(var(--muted-foreground))'}
-                                        fill={trendDirection === 'up' && isPositiveTrend ? 'hsl(var(--chart-1))' : trendDirection === 'down' && !isPositiveTrend ? 'hsl(var(--chart-1))' : 'hsl(var(--muted-foreground))'}
-                                        fillOpacity={0.2}
-                                        strokeWidth={1.5}
+                                        stroke={isPositiveTrend ? '#10b981' : '#f43f5e'}
+                                        fill={`url(#gradient-${title})`}
+                                        strokeWidth={2}
                                     />
                                 </AreaChart>
                             </ResponsiveContainer>
                         </div>
                     )}
+
                 </div>
             </CardContent>
         </Card>

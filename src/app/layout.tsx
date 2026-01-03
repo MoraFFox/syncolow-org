@@ -1,6 +1,7 @@
 
 import type { Metadata } from 'next';
-import { Mulish } from 'next/font/google';
+import { Mulish, JetBrains_Mono, Outfit } from 'next/font/google';
+import { headers } from 'next/headers';
 import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
 import { AuthProvider } from '@/hooks/use-auth';
@@ -20,19 +21,44 @@ const mulish = Mulish({
   display: 'swap',
 });
 
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ['latin'],
+  variable: '--font-mono',
+  display: 'swap',
+});
+
+const outfit = Outfit({
+  subsets: ['latin'],
+  variable: '--font-display',
+  display: 'swap',
+});
+
 export const metadata: Metadata = {
   title: 'SynergyFlow',
   description: 'AI-powered ERP system to manage clients, sales, maintenance, and business analytics.',
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const headersList = await headers();
+  const correlationId = headersList.get('x-correlation-id') || '';
+  const traceId = headersList.get('x-trace-id') || '';
+
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={cn('min-h-screen bg-background font-sans antialiased', mulish.variable)}>
+      <head>
+        {correlationId && <meta name="correlation-id" content={correlationId} />}
+        {traceId && <meta name="trace-id" content={traceId} />}
+      </head>
+      <body className={cn(
+        'min-h-screen bg-background font-sans antialiased',
+        mulish.variable,
+        jetbrainsMono.variable,
+        outfit.variable
+      )}>
         <Providers>
           <AuthProvider>
             <AppShell>{children}</AppShell>

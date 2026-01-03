@@ -11,6 +11,7 @@ import { CompanyForm } from "./_components/company-form";
 import { BranchForm } from "./_components/branch-form";
 import { ClientActions } from "./_components/client-actions";
 import { ClientList } from "./_components/client-list";
+import { ClientGrid } from "./_components/client-grid";
 import { CompanyWizardForm } from "./_components/company-wizard-form";
 import { useOrderStore } from "@/store/use-order-store";
 
@@ -25,7 +26,7 @@ type SortConfig = {
 export default function CompaniesPage() {
   const { companies, loading, deleteCompany, updateCompanyAndBranches, addCompanyAndRelatedData, mergeCompanies, fetchRevenueStats } = useCompanyStore();
   const { fetchInitialData } = useOrderStore();
-  const { paginationLimit } = useSettingsStore();
+  const { paginationLimit, clientsViewMode, setClientsViewMode } = useSettingsStore();
   const [searchTerm, setSearchTerm] = useState("");
   const [typeFilter, setTypeFilter] = useState('All');
 
@@ -280,24 +281,35 @@ export default function CompaniesPage() {
         <ClientActions
           searchTerm={searchTerm}
           typeFilter={typeFilter}
+          viewMode={clientsViewMode}
           onSearchChange={setSearchTerm}
           onTypeFilterChange={setTypeFilter}
+          onViewModeChange={setClientsViewMode}
           onAddCompany={() => setIsWizardOpen(true)}
           onImport={() => setIsImportDialogOpen(true)}
         />
 
-        <ClientList
-          items={visibleItems}
-          allCompanies={companies}
-          onEdit={openEditForm}
-          onDelete={openDeleteDialog}
-          selectedIds={selectedIds}
-          onSelect={handleSelect}
-          onSelectAll={handleSelectAll}
-          sortConfig={sortConfig}
-          onSort={handleSort}
-          typeFilter={typeFilter}
-        />
+        {clientsViewMode === 'grid' ? (
+          <ClientGrid
+            items={visibleItems}
+            allCompanies={companies}
+            onEdit={openEditForm}
+            onDelete={openDeleteDialog}
+          />
+        ) : (
+          <ClientList
+            items={visibleItems}
+            allCompanies={companies}
+            onEdit={openEditForm}
+            onDelete={openDeleteDialog}
+            selectedIds={selectedIds}
+            onSelect={handleSelect}
+            onSelectAll={handleSelectAll}
+            sortConfig={sortConfig}
+            onSort={handleSort}
+            typeFilter={typeFilter}
+          />
+        )}
 
         {selectedIds.size > 0 && (
           <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-background border shadow-lg rounded-lg p-4 flex items-center gap-4 z-50 animate-in slide-in-from-bottom-5">

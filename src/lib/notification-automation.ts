@@ -2,7 +2,7 @@ import type { Notification, Order, Company, MaintenanceVisit } from './types';
 import { addDays } from 'date-fns';
 import { logger } from './logger';
 
-export type AutomationAction = 
+export type AutomationAction =
   | 'SEND_EMAIL'
   | 'CREATE_TASK'
   | 'UPDATE_STATUS'
@@ -29,6 +29,7 @@ export interface AutomationContext {
  * Configuration for automation actions
  */
 export interface ActionConfig {
+  [key: string]: unknown;
   template?: string;
   to?: string;
   priority?: string;
@@ -193,7 +194,7 @@ export class NotificationAutomation {
       maintenanceVisit?: MaintenanceVisit;
     }
   ): Promise<void> {
-    const matchingRules = this.rules.filter(rule => 
+    const matchingRules = this.rules.filter(rule =>
       rule.enabled && this.matchesRule(notification, rule, context)
     );
 
@@ -249,7 +250,7 @@ export class NotificationAutomation {
    */
   private static evaluateCondition(value: ConditionValue | undefined, operator: string, expected: ConditionValue): boolean {
     if (value === undefined) return false;
-    
+
     switch (operator) {
       case 'equals':
         return value === expected;
@@ -330,7 +331,7 @@ export class NotificationAutomation {
       // Import cache for caching of role lookups
       const { universalCache } = await import('./cache/universal-cache');
       const { CacheKeyFactory } = await import('./cache/key-factory');
-      
+
       if (to === 'client') {
         // Get email from company context
         if (context?.company?.email) {
@@ -360,14 +361,14 @@ export class NotificationAutomation {
 
       // Use universalCache.get with a fetcher for proper caching
       const cacheKey = CacheKeyFactory.detail('automation', `role-email-${targetRole}`);
-      
+
       const email = await universalCache.get<string | null>(
         cacheKey,
         async () => {
           // Query Supabase auth.users via admin API
           const { supabaseAdmin } = await import('./supabase');
           const { data: users, error } = await supabaseAdmin.auth.admin.listUsers();
-          
+
           if (error || !users?.users) {
             logger.warn('Failed to list users for email resolution', { error });
             return null;
@@ -404,7 +405,7 @@ export class NotificationAutomation {
     try {
       const { supabaseAdmin } = await import('./supabase');
       const { data: users } = await supabaseAdmin.auth.admin.listUsers();
-      
+
       if (!users?.users) return null;
 
       const user = users.users.find(
@@ -426,9 +427,9 @@ export class NotificationAutomation {
   private static async sendEmail(config: ActionConfig, notification: Notification, context?: AutomationContext): Promise<void> {
     try {
       const { sendEmailNotification } = await import('./notification-email-service');
-      
+
       const recipientEmail = config.to ? await this.resolveRecipientEmail(config.to, context) : null;
-      
+
       if (!recipientEmail) {
         logger.warn('No recipient found for email automation', { to: config.to });
         return;
@@ -438,24 +439,24 @@ export class NotificationAutomation {
       // For now, send with the standard template
       const notificationWithTemplate = config.template ? {
         ...notification,
-        metadata: { 
-          ...notification.metadata, 
-          automationTemplate: config.template 
+        metadata: {
+          ...notification.metadata,
+          automationTemplate: config.template
         }
       } : notification;
 
       await sendEmailNotification(recipientEmail, notificationWithTemplate);
-      
-      logger.debug('Automation email sent', { 
-        to: recipientEmail, 
+
+      logger.debug('Automation email sent', {
+        to: recipientEmail,
         template: config.template,
-        notificationId: notification.id 
+        notificationId: notification.id
       });
     } catch (error) {
-      logger.error(error, { 
-        component: 'NotificationAutomation', 
+      logger.error(error, {
+        component: 'NotificationAutomation',
         action: 'sendEmail',
-        config 
+        config
       });
     }
   }
@@ -463,9 +464,9 @@ export class NotificationAutomation {
   private static async createTask(config: ActionConfig, notification: Notification): Promise<void> {
     try {
       // Call the automation API route to create task with server-side token access
-      const baseUrl = typeof window !== 'undefined' 
-        ? window.location.origin 
-        : process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:9002';
+      const baseUrl = typeof window !== 'undefined'
+        ? window.location.origin
+        : process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3001';
 
       const response = await fetch(`${baseUrl}/api/automation/create-task`, {
         method: 'POST',
@@ -487,15 +488,15 @@ export class NotificationAutomation {
       }
 
       const result = await response.json();
-      logger.debug('Automation task created', { 
-        taskId: result.taskId, 
-        title: config.title 
+      logger.debug('Automation task created', {
+        taskId: result.taskId,
+        title: config.title
       });
     } catch (error) {
-      logger.error(error, { 
-        component: 'NotificationAutomation', 
+      logger.error(error, {
+        component: 'NotificationAutomation',
         action: 'createTask',
-        config 
+        config
       });
     }
   }
@@ -516,7 +517,7 @@ export class NotificationAutomation {
 
         const { error } = await supabase
           .from('orders')
-          .update({ 
+          .update({
             status: config.newStatus,
             statusHistory: [
               ...(context.order.statusHistory || []),
@@ -533,10 +534,10 @@ export class NotificationAutomation {
         // Invalidate caches using namespace tag
         await universalCache.invalidate('orders');
         await drilldownCacheInvalidator.invalidatePreview('order', context.order.id);
-        
-        logger.debug('Order status updated via automation', { 
-          orderId: context.order.id, 
-          status: config.newStatus 
+
+        logger.debug('Order status updated via automation', {
+          orderId: context.order.id,
+          status: config.newStatus
         });
       } else if (context?.maintenanceVisit && config.newStatus) {
         // Validate status is valid for MaintenanceVisit type
@@ -558,26 +559,26 @@ export class NotificationAutomation {
 
         // Invalidate caches using namespace tag
         await universalCache.invalidate('maintenance');
-        
-        logger.debug('Maintenance status updated via automation', { 
-          visitId: context.maintenanceVisit.id, 
-          status: config.newStatus 
+
+        logger.debug('Maintenance status updated via automation', {
+          visitId: context.maintenanceVisit.id,
+          status: config.newStatus
         });
       } else {
         logger.warn('No valid context for status update', { config });
       }
     } catch (error) {
-      logger.error(error, { 
-        component: 'NotificationAutomation', 
+      logger.error(error, {
+        component: 'NotificationAutomation',
         action: 'updateStatus',
-        config 
+        config
       });
     }
   }
 
   private static async escalate(config: ActionConfig, notification: Notification): Promise<void> {
     const { NotificationService } = await import('./notification-service');
-    
+
     // Create escalated notification
     await NotificationService.createNotification({
       ...notification,
@@ -594,10 +595,10 @@ export class NotificationAutomation {
       if (config.type === 'delivery_retry' && context?.order) {
         // Reschedule delivery
         const newDeliveryDate = addDays(new Date(), config.daysFromNow || 1);
-        
+
         const { error } = await supabase
           .from('orders')
-          .update({ 
+          .update({
             deliveryDate: newDeliveryDate.toISOString(),
             status: 'Pending' // Reset to pending for retry
           })
@@ -608,14 +609,14 @@ export class NotificationAutomation {
           return;
         }
 
-        logger.debug('Delivery rescheduled via automation', { 
-          orderId: context.order.id, 
-          newDate: newDeliveryDate.toISOString() 
+        logger.debug('Delivery rescheduled via automation', {
+          orderId: context.order.id,
+          newDate: newDeliveryDate.toISOString()
         });
       } else if (context?.maintenanceVisit) {
         // Schedule follow-up maintenance visit
         const scheduledDate = addDays(new Date(), config.daysFromNow || 3);
-        
+
         const { error } = await supabase
           .from('maintenance')
           .insert({
@@ -637,18 +638,18 @@ export class NotificationAutomation {
           return;
         }
 
-        logger.debug('Follow-up visit scheduled via automation', { 
-          rootVisitId: context.maintenanceVisit.id, 
-          scheduledDate: scheduledDate.toISOString() 
+        logger.debug('Follow-up visit scheduled via automation', {
+          rootVisitId: context.maintenanceVisit.id,
+          scheduledDate: scheduledDate.toISOString()
         });
       } else {
         logger.warn('No valid context for scheduling follow-up', { config });
       }
     } catch (error) {
-      logger.error(error, { 
-        component: 'NotificationAutomation', 
+      logger.error(error, {
+        component: 'NotificationAutomation',
         action: 'scheduleFollowUp',
-        config 
+        config
       });
     }
   }
@@ -673,8 +674,8 @@ export class NotificationAutomation {
 
       const { error } = await supabase
         .from('companies')
-        .update({ 
-          is_suspended: true, 
+        .update({
+          is_suspended: true,
           suspension_reason: config.reason || 'Automated suspension'
         })
         .eq('id', companyId);
@@ -687,15 +688,15 @@ export class NotificationAutomation {
       // Invalidate company cache using namespace tag
       await universalCache.invalidate('companies');
 
-      logger.debug('Company orders suspended via automation', { 
-        companyId, 
-        reason: config.reason 
+      logger.debug('Company orders suspended via automation', {
+        companyId,
+        reason: config.reason
       });
     } catch (error) {
-      logger.error(error, { 
-        component: 'NotificationAutomation', 
+      logger.error(error, {
+        component: 'NotificationAutomation',
         action: 'suspendOrders',
-        config 
+        config
       });
     }
   }
@@ -731,20 +732,20 @@ export class NotificationAutomation {
 
       // Build SMS message
       const message = `SynergyFlow: ${notification.title}\n${notification.message}`;
-      
+
       const success = await SMSService.sendSMS(phoneNumber, message);
-      
+
       if (success) {
-        logger.debug('Automation SMS sent', { 
-          to: phoneNumber, 
-          notificationId: notification.id 
+        logger.debug('Automation SMS sent', {
+          to: phoneNumber,
+          notificationId: notification.id
         });
       }
     } catch (error) {
-      logger.error(error, { 
-        component: 'NotificationAutomation', 
+      logger.error(error, {
+        component: 'NotificationAutomation',
         action: 'sendSMS',
-        config 
+        config
       });
     }
   }

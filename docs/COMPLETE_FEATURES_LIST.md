@@ -1092,7 +1092,7 @@
 - Fast refresh
 - Turbopack bundler
 - TypeScript compiler
-- Development server (port 9002)
+- Development server (port 3001)
 
 ### Testing
 - Vitest for unit tests

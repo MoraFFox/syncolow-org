@@ -1,58 +1,62 @@
-import { useState, useEffect } from 'react';
-// import { cacheManager } from '@/lib/cache-manager'; // File doesn't exist
+import { useUniversalCache } from './use-universal-cache';
 import { useOnlineStatus } from './use-online-status';
+import { CacheKey } from '@/lib/cache/types';
+import { supabase } from '@/lib/supabase';
 
+/**
+ * Hook to fetch cached data for a collection with offline support.
+ * 
+ * Uses the Universal Caching System which provides:
+ * - L1 (Memory) + L2 (IndexedDB) caching
+ * - Stale-while-revalidate strategy
+ * - Automatic offline data serving from cache
+ * 
+ * @param collection - The Supabase table/collection name
+ * @param forceRefresh - If true, bypasses stale data and forces a network fetch
+ */
 export function useCachedData<T>(collection: string, forceRefresh = false) {
-  const [data, setData] = useState<T[] | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
-  const [isFromCache, setIsFromCache] = useState(false);
-  const isOnline = useOnlineStatus();
+  const { isOnline } = useOnlineStatus();
 
-  useEffect(() => {
-    let mounted = true;
+  // Build a proper CacheKey
+  const cacheKey: CacheKey = ['app', 'list', collection, {}, 'v1'];
 
-    const loadData = async () => {
-      try {
-        setLoading(true);
-        // const result = await cacheManager.get<T>(collection, forceRefresh || isOnline);
-        
-        if (mounted) {
-          setData(null); // cacheManager not available
-          setIsFromCache(!isOnline);
-          setError(null);
-        }
-      } catch (err) {
-        if (mounted) {
-          setError(err as Error);
-        }
-      } finally {
-        if (mounted) {
-          setLoading(false);
-        }
-      }
-    };
+  // Default fetcher - fetches from Supabase
+  const fetcher = async (): Promise<T[]> => {
+    const { data, error } = await supabase
+      .from(collection)
+      .select('*');
 
-    loadData();
-
-    return () => {
-      mounted = false;
-    };
-  }, [collection, forceRefresh, isOnline]);
-
-  const refresh = async () => {
-    try {
-      setLoading(true);
-      // const result = await cacheManager.get<T>(collection, true);
-      setData(null); // cacheManager not available
-      setIsFromCache(false);
-      setError(null);
-    } catch (err) {
-      setError(err as Error);
-    } finally {
-      setLoading(false);
-    }
+    if (error) throw error;
+    return (data || []) as T[];
   };
 
-  return { data, loading, error, isFromCache, refresh };
+  const {
+    data,
+    isLoading: loading,
+    error,
+    refetch,
+    isStale,
+  } = useUniversalCache<T[]>(
+    cacheKey,
+    fetcher,
+    {
+      // Force refetch if requested
+      staleTime: forceRefresh ? 0 : undefined,
+      // Enable/disable background refetch based on online status
+      enabled: !!isOnline || !forceRefresh,
+    }
+  );
+
+  const refresh = async () => {
+    await refetch();
+  };
+
+  return {
+    data: data ?? null,
+    loading,
+    error: error as Error | null,
+    isFromCache: isStale || !isOnline,
+    refresh
+  };
 }
+

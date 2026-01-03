@@ -60,7 +60,7 @@ D:\My projects\firebase-orginal\
 ### Key Commands
 | Command | Description |
 | :--- | :--- |
-| `npm run dev` | Start development server on port **9002** |
+| `npm run dev` | Start development server on port **3001** |
 | `npm run genkit:watch` | Start Genkit AI flows in watch mode |
 | `npm run build` | Build the application for production |
 | `npm run test` | Run unit and integration tests (Vitest) |

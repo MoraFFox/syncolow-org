@@ -9,12 +9,13 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { withTraceContext } from '@/lib/with-trace-context';
 import { GeneratorConfigSchema } from '@/lib/mock-data-generator/config/schemas';
 import { getScenarioManager } from '@/lib/mock-data-generator/scenarios/scenario-manager';
 import { SafetyGuard } from '@/lib/mock-data-generator/safety-guard';
 import { logger } from '@/lib/logger';
 
-export async function GET() {
+export const GET = withTraceContext(async () => {
   try {
     const scenarioManager = getScenarioManager();
     const safetyGuard = new SafetyGuard();
@@ -41,16 +42,16 @@ export async function GET() {
       defaultDistributions: scenarioManager.getDefaultDistributions(),
     });
   } catch (error) {
-    logger.error('[API] Config GET error', { error });
+    logger.error('[API] Config GET error', { data: { error } });
 
     return NextResponse.json(
       { error: 'Internal server error', message: error instanceof Error ? error.message : String(error) },
       { status: 500 }
     );
   }
-}
+});
 
-export async function POST(request: NextRequest) {
+export const POST = withTraceContext(async (request: NextRequest) => {
   try {
     const body = await request.json();
 
@@ -102,11 +103,11 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch (error) {
-    logger.error('[API] Config POST error', { error });
+    logger.error('[API] Config POST error', { data: { error } });
 
     return NextResponse.json(
       { error: 'Internal server error', message: error instanceof Error ? error.message : String(error) },
       { status: 500 }
     );
   }
-}
+});

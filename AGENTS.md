@@ -59,6 +59,12 @@ The primary goal is to produce **clean, maintainable, and bug-free code** that i
    - Use modern React patterns (hooks, functional components, context where needed).
    - Keep components small and single-purpose (<150 lines ideally).
 
+5. **Distributed Tracing**
+   - All API routes **must** be wrapped with `withTraceContext`.
+   - All Server Actions **must** be wrapped with `withServerActionTrace`.
+   - Pass `LogContext` (traceId, correlationId) to all logger calls.
+   - Use `export const GET = withTraceContext(...)` syntax for route handlers.
+
 4. **Error Handling Standards**
    This project follows a consistent error handling pattern across all layers:
 
@@ -159,6 +165,31 @@ The primary goal is to produce **clean, maintainable, and bug-free code** that i
    - Never use `any` unless justified with a code comment.
    - Prefer utility types (`Partial<>`, `Pick<>`, `Omit<>`, etc.).
    - Use `zod` or TypeScript guards for runtime type validation where appropriate.
+
+---
+
+## 🎨 2a. UI Component & Tooling Guidelines
+
+1. **Component Usage**
+   - Always prioritize **ShadCN UI components** when applicable.
+   - Avoid creating custom components when a ShadCN equivalent exists.
+   - See `ShadCN-context.md` for the complete list of installed components.
+
+2. **Component Discovery**
+   - Use **Context7 MCP Tool** to discover suitable components and packages.
+   - When a user provides a **URL** reference, use the **Fetch tool** to analyze it.
+
+3. **ShadCN Component Tracking**
+   - Maintain `ShadCN-context.md` at the project root.
+   - Update this file when adding new ShadCN components.
+   - Install new components via: `npx shadcn@latest add <component>`
+
+4. **Existing UI Components (60+)**
+   - Core: Button, Card, Dialog, Input, Select, Form, Table, Tabs, Badge
+   - Navigation: Sidebar, Sheet, Dropdown Menu, Menubar, Command
+   - Feedback: Toast, Alert, Progress, Skeleton
+   - Data Display: Avatar, HoverCard, Tooltip, Carousel, ScrollArea
+   - Custom: Product Picker, File Upload, Date Range Filter, Map components
 
 ---
 
@@ -339,3 +370,64 @@ The primary goal is to produce **clean, maintainable, and bug-free code** that i
 > - Typed  
 > - Tested  
 > - Aligned with project conventions  
+
+---
+
+## 📚 9. Quick Reference
+
+### Key Files
+| File | Purpose |
+|------|---------|
+| `src/lib/supabase.ts` | Supabase client configuration |
+| `src/lib/types.ts` | Core TypeScript interfaces |
+| `src/lib/logger.ts` | Centralized logging |
+| `src/store/use-order-store.ts` | Primary order state management |
+| `src/middleware.ts` | Request middleware & auth |
+| `ShadCN-context.md` | UI component inventory |
+| `docs/project-context.md` | Full project documentation |
+
+### Primary Stores
+| Store | Purpose |
+|-------|---------|
+| `use-order-store` | Order CRUD, filtering, payments |
+| `use-company-store` | Companies & branches |
+| `use-products-store` | Product catalog & inventory |
+| `use-maintenance-store` | Maintenance visits |
+| `use-notification-store` | Notification state |
+
+### Common Commands
+```bash
+npm run dev           # Start dev server (port 3001)
+npm run test          # Run Vitest
+npm run typecheck     # TypeScript validation
+npm run lint          # ESLint check
+npm run ci            # Full CI pipeline
+```
+
+### API Route Pattern
+```typescript
+import { withTraceContext } from '@/lib/with-trace-context';
+import { logger } from '@/lib/logger';
+
+export const GET = withTraceContext(async (request, { context }) => {
+  logger.info('Processing request', context);
+  // ... route logic
+});
+```
+
+### Server Action Pattern
+```typescript
+'use server';
+import { withServerActionTrace } from '@/lib/with-server-action-trace';
+
+export const myAction = withServerActionTrace(
+  'myAction',
+  async (params: MyParams) => {
+    // ... action logic
+  }
+);
+```
+
+---
+
+**Last Updated:** 2025-12-30

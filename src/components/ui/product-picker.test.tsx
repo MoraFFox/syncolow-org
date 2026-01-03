@@ -10,6 +10,9 @@ import type { Product, Manufacturer } from '@/lib/types';
 // Mock the stores
 vi.mock('@/store/use-products-store');
 vi.mock('@/store/use-manufacturer-store');
+vi.mock('@/hooks/use-auth', () => ({
+    useAuth: vi.fn(),
+}));
 
 // Mock IndexedDB to avoid runtime errors
 vi.mock('@/lib/cache/indexed-db', () => ({
@@ -82,9 +85,14 @@ const mockManufacturers: Manufacturer[] = [
     { id: 'man-2', name: 'Samsung', code: 'SAM', icon: '📱', color: '#0000FF', createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
 ];
 
+import { useAuth } from '@/hooks/use-auth';
+
 describe('ProductPicker Search', () => {
     beforeEach(() => {
         vi.clearAllMocks();
+        (useAuth as any).mockReturnValue({
+            user: { email: 'test@example.com' },
+        });
         (useProductsStore as any).mockReturnValue({
             products: mockProducts,
             loading: false,

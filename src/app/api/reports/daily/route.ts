@@ -8,6 +8,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { withTraceContext } from '@/lib/with-trace-context';
 import {
   generateDailyReports,
   processAndSendDailyReports,
@@ -44,7 +45,7 @@ function validateCronSecret(secret: string | undefined): boolean {
  * Generates daily reports and optionally sends them via email.
  * Can be called manually from the UI or by a scheduled job.
  */
-export async function POST(request: NextRequest) {
+export const POST = withTraceContext(async (request: NextRequest) => {
   try {
     const body: GenerateReportRequest = await request.json();
     const { sendEmail = false, reportDate, recipients, cronSecret } = body;
@@ -63,9 +64,11 @@ export async function POST(request: NextRequest) {
     logger.debug('Daily reports generation started', {
       component: 'api/reports/daily',
       action: 'POST',
-      sendEmail,
-      reportDate: date.toISOString(),
-      isFromScheduler,
+      data: {
+        sendEmail,
+        reportDate: date.toISOString(),
+        isFromScheduler,
+      }
     });
 
     if (sendEmail) {
@@ -99,17 +102,17 @@ export async function POST(request: NextRequest) {
         success: reports.success,
         deliveryReport: reports.deliveryReport
           ? {
-              filename: reports.deliveryReport.filename,
-              orderCount: reports.deliveryReport.orderCount,
-              base64: reports.deliveryReport.base64,
-            }
+            filename: reports.deliveryReport.filename,
+            orderCount: reports.deliveryReport.orderCount,
+            base64: reports.deliveryReport.base64,
+          }
           : null,
         warehouseReport: reports.warehouseReport
           ? {
-              filename: reports.warehouseReport.filename,
-              orderCount: reports.warehouseReport.orderCount,
-              base64: reports.warehouseReport.base64,
-            }
+            filename: reports.warehouseReport.filename,
+            orderCount: reports.warehouseReport.orderCount,
+            base64: reports.warehouseReport.base64,
+          }
           : null,
         error: reports.error,
         timestamp: new Date().toISOString(),
@@ -129,14 +132,14 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     );
   }
-}
+});
 
 /**
  * GET /api/reports/daily
  *
  * Returns information about the daily reports endpoint.
  */
-export async function GET() {
+export const GET = withTraceContext(async () => {
   return NextResponse.json({
     endpoint: '/api/reports/daily',
     methods: ['POST', 'GET'],
@@ -171,4 +174,4 @@ export async function GET() {
       NEXT_PUBLIC_ADMIN_EMAIL: process.env.NEXT_PUBLIC_ADMIN_EMAIL || 'not set',
     },
   });
-}
+});

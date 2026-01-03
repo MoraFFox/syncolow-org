@@ -1,20 +1,23 @@
 
 "use client";
 
-import { useEffect } from 'react';
-import { useForm, Controller } from 'react-hook-form';
+import { useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { FormDialogWrapper } from '@/components/maintenance/form-dialog-wrapper';
+import { FormSection } from '@/components/maintenance/form-section';
+import { Box, Wrench, AlertTriangle, Tag, DollarSign, Loader2, Save } from 'lucide-react';
 
 export interface CatalogItem {
-    category: string;
-    name: string;
-    cost?: number;
-    price?: number;
+  id?: string;
+  category: string;
+  name: string;
+  cost?: number;
+  price?: number;
 }
 
 const formSchema = z.object({
@@ -34,6 +37,7 @@ interface ServicePartFormDialogProps {
 }
 
 export function ServicePartFormDialog({ isOpen, onOpenChange, onSubmit, item, itemType, isProblemMode = false }: ServicePartFormDialogProps) {
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { register, handleSubmit, reset, formState: { errors } } = useForm<CatalogItem>({
     resolver: zodResolver(formSchema),
   });
@@ -48,58 +52,109 @@ export function ServicePartFormDialog({ isOpen, onOpenChange, onSubmit, item, it
     }
   }, [isOpen, item, reset]);
 
-  const handleFormSubmit = (data: CatalogItem) => {
-    onSubmit(data);
-    onOpenChange(false);
+  const handleFormSubmit = async (data: CatalogItem) => {
+    setIsSubmitting(true);
+    try {
+      onSubmit(data);
+      onOpenChange(false);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
-  
+
   const isService = itemType === 'service' && !isProblemMode;
   const isProblem = isProblemMode;
   const isPart = itemType === 'part' && !isProblemMode;
 
+  const getTitle = () => {
+    if (isProblem) return item ? 'Edit Problem' : 'Log New Problem';
+    if (isService) return item ? 'Edit Service' : 'Add New Service';
+    return item ? 'Edit Part' : 'Add New Part';
+  };
+
+  const getDescription = () => {
+    if (isProblem) return "Define a common problem for quick selection.";
+    if (isService) return "Configure a service offering and its base cost.";
+    return "Add a spare part to the inventory catalog.";
+  };
+
+  const Footer = (
+    <>
+      <Button variant="ghost" onClick={() => onOpenChange(false)} disabled={isSubmitting}>
+        Cancel
+      </Button>
+      <Button onClick={handleSubmit(handleFormSubmit)} disabled={isSubmitting} className="min-w-[120px]">
+        {isSubmitting ? (
+          <>
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            Saving...
+          </>
+        ) : (
+          <>
+            <Save className="mr-2 h-4 w-4" />
+            {item ? 'Save Changes' : 'Add Item'}
+          </>
+        )}
+      </Button>
+    </>
+  );
+
   return (
-    <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>{item ? 'Edit' : 'Add'} {isProblem ? 'Problem' : isService ? 'Service' : 'Part'}</DialogTitle>
-          <DialogDescription>
-            {item ? 'Update the details below.' : `Enter the details for the new ${isProblem ? 'problem' : isService ? 'service' : 'part'}.`}
-          </DialogDescription>
-        </DialogHeader>
-        <form onSubmit={handleSubmit(handleFormSubmit)}>
-          <div className="grid gap-4 py-4">
+    <FormDialogWrapper
+      isOpen={isOpen}
+      onOpenChange={onOpenChange}
+      title={getTitle()}
+      description={getDescription()}
+      footer={Footer}
+      maxWidth="md"
+    >
+      <div className="space-y-6">
+        <FormSection
+          title={isProblem ? "Problem Details" : isService ? "Service Details" : "Part Details"}
+          icon={isProblem ? AlertTriangle : isService ? Wrench : Box}
+        >
+          <div className="grid gap-4">
             <div className="grid gap-2">
-              <Label htmlFor="category">Category</Label>
-              <Input id="category" {...register('category')} />
+              <Label htmlFor="category">Category / Group</Label>
+              <div className="relative">
+                <Tag className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                <Input id="category" className="pl-9" {...register('category')} placeholder="e.g. Electrical, Plumbing" />
+              </div>
               {errors.category && <p className="text-sm text-destructive">{errors.category.message}</p>}
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="name">Name</Label>
-              <Input id="name" {...register('name')} />
+              <Label htmlFor="name">Item Name</Label>
+              <Input id="name" {...register('name')} placeholder={isProblem ? "e.g. Leaking Faucet" : isService ? "e.g. AC Maintenance" : "e.g. Compressor"} />
               {errors.name && <p className="text-sm text-destructive">{errors.name.message}</p>}
             </div>
-            {!isProblem && (
+          </div>
+        </FormSection>
+
+        {!isProblem && (
+          <FormSection title="Pricing" icon={DollarSign}>
+            <div className="grid gap-4">
               <div className="grid gap-2">
-                <Label htmlFor={isService ? 'cost' : 'price'}>{isService ? 'Cost (EGP)' : 'Price ($)'}</Label>
-                <Input
-                  id={isService ? 'cost' : 'price'}
-                  type="number"
-                  step={isService ? 'any' : '0.01'}
-                  {...register(isService ? 'cost' : 'price', { valueAsNumber: true })}
-                />
+                <Label htmlFor={isService ? 'cost' : 'price'}>{isService ? 'Base Labor Cost (EGP)' : 'Unit Price (EGP)'}</Label>
+                <div className="relative">
+                  <span className="absolute left-3 top-2.5 text-muted-foreground font-semibold text-sm">EGP</span>
+                  <Input
+                    id={isService ? 'cost' : 'price'}
+                    type="number"
+                    step={isService ? 'any' : '0.01'}
+                    className="pl-12"
+                    {...register(isService ? 'cost' : 'price', { valueAsNumber: true })}
+                  />
+                </div>
                 {(isService && errors.cost) && <p className="text-sm text-destructive">{errors.cost.message}</p>}
                 {(isPart && errors.price) && <p className="text-sm text-destructive">{errors.price.message}</p>}
               </div>
-            )}
-          </div>
-          <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
-            <Button type="submit">{item ? 'Save Changes' : 'Add Item'}</Button>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
+            </div>
+          </FormSection>
+        )}
+      </div>
+    </FormDialogWrapper>
   );
 }
 
-    

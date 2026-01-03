@@ -1,19 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
+import { withTraceContext } from "@/lib/with-trace-context";
 import { DrillKind } from "@/lib/drilldown-types";
 import { supabaseAdmin } from "@/lib/supabase";
 import { getCompanyPreview, getProductPreview, getBranchPreview } from "@/lib/drilldown/data-service";
 import { logger } from "@/lib/logger";
 
-// Helper to compute health score if not present
-function calculateHealthScore(company: any) {
-  if (company.currentPaymentScore) return company.currentPaymentScore;
-  let score = 100;
-  if (company.status !== 'Active') score -= 20;
-  if (company.totalOutstandingAmount > 0) score -= 10;
-  return Math.max(0, score);
-}
-
-export async function POST(req: NextRequest) {
+export const POST = withTraceContext(async (req: NextRequest) => {
   try {
     if (!supabaseAdmin) {
       return NextResponse.json(
@@ -264,4 +256,4 @@ export async function POST(req: NextRequest) {
     logger.error(error, { component: 'DrillPreviewAPI', action: 'POST' });
     return NextResponse.json({ error: "Failed to fetch data" }, { status: 500 });
   }
-}
+});

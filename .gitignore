@@ -96,15 +96,19 @@ supabase/.temp/
 # pnpm-lock.yaml
 
 # Generated files (keep commented unless needed)
-# *.generated.ts
+*.generated.ts
 
-Large media files (uncomment if needed)
+# Large media files 
 *.mp4
 *.mov
 *.zip
 *.pdf
-*.xlsx
-*.xls
+# *.xlsx
+# *.xls
 *.csv
+*.txt
 # Local scripts (uncomment if you have local-only scripts)
-# scripts/local/
+scripts/local/
+
+# Auto Claude data directory
+.auto-claude/

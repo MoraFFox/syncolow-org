@@ -1,8 +1,8 @@
 
 "use client";
 
-import { useState } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { useState, useMemo } from 'react';
+import { ResponsiveDialog, ResponsiveDialogContent, ResponsiveDialogHeader, ResponsiveDialogTitle, ResponsiveDialogDescription } from '@/components/ui/responsive-dialog';
 import { Input } from '@/components/ui/input';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -20,20 +20,39 @@ export function ProblemReasonSelector({ isOpen, onOpenChange, selectedReasons, o
     const { problemsCatalog } = useMaintenanceStore();
     const [searchTerm, setSearchTerm] = useState('');
 
-    const filteredReasons = Object.entries(problemsCatalog).map(([category, reasons]) => {
-        const filtered = reasons.filter(reason => reason.toLowerCase().includes(searchTerm.toLowerCase()));
-        return { category, reasons: filtered };
-    }).filter(group => group.reasons.length > 0);
+    // Safely handle the flat array structure from the store
+    const filteredReasons = useMemo(() => {
+        if (!Array.isArray(problemsCatalog)) return [];
+
+        const groups: Record<string, string[]> = {};
+
+        problemsCatalog.forEach(item => {
+            // Filter by search term
+            if (searchTerm && !item.problem.toLowerCase().includes(searchTerm.toLowerCase())) {
+                return;
+            }
+
+            if (!groups[item.category]) {
+                groups[item.category] = [];
+            }
+            groups[item.category].push(item.problem);
+        });
+
+        return Object.entries(groups).map(([category, reasons]) => ({
+            category,
+            reasons
+        }));
+    }, [problemsCatalog, searchTerm]);
 
     return (
-        <Dialog open={isOpen} onOpenChange={onOpenChange}>
-            <DialogContent className="max-w-2xl max-h-[80vh] flex flex-col">
-                <DialogHeader>
-                    <DialogTitle>Select Problem Reasons</DialogTitle>
-                    <DialogDescription>Choose one or more reasons that describe the issue.</DialogDescription>
-                </DialogHeader>
+        <ResponsiveDialog open={isOpen} onOpenChange={onOpenChange}>
+            <ResponsiveDialogContent className="max-w-2xl max-h-[85vh] flex flex-col sm:max-h-[80vh]">
+                <ResponsiveDialogHeader>
+                    <ResponsiveDialogTitle>Select Problem Reasons</ResponsiveDialogTitle>
+                    <ResponsiveDialogDescription>Choose one or more reasons that describe the issue.</ResponsiveDialogDescription>
+                </ResponsiveDialogHeader>
                 <div className="py-2">
-                    <Input 
+                    <Input
                         placeholder="Search reasons..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
@@ -68,7 +87,7 @@ export function ProblemReasonSelector({ isOpen, onOpenChange, selectedReasons, o
                         ))}
                     </Accordion>
                 </div>
-            </DialogContent>
-        </Dialog>
+            </ResponsiveDialogContent>
+        </ResponsiveDialog>
     )
 }

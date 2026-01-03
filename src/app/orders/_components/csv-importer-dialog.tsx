@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useEffect } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useDropzone } from 'react-dropzone';
 import { useOrderStore } from '@/store/use-order-store';
@@ -404,10 +404,19 @@ export function CsvImporterDialog({
   /* -------------------------------------------------------------------------
    * Sales Account Verification Logic
    * ----------------------------------------------------------------------- */
-  const { addAccount, accounts, defaultAccountId, getAccountById } = useSalesAccountStore();
+  const { addAccount, updateAccount, accounts, defaultAccountId, getAccountById, fetchAccounts } = useSalesAccountStore();
   const [unknownAccounts, setUnknownAccounts] = useState<Set<string>>(new Set());
   const [accountToCreate, setAccountToCreate] = useState<string | null>(null);
+  const [accountToAddTo, setAccountToAddTo] = useState<string | null>(null); // Code being added to existing
+  const [selectedExistingAccount, setSelectedExistingAccount] = useState<string>(''); // ID of existing account
   const [newAccountData, setNewAccountData] = useState({ name: '', color: '#3b82f6' });
+
+  // Fetch sales accounts from database when dialog opens
+  useEffect(() => {
+    if (isOpen) {
+      fetchAccounts();
+    }
+  }, [isOpen, fetchAccounts]);
 
   const handleCreateAccount = (code: string) => {
     if (!newAccountData.name) {
@@ -422,7 +431,30 @@ export function CsvImporterDialog({
     });
     setAccountToCreate(null);
     setNewAccountData({ name: '', color: '#3b82f6' });
-    toast({ title: "Account Created", description: `Sales Account ${code} created.` });
+    toast({ title: "Account Created", description: `Sales Account '${newAccountData.name}' created with code ${code}.` });
+  };
+
+  const handleAddCodeToExisting = (code: string) => {
+    if (!selectedExistingAccount) {
+      toast({ title: "Please select an account", variant: "destructive" });
+      return;
+    }
+    const existingAccount = getAccountById(selectedExistingAccount);
+    if (!existingAccount) {
+      toast({ title: "Account not found", variant: "destructive" });
+      return;
+    }
+    // Add the new code to the existing account's codes array
+    const updatedCodes = [...existingAccount.codes, code];
+    updateAccount(selectedExistingAccount, { codes: updatedCodes });
+    setUnknownAccounts(prev => {
+      const next = new Set(prev);
+      next.delete(code);
+      return next;
+    });
+    setAccountToAddTo(null);
+    setSelectedExistingAccount('');
+    toast({ title: "Code Added", description: `Code ${code} added to '${existingAccount.name}'.` });
   };
 
   const handleMappingComplete = (data: CsvRow[]) => {
@@ -624,14 +656,44 @@ export function CsvImporterDialog({
                       <Button size="sm" onClick={() => handleCreateAccount(code)} className="bg-emerald-600 hover:bg-emerald-500 text-white border-0 h-8">Save</Button>
                       <Button size="sm" variant="ghost" onClick={() => setAccountToCreate(null)} className="text-zinc-400 hover:text-white h-8">Cancel</Button>
                     </div>
+                  ) : accountToAddTo === code ? (
+                    <div className="flex items-center gap-2 animate-in fade-in slide-in-from-right-5">
+                      <select
+                        className="h-8 px-3 rounded-md bg-zinc-950 border border-zinc-700 text-zinc-300 text-sm focus:border-emerald-500 focus:outline-none min-w-[180px]"
+                        value={selectedExistingAccount}
+                        onChange={(e) => setSelectedExistingAccount(e.target.value)}
+                        autoFocus
+                      >
+                        <option value="">Select Account...</option>
+                        {accounts.map(acc => (
+                          <option key={acc.id} value={acc.id}>
+                            {acc.name} ({acc.codes.join(', ')})
+                          </option>
+                        ))}
+                      </select>
+                      <Button size="sm" onClick={() => handleAddCodeToExisting(code)} className="bg-blue-600 hover:bg-blue-500 text-white border-0 h-8">Add</Button>
+                      <Button size="sm" variant="ghost" onClick={() => { setAccountToAddTo(null); setSelectedExistingAccount(''); }} className="text-zinc-400 hover:text-white h-8">Cancel</Button>
+                    </div>
                   ) : (
-                    <Button size="sm" variant="outline" onClick={() => {
-                      setAccountToCreate(code);
-                      setNewAccountData({ name: '', color: '#3b82f6' });
-                    }} className="border-zinc-700 bg-transparent hover:bg-zinc-800 text-zinc-300 hover:text-white h-8">
-                      <Plus className="h-4 w-4 mr-1" />
-                      Create
-                    </Button>
+                    <div className="flex items-center gap-2">
+                      <Button size="sm" variant="outline" onClick={() => {
+                        setAccountToCreate(code);
+                        setAccountToAddTo(null);
+                        setNewAccountData({ name: '', color: '#3b82f6' });
+                      }} className="border-zinc-700 bg-transparent hover:bg-zinc-800 text-zinc-300 hover:text-white h-8">
+                        <Plus className="h-4 w-4 mr-1" />
+                        Create New
+                      </Button>
+                      {accounts.length > 0 && (
+                        <Button size="sm" variant="outline" onClick={() => {
+                          setAccountToAddTo(code);
+                          setAccountToCreate(null);
+                          setSelectedExistingAccount('');
+                        }} className="border-blue-700/50 bg-blue-900/20 hover:bg-blue-800/30 text-blue-300 hover:text-blue-200 h-8">
+                          Add to Existing
+                        </Button>
+                      )}
+                    </div>
                   )}
                 </div>
               ))}
@@ -781,10 +843,9 @@ export function CsvImporterDialog({
               <div className="space-y-2">
                 <div className="flex justify-between text-sm">
                   <span className="font-medium">
-                    {stage === 'parsing' ? 'Parsing file...' :
-                      stage === 'validating' ? 'Validating data...' :
-                        stage === 'duplicate_checking' ? 'Checking for duplicates...' :
-                          stage === 'importing' ? 'Importing data...' : `${stage}...`}
+                    {stage === 'validating' ? 'Validating data...' :
+                      stage === 'duplicate_checking' ? 'Checking for duplicates...' :
+                        stage === 'importing' ? 'Importing data...' : `${stage}...`}
                   </span>
                   <span>{importProgress}%</span>
                 </div>
@@ -798,16 +859,14 @@ export function CsvImporterDialog({
               <div className="flex flex-col items-center">
                 <Loader2 className="h-12 w-12 animate-spin text-primary mb-2" />
                 <p className="text-lg text-muted-foreground capitalize">
-                  {stage === 'parsing' ? 'Parsing file...' :
-                    stage === 'validating' ? 'Validating data...' :
-                      stage === 'duplicate_checking' ? 'Checking for duplicates...' :
-                        stage === 'importing' ? 'Importing data...' : 'Processing...'}
+                  {stage === 'validating' ? 'Validating data...' :
+                    stage === 'duplicate_checking' ? 'Checking for duplicates...' :
+                      stage === 'importing' ? 'Importing data...' : 'Processing...'}
                 </p>
                 <p className="text-sm text-muted-foreground mt-1">
-                  {stage === 'parsing' ? 'Analyzing file structure and extracting data...' :
-                    stage === 'validating' ? 'Checking data format and required fields...' :
-                      stage === 'duplicate_checking' ? 'Looking for duplicate entries...' :
-                        stage === 'importing' ? 'Adding data to the system...' : 'Please wait...'}
+                  {stage === 'validating' ? 'Checking data format and required fields...' :
+                    stage === 'duplicate_checking' ? 'Looking for duplicate entries...' :
+                      stage === 'importing' ? 'Adding data to the system...' : 'Please wait...'}
                 </p>
               </div>
             </div>

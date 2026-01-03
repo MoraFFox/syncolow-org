@@ -219,7 +219,7 @@ export class MockDataOrchestrator {
         new Date(this.config.startDate)
       );
       // Removed unused calculation
-      
+
       this.orders = await generator.generateForDateRange(rates.ordersPerDay * volumeMultiplier);
       return this.orders.length;
     });
@@ -394,7 +394,7 @@ export class MockDataOrchestrator {
    */
   private async writeToDatabase(): Promise<void> {
     logger.info('[Orchestrator] Writing data to database');
-    
+
     const supabase = getSafeMockDataClient();
     const batchSize = 100;
 
@@ -408,16 +408,16 @@ export class MockDataOrchestrator {
       transformFn?: (item: any) => Record<string, unknown>
     ) => {
       if (data.length === 0) return;
-      
+
       for (let i = 0; i < data.length; i += batchSize) {
         const batch = data.slice(i, i + batchSize);
         const insertData = transformFn ? batch.map(transformFn) : batch;
-        
+
         const { error } = await supabase.from(table).insert(insertData);
-        
+
         if (error) {
           // Log more detailed error info
-          logger.error(`[Orchestrator] Failed to insert ${table}`, { 
+          logger.error(`[Orchestrator] Failed to insert ${table}`, {
             errorMessage: error.message,
             errorCode: error.code,
             errorDetails: error.details,
@@ -428,7 +428,7 @@ export class MockDataOrchestrator {
           throw new Error(`Insert ${table} failed: ${error.message} (code: ${error.code})`);
         }
       }
-      
+
       logger.info(`[Orchestrator] Inserted ${data.length} records into ${table}`);
     };
 
@@ -446,8 +446,8 @@ export class MockDataOrchestrator {
     // 2. Companies & Branches (Merged into 'companies' table)
     // Flatten hierarchy: MockBranch has companyId which maps to parentCompanyId
     const allCompanies = [
-        ...this.companies.map(c => ({...c, isBranch: false})), 
-        ...this.branches.map(b => ({...b, isBranch: true, parentCompanyId: b.companyId}))
+      ...this.companies.map(c => ({ ...c, isBranch: false })),
+      ...this.branches.map(b => ({ ...b, isBranch: true, parentCompanyId: b.companyId }))
     ];
 
     await insertBatch('companies', allCompanies, (c: any) => ({
@@ -481,20 +481,20 @@ export class MockDataOrchestrator {
 
     // 3. Baristas (Extracted from companies/branches json)
     const allBaristas = allCompanies.flatMap((c: any) => {
-        if (!c.baristas) return [];
-        return c.baristas.map((b: any) => ({
-            ...b,
-            branchId: c.id // Corresponds to the company/branch record ID
-        }));
+      if (!c.baristas) return [];
+      return c.baristas.map((b: any) => ({
+        ...b,
+        branchId: c.id // Corresponds to the company/branch record ID
+      }));
     });
-    
+
     await insertBatch('baristas', allBaristas, (b) => ({
-        id: b.id,
-        branchId: b.branchId,
-        name: b.name,
-        phoneNumber: b.phoneNumber,
-        rating: b.rating,
-        notes: b.notes
+      id: b.id,
+      branchId: b.branchId,
+      name: b.name,
+      phoneNumber: b.phoneNumber,
+      rating: b.rating,
+      notes: b.notes
     }));
 
     // 4. Products (CamelCase)
@@ -518,29 +518,29 @@ export class MockDataOrchestrator {
 
     // 5. Orders (CamelCase, with Items JSONB)
     await insertBatch('orders', this.orders, (order) => ({
-        id: order.id,
-        companyId: order.companyId,
-        branchId: order.branchId,
-        companyName: order.companyName,
-        branchName: order.branchName,
-        orderDate: order.orderDate,
-        deliveryDate: order.deliveryDate,
-        deliverySchedule: order.deliverySchedule,
-        paymentDueDate: order.paymentDueDate,
-        status: order.status,
-        paymentStatus: order.paymentStatus,
-        subtotal: order.subtotal,
-        totalTax: order.totalTax || 0,
-        discountType: order.discountType,
-        discountValue: order.discountValue,
-        grandTotal: order.grandTotal,
-        total: order.grandTotal,
-        items: order.items, // JSONB
-        isPotentialClient: order.isPotentialClient,
-        daysOverdue: order.daysOverdue,
-        deliveryNotes: order.deliveryNotes,
-        createdAt: order.orderDate,
-        updatedAt: order.orderDate
+      id: order.id,
+      companyId: order.companyId,
+      branchId: order.branchId,
+      companyName: order.companyName,
+      branchName: order.branchName,
+      orderDate: order.orderDate,
+      deliveryDate: order.deliveryDate,
+      deliverySchedule: order.deliverySchedule,
+      paymentDueDate: order.paymentDueDate,
+      status: order.status,
+      paymentStatus: order.paymentStatus,
+      subtotal: order.subtotal,
+      totalTax: order.totalTax || 0,
+      discountType: order.discountType,
+      discountValue: order.discountValue,
+      grandTotal: order.grandTotal,
+      total: order.grandTotal,
+      items: order.items, // JSONB
+      isPotentialClient: order.isPotentialClient,
+      daysOverdue: order.daysOverdue,
+      deliveryNotes: order.deliveryNotes,
+      createdAt: order.orderDate,
+      updatedAt: order.orderDate
     }));
 
     // 6. Maintenance (Renamed from maintenance_visits)
@@ -566,83 +566,83 @@ export class MockDataOrchestrator {
     }));
 
     // 7. Inventory Movements
-    await insertBatch('inventoryMovements', this.inventoryMovements, (m) => ({
-        id: m.id,
-        productId: m.productId,
-        type: m.movementType, // map movementType to 'type' column
-        quantity: m.quantity,
-        reason: 'Order Fulfillment', // Default/calculated
-        reference: m.referenceId,
-        createdAt: m.createdAt
+    await insertBatch('inventory_movements', this.inventoryMovements, (m) => ({
+      id: m.id,
+      productId: m.productId,
+      type: m.movementType, // map movementType to 'type' column
+      quantity: m.quantity,
+      reason: 'Order Fulfillment', // Default/calculated
+      reference: m.referenceId,
+      createdAt: m.createdAt
     }));
 
     // 8. Shipments
     await insertBatch('shipments', this.shipments, (s) => ({
-        id: s.id,
-        orderId: s.orderId,
-        status: s.status,
-        trackingNumber: null, // shipment type doesn't support generic tracking number field? Check type
-        carrier: 'Internal', 
-        estimatedDelivery: s.scheduledDeliveryDate,
-        actualDelivery: s.actualDeliveryDate,
-        createdAt: s.createdAt,
-        updatedAt: s.updatedAt
+      id: s.id,
+      orderId: s.orderId,
+      status: s.status,
+      trackingNumber: null, // shipment type doesn't support generic tracking number field? Check type
+      carrier: 'Internal',
+      estimatedDelivery: s.scheduledDeliveryDate,
+      actualDelivery: s.actualDeliveryDate,
+      createdAt: s.createdAt,
+      updatedAt: s.updatedAt
     }));
 
     // 9. Delivery Attempts
-    const attempts = this.shipments.flatMap(s => s.attempts.map(a => ({...a, shipmentId: s.id})));
-    await insertBatch('deliveryAttempts', attempts, (a) => ({
-        // id is generated by DB default if not provided? No, schema says primary key default gen_random_uuid()
-        // But we might need to link them. The mock generator type has no ID for attempts?
-        // DeliveryAttempt interface: attemptNumber, attemptDate, status...
-        shipmentId: a.shipmentId,
-        attemptDate: a.attemptDate,
-        success: a.status === 'success',
-        notes: a.notes,
-        driverName: null
+    const attempts = this.shipments.flatMap(s => s.attempts.map(a => ({ ...a, shipmentId: s.id })));
+    await insertBatch('delivery_attempts', attempts, (a) => ({
+      // id is generated by DB default if not provided? No, schema says primary key default gen_random_uuid()
+      // But we might need to link them. The mock generator type has no ID for attempts?
+      // DeliveryAttempt interface: attemptNumber, attemptDate, status...
+      shipmentId: a.shipmentId,
+      attemptDate: a.attemptDate,
+      success: a.status === 'success',
+      notes: a.notes,
+      driverName: null
     }));
 
     // 10. Payments
     await insertBatch('payments', this.payments, (p) => ({
-        id: p.id,
-        orderId: p.invoiceId, // MockPayment maps invoiceId likely to orderId in this context
-        amount: p.amount,
-        date: p.paymentDate,
-        method: p.method,
-        status: 'Paid',
-        notes: 'Generated Payment'
+      id: p.id,
+      orderId: p.invoiceId, // MockPayment maps invoiceId likely to orderId in this context
+      amount: p.amount,
+      date: p.paymentDate,
+      method: p.method,
+      status: 'Paid',
+      notes: 'Generated Payment'
     }));
 
     // 11. Discounts
     await insertBatch('discounts', this.discounts, (d) => ({
-        id: d.id,
-        code: `DISC-${d.id.substring(0,6)}`,
-        type: d.type,
-        value: d.value,
-        startDate: d.appliedAt, // Approximate
-        endDate: null,
-        usedCount: 1
+      id: d.id,
+      code: `DISC-${d.id.substring(0, 6)}`,
+      type: d.type,
+      value: d.value,
+      startDate: d.appliedAt, // Approximate
+      endDate: null,
+      usedCount: 1
     }));
 
     // 12. Refunds (from this.refunds array)
     await insertBatch('refunds', this.refunds, (r) => ({
-        id: r.id,
-        paymentId: null, // MockRefund has returnId/orderId, schema has payment_id/order_id.
-        orderId: r.orderId,
-        amount: r.amount,
-        reason: r.reason,
-        status: r.status,
-        date: r.createdAt
+      id: r.id,
+      paymentId: null, // MockRefund has returnId/orderId, schema has payment_id/order_id.
+      orderId: r.orderId,
+      amount: r.amount,
+      reason: r.reason,
+      status: r.status,
+      date: r.createdAt
     }));
 
     // 13. Audit Logs
-    await insertBatch('auditLogs', this.auditLogs, (l) => ({
-        id: l.id,
-        userId: l.userId,
-        action: l.action,
-        entityType: 'System', // Generic
-        details: l.details,
-        createdAt: l.timestamp
+    await insertBatch('audit_logs', this.auditLogs, (l) => ({
+      id: l.id,
+      userId: l.userId,
+      action: l.action,
+      entityType: 'System', // Generic
+      details: l.details,
+      createdAt: l.timestamp
     }));
 
     logger.info('[Orchestrator] Database write complete');
@@ -682,14 +682,14 @@ export class MockDataOrchestrator {
       recordCounts: progress.recordsGenerated,
       errors: errorMessage
         ? [
-            ...this.errors,
-            {
-              entity: 'users',
-              message: errorMessage,
-              recovered: false,
-              timestamp: new Date().toISOString(),
-            },
-          ]
+          ...this.errors,
+          {
+            entity: 'users',
+            message: errorMessage,
+            recovered: false,
+            timestamp: new Date().toISOString(),
+          },
+        ]
         : this.errors,
       timing: {
         startedAt: new Date(this.startTime).toISOString(),

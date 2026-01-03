@@ -126,7 +126,7 @@ export function NotificationCenter() {
   }, [unreadNotifications]);
 
   const iconMap: Record<string, React.ElementType> = {
-    Bell, AlertCircle, TrendingUp, Package, Users, DollarSign, CheckCircle, Info, 
+    Bell, AlertCircle, TrendingUp, Package, Users, DollarSign, CheckCircle, Info,
     AlertTriangle, Calendar, FileText, MessageSquare, ShoppingCart, Wrench, Clock
   };
 
@@ -392,11 +392,11 @@ export function NotificationCenter() {
                                     ? "bg-muted/30 opacity-70"
                                     : "bg-background hover:bg-muted/50 hover:shadow-md",
                                   notification.priority === "critical" &&
-                                    "border-destructive",
+                                  "border-destructive",
                                   notification.priority === "warning" &&
-                                    "border-yellow-500",
+                                  "border-yellow-500",
                                   notification.priority === "info" &&
-                                    "border-blue-500"
+                                  "border-blue-500"
                                 )}
                                 role='article'
                                 aria-label={notification.title}
@@ -411,11 +411,11 @@ export function NotificationCenter() {
                                     className={cn(
                                       "relative mt-1 p-2 rounded-full",
                                       notification.priority === "critical" &&
-                                        "bg-destructive/10",
+                                      "bg-destructive/10",
                                       notification.priority === "warning" &&
-                                        "bg-yellow-500/10",
+                                      "bg-yellow-500/10",
                                       notification.priority === "info" &&
-                                        "bg-blue-500/10"
+                                      "bg-blue-500/10"
                                     )}
                                   >
                                     <Icon name={notification.icon} />
@@ -432,7 +432,7 @@ export function NotificationCenter() {
                                   </div>
                                   <div className='flex-1 overflow-hidden'>
                                     {notification.isGroup &&
-                                    notification.items ? (
+                                      notification.items ? (
                                       <AccordionItem
                                         value={notification.id}
                                         className='border-b-0'

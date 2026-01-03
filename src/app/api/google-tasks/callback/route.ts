@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { withTraceContext } from '@/lib/with-trace-context';
 import { googleTasksService } from '@/services/google-tasks-service';
 import { cookies } from 'next/headers';
 import { logger } from '@/lib/logger';
 
-export async function GET(request: NextRequest) {
+export const GET = withTraceContext(async (request: NextRequest) => {
   const searchParams = request.nextUrl.searchParams;
   const code = searchParams.get('code');
 
@@ -13,7 +14,7 @@ export async function GET(request: NextRequest) {
 
   try {
     const tokens = await googleTasksService.getTokens(code);
-    
+
     const cookieStore = await cookies();
     cookieStore.set('google_tasks_tokens', JSON.stringify(tokens), {
       httpOnly: true,
@@ -27,4 +28,4 @@ export async function GET(request: NextRequest) {
     logger.error(error, { component: 'GoogleTasksCallbackAPI', action: 'GET' });
     return NextResponse.json({ error: 'Failed to exchange code' }, { status: 500 });
   }
-}
+});

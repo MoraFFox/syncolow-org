@@ -9,9 +9,10 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { withTraceContext } from '@/lib/with-trace-context';
 import { logger } from '@/lib/logger';
 
-export async function GET() {
+export const GET = withTraceContext(async () => {
   try {
     const isEnabled = process.env.MOCK_DATA_ENABLED === 'true';
     const nodeEnv = process.env.NODE_ENV ?? 'development';
@@ -25,16 +26,16 @@ export async function GET() {
         : 'Mock data generation is disabled. Set MOCK_DATA_ENABLED=true to enable.',
     });
   } catch (error) {
-    logger.error('[API] Toggle GET error', { error });
+    logger.error('[API] Toggle GET error', { data: { error } });
 
     return NextResponse.json(
       { error: 'Internal server error', message: error instanceof Error ? error.message : String(error) },
       { status: 500 }
     );
   }
-}
+});
 
-export async function POST(request: NextRequest) {
+export const POST = withTraceContext(async (request: NextRequest) => {
   try {
     const body = await request.json();
     const { enable } = body;
@@ -63,7 +64,7 @@ export async function POST(request: NextRequest) {
     // a different approach (e.g., storing in database/Redis).
     // This endpoint provides the interface; implementation depends on deployment.
 
-    logger.info('[API] Mock data toggle requested', { enable, environment: nodeEnv });
+    logger.info('[API] Mock data toggle requested', { data: { enable, environment: nodeEnv } });
 
     return NextResponse.json({
       success: true,
@@ -75,11 +76,11 @@ export async function POST(request: NextRequest) {
       note: 'Environment variable changes require server restart to take effect.',
     });
   } catch (error) {
-    logger.error('[API] Toggle POST error', { error });
+    logger.error('[API] Toggle POST error', { data: { error } });
 
     return NextResponse.json(
       { error: 'Internal server error', message: error instanceof Error ? error.message : String(error) },
       { status: 500 }
     );
   }
-}
+});

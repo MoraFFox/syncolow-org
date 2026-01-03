@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { withTraceContext } from '@/lib/with-trace-context';
 import { GenerateRequestSchema } from '@/lib/mock-data-generator/config/schemas';
 import { MockDataOrchestrator } from '@/lib/mock-data-generator/orchestrator';
 import { SafetyGuard, getSafeMockDataClient } from '@/lib/mock-data-generator/safety-guard';
@@ -11,7 +12,7 @@ import type { ProgressEvent } from '@/lib/mock-data-generator/progress-tracker';
 // (Optional, strictly we could rely on DB, but this bridges the gap)
 export const activeJobs = new Map<string, MockDataOrchestrator>();
 
-export async function POST(request: NextRequest) {
+export const POST = withTraceContext(async (request: NextRequest) => {
   try {
     const supabase = getSafeMockDataClient();
 
@@ -79,19 +80,19 @@ export async function POST(request: NextRequest) {
     activeJobs.set(jobId, orchestrator);
 
     // 1. Create Job Record
-    const { error: createError } = await supabase.from('jobs').insert({
-        id: jobId, // Using the orchestrator's ID (we might need to ensure uuid format if orchestrator uses random string. Orchestrator uses job_timestamp_random. Schema expects UUID. We need to override orchestrator ID or allow text id in schema. Schema says UUID default gen_random_uuid. Orchestrator generates `job_...`. We should probably let DB generate UUID and pass it to Orchestrator? Or change schema to TEXT id? Schema is UUID. Orchestrator ID is string.
-        // CHANGE: Orchestrator ID is string `job_...`. Schema expectation is UUID. 
-        // We will generate a UUID here and assume orchestrator uses it or wemap it.
-        // Actually, Orchestrator generates its own ID in constructor.
-        // We should probably modify Orchestrator to accept an ID or change schema to TEXT.
-        // For now, I'll modify schema to TEXT id or generate a UUID and ignore orchestrator's internal ID for query purposes? Safest is to change schema to TEXT to match Orchestrator? Or force Orchestrator to use UUID.
-        // Orchestrator ID generation: `job_${Date.now()}_...`.
-        // I will change Orchestrator to accept an optional ID in constructor? 
-        // No, Orchestrator is already instantiated.
-        // I'll try to insert using a UUID generated here, and just use it as the ref.
+    const { error: _createError } = await supabase.from('jobs').insert({
+      id: jobId, // Using the orchestrator's ID (we might need to ensure uuid format if orchestrator uses random string. Orchestrator uses job_timestamp_random. Schema expects UUID. We need to override orchestrator ID or allow text id in schema. Schema says UUID default gen_random_uuid. Orchestrator generates `job_...`. We should probably let DB generate UUID and pass it to Orchestrator? Or change schema to TEXT id? Schema is UUID. Orchestrator ID is string.
+      // CHANGE: Orchestrator ID is string `job_...`. Schema expectation is UUID. 
+      // We will generate a UUID here and assume orchestrator uses it or wemap it.
+      // Actually, Orchestrator generates its own ID in constructor.
+      // We should probably modify Orchestrator to accept an ID or change schema to TEXT.
+      // For now, I'll modify schema to TEXT id or generate a UUID and ignore orchestrator's internal ID for query purposes? Safest is to change schema to TEXT to match Orchestrator? Or force Orchestrator to use UUID.
+      // Orchestrator ID generation: `job_${Date.now()}_...`.
+      // I will change Orchestrator to accept an optional ID in constructor? 
+      // No, Orchestrator is already instantiated.
+      // I'll try to insert using a UUID generated here, and just use it as the ref.
     });
-    
+
     // Wait, Orchestrator.ts line 89: `this.jobId = ...`.
     // I can't easily change it without editing Orchestrator.
     // I will check create_mock_data_schema.sql again.
@@ -100,35 +101,35 @@ export async function POST(request: NextRequest) {
     // Orchestrator ID is NOT UUID.
     // I will use `crypto.randomUUID()` here and pass it to Orchestrator? Orchestrator constructor doesn't take ID.
     // I will modify schema to `id TEXT` to allow Orchestrator IDs.
-    
+
     // STOP. I'll modify schema first.
-    
+
     // But to proceed with this file content:
     // I'll assume I update schema to TEXT ID.
-    
+
     await supabase.from('jobs').insert({
-        id: jobId, // Assumes modified schema
-        type: 'generate_mock_data',
-        status: 'pending',
-        progress: 0,
-        result: config, // Storing config as initial result metadata
+      id: jobId, // Assumes modified schema
+      type: 'generate_mock_data',
+      status: 'pending',
+      progress: 0,
+      result: config, // Storing config as initial result metadata
     });
 
-    logger.info('[API] Starting generation job', { jobId, scenario, config });
+    logger.info('[API] Starting generation job', { data: { jobId, scenario, config } });
 
     // 2. Attach Listener for DB Updates
     // Throttle updates to avoid spamming DB
     let lastUpdate = Date.now();
     orchestrator.getProgressTracker().addListener(async (progress: GenerationProgress, event: ProgressEvent) => {
-        const now = Date.now();
-        if (event.type === 'entity_completed' || event.type === 'batch_completed' || (now - lastUpdate > 2000)) {
-            lastUpdate = now;
-            await supabase.from('jobs').update({
-                status: 'running',
-                progress: progress.progressPercent,
-                updated_at: new Date().toISOString()
-            }).eq('id', jobId);
-        }
+      const now = Date.now();
+      if (event.type === 'entity_completed' || event.type === 'batch_completed' || (now - lastUpdate > 2000)) {
+        lastUpdate = now;
+        await supabase.from('jobs').update({
+          status: 'running',
+          progress: progress.progressPercent,
+          updated_at: new Date().toISOString()
+        }).eq('id', jobId);
+      }
     });
 
     // 3. Execute
@@ -141,8 +142,8 @@ export async function POST(request: NextRequest) {
         error: result.errors.length > 0 ? result.errors[0].message : null,
         updated_at: new Date().toISOString()
       }).eq('id', jobId);
-      
-      logger.info('[API] Generation job completed', { jobId, success: result.success });
+
+      logger.info('[API] Generation job completed', { data: { jobId, success: result.success } });
     }).catch(async (error) => {
       activeJobs.delete(jobId);
       await supabase.from('jobs').update({
@@ -150,8 +151,8 @@ export async function POST(request: NextRequest) {
         error: error instanceof Error ? error.message : String(error),
         updated_at: new Date().toISOString()
       }).eq('id', jobId);
-      
-      logger.error('[API] Generation job failed', { jobId, error });
+
+      logger.error('[API] Generation job failed', { data: { jobId, error } });
     });
 
     return NextResponse.json({
@@ -162,12 +163,12 @@ export async function POST(request: NextRequest) {
       message: 'Generation started.',
     });
   } catch (error) {
-    logger.error('[API] Generate endpoint error', { error });
+    logger.error('[API] Generate endpoint error', { data: { error } });
 
     return NextResponse.json(
       { error: 'Internal server error', message: error instanceof Error ? error.message : String(error) },
       { status: 500 }
     );
   }
-}
+});
 

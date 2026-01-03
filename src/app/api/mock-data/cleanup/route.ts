@@ -7,10 +7,11 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { withTraceContext } from '@/lib/with-trace-context';
 import { SafetyGuard } from '@/lib/mock-data-generator/safety-guard';
 import { logger } from '@/lib/logger';
 
-export async function DELETE(request: NextRequest) {
+export const DELETE = withTraceContext(async (request: NextRequest) => {
   try {
     const { searchParams } = new URL(request.url);
     const confirmToken = searchParams.get('confirm');
@@ -76,7 +77,7 @@ export async function DELETE(request: NextRequest) {
 
         if (error) {
           results[table] = `Error: ${error.message}`;
-          logger.warn(`[API] Failed to cleanup ${table}`, { error });
+          logger.warn(`[API] Failed to cleanup ${table}`, { data: { error } });
         } else {
           results[table] = 'Cleaned';
         }
@@ -85,7 +86,7 @@ export async function DELETE(request: NextRequest) {
       }
     }
 
-    logger.info('[API] Mock data cleanup complete', { results });
+    logger.info('[API] Mock data cleanup complete', { data: { results } });
 
     return NextResponse.json({
       success: true,
@@ -94,11 +95,11 @@ export async function DELETE(request: NextRequest) {
       timestamp: new Date().toISOString(),
     });
   } catch (error) {
-    logger.error('[API] Cleanup endpoint error', { error });
+    logger.error('[API] Cleanup endpoint error', { data: { error } });
 
     return NextResponse.json(
       { error: 'Internal server error', message: error instanceof Error ? error.message : String(error) },
       { status: 500 }
     );
   }
-}
+});

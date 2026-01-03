@@ -39,7 +39,7 @@ SynergyFlow ERP streamlines business operations through:
 - **Hosting**: Firebase Hosting with App Hosting configuration
 
 ### Development Environment
-- **Port**: 9002 (development server)
+- **Port**: 3001 (development server)
 - **Bundler**: Turbopack for fast development builds
 - **Code Quality**: ESLint, TypeScript strict mode, Prettier
 
@@ -573,7 +573,7 @@ Company Score: Weighted average by order amount
 
 ### Development
 ```bash
-npm run dev              # Start dev server (port 9002)
+npm run dev              # Start dev server (port 3001)
 npm run genkit:watch     # Start AI flows with hot reload
 npm run typecheck        # TypeScript validation
 npm run lint             # ESLint checks

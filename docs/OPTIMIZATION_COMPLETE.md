@@ -123,7 +123,7 @@ await productCache.clearProducts();
 1. **Test in Development**
    ```bash
    npm run dev
-   # Open http://localhost:9002
+   # Open http://localhost:3001
    # Check DevTools → Application → IndexedDB
    ```
 

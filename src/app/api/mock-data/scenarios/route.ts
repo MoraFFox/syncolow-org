@@ -6,10 +6,11 @@
  */
 
 import { NextResponse } from 'next/server';
+import { withTraceContext } from '@/lib/with-trace-context';
 import { getScenarioManager } from '@/lib/mock-data-generator/scenarios/scenario-manager';
 import { logger } from '@/lib/logger';
 
-export async function GET() {
+export const GET = withTraceContext(async () => {
   try {
     const scenarioManager = getScenarioManager();
     const scenarios = scenarioManager.listScenariosWithDescriptions();
@@ -20,11 +21,11 @@ export async function GET() {
       defaultScenario: 'normal-ops',
     });
   } catch (error) {
-    logger.error('[API] Scenarios endpoint error', { error });
+    logger.error('[API] Scenarios endpoint error', { data: { error } });
 
     return NextResponse.json(
       { error: 'Internal server error', message: error instanceof Error ? error.message : String(error) },
       { status: 500 }
     );
   }
-}
+});

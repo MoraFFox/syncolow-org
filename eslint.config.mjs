@@ -39,6 +39,13 @@ export default [
           allow: ["warn", "error"],
         },
       ],
+      "no-restricted-syntax": [
+        "error",
+        {
+          selector: "ExportNamedDeclaration[declaration.type='FunctionDeclaration'][declaration.id.name=/(GET|POST|PUT|DELETE|PATCH|HEAD|OPTIONS)/]",
+          message: "API route handlers must be wrapped with withTraceContext. Use `export const GET = withTraceContext(...)` instead."
+        }
+      ],
     },
   },
   {

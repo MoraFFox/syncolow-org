@@ -242,6 +242,7 @@ export async function importFlow({
       items: ImportOrderItem[];
       cancellationReason: string | undefined;
       cancellationNotes: string | undefined;
+      customerAccount: string | undefined; // Account code for sales filtering
     }
 
     // Group rows by Order ID (if available) or treat as single orders
@@ -365,6 +366,14 @@ export async function importFlow({
 
         const areaStr = findValueRobust(row, 'area', 'region', 'location');
 
+        // Extract customer account code for sales account filtering
+        const customerAccountStr = findValueRobust(row, 'cust account', 'customer account', 'account');
+
+        // DEBUG: Log customerAccount extraction for first few rows
+        if (index < 3) {
+          console.log(`[IMPORT DEBUG] Row ${index} customerAccount:`, customerAccountStr, '| Raw row keys:', Object.keys(row).filter(k => k.toLowerCase().includes('account')));
+        }
+
         // Item Data
         const itemData: ImportOrderItem = {
           id: `item-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
@@ -395,6 +404,7 @@ export async function importFlow({
             items: [],
             cancellationReason: isReturn ? 'item returned' : undefined,
             cancellationNotes: isReturn ? 'Auto-detected return' : undefined,
+            customerAccount: customerAccountStr || undefined,
           });
         }
 
@@ -464,6 +474,7 @@ export async function importFlow({
         companyName: group.companyName,
         branchName: group.branchName,
         area: group.area,
+        customerAccount: group.customerAccount, // Account code for sales filtering
         orderDate: group.orderDate,
         status: finalStatus,
         paymentStatus: finalPaymentStatus,

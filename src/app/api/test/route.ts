@@ -1,6 +1,7 @@
 
 import { NextResponse } from 'next/server';
+import { withTraceContext } from '@/lib/with-trace-context';
 
-export async function GET() {
+export const GET = withTraceContext(async () => {
   return NextResponse.json({ message: 'Test route works' });
-}
+});

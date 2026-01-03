@@ -36,7 +36,7 @@ cp .env.example .env
 ### Development
 
 ```bash
-# Start development server (port 9002)
+# Start development server (port 3001)
 npm run dev
 
 # Start Genkit AI flows

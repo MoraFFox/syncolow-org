@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { withTraceContext } from '@/lib/with-trace-context';
 import { googleCalendarService } from '@/services/google-calendar-service';
 import { cookies } from 'next/headers';
 import { logger } from '@/lib/logger';
 
-export async function POST(request: NextRequest) {
+export const POST = withTraceContext(async (request: NextRequest) => {
   try {
     const cookieStore = await cookies();
     const tokensCookie = cookieStore.get('google_calendar_tokens');
@@ -26,4 +27,4 @@ export async function POST(request: NextRequest) {
     logger.error(error, { component: 'GoogleCalendarUpdateEventAPI', action: 'POST' });
     return NextResponse.json({ error: 'Failed to update event' }, { status: 500 });
   }
-}
+});

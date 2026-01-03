@@ -9,6 +9,7 @@ const nextConfig = {
       },
     ],
   },
+  transpilePackages: ['react-grid-layout'],
   experimental: {
     optimizePackageImports: ['recharts', 'lucide-react', '@radix-ui/react-icons'],
   },

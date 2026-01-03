@@ -16,8 +16,21 @@ interface OptimisticOrderStatusUpdateProps {
 export function OptimisticOrderStatusUpdate({ order }: OptimisticOrderStatusUpdateProps) {
   const [selectedStatus, setSelectedStatus] = useState<Order['status']>(order.status);
   const updateOrderStatus = useOrderStore(state => state.updateOrderStatus);
-  
-  const { update, isPending } = useOptimisticMutation<Order>('orders', {
+  const { mutate, isPending } = useOptimisticMutation<Order, { status: Order['status'] }>({
+    entity: 'orders',
+    mutationFn: async ({ status }) => {
+      await updateOrderStatus(order.id, status);
+      return { ...order, status };
+    },
+    getOptimisticData: ({ status }) => ({ ...order, status } as Order),
+    onOptimistic: (data) => {
+      // Optimistic update in store
+      useOrderStore.setState(state => ({
+        orders: state.orders.map(o =>
+          o.id === order.id ? { ...o, ...data } : o
+        )
+      }));
+    },
     onSuccess: () => {
       console.log('Status updated successfully');
     },
@@ -28,20 +41,7 @@ export function OptimisticOrderStatusUpdate({ order }: OptimisticOrderStatusUpda
 
   const handleStatusChange = async () => {
     if (selectedStatus === order.status) return;
-
-    await update(
-      order.id,
-      { status: selectedStatus },
-      () => order,
-      (updates) => {
-        // Optimistic update in store
-        useOrderStore.setState(state => ({
-          orders: state.orders.map(o => 
-            o.id === order.id ? { ...o, ...updates } : o
-          )
-        }));
-      }
-    );
+    mutate({ status: selectedStatus });
   };
 
   return (

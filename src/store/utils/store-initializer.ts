@@ -7,7 +7,13 @@ import { useCompanyStore } from '../use-company-store';
 import { useMaintenanceStore } from '../use-maintenance-store';
 import { useManufacturerStore } from '../use-manufacturer-store';
 import { useProductsStore } from '../use-products-store';
-import type { Product } from '@/lib/types';
+import { useSalesAccountStore } from '../use-sales-account-store';
+import type { Product, SalesAccount } from '@/lib/types';
+import {
+  getServicesCatalog,
+  getPartsCatalog,
+  getProblemsCatalog
+} from '@/app/actions/maintenance';
 
 export async function initializeAllStores() {
   console.log('[StoreInitializer] Starting initializeAllStores...');
@@ -25,13 +31,17 @@ export async function initializeAllStores() {
       categories,
       taxes,
       returns,
+      salesAccounts,
+      servicesRes,
+      partsRes,
+      problemsRes,
     ] = await Promise.all([
       universalCache.get(CacheKeyFactory.list('visits'), async () => {
         const { data, error } = await supabase.from('visits').select('*');
         if (error) throw error;
         return data;
       }),
-      universalCache.get(CacheKeyFactory.list('companies', { v: '2' }), async () => {
+      universalCache.get(CacheKeyFactory.list('companies', { v: '3' }), async () => {
         const { data, error } = await supabase.from('companies').select('*').not('name', 'like', '[DELETED]%');
         if (error) throw error;
 
@@ -93,10 +103,27 @@ export async function initializeAllStores() {
         if (error) throw error;
         return data;
       }),
+      // Fetch sales accounts for analytics filtering
+      universalCache.get(CacheKeyFactory.list('sales_accounts', { v: '1' }), async () => {
+        const { data, error } = await supabase.from('sales_accounts').select('*');
+        if (error) throw error;
+        return data;
+      }),
+      // Fetch maintenance catalogs
+      getServicesCatalog(),
+      getPartsCatalog(),
+      getProblemsCatalog(),
     ]);
 
+    // Debug catalog responses
+    console.log('[StoreInitializer] Catalog Responses:', {
+      services: { success: servicesRes?.success, dataType: typeof servicesRes?.data, isArray: Array.isArray(servicesRes?.data), keys: Object.keys(servicesRes || {}) },
+      parts: { success: partsRes?.success, dataType: typeof partsRes?.data, isArray: Array.isArray(partsRes?.data), keys: Object.keys(partsRes || {}) },
+      problems: { success: problemsRes?.success, dataType: typeof problemsRes?.data, isArray: Array.isArray(problemsRes?.data), keys: Object.keys(problemsRes || {}) },
+    });
+
     const products = await universalCache.get(
-      CacheKeyFactory.list('products', { limit: 50, offset: 0 }),
+      CacheKeyFactory.list('products', { limit: 50, offset: 0, v: '2' }),
       async () => {
         const { data, error } = await supabase.from('products').select('*').range(0, 49);
         if (error) throw error;
@@ -107,7 +134,8 @@ export async function initializeAllStores() {
     console.log('[StoreInitializer] Data loaded:', {
       productsCount: products?.length || 0,
       areasCount: areas?.length || 0,
-      companiesCount: companies?.length || 0
+      companiesCount: companies?.length || 0,
+      salesAccountsCount: (salesAccounts as SalesAccount[] | null)?.length || 0
     });
 
     const productsByManufacturer = (products || []).reduce((acc: Record<string, Product[]>, product: Product) => {
@@ -131,6 +159,9 @@ export async function initializeAllStores() {
       maintenanceVisits: maintenanceVisits || [],
       maintenanceEmployees: maintenanceEmployees || [],
       cancellationReasons: cancellationReasons || [],
+      servicesCatalog: servicesRes.success ? (servicesRes.data || []) : [],
+      partsCatalog: partsRes.success ? (partsRes.data || []) : [],
+      problemsCatalog: problemsRes.success ? (problemsRes.data || []) : [],
       loading: false,
     });
 
@@ -145,6 +176,11 @@ export async function initializeAllStores() {
       productsOffset: 50,
       productsHasMore: (products?.length || 0) === 50,
       loading: false,
+    });
+
+    // Initialize sales accounts store
+    useSalesAccountStore.setState({
+      accounts: (salesAccounts as SalesAccount[]) || [],
     });
 
     return {

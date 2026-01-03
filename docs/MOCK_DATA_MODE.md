@@ -102,7 +102,7 @@ npx tsx scripts/mock-data-cli.ts generate --scenario normal-ops --no-dry-run
 
 ### 5. View Mock Data
 
-Open http://localhost:9002 - you should see mock data!
+Open http://localhost:3001 - you should see mock data!
 
 ---
 

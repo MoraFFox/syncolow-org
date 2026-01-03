@@ -1,25 +1,31 @@
 
+
 "use client";
 
 import { useState, useMemo } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { PlusCircle, Edit, Trash2, Search, ArrowLeft } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { PlusCircle, Search, ArrowLeft, Wrench, Box, AlertTriangle } from 'lucide-react';
 import { useMaintenanceStore } from '@/store/use-maintenance-store';
 import { useRouter } from 'next/navigation';
+
 import { ServicePartFormDialog, CatalogItem } from './_components/service-part-form-dialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { toast } from '@/hooks/use-toast';
+import { useCatalogUsageStats } from './_hooks/use-catalog-usage-stats';
+import { ResourceCard } from './_components/resource-card';
+import type { ServiceCatalogItem, PartsCatalogItem, ProblemsCatalogItem } from '@/app/actions/maintenance';
+
+type ResourceItem = ServiceCatalogItem | PartsCatalogItem | ProblemsCatalogItem;
 
 export default function ServicesCatalogPage() {
-    const { 
-        servicesCatalog, 
-        partsCatalog, 
-        problemsCatalog, 
-        addProblem, 
-        updateProblem, 
+    const {
+        servicesCatalog,
+        partsCatalog,
+        problemsCatalog,
+        addProblem,
+        updateProblem,
         deleteProblem,
         addService,
         updateService,
@@ -29,129 +35,159 @@ export default function ServicesCatalogPage() {
         deletePart
     } = useMaintenanceStore();
     const router = useRouter();
-    
+
     const [searchTerm, setSearchTerm] = useState('');
-    const [partsSearchTerm, setPartsSearchTerm] = useState('');
-    const [problemsSearchTerm, setProblemsSearchTerm] = useState('');
-    
+    const [activeTab, setActiveTab] = useState("services");
+
     const [isFormOpen, setIsFormOpen] = useState(false);
     const [editingItem, setEditingItem] = useState<CatalogItem | null>(null);
     const [itemType, setItemType] = useState<'service' | 'part'>('service');
     const [isProblemMode, setIsProblemMode] = useState(false);
-    
+
     const [isAlertOpen, setIsAlertOpen] = useState(false);
-    const [itemToDelete, setItemToDelete] = useState<{ type: 'service' | 'part' | 'problem', item: CatalogItem } | null>(null);
+    const [itemToDelete, setItemToDelete] = useState<{ type: 'service' | 'part' | 'problem', item: ResourceItem } | null>(null);
+
+    // Usage Stats
+    const stats = useCatalogUsageStats();
 
     const filteredServices = useMemo(() => {
+        if (!Array.isArray(servicesCatalog)) return [];
         const searchLower = searchTerm.toLowerCase();
-        if (!searchLower) {
-            return Object.entries(servicesCatalog).flatMap(([category, services]) =>
-                Object.entries(services).map(([name, cost]) => ({ category, name, cost }))
-            );
-        }
-        return Object.entries(servicesCatalog).flatMap(([category, services]) =>
-            Object.entries(services)
-                .filter(([name, cost]) => category.toLowerCase().includes(searchLower) || name.toLowerCase().includes(searchLower))
-                .map(([name, cost]) => ({ category, name, cost }))
+        if (!searchLower) return [...servicesCatalog];
+        return servicesCatalog.filter(s =>
+            (s.category || '').toLowerCase().includes(searchLower) || (s.name || '').toLowerCase().includes(searchLower)
         );
     }, [servicesCatalog, searchTerm]);
 
     const filteredParts = useMemo(() => {
-        const searchLower = partsSearchTerm.toLowerCase();
-        if (!searchLower) {
-             return Object.entries(partsCatalog).flatMap(([category, parts]) =>
-                Object.entries(parts).map(([name, price]) => ({ category, name, price }))
-            );
-        }
-        return Object.entries(partsCatalog).flatMap(([category, parts]) =>
-            Object.entries(parts)
-                .filter(([name, price]) => category.toLowerCase().includes(searchLower) || name.toLowerCase().includes(searchLower))
-                .map(([name, price]) => ({ category, name, price }))
+        if (!Array.isArray(partsCatalog)) return [];
+        const searchLower = searchTerm.toLowerCase();
+        if (!searchLower) return [...partsCatalog];
+        return partsCatalog.filter(p =>
+            (p.category || '').toLowerCase().includes(searchLower) || (p.name || '').toLowerCase().includes(searchLower)
         );
-    }, [partsCatalog, partsSearchTerm]);
+    }, [partsCatalog, searchTerm]);
 
     const filteredProblems = useMemo(() => {
-        const searchLower = problemsSearchTerm.toLowerCase();
-        if (!searchLower) {
-            return Object.entries(problemsCatalog).flatMap(([category, problems]) =>
-                problems.map(problem => ({ category, name: problem }))
-            );
-        }
-        return Object.entries(problemsCatalog).flatMap(([category, problems]) =>
-            problems
-                .filter(problem => category.toLowerCase().includes(searchLower) || problem.toLowerCase().includes(searchLower))
-                .map(problem => ({ category, name: problem }))
-        );
-    }, [problemsCatalog, problemsSearchTerm]);
+        if (!Array.isArray(problemsCatalog)) return [];
+        const searchLower = searchTerm.toLowerCase();
+        // Problems are filtered directly (ResourceItem type)
+        if (!searchLower) return [...problemsCatalog];
+        return problemsCatalog.filter(p => (p.category || '').toLowerCase().includes(searchLower) || (p.problem || '').toLowerCase().includes(searchLower));
+    }, [problemsCatalog, searchTerm]);
 
-    const handleOpenForm = (type: 'service' | 'part' | 'problem', item: CatalogItem | null) => {
+    const handleOpenForm = (type: 'service' | 'part' | 'problem', item: ResourceItem | null) => {
+        let formItem: CatalogItem | null = null;
+
+        if (item) {
+            if (type === 'problem') {
+                const p = item as ProblemsCatalogItem;
+                formItem = { id: p.id, category: p.category || '', name: p.problem || '' };
+            } else if (type === 'service') {
+                const s = item as ServiceCatalogItem;
+                formItem = { id: s.id, category: s.category || '', name: s.name || '', cost: s.defaultCost };
+            } else if (type === 'part') {
+                const p = item as PartsCatalogItem;
+                formItem = { id: p.id, category: p.category || '', name: p.name || '', price: p.defaultPrice };
+            }
+        }
+
         if (type === 'problem') {
             setIsProblemMode(true);
-            setItemType('service'); // Use service as fallback
+            setItemType('service');
         } else {
             setIsProblemMode(false);
-            setItemType(type);
+            setItemType(type as 'service' | 'part');
         }
-        setEditingItem(item);
+        setEditingItem(formItem);
         setIsFormOpen(true);
     };
 
-    const handleFormSubmit = (data: CatalogItem) => {
+    const handleFormSubmit = async (data: CatalogItem) => {
         if (isProblemMode) {
-            if (editingItem) {
-                updateProblem(editingItem.category, editingItem.name, data.category, data.name);
+            if (editingItem && editingItem.id) {
+                await updateProblem(editingItem.id, { category: data.category, problem: data.name });
             } else {
-                addProblem(data.category, data.name);
+                await addProblem(data.category, data.name);
             }
         } else if (itemType === 'service') {
-            if (editingItem) {
-                updateService(editingItem.category, editingItem.name, data.category, data.name, data.cost!);
+            if (editingItem && editingItem.id) {
+                await updateService(editingItem.id, { category: data.category, name: data.name, defaultCost: data.cost });
             } else {
-                addService(data.category, data.name, data.cost!);
+                await addService(data.category, data.name, data.cost!);
             }
         } else if (itemType === 'part') {
-            if (editingItem) {
-                updatePart(editingItem.category, editingItem.name, data.category, data.name, data.price!);
+            if (editingItem && editingItem.id) {
+                await updatePart(editingItem.id, { category: data.category, name: data.name, defaultPrice: data.price });
             } else {
-                addPart(data.category, data.name, data.price!);
+                await addPart(data.category, data.name, data.price!);
             }
         }
         toast({ title: `${isProblemMode ? 'Problem' : itemType === 'service' ? 'Service' : 'Part'} ${editingItem ? 'Updated' : 'Added'}` });
     };
 
-    const openDeleteDialog = (type: 'service' | 'part' | 'problem', item: CatalogItem) => {
+
+    const openDeleteDialog = (type: 'service' | 'part' | 'problem', item: ResourceItem) => {
         setItemToDelete({ type, item });
         setIsAlertOpen(true);
     };
 
-    const handleDeleteConfirm = () => {
-        if (!itemToDelete) return;
+    const handleDeleteConfirm = async () => {
+        if (!itemToDelete || !itemToDelete.item.id) return;
+        const id = itemToDelete.item.id;
+
         if (itemToDelete.type === 'service') {
-            deleteService(itemToDelete.item.category, itemToDelete.item.name);
+            await deleteService(id);
         } else if (itemToDelete.type === 'part') {
-            deletePart(itemToDelete.item.category, itemToDelete.item.name);
+            await deletePart(id);
         } else if (itemToDelete.type === 'problem') {
-            deleteProblem(itemToDelete.item.category, itemToDelete.item.name);
+            await deleteProblem(id);
         }
         toast({ title: `${itemToDelete.type === 'problem' ? 'Problem' : itemToDelete.type === 'service' ? 'Service' : 'Part'} Deleted`, variant: 'destructive' });
         setItemToDelete(null);
         setIsAlertOpen(false);
     };
 
+    // Helper to get stats safely
+    // The hook calculates stats keyed by Name (because historical visits don't always store the Catalog ID).
+    // So we must look up by name to find the match.
+    const getStats = (id: string, name: string, type: 'service' | 'part' | 'problem') => {
+        const statsMap = type === 'service'
+            ? stats.serviceStats
+            : type === 'part'
+                ? stats.partStats
+                : stats.problemStats;
+        // Try exact name match first (most likely), then ID as fallback
+        return statsMap[name] || statsMap[id];
+    };
+
     return (
-        <div className="space-y-8">
-             <div className="flex items-center gap-4">
-                <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => router.back()}>
-                    <ArrowLeft className="h-4 w-4" />
-                    <span className="sr-only">Back</span>
-                </Button>
-                <div>
-                    <h1 className="text-3xl font-bold">Services & Parts Catalog</h1>
-                    <p className="text-muted-foreground">Manage the services and spare parts used in maintenance visits.</p>
+        <div className="space-y-6 animate-in fade-in duration-500">
+            {/* Header */}
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div className="flex items-center gap-4">
+                    <Button variant="ghost" size="icon" onClick={() => router.back()} className="shrink-0">
+                        <ArrowLeft className="h-5 w-5" />
+                    </Button>
+                    <div>
+                        <h1 className="text-3xl font-bold tracking-tight">Resource Catalog</h1>
+                        <p className="text-muted-foreground">Master inventory of services, parts, and issue types.</p>
+                    </div>
+                </div>
+                <div className="flex items-center gap-2 w-full sm:w-auto">
+                    <div className="relative flex-1 sm:w-64">
+                        <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                        <Input
+                            placeholder="Search catalog..."
+                            className="pl-8"
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                        />
+                    </div>
                 </div>
             </div>
-            
-            <ServicePartFormDialog 
+
+            <ServicePartFormDialog
                 isOpen={isFormOpen}
                 onOpenChange={setIsFormOpen}
                 onSubmit={handleFormSubmit}
@@ -165,7 +201,7 @@ export default function ServicesCatalogPage() {
                     <AlertDialogHeader>
                         <AlertDialogTitle>Are you sure?</AlertDialogTitle>
                         <AlertDialogDescription>
-                            This will permanently delete "{itemToDelete?.item.name}" from the catalog. This action cannot be undone.
+                            This will permanently delete "{itemToDelete?.type === 'problem' ? (itemToDelete?.item as any)?.problem : (itemToDelete?.item as any)?.name}" from the catalog.
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
@@ -175,128 +211,97 @@ export default function ServicesCatalogPage() {
                 </AlertDialogContent>
             </AlertDialog>
 
-            <Card>
-                <CardHeader>
-                    <div className="flex justify-between items-center">
-                        <CardTitle>Maintenance Services</CardTitle>
-                        <Button size="sm" onClick={() => handleOpenForm('service', null)}>
-                            <PlusCircle className="mr-2 h-4 w-4" />
-                            Add Service
-                        </Button>
-                    </div>
-                     <div className="relative mt-2">
-                         <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                         <Input placeholder="Search services..." className="pl-8" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
-                    </div>
-                </CardHeader>
-                <CardContent>
-                    <Table>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead>Category</TableHead>
-                                <TableHead>Service Name</TableHead>
-                                <TableHead>Cost</TableHead>
-                                <TableHead className="text-right">Actions</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {filteredServices.map(service => (
-                                <TableRow key={`${service.category}-${service.name}`}>
-                                    <TableCell>{service.category}</TableCell>
-                                    <TableCell className="font-medium">{service.name}</TableCell>
-                                    <TableCell>{service.cost} EGP</TableCell>
-                                    <TableCell className="text-right">
-                                        <Button variant="ghost" size="icon" onClick={() => handleOpenForm('service', service)}><Edit className="h-4 w-4" /></Button>
-                                        <Button variant="ghost" size="icon" onClick={() => openDeleteDialog('service', service)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
-                                    </TableCell>
-                                </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
-                </CardContent>
-            </Card>
-            
-             <Card>
-                <CardHeader>
-                    <div className="flex justify-between items-center">
-                        <CardTitle>Spare Parts</CardTitle>
-                        <Button size="sm" onClick={() => handleOpenForm('part', null)}>
-                            <PlusCircle className="mr-2 h-4 w-4" />
-                            Add Part
-                        </Button>
-                    </div>
-                    <div className="relative mt-2">
-                         <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                         <Input placeholder="Search parts..." className="pl-8" value={partsSearchTerm} onChange={(e) => setPartsSearchTerm(e.target.value)} />
-                    </div>
-                </CardHeader>
-                 <CardContent>
-                    <Table>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead>Category</TableHead>
-                                <TableHead>Part Name</TableHead>
-                                <TableHead>Price</TableHead>
-                                <TableHead className="text-right">Actions</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {filteredParts.map(part => (
-                                <TableRow key={`${part.category}-${part.name}`}>
-                                    <TableCell>{part.category}</TableCell>
-                                    <TableCell className="font-medium">{part.name}</TableCell>
-                                    <TableCell>${part.price.toFixed(2)}</TableCell>
-                                    <TableCell className="text-right">
-                                        <Button variant="ghost" size="icon" onClick={() => handleOpenForm('part', { ...part, cost: part.price })}><Edit className="h-4 w-4" /></Button>
-                                        <Button variant="ghost" size="icon" onClick={() => openDeleteDialog('part', { ...part, cost: part.price })}><Trash2 className="h-4 w-4 text-destructive" /></Button>
-                                    </TableCell>
-                                </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
-                 </CardContent>
-            </Card>
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+                <div className="flex items-center justify-between mb-4">
+                    <TabsList>
+                        <TabsTrigger value="services" className="flex items-center gap-2">
+                            <Wrench className="h-4 w-4" /> Services
+                            <span className="ml-1 rounded-full bg-primary/10 px-2 py-0.5 text-xs text-primary">
+                                {filteredServices.length}
+                            </span>
+                        </TabsTrigger>
+                        <TabsTrigger value="parts" className="flex items-center gap-2">
+                            <Box className="h-4 w-4" /> Parts
+                            <span className="ml-1 rounded-full bg-primary/10 px-2 py-0.5 text-xs text-primary">
+                                {filteredParts.length}
+                            </span>
+                        </TabsTrigger>
+                        <TabsTrigger value="problems" className="flex items-center gap-2">
+                            <AlertTriangle className="h-4 w-4" /> Problems
+                            <span className="ml-1 rounded-full bg-primary/10 px-2 py-0.5 text-xs text-primary">
+                                {filteredProblems.length}
+                            </span>
+                        </TabsTrigger>
+                    </TabsList>
 
-            <Card>
-                <CardHeader>
-                    <div className="flex justify-between items-center">
-                        <CardTitle>Common Problems</CardTitle>
-                        <Button size="sm" onClick={() => handleOpenForm('problem', null)}>
-                            <PlusCircle className="mr-2 h-4 w-4" />
-                            Add Problem
-                        </Button>
+                    <Button
+                        onClick={() => handleOpenForm(activeTab === 'problems' ? 'problem' : activeTab === 'parts' ? 'part' : 'service', null)}
+                        className="hidden sm:flex"
+                    >
+                        <PlusCircle className="mr-2 h-4 w-4" />
+                        Add {activeTab === 'problems' ? 'Problem' : activeTab === 'parts' ? 'Part' : 'Service'}
+                    </Button>
+                </div>
+
+                {/* Mobile Add Button - FAB style or sticky bottom if needed, but for now just relying on top button visibility logic or adding one here if needed for mobile */}
+                <div className="sm:hidden mb-4">
+                    <Button
+                        className="w-full"
+                        onClick={() => handleOpenForm(activeTab === 'problems' ? 'problem' : activeTab === 'parts' ? 'part' : 'service', null)}
+                    >
+                        <PlusCircle className="mr-2 h-4 w-4" />
+                        Add {activeTab === 'problems' ? 'Problem' : activeTab === 'parts' ? 'Part' : 'Service'}
+                    </Button>
+                </div>
+
+                <TabsContent value="services" className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {filteredServices.map(service => (
+                            <ResourceCard
+                                key={service.id}
+                                type="service"
+                                data={service}
+                                stats={getStats(service.id, service.name, 'service')}
+                                onEdit={handleOpenForm}
+                                onDelete={openDeleteDialog}
+                            />
+                        ))}
                     </div>
-                    <div className="relative mt-2">
-                         <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                         <Input placeholder="Search problems..." className="pl-8" value={problemsSearchTerm} onChange={(e) => setProblemsSearchTerm(e.target.value)} />
+                </TabsContent>
+
+                <TabsContent value="parts" className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {filteredParts.map(part => (
+                            <ResourceCard
+                                key={part.id}
+                                type="part"
+                                data={part}
+                                stats={getStats(part.id, part.name, 'part')}
+                                onEdit={handleOpenForm}
+                                onDelete={openDeleteDialog}
+                            />
+                        ))}
                     </div>
-                </CardHeader>
-                 <CardContent>
-                    <Table>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead>Category</TableHead>
-                                <TableHead>Problem Description</TableHead>
-                                <TableHead className="text-right">Actions</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {filteredProblems.map(problem => (
-                                <TableRow key={`${problem.category}-${problem.name}`}>
-                                    <TableCell>{problem.category}</TableCell>
-                                    <TableCell className="font-medium">{problem.name}</TableCell>
-                                    <TableCell className="text-right">
-                                        <Button variant="ghost" size="icon" onClick={() => handleOpenForm('problem', problem)}><Edit className="h-4 w-4" /></Button>
-                                        <Button variant="ghost" size="icon" onClick={() => openDeleteDialog('problem', problem)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
-                                    </TableCell>
-                                </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
-                 </CardContent>
-            </Card>
+                </TabsContent>
+
+                <TabsContent value="problems" className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {filteredProblems.map(problem => (
+                            <ResourceCard
+                                key={problem.id}
+                                type="problem"
+                                data={problem}
+                                stats={getStats(problem.id, problem.problem, 'problem')}
+                                onEdit={handleOpenForm}
+                                onDelete={openDeleteDialog}
+                            />
+                        ))}
+                    </div>
+                </TabsContent>
+            </Tabs>
         </div>
     );
 }
 
-    
+
+

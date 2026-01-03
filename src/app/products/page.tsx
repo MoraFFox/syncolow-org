@@ -42,7 +42,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import { useManufacturerStore } from "@/store/use-manufacturer-store";
 import { ProductsOverview } from "./_components/products-overview";
-import { CategoryCard } from "./_components/category-card";
+// import { CategoryCard } from "./_components/category-card"; // Deprecated
+import { CategoryStrip } from "./_components/category-strip";
 import { ManufacturerCard } from "./_components/manufacturer-card";
 import { ProductGrid } from "./_components/product-grid";
 import { ArrowLeft } from "lucide-react";
@@ -290,49 +291,77 @@ function ProductsPageContent() {
         </AlertDialogContent>
       </AlertDialog>
 
-      <div className='flex flex-col gap-8'>
-        <div className='flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4'>
-          <div>
-            <h1 className='text-3xl font-bold'>Products</h1>
-            <p className='text-muted-foreground'>
-              Manage your product inventory.
-            </p>
+      <div className='flex flex-col gap-10 pb-20'>
+        {/* Header Section */}
+        <div className='flex flex-col gap-8'>
+          <div className='flex flex-col lg:flex-row items-start lg:items-end justify-between gap-6'>
+            <div className="space-y-1">
+              <h1 className='text-5xl font-black tracking-tight text-foreground'>INVENTORY</h1>
+              <p className='text-muted-foreground font-mono text-sm uppercase tracking-wider'>
+                Logistics & Asset Management Terminal
+              </p>
+            </div>
+
+            <div className='flex flex-wrap items-center gap-3 w-full lg:w-auto'>
+              <Button
+                onClick={() => handleOpenForm(null)}
+                className='h-11 px-6 font-semibold shadow-lg shadow-primary/20'
+              >
+                <PlusCircle className='h-4 w-4 mr-2' />
+                Add Item
+              </Button>
+              <Button
+                variant='outline'
+                onClick={() => setIsImporterOpen(true)}
+                className='h-11 border-dashed'
+              >
+                <Upload className='h-4 w-4 mr-2' />
+                Import
+              </Button>
+              <div className="h-8 w-px bg-border hidden sm:block mx-1" />
+              <div className="flex gap-2 w-full sm:w-auto">
+                <Button variant='secondary' asChild className='h-11 flex-1 sm:w-auto'>
+                  <Link href='/products/manufacturers'>Brands</Link>
+                </Button>
+                <Button variant='secondary' asChild className='h-11 flex-1 sm:w-auto'>
+                  <Link href='/products/categories'>
+                    <Tags className='h-4 w-4 mr-2' />
+                    Categories
+                  </Link>
+                </Button>
+              </div>
+
+              <Button
+                variant='destructive'
+                size="icon"
+                onClick={() => setIsDeleteAllAlertOpen(true)}
+                className='h-11 w-11 ml-auto sm:ml-0'
+              >
+                <Trash2 className='h-4 w-4' />
+              </Button>
+            </div>
           </div>
-          <div className='flex items-center gap-2 w-full sm:w-auto'>
-            <Button
-              onClick={() => handleOpenForm(null)}
-              className='w-full sm:w-auto'
-            >
-              <PlusCircle className='h-4 w-4 mr-2' />
-              Add Product
-            </Button>
-            <Button
-              variant='outline'
-              onClick={() => setIsImporterOpen(true)}
-              className='w-full sm:w-auto'
-            >
-              <Upload className='h-4 w-4 mr-2' />
-              Import
-            </Button>
-            <Button variant='outline' asChild className='w-full sm:w-auto'>
-              <Link href='/products/manufacturers'>Manage Manufacturers</Link>
-            </Button>
-            <Button variant='outline' asChild className='w-full sm:w-auto'>
-              <Link href='/products/categories'>
-                <Tags className='h-4 w-4 mr-2' />
-                Manage Categories
-              </Link>
-            </Button>
-            <Button
-              variant='destructive'
-              onClick={() => setIsDeleteAllAlertOpen(true)}
-              className='w-full sm:w-auto'
-            >
-              <Trash2 className='h-4 w-4 mr-2' />
-              Delete All
-            </Button>
+
+          {/* Search & Filter Bar */}
+          <div className='relative group'>
+            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+              <Search className='h-5 w-5 text-muted-foreground group-focus-within:text-primary transition-colors' />
+            </div>
+            <Input
+              type='search'
+              placeholder='SEARCH_INDEX...'
+              className='h-14 pl-12 pr-12 text-lg font-mono bg-muted/30 border-2 border-transparent focus-visible:border-primary/50 focus-visible:bg-background transition-all rounded-xl shadow-inner'
+              value={searchTerm}
+              onChange={(e) => handleSearch(e.target.value)}
+            />
+            {isLoadingMore && isSearching && (
+              <div className='absolute right-4 top-4'>
+                <div className='h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent' />
+              </div>
+            )}
           </div>
         </div>
+
         <ProductForm
           isOpen={isFormOpen}
           onOpenChange={setIsFormOpen}
@@ -344,31 +373,17 @@ function ProductsPageContent() {
           onOpenChange={setIsImporterOpen}
         />
 
-        <div className='relative'>
-          <Search className='absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground' />
-          <Input
-            type='search'
-            placeholder='Search products...'
-            className='pl-8 pr-10'
-            value={searchTerm}
-            onChange={(e) => handleSearch(e.target.value)}
-          />
-          {isLoadingMore && isSearching && (
-            <div className='absolute right-2.5 top-2.5'>
-              <div className='h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent' />
-            </div>
-          )}
-        </div>
 
-        <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList>
-            <TabsTrigger value='overview'>Overview</TabsTrigger>
-            <TabsTrigger value='category'>By Category</TabsTrigger>
-            <TabsTrigger value='manufacturer'>By Manufacturer</TabsTrigger>
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-8">
+          <TabsList className="w-full justify-start h-auto p-1 bg-muted/40 rounded-lg border border-border/50 overflow-x-auto flex-nowrap">
+            <TabsTrigger value='overview' className="h-10 px-6 rounded-md data-[state=active]:bg-background data-[state=active]:shadow-sm">Grid View</TabsTrigger>
+            <TabsTrigger value='category' className="h-10 px-6 rounded-md data-[state=active]:bg-background data-[state=active]:shadow-sm">By Category</TabsTrigger>
+            <TabsTrigger value='manufacturer' className="h-10 px-6 rounded-md data-[state=active]:bg-background data-[state=active]:shadow-sm">By Brand</TabsTrigger>
           </TabsList>
-          <TabsContent value='overview' className='mt-4'>
-            <div className="space-y-8">
-              <div className="h-[600px] overflow-y-auto pr-2 border rounded-md p-4">
+
+          <TabsContent value='overview' className='animate-in fade-in-50 slide-in-from-bottom-2 duration-300'>
+            <div className="space-y-12">
+              <div className="h-[70vh] overflow-y-auto pr-2  p-1">
                 <ErrorBoundary>
                   <ProductGrid
                     products={products}
@@ -379,8 +394,9 @@ function ProductsPageContent() {
                 </ErrorBoundary>
               </div>
 
-              <div className="pt-4 border-t">
-                <h2 className="text-2xl font-bold mb-4">Analytics Overview</h2>
+              {/* Analytics Overview Section - Kept but styled */}
+              <div className="pt-8 border-t border-dashed">
+                <h2 className="text-xl font-bold mb-6 font-mono uppercase tracking-wider text-muted-foreground">System Metrics</h2>
                 <ErrorBoundary>
                   <ProductsOverview
                     products={products}
@@ -391,15 +407,16 @@ function ProductsPageContent() {
               </div>
             </div>
           </TabsContent>
-          <TabsContent value='category' className='mt-4'>
+
+          <TabsContent value='category' className='mt-0 animate-in fade-in-50 slide-in-from-bottom-2 duration-300'>
             {selectedCategory ? (
-              <div className="space-y-4">
-                <div className="flex items-center gap-2">
-                  <Button variant="ghost" onClick={() => setSelectedCategory(null)}>
+              <div className="space-y-6">
+                <div className="flex items-center gap-4 pb-4 border-b">
+                  <Button variant="ghost" size="sm" onClick={() => setSelectedCategory(null)} className="font-mono text-muted-foreground">
                     <ArrowLeft className="h-4 w-4 mr-2" />
-                    Back to Categories
+                    BACK_TO_INDEX
                   </Button>
-                  <h2 className="text-xl font-bold">{selectedCategory.name}</h2>
+                  <h2 className="text-3xl font-bold tracking-tight">{selectedCategory.name}</h2>
                 </div>
                 <ProductGrid
                   products={productsByCategory[selectedCategory.name] || []}
@@ -408,41 +425,34 @@ function ProductsPageContent() {
                 />
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                {Object.entries(productsByCategory).map(([categoryName, categoryProducts]) => {
+              <div className="flex flex-col space-y-2">
+                {Object.entries(productsByCategory).map(([categoryName, categoryProducts], idx) => {
                   const categoryObj = categories.find(c => c.name === categoryName) || { id: 'uncategorized', name: categoryName };
                   return (
-                    <DrillTarget
+                    <CategoryStrip
                       key={categoryName}
-                      kind="category"
-                      payload={{
-                        id: categoryObj.id,
-                        name: categoryObj.name,
-                        productCount: categoryProducts.length
+                      index={idx}
+                      category={categoryObj}
+                      products={categoryProducts}
+                      onClick={() => {
+                        setSelectedCategory(categoryObj);
                       }}
-                    >
-                      <CategoryCard
-                        category={categoryObj}
-                        products={categoryProducts}
-                        onClick={() => {
-                          setSelectedCategory(categoryObj);
-                        }}
-                      />
-                    </DrillTarget>
+                    />
                   );
                 })}
               </div>
             )}
           </TabsContent>
-          <TabsContent value='manufacturer' className='mt-4'>
+
+          <TabsContent value='manufacturer' className='mt-0 animate-in fade-in-50 slide-in-from-bottom-2 duration-300'>
             {selectedManufacturer ? (
-              <div className="space-y-4">
-                <div className="flex items-center gap-2">
-                  <Button variant="ghost" onClick={() => setSelectedManufacturer(null)}>
+              <div className="space-y-6">
+                <div className="flex items-center gap-4 pb-4 border-b">
+                  <Button variant="ghost" size="sm" onClick={() => setSelectedManufacturer(null)} className="font-mono text-muted-foreground">
                     <ArrowLeft className="h-4 w-4 mr-2" />
-                    Back to Manufacturers
+                    BACK_TO_INDEX
                   </Button>
-                  <h2 className="text-xl font-bold">{selectedManufacturer.name}</h2>
+                  <h2 className="text-3xl font-bold tracking-tight">{selectedManufacturer.name}</h2>
                 </div>
                 <ProductGrid
                   products={productsByManufacturer[selectedManufacturer.name] || []}
@@ -451,29 +461,19 @@ function ProductsPageContent() {
                 />
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {Object.entries(productsByManufacturer).map(([manufacturerName, manufacturerProducts]) => {
                   const manufacturerObj = manufacturers.find(m => m.name === manufacturerName) || { id: 'unknown', name: manufacturerName, icon: undefined };
 
                   return (
-                    <DrillTarget
+                    <ManufacturerCard
                       key={manufacturerName}
-                      kind="manufacturer"
-                      payload={{
-                        id: manufacturerObj.id,
-                        name: manufacturerObj.name,
-                        icon: manufacturerObj.icon,
-                        productCount: manufacturerProducts.length
+                      manufacturer={manufacturerObj}
+                      products={manufacturerProducts}
+                      onClick={() => {
+                        setSelectedManufacturer(manufacturerObj);
                       }}
-                    >
-                      <ManufacturerCard
-                        manufacturer={manufacturerObj}
-                        products={manufacturerProducts}
-                        onClick={() => {
-                          setSelectedManufacturer(manufacturerObj);
-                        }}
-                      />
-                    </DrillTarget>
+                    />
                   );
                 })}
               </div>
@@ -482,18 +482,21 @@ function ProductsPageContent() {
         </Tabs>
 
         {!isSearching && (
-          <div ref={loadMoreRef} className='flex justify-center py-8'>
+          <div ref={loadMoreRef} className='flex justify-center py-12'>
             {isLoadingMore && (
-              <p className='text-muted-foreground'>Loading more products...</p>
+              <div className='flex flex-col items-center gap-2 text-muted-foreground font-mono text-xs'>
+                <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+                LOADING_DATA...
+              </div>
             )}
             {!isLoadingMore && !hasLoadedAll && products.length >= 50 && (
-              <Button variant='outline' onClick={handleLoadMore}>
-                Load More Products
+              <Button variant='outline' onClick={handleLoadMore} className="font-mono text-xs tracking-wider">
+                LOAD MORE
               </Button>
             )}
             {hasLoadedAll && (
-              <p className='text-sm text-muted-foreground'>
-                All products loaded ({products.length} total)
+              <p className='text-xs font-mono text-muted-foreground opacity-50 uppercase tracking-widest'>
+                -- End of Index ({products.length} records) --
               </p>
             )}
           </div>

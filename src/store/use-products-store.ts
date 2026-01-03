@@ -24,6 +24,7 @@ interface ProductsState {
   updateProduct: (productId: string, productData: Partial<Product>) => Promise<void>;
   deleteProduct: (productId: string) => Promise<void>;
   deleteAllProducts: () => Promise<void>;
+  getProduct: (productId: string) => Promise<void>;
 }
 
 export const useProductsStore = create<ProductsState>((set, get) => ({
@@ -32,14 +33,35 @@ export const useProductsStore = create<ProductsState>((set, get) => ({
   productsHasMore: true,
   loading: false,
 
+  getProduct: async (productId: string) => {
+    // check if already exists
+    if (get().products.find(p => p.id === productId)) return;
+
+    set({ loading: true });
+    try {
+      const { data, error } = await supabase.from('products').select('*').eq('id', productId).single();
+      if (error) throw error;
+      if (data) {
+        set(produce((state: ProductsState) => {
+          state.products.push(data);
+        }));
+      }
+      set({ loading: false });
+    } catch (error) {
+      set({ loading: false });
+      // Don't toast error here, just log, let UI handle missing
+      console.error("Failed to fetch product", error);
+    }
+  },
+
   loadAllProducts: async () => {
     set({ loading: true });
     try {
       const { data, error } = await supabase.from('products').select('*');
-      console.log('useProductsStore: loadAllProducts result:', { 
-        count: data?.length, 
+      console.log('useProductsStore: loadAllProducts result:', {
+        count: data?.length,
         error: error?.message,
-        firstProduct: data?.[0]?.name 
+        firstProduct: data?.[0]?.name
       });
       if (error) throw error;
       set({

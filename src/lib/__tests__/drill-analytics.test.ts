@@ -26,14 +26,22 @@ Object.defineProperty(window, "localStorage", {
 
 describe("drillAnalytics", () => {
   beforeEach(() => {
+    vi.useFakeTimers();
     localStorageMock.clear();
     vi.clearAllMocks();
 
+    // Mock requestIdleCallback
+    if (!global.requestIdleCallback) {
+      global.requestIdleCallback = ((cb: any) => setTimeout(cb, 1)) as any;
+    }
+
     // Reset internal state by calling clearOldEvents with future timestamp
     drillAnalytics.clearOldEvents(Date.now() + 1000000);
+    vi.runAllTimers();
   });
 
   afterEach(() => {
+    vi.useRealTimers();
     localStorageMock.clear();
   });
 
@@ -238,11 +246,15 @@ describe("drillAnalytics", () => {
     it("should save events to localStorage", () => {
       drillAnalytics.track("order", { id: "ord-persist" }, "preview");
 
+      vi.runAllTimers();
+
       expect(localStorageMock.setItem).toHaveBeenCalled();
     });
 
     it("should save performance metrics to localStorage", () => {
       drillAnalytics.trackPreviewLoad("order", "ord-perf", 100, false);
+
+      vi.runAllTimers();
 
       expect(localStorageMock.setItem).toHaveBeenCalled();
     });

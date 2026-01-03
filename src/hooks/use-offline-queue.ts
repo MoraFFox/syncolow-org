@@ -14,14 +14,14 @@ export function useOfflineQueue() {
 
   // Process queue when coming online
   useEffect(() => {
-    if (isOnline && queue.length > 0 && !isProcessing) {
+    if (isOnline && (queue?.length || 0) > 0 && !isProcessing) {
       offlineQueueManager.processQueue();
     }
-  }, [isOnline, queue.length, isProcessing]);
+  }, [isOnline, queue?.length, isProcessing]);
 
   return {
-    queue,
+    queue: queue || [],
     isProcessing,
-    pendingCount: queue.length,
+    pendingCount: queue?.length || 0,
   };
 }

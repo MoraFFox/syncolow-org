@@ -123,6 +123,7 @@ export interface Product {
   hint?: string;
   manufacturerId: string;
   category?: string;
+  categoryId?: string;
   totalSold?: number;
   createdAt?: string;
   updatedAt?: string;
@@ -148,6 +149,7 @@ export interface Manufacturer {
 
 export interface Order {
   id: string;
+  customerAccount?: string;
   companyId: string;
   branchId?: string | null;
   companyName?: string;
@@ -254,13 +256,22 @@ export interface MaintenanceVisit {
   reportSignedBy?: string;
   supervisorWitness?: string;
   status: 'Scheduled' | 'In Progress' | 'Completed' | 'Cancelled' | 'Follow-up Required' | 'Waiting for Parts';
+  // Follow-up chain tracking
   rootVisitId?: string | null;
   totalVisits?: number;
   totalCost?: number;
   resolutionTimeDays?: number;
   averageDelayDays?: number;
   laborCost?: number;
+  // Enhanced chain tracking (new fields)
+  chainDepth?: number; // 0 = root visit, 1+ = follow-up depth
+  priority?: 'low' | 'normal' | 'high' | 'urgent';
+  slaDeadline?: string | Date | null;
+  lastEscalatedAt?: string | Date | null;
+  // UI helper field (populated by queries, not stored)
+  parentVisitBranchName?: string;
 }
+
 
 
 export interface VisitCall {
@@ -345,6 +356,12 @@ export interface MaintenanceEmployee {
   id: string;
   name: string;
   phone: string;
+  email?: string;
+  role?: string;
+  status?: 'active' | 'inactive' | 'on_leave';
+  skills?: string[];
+  availability?: string;
+  currentLoad?: number;
 }
 
 export interface DeliveryArea {
@@ -469,5 +486,10 @@ export interface CancellationReason {
   id: string;
   reason: string;
   createdAt: string;
+}
+
+// Client component specific types
+export interface ListItem extends Company {
+  depth: number;
 }
 

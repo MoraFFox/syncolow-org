@@ -16,15 +16,19 @@ const mockRange = vi.fn();
 const mockSingle = vi.fn();
 const mockGte = vi.fn();
 const mockLte = vi.fn();
+const mockOr = vi.fn();
+const mockUpsert = vi.fn();
 
 const buildChain = () => ({
   select: mockSelect.mockReturnThis(),
   insert: mockInsert.mockReturnThis(),
   update: mockUpdate.mockReturnThis(),
+  upsert: mockUpsert.mockReturnThis(),
   delete: mockDelete.mockReturnThis(),
   eq: mockEq.mockReturnThis(),
   neq: mockNeq.mockReturnThis(),
   in: mockIn.mockReturnThis(),
+  or: mockOr.mockReturnThis(),
   order: mockOrder.mockReturnThis(),
   range: mockRange.mockReturnThis(),
   single: mockSingle,
@@ -146,7 +150,7 @@ describe('useOrderStore', () => {
     vi.clearAllMocks();
     vi.useFakeTimers();
     vi.setSystemTime(new Date('2024-01-15T12:00:00.000Z'));
-    
+
     // Reset store state
     useOrderStore.setState({
       orders: [],
@@ -170,7 +174,7 @@ describe('useOrderStore', () => {
   describe('Initial State', () => {
     it('should have correct initial state', () => {
       const state = useOrderStore.getState();
-      
+
       expect(state.orders).toEqual([]);
       expect(state.notifications).toEqual([]);
       expect(state.visits).toEqual([]);
@@ -207,8 +211,7 @@ describe('useOrderStore', () => {
       ];
 
       (supabase.from as ReturnType<typeof vi.fn>).mockImplementation(() => ({
-        select: vi.fn().mockReturnThis(),
-        order: vi.fn().mockReturnThis(),
+        ...buildChain(),
         range: vi.fn().mockResolvedValue({ data: mockOrders, error: null }),
       }));
 
@@ -226,8 +229,7 @@ describe('useOrderStore', () => {
       const mockOrders = [{ id: 'order-1' }];
 
       (supabase.from as ReturnType<typeof vi.fn>).mockImplementation(() => ({
-        select: vi.fn().mockReturnThis(),
-        order: vi.fn().mockReturnThis(),
+        ...buildChain(),
         range: vi.fn().mockResolvedValue({ data: mockOrders, error: null }),
       }));
 
@@ -242,11 +244,10 @@ describe('useOrderStore', () => {
   describe('fetchOrdersWithFilters', () => {
     it('should apply status filter', async () => {
       const mockEqFn = vi.fn().mockReturnThis();
-      
+
       (supabase.from as ReturnType<typeof vi.fn>).mockImplementation(() => ({
-        select: vi.fn().mockReturnThis(),
+        ...buildChain(),
         eq: mockEqFn,
-        order: vi.fn().mockReturnThis(),
         range: vi.fn().mockResolvedValue({ data: [], error: null }),
       }));
 
@@ -259,11 +260,10 @@ describe('useOrderStore', () => {
 
     it('should not apply filter when status is "All"', async () => {
       const mockEqFn = vi.fn().mockReturnThis();
-      
+
       (supabase.from as ReturnType<typeof vi.fn>).mockImplementation(() => ({
-        select: vi.fn().mockReturnThis(),
+        ...buildChain(),
         eq: mockEqFn,
-        order: vi.fn().mockReturnThis(),
         range: vi.fn().mockResolvedValue({ data: [], error: null }),
       }));
 
@@ -359,10 +359,7 @@ describe('useOrderStore', () => {
   describe('markOrderAsPaid', () => {
     it('should update payment fields correctly', async () => {
       const mockUpdateChain = {
-        update: vi.fn().mockReturnThis(),
-        eq: vi.fn().mockResolvedValue({ error: null }),
-        select: vi.fn().mockReturnThis(),
-        order: vi.fn().mockReturnThis(),
+        ...buildChain(),
         range: vi.fn().mockResolvedValue({ data: [], error: null }),
       };
 
@@ -395,10 +392,7 @@ describe('useOrderStore', () => {
   describe('markBulkOrdersAsPaid', () => {
     it('should update multiple orders with in clause', async () => {
       const mockChain = {
-        update: vi.fn().mockReturnThis(),
-        in: vi.fn().mockResolvedValue({ error: null }),
-        select: vi.fn().mockReturnThis(),
-        order: vi.fn().mockReturnThis(),
+        ...buildChain(),
         range: vi.fn().mockResolvedValue({ data: [], error: null }),
       };
 
@@ -551,14 +545,14 @@ describe('useOrderStore', () => {
   describe('clearSnooze', () => {
     it('should clear snooze and mark as unread', async () => {
       const notifications: Notification[] = [
-        { 
-          id: 'notif-1', 
-          userId: 'user-1', 
-          type: 'order', 
-          title: 'Test', 
-          message: 'msg', 
-          read: true, 
-          snoozedUntil: '2024-01-16T10:00:00.000Z' 
+        {
+          id: 'notif-1',
+          userId: 'user-1',
+          type: 'order',
+          title: 'Test',
+          message: 'msg',
+          read: true,
+          snoozedUntil: '2024-01-16T10:00:00.000Z'
         } as Notification,
       ];
       useOrderStore.setState({ notifications });

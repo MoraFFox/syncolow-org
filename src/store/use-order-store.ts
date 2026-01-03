@@ -156,23 +156,23 @@ export const useOrderStore = create<AppState>((set, get) => ({
   ordersHasMore: true,
   ordersLoading: false,
   analyticsLoading: false,
-  deleteVisit: async () => {},
+  deleteVisit: async () => { },
 
   fetchInitialData: async () => {
     const currentState = get();
     const hasData = currentState.orders.length > 0;
-    
+
     if (!hasData && !currentState.loading) {
       set({ loading: true });
     }
 
     try {
       const data = await initializeAllStores();
-      
-      set({ 
-        visits: data.visits || [], 
-        returns: data.returns || [], 
-        loading: false 
+
+      set({
+        visits: data.visits || [],
+        returns: data.returns || [],
+        loading: false
       });
     } catch {
       set({ loading: false });
@@ -228,34 +228,34 @@ export const useOrderStore = create<AppState>((set, get) => ({
       if (filters.branchId) {
         query = query.eq("branchId", filters.branchId);
       }
-      
+
       // Archive Logic
       if (filters.showArchived) {
-          // Show Delivered OR Cancelled
-          query = query.in('status', ['Delivered', 'Cancelled']);
+        // Show Delivered OR Cancelled
+        query = query.in('status', ['Delivered', 'Cancelled']);
       } else {
-          // Show Active: NOT Delivered AND NOT Cancelled
-          query = query.neq('status', 'Delivered').neq('status', 'Cancelled');
+        // Show Active: NOT Delivered AND NOT Cancelled
+        query = query.neq('status', 'Delivered').neq('status', 'Cancelled');
       }
 
       // Apply sorting
       if (sort) {
-          let column = sort.key;
-          // Map UI sort keys to DB columns
-          switch (sort.key) {
-            case 'client': column = 'companyName'; break;
-            case 'date': column = 'orderDate'; break;
-            case 'deliveryDate': column = 'deliveryDate'; break;
-            case 'total': column = 'grandTotal'; break; // Could be 'total' depending on schema, assume grandTotal for now or fallback
-             // 'id' and 'status' map directly
-          }
-          query = query.order(column, { ascending: sort.direction === 'asc' });
+        let column = sort.key;
+        // Map UI sort keys to DB columns
+        switch (sort.key) {
+          case 'client': column = 'companyName'; break;
+          case 'date': column = 'orderDate'; break;
+          case 'deliveryDate': column = 'deliveryDate'; break;
+          case 'total': column = 'grandTotal'; break; // Could be 'total' depending on schema, assume grandTotal for now or fallback
+          // 'id' and 'status' map directly
+        }
+        query = query.order(column, { ascending: sort.direction === 'asc' });
       } else {
-          query = query.order("orderDate", { ascending: false });
+        query = query.order("orderDate", { ascending: false });
       }
 
       const { data, error } = await query.range(0, limitCount - 1);
-      
+
       if (error) throw error;
 
       set({
@@ -282,7 +282,7 @@ export const useOrderStore = create<AppState>((set, get) => ({
       const term = searchTerm.trim();
       // Use server-side ILIKE search
       // Assuming companyName, branchName, id, temporaryCompanyName are columns on 'orders' due to previous client-side logic
-      
+
       const { data: filtered, error } = await supabase
         .from("orders")
         .select("*")
@@ -300,8 +300,8 @@ export const useOrderStore = create<AppState>((set, get) => ({
         activeFilters: null
       });
     } catch (error) {
-        console.error('❌ [useOrderStore] searchOrdersByText failed:', error);
-        set({ ordersLoading: false });
+      console.error('❌ [useOrderStore] searchOrdersByText failed:', error);
+      set({ ordersLoading: false });
     }
   },
 
@@ -330,15 +330,15 @@ export const useOrderStore = create<AppState>((set, get) => ({
         if (activeFilters.branchId) {
           query = query.eq("branchId", activeFilters.branchId);
         }
-        
+
         if (activeFilters.showArchived) {
-            query = query.in('status', ['Delivered', 'Cancelled']);
+          query = query.in('status', ['Delivered', 'Cancelled']);
         } else {
-            query = query.neq('status', 'Delivered').neq('status', 'Cancelled');
+          query = query.neq('status', 'Delivered').neq('status', 'Cancelled');
         }
       } else {
-          // Default to not showing archived if no filters (mimics fetchOrders default)
-          query = query.neq('status', 'Delivered').neq('status', 'Cancelled');
+        // Default to not showing archived if no filters (mimics fetchOrders default)
+        query = query.neq('status', 'Delivered').neq('status', 'Cancelled');
       }
 
       // Apply sorting
@@ -371,7 +371,7 @@ export const useOrderStore = create<AppState>((set, get) => ({
           // Deduplicate by checking if order ID already exists
           const existingIds = new Set(state.orders.map(o => o.id));
           const uniqueNewOrders = (newOrders || []).filter((order: Order) => !existingIds.has(order.id));
-          
+
           state.orders.push(...uniqueNewOrders);
           state.ordersOffset = ordersOffset + limitCount;
           state.ordersHasMore = (newOrders?.length || 0) === limitCount;
@@ -390,7 +390,7 @@ export const useOrderStore = create<AppState>((set, get) => ({
     // Invalidate all order-related cache entries by using string tag
     // This ensures all cached order queries (with different params) are cleared
     await universalCache.invalidate('orders');
-    
+
     // Force a fresh fetch directly from the database, bypassing the cache
     set({ ordersLoading: true });
     try {
@@ -401,9 +401,9 @@ export const useOrderStore = create<AppState>((set, get) => ({
         .neq('status', 'Cancelled') // Default: Show only Active
         .order("orderDate", { ascending: false })
         .range(0, limitCount - 1);
-      
+
       if (error) throw error;
-      
+
       set({
         orders: data || [],
         ordersOffset: limitCount,
@@ -441,7 +441,7 @@ export const useOrderStore = create<AppState>((set, get) => ({
 
           while (hasMore) {
             if (get().currentFetchId !== fetchId) throw new Error("Fetch aborted");
-            
+
             logger.debug(`[Analytics] Fetching page ${page}...`);
             const { data: orders, error } = await supabase
               .from("orders")
@@ -454,12 +454,12 @@ export const useOrderStore = create<AppState>((set, get) => ({
             if (error) throw error;
 
             if (orders && orders.length > 0) {
-               allOrders = [...allOrders, ...(orders as Order[])];
-               logger.debug(`[Analytics] Page ${page} received ${orders.length} orders. Total: ${allOrders.length}`);
-               if (orders.length < pageSize) hasMore = false;
-               else page++;
+              allOrders = [...allOrders, ...(orders as Order[])];
+              logger.debug(`[Analytics] Page ${page} received ${orders.length} orders. Total: ${allOrders.length}`);
+              if (orders.length < pageSize) hasMore = false;
+              else page++;
             } else {
-               hasMore = false;
+              hasMore = false;
             }
           }
           logger.debug(`[Analytics] Fetch complete. Total Orders: ${allOrders.length}`);
@@ -472,7 +472,7 @@ export const useOrderStore = create<AppState>((set, get) => ({
 
       logger.debug(`[Analytics] Updating store with ${allOrders.length} orders`);
       set({ analyticsOrders: allOrders, analyticsLoading: false });
-      
+
       toast({
         title: "Analytics Data Loaded",
         description: `Successfully loaded ${allOrders.length} orders.`,
@@ -483,9 +483,9 @@ export const useOrderStore = create<AppState>((set, get) => ({
         logger.error(error, { component: 'use-order-store', action: 'fetchAnalyticsOrders' });
         set({ analyticsLoading: false });
         toast({
-            variant: "destructive",
-            title: "Error Loading Data",
-            description: error.message || "Failed to fetch analytics data",
+          variant: "destructive",
+          title: "Error Loading Data",
+          description: error.message || "Failed to fetch analytics data",
         });
       }
     }
@@ -499,7 +499,7 @@ export const useOrderStore = create<AppState>((set, get) => ({
     const currentHistory = currentOrder?.statusHistory || [];
     const newHistory = [...(Array.isArray(currentHistory) ? currentHistory : []), { status, timestamp: new Date().toISOString() }];
 
-    const updateData: any = { 
+    const updateData: any = {
       status,
       statusHistory: newHistory
     };
@@ -521,16 +521,16 @@ export const useOrderStore = create<AppState>((set, get) => ({
         }
       })
     );
-    
+
     // Sync to search
     const { data: updatedOrder } = await supabase.from("orders").select("*").eq("id", orderId).single();
     if (updatedOrder) {
-        await syncOrderToSearch(updatedOrder as Order);
+      await syncOrderToSearch(updatedOrder as Order);
     }
-    
+
     // Invalidate cache using entity tag
     await universalCache.invalidate('orders');
-    
+
     // Invalidate drilldown preview
     try {
       drilldownCacheInvalidator.invalidateRelatedPreviews('order', orderId, {
@@ -560,7 +560,14 @@ export const useOrderStore = create<AppState>((set, get) => ({
     if (reference) updateData.paymentReference = reference;
     if (notes) updateData.paymentNotes = notes;
 
-    await supabase.from("orders").update(updateData).eq("id", orderId);
+    const { error } = await supabase.from("orders").update(updateData).eq("id", orderId);
+
+    if (error) {
+      console.error('[markOrderAsPaid] Supabase error:', error);
+      toast({ variant: "destructive", title: "Failed to update order", description: error.message });
+      return;
+    }
+
     await get().refreshOrders();
     await get().updatePaymentScores();
     toast({ title: "Payment Recorded" });
@@ -578,14 +585,58 @@ export const useOrderStore = create<AppState>((set, get) => ({
     if (reference) updateData.paymentReference = reference;
     if (notes) updateData.paymentNotes = notes;
 
-    await supabase.from("orders").update(updateData).in("id", orderIds);
+    // Show loading toast immediately
+    const totalCount = orderIds.length;
+    toast({
+      title: "Processing bulk payment...",
+      description: `Updating ${totalCount.toLocaleString()} orders. Please wait.`,
+    });
+
+    // Batch updates to avoid URL length limits (50 IDs per batch)
+    // Process batches in parallel (10 concurrent) for speed
+    const BATCH_SIZE = 50;
+    const CONCURRENT_BATCHES = 10;
+    let failedCount = 0;
+
+    // Create all batches
+    const batches: string[][] = [];
+    for (let i = 0; i < orderIds.length; i += BATCH_SIZE) {
+      batches.push(orderIds.slice(i, i + BATCH_SIZE));
+    }
+
+    // Process batches in parallel chunks
+    for (let i = 0; i < batches.length; i += CONCURRENT_BATCHES) {
+      const chunk = batches.slice(i, i + CONCURRENT_BATCHES);
+      const results = await Promise.all(
+        chunk.map(batch =>
+          supabase.from("orders").update(updateData).in("id", batch)
+        )
+      );
+
+      // Count errors
+      results.forEach((result, idx) => {
+        if (result.error) {
+          console.error(`[markBulkOrdersAsPaid] Batch error:`, result.error);
+          failedCount += chunk[idx].length;
+        }
+      });
+    }
+
+    if (failedCount > 0) {
+      toast({ variant: "destructive", title: "Partial failure", description: `${failedCount} orders failed to update` });
+    }
+
     // refreshOrders handles cache invalidation internally
     await get().refreshOrders();
     await get().updatePaymentScores();
-    toast({
-      title: "Bulk Payment Recorded",
-      description: `${orderIds.length} orders marked as paid`,
-    });
+
+    const successCount = orderIds.length - failedCount;
+    if (successCount > 0) {
+      toast({
+        title: "Bulk Payment Complete",
+        description: `${successCount.toLocaleString()} orders marked as paid`,
+      });
+    }
   },
 
   markBulkCycleAsPaid: async (
@@ -606,13 +657,50 @@ export const useOrderStore = create<AppState>((set, get) => ({
     if (reference) updateData.paymentReference = reference;
     if (notes) updateData.paymentNotes = notes;
 
-    await supabase.from("orders").update(updateData).in("id", orderIds);
+    // Show loading toast
+    toast({
+      title: "Processing cycle payment...",
+      description: `Updating ${orderIds.length.toLocaleString()} orders. Please wait.`,
+    });
+
+    // Batch updates with parallel processing
+    const BATCH_SIZE = 50;
+    const CONCURRENT_BATCHES = 10;
+    let failedCount = 0;
+
+    const batches: string[][] = [];
+    for (let i = 0; i < orderIds.length; i += BATCH_SIZE) {
+      batches.push(orderIds.slice(i, i + BATCH_SIZE));
+    }
+
+    for (let i = 0; i < batches.length; i += CONCURRENT_BATCHES) {
+      const chunk = batches.slice(i, i + CONCURRENT_BATCHES);
+      const results = await Promise.all(
+        chunk.map(batch => supabase.from("orders").update(updateData).in("id", batch))
+      );
+
+      results.forEach((result, idx) => {
+        if (result.error) {
+          console.error(`[markBulkCycleAsPaid] Batch error:`, result.error);
+          failedCount += chunk[idx].length;
+        }
+      });
+    }
+
+    if (failedCount > 0) {
+      toast({ variant: "destructive", title: "Partial failure", description: `${failedCount} orders failed to update` });
+    }
+
     await get().refreshOrders();
     await get().updatePaymentScores();
-    toast({
-      title: "Bulk Payment Recorded",
-      description: `${orderIds.length} orders marked as paid`,
-    });
+
+    const successCount = orderIds.length - failedCount;
+    if (successCount > 0) {
+      toast({
+        title: "Cycle Payment Complete",
+        description: `${successCount.toLocaleString()} orders marked as paid`,
+      });
+    }
   },
 
   updatePaymentScores: async (companyId) => {
@@ -641,7 +729,7 @@ export const useOrderStore = create<AppState>((set, get) => ({
         o => o.companyId === companyId && !o.isPaid && o.paymentStatus !== "Paid"
       );
       const { score, status, totalUnpaid, totalOutstanding } = calculateCompanyPaymentScore(companyOrders);
-      
+
       await supabase.from("companies").update({
         currentPaymentScore: score,
         paymentStatus: status,
@@ -658,18 +746,18 @@ export const useOrderStore = create<AppState>((set, get) => ({
     const { data: order } = await supabase.from("orders").select("companyId, branchId").eq("id", orderId).single();
     const companyId = order?.companyId;
     const branchId = order?.branchId;
-    
+
     await supabase.from("orders").delete().eq("id", orderId);
     await deleteOrderFromSearch(orderId);
     await get().refreshOrders();
-    
+
     // Update company payment score if order had a company
     if (companyId) {
       await get().updatePaymentScores(companyId);
     }
-    
+
     // Note: refreshOrders above already invalidates the cache
-    
+
     // Invalidate drilldown preview
     try {
       drilldownCacheInvalidator.invalidateRelatedPreviews('order', orderId, {
@@ -679,7 +767,7 @@ export const useOrderStore = create<AppState>((set, get) => ({
     } catch (e) {
       logger.error(e, { component: 'use-order-store', action: 'deleteOrder', orderId, companyId, branchId });
     }
-    
+
     toast({
       title: "Order Deleted",
       description: "The order has been permanently removed.",
@@ -691,7 +779,7 @@ export const useOrderStore = create<AppState>((set, get) => ({
       .from("orders")
       .delete()
       .neq("id", "00000000-0000-0000-0000-000000000000"); // Delete all rows
-    
+
     if (error) throw error;
     set({ orders: [], ordersOffset: 0, ordersHasMore: false });
     toast({
@@ -727,8 +815,8 @@ export const useOrderStore = create<AppState>((set, get) => ({
       : undefined;
     const parentCompany = client?.isBranch
       ? useCompanyStore
-          .getState()
-          .companies.find((c) => c.id === client.parentCompanyId)
+        .getState()
+        .companies.find((c) => c.id === client.parentCompanyId)
       : client;
 
     // Check if company is suspended - block order creation
@@ -742,9 +830,9 @@ export const useOrderStore = create<AppState>((set, get) => ({
     }
 
     // Determine region - use form value, fall back to client's region, then default to 'A'
-    const effectiveRegion: "A" | "B" = 
-      (region === "A" || region === "B") ? region : 
-      (client?.region === "A" || client?.region === "B") ? client.region : "A";
+    const effectiveRegion: "A" | "B" =
+      (region === "A" || region === "B") ? region :
+        (client?.region === "A" || client?.region === "B") ? client.region : "A";
 
     const deliveryDate = calculateNextDeliveryDate(
       effectiveRegion,
@@ -808,8 +896,8 @@ export const useOrderStore = create<AppState>((set, get) => ({
     if (client) {
       const parentCompany = client.isBranch
         ? useCompanyStore
-            .getState()
-            .companies.find((c) => c.id === client.parentCompanyId)
+          .getState()
+          .companies.find((c) => c.id === client.parentCompanyId)
         : client;
       newOrderPayload.companyName = parentCompany?.name || "Unknown Company";
       newOrderPayload.branchName = client.name;
@@ -822,7 +910,7 @@ export const useOrderStore = create<AppState>((set, get) => ({
     if (error) throw error;
     const createdOrder = orderData as Order;
     await syncOrderToSearch(createdOrder);
-    
+
     // Update payment scores for the specific company only
     if (createdOrder.companyId) {
       await get().updatePaymentScores(createdOrder.companyId);
@@ -915,11 +1003,11 @@ export const useOrderStore = create<AppState>((set, get) => ({
         }
       })
     );
-    
+
     try {
-      await supabase.from("notifications").update({ 
+      await supabase.from("notifications").update({
         read: true,
-        readAt: new Date().toISOString() 
+        readAt: new Date().toISOString()
       }).eq("id", notificationId);
     } catch (e) {
       logger.error(e, { component: 'use-order-store', action: 'markNotificationAsRead' });
@@ -948,9 +1036,9 @@ export const useOrderStore = create<AppState>((set, get) => ({
         }
       })
     );
-    
+
     try {
-      await supabase.from("notifications").update({ 
+      await supabase.from("notifications").update({
         snoozedUntil: snoozeUntil.toISOString(),
         read: true,
         readAt: new Date().toISOString()
@@ -972,9 +1060,9 @@ export const useOrderStore = create<AppState>((set, get) => ({
         }
       })
     );
-    
+
     try {
-      await supabase.from("notifications").update({ 
+      await supabase.from("notifications").update({
         snoozedUntil: null,
         read: false,
         readAt: null
@@ -1003,17 +1091,17 @@ export const useOrderStore = create<AppState>((set, get) => ({
   },
 
   subscribeToNotifications: () => {
-    return () => {}; // Placeholder - use notification store instead
+    return () => { }; // Placeholder - use notification store instead
   },
 
   syncNotificationsToFirestore: async (userId: string) => {
     const { notifications } = get();
-    
+
     const notificationsWithUser = notifications.map(n => ({
       ...n,
       userId,
     }));
-    
+
     try {
       await supabase.from("notifications").upsert(notificationsWithUser);
     } catch (e) {

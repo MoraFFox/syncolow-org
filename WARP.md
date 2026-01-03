@@ -8,7 +8,7 @@ Use these commands to develop, test, and build the application.
 
 ### Development
 - **Start Dev Server:** `npm run dev`
-  - Runs Next.js with Turbopack on port 9002.
+  - Runs Next.js with Turbopack on port 3001.
 - **Start AI Flows (Genkit):** `npm run genkit:watch`
   - Starts the Genkit developer UI for testing AI flows.
 

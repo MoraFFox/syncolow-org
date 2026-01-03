@@ -4,8 +4,8 @@ import { drilldownCacheInvalidator } from './cache/drilldown-cache-invalidator';
 export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 30000, // 30 seconds
-      gcTime: 300000, // 5 minutes
+      staleTime: 5 * 60 * 1000, // 5 minutes (documented fresh window)
+      gcTime: 24 * 60 * 60 * 1000, // 24 hours (documented cleanup policy)
       retry: 1,
       refetchOnWindowFocus: false,
     },
@@ -14,3 +14,4 @@ export const queryClient = new QueryClient({
 
 // Initialize cache invalidator with queryClient
 drilldownCacheInvalidator.initialize(queryClient);
+

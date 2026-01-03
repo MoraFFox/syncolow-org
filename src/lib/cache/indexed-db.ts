@@ -25,7 +25,7 @@ export class IndexedDBStorage {
           if (db.objectStoreNames.contains(STORE_NAME)) {
             db.deleteObjectStore(STORE_NAME);
           }
-          
+
           const store = db.createObjectStore(STORE_NAME, { keyPath: 'key' });
           store.createIndex('by-timestamp', 'metadata.updatedAt');
         },
@@ -54,7 +54,7 @@ export class IndexedDBStorage {
       ...entry,
       key: serializedKey,
     } as any);
-    
+
     // Trigger eviction check (fire and forget)
     this.prune().catch(err => logger.error(err, { component: 'IndexedDBStorage', action: 'prune' }));
   }
@@ -75,16 +75,16 @@ export class IndexedDBStorage {
    * LRU Eviction Policy
    * Keeps the cache size within limits by removing oldest entries.
    */
-  async prune(maxEntries = 1000, maxAge = 7 * 24 * 60 * 60 * 1000): Promise<void> {
+  async prune(maxEntries = 1000, maxAge = 24 * 60 * 60 * 1000): Promise<void> {
     if (!this.dbPromise) return;
     const db = await this.dbPromise;
     const tx = db.transaction(STORE_NAME, 'readwrite');
     const index = tx.store.index('by-timestamp');
-    
+
     // 1. Remove expired items (Time-based)
     const now = Date.now();
     const expiryRange = IDBKeyRange.upperBound(now - maxAge);
-    
+
     let cursor = await index.openCursor(expiryRange);
     while (cursor) {
       await cursor.delete();
@@ -104,7 +104,7 @@ export class IndexedDBStorage {
         deleted++;
       }
     }
-    
+
     await tx.done;
   }
 }

@@ -122,7 +122,7 @@ program
 
     try {
       const response = await fetch(
-        `http://localhost:9002/api/mock-data/status?jobId=${options.job}`
+        `http://localhost:3001/api/mock-data/status?jobId=${options.job}`
       );
       const data = await response.json();
 
@@ -159,7 +159,7 @@ program
 
     try {
       const response = await fetch(
-        'http://localhost:9002/api/mock-data/cleanup?confirm=DELETE_ALL_MOCK_DATA',
+        'http://localhost:3001/api/mock-data/cleanup?confirm=DELETE_ALL_MOCK_DATA',
         { method: 'DELETE' }
       );
       const data = await response.json();
@@ -192,7 +192,7 @@ program
     if (!options.enable && !options.disable) {
       // Just check status
       try {
-        const response = await fetch('http://localhost:9002/api/mock-data/toggle');
+        const response = await fetch('http://localhost:3001/api/mock-data/toggle');
         const data = await response.json();
         console.log(`\n📊 Mock Data Generation: ${data.enabled ? '✅ Enabled' : '❌ Disabled'}`);
         console.log(`   Environment: ${data.environment}`);
@@ -207,7 +207,7 @@ program
     const enable = options.enable ?? false;
 
     try {
-      const response = await fetch('http://localhost:9002/api/mock-data/toggle', {
+      const response = await fetch('http://localhost:3001/api/mock-data/toggle', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ enable }),
@@ -277,7 +277,7 @@ program
     console.log(`\n📤 Exporting mock data as ${options.format}...\n`);
 
     try {
-      const response = await fetch('http://localhost:9002/api/mock-data/export', {
+      const response = await fetch('http://localhost:3001/api/mock-data/export', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

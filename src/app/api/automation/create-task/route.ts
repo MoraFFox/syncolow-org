@@ -1,5 +1,6 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
+import { withTraceContext } from '@/lib/with-trace-context';
 import { googleTasksService } from '@/services/google-tasks-service';
 import { logger } from '@/lib/logger';
 import { supabaseAdmin } from '@/lib/supabase';
@@ -20,7 +21,7 @@ interface CreateTaskRequest {
  * Creates a task in Google Tasks via automation
  * Supports both server-side (Supabase tokens) and client-side (cookie tokens) contexts
  */
-export async function POST(request: NextRequest) {
+export const POST = withTraceContext(async (request: Request) => {
   try {
     const body: CreateTaskRequest = await request.json();
     const { title, assignee, priority, notificationId, notes, dueDate } = body;
@@ -58,8 +59,13 @@ export async function POST(request: NextRequest) {
     }
 
     if (!tokens) {
-      logger.warn('Google Tasks not connected - cannot create automation task', { 
-        component: 'AutomationCreateTask' 
+      logger.warn('Google Tasks not connected - cannot create automation task', {
+        action: 'create-task',
+        component: 'automation',
+        data: {
+          title,
+          notificationId,
+        }
       });
       return NextResponse.json(
         { error: 'Google Tasks not connected. Please connect in Settings > Sync.' },
@@ -73,7 +79,7 @@ export async function POST(request: NextRequest) {
 
     if (!taskList) {
       taskList = await googleTasksService.createTaskList(tokens, TASK_LIST_NAME);
-      logger.debug('Created automation task list', { taskListId: taskList.id });
+      logger.debug('Created automation task list', { taskListId: taskList.id || undefined });
     }
 
     // Build task title with priority/assignee prefix
@@ -83,7 +89,7 @@ export async function POST(request: NextRequest) {
     } else if (priority === 'low') {
       taskTitle = `🟢 [LOW] ${title}`;
     }
-    
+
     if (assignee) {
       const assigneeLabel = assignee.charAt(0).toUpperCase() + assignee.slice(1);
       taskTitle = `[${assigneeLabel}] ${taskTitle}`;
@@ -110,10 +116,10 @@ export async function POST(request: NextRequest) {
 
     const createdTask = await googleTasksService.createTask(tokens, taskList.id!, taskData);
 
-    logger.debug('Automation task created', { 
-      taskId: createdTask.id, 
+    logger.debug('Automation task created', {
+      taskId: createdTask.id,
       title: taskTitle,
-      notificationId 
+      notificationId
     });
 
     return NextResponse.json({
@@ -123,9 +129,9 @@ export async function POST(request: NextRequest) {
       title: taskTitle
     });
   } catch (error) {
-    logger.error(error, { 
-      component: 'AutomationCreateTask', 
-      action: 'POST' 
+    logger.error(error, {
+      component: 'AutomationCreateTask',
+      action: 'POST'
     });
 
     return NextResponse.json(
@@ -133,4 +139,4 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     );
   }
-}
+});

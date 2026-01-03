@@ -1,9 +1,9 @@
-
 "use client"
 
 import { useMemo, useState } from "react";
 import { useOrderStore } from "@/store/use-order-store";
 import { useCompanyStore } from "@/store/use-company-store";
+import { useSalesAccountStore } from "@/store/use-sales-account-store";
 import { parse, startOfDay, endOfDay, isWithinInterval } from "date-fns";
 import { SortableTableHeader } from './sortable-table-header';
 import {
@@ -22,13 +22,15 @@ import { Loader2 } from "lucide-react";
 
 interface CustomerReportProps {
     dateRange: { from: string; to: string };
+    selectedAccountId?: string;
 }
 
 import { DrillTarget } from '@/components/drilldown/drill-target';
 
-export function CustomerReport({ dateRange }: CustomerReportProps) {
+export function CustomerReport({ dateRange, selectedAccountId }: CustomerReportProps) {
     const { companies } = useCompanyStore();
     const { analyticsOrders } = useOrderStore();
+    const { accounts } = useSalesAccountStore();
     const [sortConfig, setSortConfig] = useState<{ key: string; direction: 'asc' | 'desc' } | null>({ key: 'totalRevenue', direction: 'desc' });
     const [visibleCount, setVisibleCount] = useState(10);
     const [isLoadingMore, setIsLoadingMore] = useState(false);
@@ -41,16 +43,28 @@ export function CustomerReport({ dateRange }: CustomerReportProps) {
         const start = startOfDay(fromDate);
         const end = endOfDay(toDate);
 
+        // Pre-filter orders by account if needed
+        let filteredAnalyticsOrders = analyticsOrders;
+        if (selectedAccountId && selectedAccountId !== 'all') {
+            const minAccount = accounts.find(a => a.id === selectedAccountId);
+            if (minAccount) {
+                filteredAnalyticsOrders = analyticsOrders.filter(o => {
+                    const accCode = o.customerAccount;
+                    return accCode ? minAccount.codes.some(c => accCode.toString().trim().startsWith(c)) : false;
+                });
+            }
+        }
+
         const result = companies.map(company => {
-            const clientOrders = analyticsOrders.filter(o =>
+            const clientOrders = filteredAnalyticsOrders.filter(o =>
                 o.companyId === company.id &&
                 o.status !== 'Cancelled' &&
                 isWithinInterval(new Date(o.orderDate), { start, end })
             );
-            const totalRevenue = clientOrders.reduce((sum, order) => sum + order.total, 0);
+            const totalRevenue = clientOrders.reduce((sum, order) => sum + (order.total || order.grandTotal || 0), 0);
 
-            const allClientOrders = analyticsOrders.filter(o => o.companyId === company.id && o.status !== 'Cancelled');
-            const clv = allClientOrders.reduce((sum, order) => sum + order.total, 0);
+            const allClientOrders = filteredAnalyticsOrders.filter(o => o.companyId === company.id && o.status !== 'Cancelled');
+            const clv = allClientOrders.reduce((sum, order) => sum + (order.total || order.grandTotal || 0), 0);
 
             const paymentStatus = clientOrders.some(o => o.paymentStatus === 'Overdue') ? 'Overdue'
                 : clientOrders.some(o => o.paymentStatus === 'Pending') ? 'Pending'
@@ -76,7 +90,7 @@ export function CustomerReport({ dateRange }: CustomerReportProps) {
         }
 
         return result.slice(0, 20);
-    }, [companies, analyticsOrders, dateRange, sortConfig]);
+    }, [companies, analyticsOrders, dateRange, sortConfig, selectedAccountId, accounts]);
 
     const visibleCustomerAnalytics = useMemo(() => {
         return customerAnalytics.slice(0, visibleCount);
@@ -109,11 +123,11 @@ export function CustomerReport({ dateRange }: CustomerReportProps) {
     }
 
     return (
-        <Card>
+        <Card className="bg-zinc-950/50 backdrop-blur-sm border-zinc-800">
             <CardHeader>
-                <CardTitle>Customer Report</CardTitle>
-                <CardDescription>
-                    Your top customers by total revenue.
+                <CardTitle className="text-zinc-200 font-mono font-bold uppercase tracking-tight">Customer Intelligence</CardTitle>
+                <CardDescription className="text-zinc-500 font-mono text-xs">
+                    Key revenue drivers by entity
                 </CardDescription>
             </CardHeader>
             <CardContent>
@@ -122,16 +136,16 @@ export function CustomerReport({ dateRange }: CustomerReportProps) {
                     {visibleCustomerAnalytics.map(client => (
                         <DrillTarget key={client.id} kind="company" payload={{ id: client.id, name: client.name, status: client.paymentStatus }} asChild>
                             <Link href={`/clients/${client.id}`}>
-                                <Card>
+                                <Card className="bg-zinc-900/50 border-zinc-800">
                                     <CardContent className="p-4 flex flex-col gap-2">
                                         <div className="flex justify-between items-start">
-                                            <p className="font-semibold">{client.name}</p>
+                                            <p className="font-semibold text-zinc-200">{client.name}</p>
                                             <Badge variant={getStatusVariant(client.paymentStatus)}>{client.paymentStatus}</Badge>
                                         </div>
                                         <div className="flex justify-between items-end">
                                             <div>
-                                                <p className="text-sm text-muted-foreground">{client.totalOrders} Orders • CLV: ${client.clv.toFixed(2)}</p>
-                                                <p className="text-lg font-bold">${client.totalRevenue.toFixed(2)}</p>
+                                                <p className="text-sm text-zinc-500 font-mono">{client.totalOrders} Orders • CLV: ${client.clv.toFixed(2)}</p>
+                                                <p className="text-lg font-bold text-zinc-300 font-mono">${client.totalRevenue.toFixed(2)}</p>
                                             </div>
                                         </div>
                                     </CardContent>
@@ -145,12 +159,12 @@ export function CustomerReport({ dateRange }: CustomerReportProps) {
                 <div className="hidden md:block">
                     <Table>
                         <TableHeader>
-                            <TableRow>
-                                <SortableTableHeader label="Client" sortKey="name" currentSort={sortConfig} onSort={handleSort} />
-                                <SortableTableHeader label="Revenue" sortKey="totalRevenue" currentSort={sortConfig} onSort={handleSort} className="text-right" />
-                                <SortableTableHeader label="Orders" sortKey="totalOrders" currentSort={sortConfig} onSort={handleSort} className="text-right" />
-                                <SortableTableHeader label="CLV" sortKey="clv" currentSort={sortConfig} onSort={handleSort} className="text-right" />
-                                <TableHead className="text-right">Status</TableHead>
+                            <TableRow className="hover:bg-transparent border-zinc-800">
+                                <SortableTableHeader label="CLIENT ENTITY" sortKey="name" currentSort={sortConfig} onSort={handleSort} className="text-zinc-500 font-mono text-xs font-normal" />
+                                <SortableTableHeader label="REVENUE" sortKey="totalRevenue" currentSort={sortConfig} onSort={handleSort} className="text-right text-zinc-500 font-mono text-xs font-normal" />
+                                <SortableTableHeader label="ORDERS" sortKey="totalOrders" currentSort={sortConfig} onSort={handleSort} className="text-right text-zinc-500 font-mono text-xs font-normal" />
+                                <SortableTableHeader label="LTV" sortKey="clv" currentSort={sortConfig} onSort={handleSort} className="text-right text-zinc-500 font-mono text-xs font-normal" />
+                                <TableHead className="text-right text-zinc-500 font-mono text-xs font-normal">STATUS</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -162,18 +176,18 @@ export function CustomerReport({ dateRange }: CustomerReportProps) {
                                     asChild
                                 >
                                     <TableRow
-                                        className="cursor-pointer hover:bg-muted/50"
+                                        className="cursor-pointer hover:bg-zinc-900/50 border-zinc-800/50 transition-colors"
                                     >
-                                        <TableCell className="font-medium">
+                                        <TableCell className="font-medium text-zinc-300 font-mono text-sm">
                                             {client.name}
                                         </TableCell>
-                                        <TableCell className="text-right">${client.totalRevenue.toFixed(2)}</TableCell>
-                                        <TableCell className="text-right">{client.totalOrders}</TableCell>
+                                        <TableCell className="text-right text-zinc-400 font-mono text-sm">${client.totalRevenue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</TableCell>
+                                        <TableCell className="text-right text-zinc-400 font-mono text-sm">{client.totalOrders}</TableCell>
                                         <TableCell className="text-right">
-                                            <span className="text-muted-foreground">${client.clv.toFixed(2)}</span>
+                                            <span className="text-zinc-500 font-mono text-sm">${client.clv.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                                         </TableCell>
                                         <TableCell className="text-right">
-                                            <Badge variant={getStatusVariant(client.paymentStatus)}>{client.paymentStatus}</Badge>
+                                            <Badge variant={getStatusVariant(client.paymentStatus)} className="font-mono text-[10px] tracking-wide uppercase">{client.paymentStatus}</Badge>
                                         </TableCell>
                                     </TableRow>
                                 </DrillTarget>
@@ -183,9 +197,9 @@ export function CustomerReport({ dateRange }: CustomerReportProps) {
                 </div>
                 {visibleCount < customerAnalytics.length && (
                     <div className="mt-4 flex justify-center">
-                        <Button onClick={handleLoadMore} disabled={isLoadingMore}>
+                        <Button onClick={handleLoadMore} disabled={isLoadingMore} variant="ghost" className="text-emerald-500 hover:text-emerald-400 font-mono hover:bg-emerald-500/10">
                             {isLoadingMore ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                            Load More
+                            [EXPAND DATASET]
                         </Button>
                     </div>
                 )}

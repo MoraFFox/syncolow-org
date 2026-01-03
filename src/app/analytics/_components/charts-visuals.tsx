@@ -1,10 +1,7 @@
-
 "use client";
 
 import { useMemo } from 'react';
-import { useOrderStore } from '@/store/use-order-store';
 import { useProductsStore } from '@/store/use-products-store';
-import { useCompanyStore } from '@/store/use-company-store';
 import { format, isWithinInterval, startOfMonth, endOfMonth, eachMonthOfInterval, parse, isValid, startOfDay, endOfDay } from 'date-fns';
 import { exportToCSV } from './export-utils';
 import { Button } from '@/components/ui/button';
@@ -19,6 +16,8 @@ import {
 import {
     ChartContainer,
     ChartTooltipContent,
+    ChartLegend,
+    ChartLegendContent
 } from '@/components/ui/chart';
 import {
     Bar,
@@ -30,51 +29,54 @@ import {
     Cell,
     XAxis,
     YAxis,
-    ResponsiveContainer,
     Tooltip,
 } from 'recharts';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { useDrillDown } from '@/hooks/use-drilldown';
-
+import { Order } from '@/lib/types';
 
 const chartConfigLine = {
     revenue: {
-        label: "Revenue",
-        color: "hsl(var(--chart-1))",
+        label: "Revenue (Selected)",
+        color: "#10b981", // Emerald-500
     },
+    comparison: {
+        label: "Revenue (Global)",
+        color: "#6366f1", // Indigo-500
+    }
 };
 
 const chartConfigBar = {
     revenue: {
         label: 'Revenue',
-        color: 'hsl(var(--chart-1))',
+        color: '#10b981', // Emerald-500
     },
     stock: {
         label: 'Stock',
-        color: 'hsl(var(--chart-2))'
+        color: '#f59e0b', // Amber-500
     }
 };
 
 const chartConfigPie = {
-    pending: { label: 'Pending', color: 'hsl(var(--chart-3))' },
-    processing: { label: 'Processing', color: 'hsl(var(--chart-4))' },
-    shipped: { label: 'Shipped', color: 'hsl(var(--chart-5))' },
-    delivered: { label: 'Delivered', color: 'hsl(var(--chart-1))' },
-    cancelled: { label: 'Cancelled', color: 'hsl(var(--chart-2))' },
+    pending: { label: 'Pending', color: '#f59e0b' }, // Amber
+    processing: { label: 'Processing', color: '#3b82f6' }, // Blue
+    shipped: { label: 'Shipped', color: '#8b5cf6' }, // Violet
+    delivered: { label: 'Delivered', color: '#10b981' }, // Emerald
+    cancelled: { label: 'Cancelled', color: '#ef4444' }, // Red
 };
 
 
 interface ChartsVisualsProps {
     dateRange: { from: string, to: string };
+    orders: Order[];
+    comparisonOrders?: Order[]; // Optional global/baseline data
 }
 
-export function ChartsVisuals({ dateRange }: ChartsVisualsProps) {
-    const { analyticsOrders } = useOrderStore();
+export function ChartsVisuals({ dateRange, orders, comparisonOrders }: ChartsVisualsProps) {
     const { products } = useProductsStore();
-    const { goToDetail, showPreview, hidePreview } = useDrillDown();
+    const { goToDetail, hidePreview } = useDrillDown();
 
-    const filteredOrders = useMemo(() => {
+    // Filter orders by Date Range and Status
+    const activeOrders = useMemo(() => {
         const fromDate = parse(dateRange.from, 'yyyy-MM-dd', new Date());
         const toDate = parse(dateRange.to, 'yyyy-MM-dd', new Date());
 
@@ -83,8 +85,29 @@ export function ChartsVisuals({ dateRange }: ChartsVisualsProps) {
         const start = startOfDay(fromDate);
         const end = endOfDay(toDate);
 
-        return analyticsOrders.filter(o => o.status !== 'Cancelled' && isWithinInterval(new Date(o.orderDate), { start, end }));
-    }, [analyticsOrders, dateRange]);
+        return orders.filter(o =>
+            o.status !== 'Cancelled' &&
+            isWithinInterval(new Date(o.orderDate), { start, end })
+        );
+    }, [orders, dateRange]);
+
+    const activeComparisonOrders = useMemo(() => {
+        if (!comparisonOrders) return [];
+
+        const fromDate = parse(dateRange.from, 'yyyy-MM-dd', new Date());
+        const toDate = parse(dateRange.to, 'yyyy-MM-dd', new Date());
+
+        if (!isValid(fromDate) || !isValid(toDate)) return [];
+
+        const start = startOfDay(fromDate);
+        const end = endOfDay(toDate);
+
+        return comparisonOrders.filter(o =>
+            o.status !== 'Cancelled' &&
+            isWithinInterval(new Date(o.orderDate), { start, end })
+        );
+    }, [comparisonOrders, dateRange]);
+
 
     const revenueGrowthData = useMemo(() => {
         const fromDate = parse(dateRange.from, 'yyyy-MM-dd', new Date());
@@ -95,12 +118,18 @@ export function ChartsVisuals({ dateRange }: ChartsVisualsProps) {
         const start = startOfMonth(fromDate);
         const end = endOfMonth(toDate);
 
+        // Map Monthly Revenue
         const monthlyRevenue: { [key: string]: number } = {};
+        const monthlyComparison: { [key: string]: number } = {};
 
-        // Use the pre-filtered orders for this calculation
-        filteredOrders.forEach(order => {
+        activeOrders.forEach(order => {
             const orderMonth = format(new Date(order.orderDate), 'yyyy-MM');
             monthlyRevenue[orderMonth] = (monthlyRevenue[orderMonth] || 0) + (order.total || order.grandTotal || 0);
+        });
+
+        activeComparisonOrders.forEach(order => {
+            const orderMonth = format(new Date(order.orderDate), 'yyyy-MM');
+            monthlyComparison[orderMonth] = (monthlyComparison[orderMonth] || 0) + (order.total || order.grandTotal || 0);
         });
 
         const months = eachMonthOfInterval({ start, end });
@@ -109,16 +138,17 @@ export function ChartsVisuals({ dateRange }: ChartsVisualsProps) {
             const monthKey = format(month, 'yyyy-MM');
             return {
                 date: format(month, 'MMM yyyy'),
-                revenue: monthlyRevenue[monthKey] || 0
+                revenue: monthlyRevenue[monthKey] || 0,
+                comparison: monthlyComparison[monthKey] || 0
             }
         });
 
-    }, [filteredOrders, dateRange]);
+    }, [activeOrders, activeComparisonOrders, dateRange]);
 
     const topProductsData = useMemo(() => {
         const productRevenue: { [key: string]: { name: string, revenue: number } } = {};
 
-        filteredOrders
+        activeOrders
             .forEach(o => o.items
                 .forEach(item => {
                     if (productRevenue[item.productId]) {
@@ -134,11 +164,8 @@ export function ChartsVisuals({ dateRange }: ChartsVisualsProps) {
         return Object.values(productRevenue)
             .sort((a, b) => b.revenue - a.revenue)
             .slice(0, 5)
-            .reverse(); // For horizontal bar chart display
-
-    }, [filteredOrders]);
-
-
+            .reverse();
+    }, [activeOrders]);
 
     const stockOverviewData = useMemo(() => {
         return [...products]
@@ -158,7 +185,7 @@ export function ChartsVisuals({ dateRange }: ChartsVisualsProps) {
 
         const monthlyData: { [key: string]: { revenue: number; orders: number } } = {};
 
-        filteredOrders.forEach(order => {
+        activeOrders.forEach(order => {
             const orderMonth = format(new Date(order.orderDate), 'yyyy-MM');
             if (!monthlyData[orderMonth]) {
                 monthlyData[orderMonth] = { revenue: 0, orders: 0 };
@@ -177,12 +204,12 @@ export function ChartsVisuals({ dateRange }: ChartsVisualsProps) {
                 aov: data.orders > 0 ? data.revenue / data.orders : 0
             }
         });
-    }, [filteredOrders, dateRange]);
+    }, [activeOrders, dateRange]);
 
     const orderStatusData = useMemo(() => {
         const statusCounts: { [key: string]: number } = {};
 
-        filteredOrders.forEach(order => {
+        activeOrders.forEach(order => {
             const status = order.status.toLowerCase();
             statusCounts[status] = (statusCounts[status] || 0) + 1;
         });
@@ -192,19 +219,19 @@ export function ChartsVisuals({ dateRange }: ChartsVisualsProps) {
             value: count,
             fill: `var(--color-${status})`
         }));
-    }, [filteredOrders]);
+    }, [activeOrders]);
 
     const enhancedCustomerSegments = useMemo(() => {
-        if (filteredOrders.length === 0) {
+        if (activeOrders.length === 0) {
             return [
-                { name: 'New', value: 0, fill: 'hsl(var(--chart-1))' },
-                { name: 'Repeat', value: 0, fill: 'hsl(var(--chart-2))' },
-                { name: 'VIP', value: 0, fill: 'hsl(var(--chart-3))' },
-                { name: 'At Risk', value: 0, fill: 'hsl(var(--chart-4))' }
+                { name: 'New', value: 0, fill: '#3b82f6' },
+                { name: 'Repeat', value: 0, fill: '#10b981' },
+                { name: 'VIP', value: 0, fill: '#8b5cf6' },
+                { name: 'At Risk', value: 0, fill: '#ef4444' }
             ];
         }
 
-        const customerStats = filteredOrders.reduce((acc, order) => {
+        const customerStats = activeOrders.reduce((acc, order) => {
             if (order.companyId) {
                 if (!acc[order.companyId]) {
                     acc[order.companyId] = { orders: 0, revenue: 0 };
@@ -215,8 +242,8 @@ export function ChartsVisuals({ dateRange }: ChartsVisualsProps) {
             return acc;
         }, {} as Record<string, { orders: number; revenue: number }>);
 
-        const allOrders = analyticsOrders.filter(o => o.status !== 'Cancelled');
-        const avgRevenue = allOrders.reduce((sum, o) => sum + (o.total || o.grandTotal || 0), 0) / Math.max(allOrders.length, 1);
+        // Use local average for segmentation logic
+        const avgRevenue = activeOrders.reduce((sum, o) => sum + (o.total || o.grandTotal || 0), 0) / Math.max(activeOrders.length, 1);
 
         let newCustomers = 0;
         let repeatCustomers = 0;
@@ -224,7 +251,7 @@ export function ChartsVisuals({ dateRange }: ChartsVisualsProps) {
         let atRiskCustomers = 0;
 
         for (const [companyId, stats] of Object.entries(customerStats)) {
-            const totalOrders = allOrders.filter(o => o.companyId === companyId).length;
+            const totalOrders = activeOrders.filter(o => o.companyId === companyId).length;
 
             if (stats.revenue > avgRevenue * 3) {
                 vipCustomers++;
@@ -240,12 +267,12 @@ export function ChartsVisuals({ dateRange }: ChartsVisualsProps) {
         }
 
         return [
-            { name: 'New', value: newCustomers, fill: 'hsl(var(--chart-1))' },
-            { name: 'Repeat', value: repeatCustomers, fill: 'hsl(var(--chart-2))' },
-            { name: 'VIP', value: vipCustomers, fill: 'hsl(var(--chart-3))' },
-            { name: 'At Risk', value: atRiskCustomers, fill: 'hsl(var(--chart-4))' }
+            { name: 'New', value: newCustomers, fill: '#3b82f6' },
+            { name: 'Repeat', value: repeatCustomers, fill: '#10b981' },
+            { name: 'VIP', value: vipCustomers, fill: '#8b5cf6' },
+            { name: 'At Risk', value: atRiskCustomers, fill: '#ef4444' }
         ];
-    }, [filteredOrders, analyticsOrders]);
+    }, [activeOrders]);
 
 
     return (
@@ -255,15 +282,18 @@ export function ChartsVisuals({ dateRange }: ChartsVisualsProps) {
             </div>
             <h2 className="text-2xl font-bold mb-4 hidden print:block">Charts & Visuals</h2>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 print:grid-cols-2">
-                <Card>
-                    <CardHeader className="flex flex-row items-center justify-between">
-                        <div>
-                            <CardTitle>Revenue Growth</CardTitle>
-                            <CardDescription>Monthly revenue trends for the selected date range.</CardDescription>
+
+                {/* REVENUE CHART */}
+                <Card className="bg-zinc-950/30 border-zinc-800 backdrop-blur-sm shadow-sm group hover:border-emerald-500/20 transition-colors">
+                    <CardHeader className="flex flex-row items-center justify-between pb-2">
+                        <div className="space-y-1">
+                            <CardTitle className="text-zinc-200 font-mono tracking-tight uppercase text-sm">Revenue Trajectory</CardTitle>
+                            <CardDescription className="text-xs text-zinc-500">Monthly Performance & Comparison</CardDescription>
                         </div>
                         <Button
                             variant="ghost"
-                            size="sm"
+                            size="icon"
+                            className="h-8 w-8 text-zinc-600 hover:text-emerald-500"
                             onClick={() => exportToCSV(revenueGrowthData, 'revenue-growth')}
                             disabled={revenueGrowthData.length === 0}
                         >
@@ -272,92 +302,79 @@ export function ChartsVisuals({ dateRange }: ChartsVisualsProps) {
                     </CardHeader>
                     <CardContent>
                         {revenueGrowthData.length === 0 ? (
-                            <div className="h-[250px] flex items-center justify-center text-muted-foreground">
-                                <p>No revenue data available for this period</p>
+                            <div className="h-[300px] flex items-center justify-center text-muted-foreground font-mono text-xs">
+                                <p>NO SIGNAL DETECTED</p>
                             </div>
                         ) : (
-                            <ChartContainer config={chartConfigLine} className="h-[250px] w-full">
+                            <ChartContainer config={chartConfigLine} className="h-[300px] w-full">
                                 <LineChart
                                     data={revenueGrowthData}
-                                    margin={{ top: 5, right: 20, left: -10, bottom: 0 }}
-                                    onClick={(data) => {
-                                        if (data && data.activePayload && data.activePayload.length > 0) {
-                                            const dateStr = data.activePayload[0].payload.date; // "MMM yyyy"
-                                            const date = parse(dateStr, 'MMM yyyy', new Date());
-                                            if (isValid(date)) {
-                                                goToDetail('revenue', {
-                                                    granularity: 'month',
-                                                    value: format(date, 'yyyy-MM')
-                                                });
-                                            }
-                                        }
-                                    }}
-                                    onMouseMove={(data: any) => {
-                                        if (data && data.activePayload && data.activePayload.length > 0) {
-                                            const payload = data.activePayload[0].payload;
-                                            // We can show a preview tooltip here
-                                            // But Recharts has its own tooltip. 
-                                            // Maybe we only want to use our preview for things that don't have tooltips?
-                                            // Or we want to enhance it.
-                                            // For now, let's rely on Recharts tooltip for charts as it's more standard.
-                                            // But the requirement says "Any UI element... that the user hovers... opens an intelligent preview tooltip".
-                                            // Let's add it for demonstration on the BarChart bars maybe?
-                                            // Or just keep Recharts tooltip for charts.
-                                            // The user asked for "ChartsVisuals -> hover preview on bars & lines".
-                                            // I will implement it.
-
-                                            // Calculate coords from event if possible, but Recharts onMouseMove gives data, not event directly in the same way.
-                                            // Actually it does provide event.
-                                            if (data.activeCoordinate) {
-                                                // This is tricky with Recharts as it handles its own events.
-                                                // Let's skip this for now and focus on DrillTarget usage where clear.
-                                                // Recharts tooltip is already a "preview".
-                                            }
-                                        }
-                                    }}
-                                    onMouseLeave={() => {
-                                        hidePreview();
-                                    }}
-                                    className="cursor-pointer"
+                                    margin={{ top: 20, right: 20, left: -10, bottom: 0 }}
                                 >
+                                    <defs>
+                                        <linearGradient id="revenueGradient" x1="0" y1="0" x2="0" y2="1">
+                                            <stop offset="5%" stopColor="rgb(16, 185, 129)" stopOpacity={0.3} />
+                                            <stop offset="95%" stopColor="rgb(16, 185, 129)" stopOpacity={0} />
+                                        </linearGradient>
+                                    </defs>
                                     <XAxis
                                         dataKey="date"
                                         tickLine={false}
                                         axisLine={false}
-                                        tickMargin={8}
+                                        tickMargin={12}
+                                        stroke="#52525b"
+                                        fontSize={12}
+                                        fontFamily="monospace"
                                     />
                                     <YAxis
                                         tickLine={false}
                                         axisLine={false}
-                                        tickMargin={8}
+                                        tickMargin={12}
+                                        stroke="#52525b"
+                                        fontSize={12}
+                                        fontFamily="monospace"
                                         tickFormatter={(value) => `$${Number(value) / 1000}k`}
                                     />
-                                    <Tooltip
-                                        content={<ChartTooltipContent indicator="dot" />}
-                                    />
+                                    <Tooltip content={<ChartTooltipContent indicator="line" className="bg-zinc-950 border-zinc-800 font-mono" />} />
+                                    {comparisonOrders && comparisonOrders.length > 0 && (
+                                        <Line
+                                            dataKey="comparison"
+                                            type="monotone"
+                                            stroke="#6366f1" // Indigo
+                                            strokeWidth={2}
+                                            strokeDasharray="4 4"
+                                            dot={false}
+                                            activeDot={{ r: 4, fill: "#6366f1" }}
+                                            animationDuration={1500}
+                                        />
+                                    )}
                                     <Line
                                         dataKey="revenue"
                                         type="monotone"
-                                        stroke="var(--color-revenue)"
-                                        strokeWidth={2}
-                                        dot={{ r: 4 }}
-                                        activeDot={{ r: 6 }}
+                                        stroke="#10b981" // Emerald
+                                        strokeWidth={3}
+                                        dot={{ r: 0, fill: "#10b981" }}
+                                        activeDot={{ r: 6, fill: "#10b981", strokeWidth: 0 }}
+                                        animationDuration={2000}
                                     />
+                                    {comparisonOrders && <ChartLegend content={<ChartLegendContent />} className="mt-4" />}
                                 </LineChart>
                             </ChartContainer>
                         )}
                     </CardContent>
                 </Card>
 
-                <Card>
-                    <CardHeader className="flex flex-row items-center justify-between">
-                        <div>
-                            <CardTitle>Top Products by Revenue</CardTitle>
-                            <CardDescription>Best-selling products for the selected date range.</CardDescription>
+                {/* TOP PRODUCTS CHART */}
+                <Card className="bg-zinc-950/30 border-zinc-800 backdrop-blur-sm shadow-sm hover:border-emerald-500/20 transition-colors">
+                    <CardHeader className="flex flex-row items-center justify-between pb-2">
+                        <div className="space-y-1">
+                            <CardTitle className="text-zinc-200 font-mono tracking-tight uppercase text-sm">Top Performers</CardTitle>
+                            <CardDescription className="text-xs text-zinc-500">Highest Yield Assets</CardDescription>
                         </div>
                         <Button
                             variant="ghost"
-                            size="sm"
+                            size="icon"
+                            className="h-8 w-8 text-zinc-600 hover:text-emerald-500"
                             onClick={() => exportToCSV(topProductsData, 'top-products')}
                             disabled={topProductsData.length === 0}
                         >
@@ -366,32 +383,23 @@ export function ChartsVisuals({ dateRange }: ChartsVisualsProps) {
                     </CardHeader>
                     <CardContent>
                         {topProductsData.length === 0 ? (
-                            <div className="h-[250px] flex items-center justify-center text-muted-foreground">
-                                <p>No product sales data available</p>
+                            <div className="h-[300px] flex items-center justify-center text-muted-foreground font-mono text-xs">
+                                <p>NO DATA AVAILABLE</p>
                             </div>
                         ) : (
-                            <ChartContainer config={chartConfigBar} className="h-[250px] w-full">
+                            <ChartContainer config={chartConfigBar} className="h-[300px] w-full">
                                 <BarChart
                                     data={topProductsData}
                                     layout="vertical"
-                                    margin={{ left: 10, right: 20 }}
+                                    margin={{ left: 0, right: 20, top: 20, bottom: 0 }}
+                                    className="cursor-pointer"
                                     onClick={(data) => {
                                         if (data && data.activePayload && data.activePayload.length > 0) {
-                                            // We need the product ID here. 
-                                            // The current data only has name and revenue.
-                                            // We need to find the product ID from the name or modify the data source.
-                                            // Let's assume we can get it or we need to modify the data generation.
-                                            // Actually, looking at the code, topProductsData is generated from filteredOrders.
-                                            // It aggregates by productId but then returns an array of { name, revenue }.
-                                            // We need to include id in the data.
                                             const productName = data.activePayload[0].payload.name;
                                             const product = products.find(p => p.name === productName);
-                                            if (product) {
-                                                goToDetail('product', { id: product.id });
-                                            }
+                                            if (product) goToDetail('product', { id: product.id });
                                         }
                                     }}
-                                    className="cursor-pointer"
                                 >
                                     <XAxis type="number" hide />
                                     <YAxis
@@ -399,31 +407,36 @@ export function ChartsVisuals({ dateRange }: ChartsVisualsProps) {
                                         type="category"
                                         tickLine={false}
                                         axisLine={false}
-                                        tickMargin={5}
-                                        width={100}
-                                        className="text-sm"
+                                        tickMargin={10}
+                                        width={140}
+                                        className="text-xs font-mono fill-zinc-400"
                                         interval={0}
                                     />
-                                    <Tooltip
-                                        cursor={{ fill: 'hsl(var(--muted))' }}
-                                        content={<ChartTooltipContent indicator="dot" />}
+                                    <Tooltip content={<ChartTooltipContent indicator="dot" className="bg-zinc-950 border-zinc-800 font-mono" />} />
+                                    <Bar
+                                        dataKey="revenue"
+                                        radius={[0, 4, 4, 0]}
+                                        fill="#10b981"
+                                        fillOpacity={0.8}
+                                        barSize={24}
                                     />
-                                    <Bar dataKey="revenue" radius={4} fill="var(--color-revenue)" />
                                 </BarChart>
                             </ChartContainer>
                         )}
                     </CardContent>
                 </Card>
 
-                <Card>
-                    <CardHeader className="flex flex-row items-center justify-between">
-                        <div>
-                            <CardTitle>Customer Segments</CardTitle>
-                            <CardDescription>Customer classification based on behavior and value.</CardDescription>
+                {/* CUSTOMER SEGMENTS */}
+                <Card className="bg-zinc-950/30 border-zinc-800 backdrop-blur-sm shadow-sm hover:border-emerald-500/20 transition-colors">
+                    <CardHeader className="flex flex-row items-center justify-between pb-2">
+                        <div className="space-y-1">
+                            <CardTitle className="text-zinc-200 font-mono tracking-tight uppercase text-sm">Segment Distribution</CardTitle>
+                            <CardDescription className="text-xs text-zinc-500">Client Composition</CardDescription>
                         </div>
                         <Button
                             variant="ghost"
-                            size="sm"
+                            size="icon"
+                            className="h-8 w-8 text-zinc-600 hover:text-emerald-500"
                             onClick={() => exportToCSV(enhancedCustomerSegments, 'customer-segments')}
                             disabled={enhancedCustomerSegments.every(d => d.value === 0)}
                         >
@@ -431,37 +444,31 @@ export function ChartsVisuals({ dateRange }: ChartsVisualsProps) {
                         </Button>
                     </CardHeader>
                     <CardContent className="flex items-center justify-center">
-                        {enhancedCustomerSegments.every(d => d.value === 0) ? (
-                            <div className="h-[200px] flex items-center justify-center text-muted-foreground">
-                                <p>No customer data available</p>
-                            </div>
-                        ) : (
-                            <ChartContainer config={{}} className="h-[200px]">
-                                <PieChart width={200} height={200}>
-                                    <Tooltip
-                                        cursor={{ fill: 'hsl(var(--muted))' }}
-                                        content={<ChartTooltipContent hideLabel />}
-                                    />
-                                    <Pie data={enhancedCustomerSegments} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={80} strokeWidth={2}>
-                                        {enhancedCustomerSegments.map((entry, index) => (
-                                            <Cell key={`cell-${index}`} fill={entry.fill} />
-                                        ))}
-                                    </Pie>
-                                </PieChart>
-                            </ChartContainer>
-                        )}
+                        <ChartContainer config={{}} className="h-[200px] w-full max-w-[300px]">
+                            <PieChart>
+                                <Tooltip content={<ChartTooltipContent hideLabel className="bg-zinc-950 border-zinc-800 font-mono" />} />
+                                <Pie data={enhancedCustomerSegments} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={60} outerRadius={80} strokeWidth={2} stroke="rgba(0,0,0,0)">
+                                    {enhancedCustomerSegments.map((entry, index) => (
+                                        <Cell key={`cell-${index}`} fill={['#10b981', '#3b82f6', '#f59e0b', '#ef4444'][index % 4]} fillOpacity={0.8} />
+                                    ))}
+                                </Pie>
+                                <ChartLegend content={<ChartLegendContent />} className="-translate-y-2 flex-wrap gap-2 justify-center" />
+                            </PieChart>
+                        </ChartContainer>
                     </CardContent>
                 </Card>
 
-                <Card>
-                    <CardHeader className="flex flex-row items-center justify-between">
-                        <div>
-                            <CardTitle>Stock Overview</CardTitle>
-                            <CardDescription>Top 5 most-stocked products.</CardDescription>
+                {/* STOCK OVERVIEW */}
+                <Card className="bg-zinc-950/30 border-zinc-800 backdrop-blur-sm shadow-sm hover:border-emerald-500/20 transition-colors">
+                    <CardHeader className="flex flex-row items-center justify-between pb-2">
+                        <div className="space-y-1">
+                            <CardTitle className="text-zinc-200 font-mono tracking-tight uppercase text-sm">Stock Levels</CardTitle>
+                            <CardDescription className="text-xs text-zinc-500">Inventory Status</CardDescription>
                         </div>
                         <Button
                             variant="ghost"
-                            size="sm"
+                            size="icon"
+                            className="h-8 w-8 text-zinc-600 hover:text-emerald-500"
                             onClick={() => exportToCSV(stockOverviewData, 'stock-overview')}
                             disabled={stockOverviewData.length === 0}
                         >
@@ -470,11 +477,11 @@ export function ChartsVisuals({ dateRange }: ChartsVisualsProps) {
                     </CardHeader>
                     <CardContent>
                         {stockOverviewData.length === 0 ? (
-                            <div className="h-[250px] flex items-center justify-center text-muted-foreground">
-                                <p>No stock data available</p>
+                            <div className="h-[200px] flex items-center justify-center text-muted-foreground font-mono text-xs">
+                                <p>NO DATA AVAILABLE</p>
                             </div>
                         ) : (
-                            <ChartContainer config={chartConfigBar} className="h-[250px] w-full">
+                            <ChartContainer config={chartConfigBar} className="h-[200px] w-full">
                                 <BarChart
                                     data={stockOverviewData}
                                     margin={{ left: -20, right: 20, bottom: 20 }}
@@ -497,29 +504,31 @@ export function ChartsVisuals({ dateRange }: ChartsVisualsProps) {
                                         textAnchor="end"
                                         height={60}
                                         interval={0}
-                                        className="text-xs"
+                                        className="text-[10px] font-mono fill-zinc-400"
                                     />
-                                    <YAxis tickFormatter={(val) => `${val}`} />
+                                    <YAxis tickFormatter={(val) => `${val}`} className="text-[10px] font-mono fill-zinc-400" />
                                     <Tooltip
                                         cursor={{ fill: 'hsl(var(--muted))' }}
-                                        content={<ChartTooltipContent indicator="dot" />}
+                                        content={<ChartTooltipContent indicator="dot" className="bg-zinc-950 border-zinc-800 font-mono" />}
                                     />
-                                    <Bar dataKey="stock" radius={4} fill="var(--color-stock)" />
+                                    <Bar dataKey="stock" radius={4} fill="#8b5cf6" />
                                 </BarChart>
                             </ChartContainer>
                         )}
                     </CardContent>
                 </Card>
 
-                <Card>
-                    <CardHeader className="flex flex-row items-center justify-between">
-                        <div>
-                            <CardTitle>Average Order Value</CardTitle>
-                            <CardDescription>Monthly AOV trend for the selected period.</CardDescription>
+                {/* AOV TREND */}
+                <Card className="bg-zinc-950/30 border-zinc-800 backdrop-blur-sm shadow-sm hover:border-emerald-500/20 transition-colors">
+                    <CardHeader className="flex flex-row items-center justify-between pb-2">
+                        <div className="space-y-1">
+                            <CardTitle className="text-zinc-200 font-mono tracking-tight uppercase text-sm">Avg. Order Value</CardTitle>
+                            <CardDescription className="text-xs text-zinc-500">Transaction Value Trend</CardDescription>
                         </div>
                         <Button
                             variant="ghost"
-                            size="sm"
+                            size="icon"
+                            className="h-8 w-8 text-zinc-600 hover:text-emerald-500"
                             onClick={() => exportToCSV(aovTrendData, 'aov-trend')}
                             disabled={aovTrendData.length === 0}
                         >
@@ -528,11 +537,11 @@ export function ChartsVisuals({ dateRange }: ChartsVisualsProps) {
                     </CardHeader>
                     <CardContent>
                         {aovTrendData.length === 0 ? (
-                            <div className="h-[250px] flex items-center justify-center text-muted-foreground">
-                                <p>No order data available</p>
+                            <div className="h-[200px] flex items-center justify-center text-muted-foreground font-mono text-xs">
+                                <p>NO DATA AVAILABLE</p>
                             </div>
                         ) : (
-                            <ChartContainer config={chartConfigLine} className="h-[250px] w-full">
+                            <ChartContainer config={chartConfigLine} className="h-[200px] w-full">
                                 <LineChart
                                     data={aovTrendData}
                                     margin={{ top: 5, right: 20, left: -10, bottom: 0 }}
@@ -542,23 +551,25 @@ export function ChartsVisuals({ dateRange }: ChartsVisualsProps) {
                                         tickLine={false}
                                         axisLine={false}
                                         tickMargin={8}
+                                        className="text-[10px] font-mono fill-zinc-400"
                                     />
                                     <YAxis
                                         tickLine={false}
                                         axisLine={false}
                                         tickMargin={8}
                                         tickFormatter={(value) => `$${Number(value).toFixed(0)}`}
+                                        className="text-[10px] font-mono fill-zinc-400"
                                     />
                                     <Tooltip
-                                        content={<ChartTooltipContent indicator="dot" />}
+                                        content={<ChartTooltipContent indicator="dot" className="bg-zinc-950 border-zinc-800 font-mono" />}
                                     />
                                     <Line
                                         dataKey="aov"
                                         type="monotone"
-                                        stroke="var(--color-revenue)"
+                                        stroke="#f59e0b"
                                         strokeWidth={2}
-                                        dot={{ r: 4 }}
-                                        activeDot={{ r: 6 }}
+                                        dot={{ r: 2 }}
+                                        activeDot={{ r: 4 }}
                                     />
                                 </LineChart>
                             </ChartContainer>
@@ -566,15 +577,17 @@ export function ChartsVisuals({ dateRange }: ChartsVisualsProps) {
                     </CardContent>
                 </Card>
 
-                <Card>
-                    <CardHeader className="flex flex-row items-center justify-between">
-                        <div>
-                            <CardTitle>Order Status Distribution</CardTitle>
-                            <CardDescription>Breakdown of orders by current status.</CardDescription>
+                {/* ORDER STATUS */}
+                <Card className="bg-zinc-950/30 border-zinc-800 backdrop-blur-sm shadow-sm hover:border-emerald-500/20 transition-colors">
+                    <CardHeader className="flex flex-row items-center justify-between pb-2">
+                        <div className="space-y-1">
+                            <CardTitle className="text-zinc-200 font-mono tracking-tight uppercase text-sm">Order Status</CardTitle>
+                            <CardDescription className="text-xs text-zinc-500">Pipeline Velocity</CardDescription>
                         </div>
                         <Button
                             variant="ghost"
-                            size="sm"
+                            size="icon"
+                            className="h-8 w-8 text-zinc-600 hover:text-emerald-500"
                             onClick={() => exportToCSV(orderStatusData, 'order-status')}
                             disabled={orderStatusData.length === 0}
                         >
@@ -582,27 +595,20 @@ export function ChartsVisuals({ dateRange }: ChartsVisualsProps) {
                         </Button>
                     </CardHeader>
                     <CardContent className="flex items-center justify-center">
-                        {orderStatusData.length === 0 ? (
-                            <div className="h-[200px] flex items-center justify-center text-muted-foreground">
-                                <p>No order data available</p>
-                            </div>
-                        ) : (
-                            <ChartContainer config={chartConfigPie} className="h-[200px]">
-                                <PieChart width={200} height={200}>
-                                    <Tooltip
-                                        cursor={{ fill: 'hsl(var(--muted))' }}
-                                        content={<ChartTooltipContent hideLabel />}
-                                    />
-                                    <Pie data={orderStatusData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={80} strokeWidth={2}>
-                                        {orderStatusData.map((entry, index) => (
-                                            <Cell key={`cell-${index}`} fill={entry.fill} />
-                                        ))}
-                                    </Pie>
-                                </PieChart>
-                            </ChartContainer>
-                        )}
+                        <ChartContainer config={chartConfigPie} className="h-[200px] w-full max-w-[300px]">
+                            <PieChart>
+                                <Tooltip content={<ChartTooltipContent hideLabel className="bg-zinc-950 border-zinc-800 font-mono" />} />
+                                <Pie data={orderStatusData} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={60} outerRadius={80} strokeWidth={2} stroke="rgba(0,0,0,0)">
+                                    {orderStatusData.map((entry, index) => (
+                                        <Cell key={`cell-${index}`} fill={['#f59e0b', '#3b82f6', '#8b5cf6', '#10b981', '#ef4444'][index % 5]} />
+                                    ))}
+                                </Pie>
+                                <ChartLegend content={<ChartLegendContent />} className="-translate-y-2 flex-wrap gap-2 justify-center" />
+                            </PieChart>
+                        </ChartContainer>
                     </CardContent>
                 </Card>
+
             </div>
         </div>
     );

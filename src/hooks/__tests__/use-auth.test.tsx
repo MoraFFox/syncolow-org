@@ -68,10 +68,10 @@ describe('useAuth', () => {
     // Default: no session
     mockGetSession.mockResolvedValue({ data: { session: null } });
     mockOnAuthStateChange.mockImplementation(() => ({ data: { subscription: { unsubscribe: mockUnsubscribe } } }));
-    
+
     // Mock window.location
     Object.defineProperty(window, 'location', {
-      value: { origin: 'http://localhost:3000' },
+      value: { origin: 'http://localhost:3001' },
       writable: true,
     });
   });
@@ -83,12 +83,12 @@ describe('useAuth', () => {
   describe('useAuth context validation', () => {
     it('should throw error when used outside AuthProvider', () => {
       // Suppress console.error for this test
-      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-      
+      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => { });
+
       expect(() => {
         renderHook(() => useAuth());
       }).toThrow('useAuth must be used within an AuthProvider');
-      
+
       consoleSpy.mockRestore();
     });
   });
@@ -307,7 +307,7 @@ describe('useAuth', () => {
       expect(mockResetPasswordForEmail).toHaveBeenCalledWith(
         'reset@example.com',
         {
-          redirectTo: 'http://localhost:3000/auth/callback?next=/account/update-password',
+          redirectTo: 'http://localhost:3001/auth/callback?next=/account/update-password',
         }
       );
     });
@@ -467,7 +467,7 @@ describe('useAuth', () => {
 
     it('should update user when auth state changes', async () => {
       let authCallback: ((event: string, session: { user: Record<string, unknown> } | null) => void) | null = null;
-      
+
       mockGetSession.mockResolvedValue({ data: { session: null } });
       mockOnAuthStateChange.mockImplementation((callback) => {
         authCallback = callback;
@@ -507,7 +507,7 @@ describe('useAuth', () => {
 
     it('should only update user when data actually changes', async () => {
       let authCallback: ((event: string, session: { user: Record<string, unknown> } | null) => void) | null = null;
-      
+
       const mockSession = {
         user: {
           id: 'user-123',
@@ -518,7 +518,7 @@ describe('useAuth', () => {
           },
         },
       };
-      
+
       mockGetSession.mockResolvedValue({ data: { session: mockSession } });
       mockOnAuthStateChange.mockImplementation((callback) => {
         authCallback = callback;

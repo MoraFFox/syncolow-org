@@ -17,12 +17,12 @@ export function MaintenanceDetailDialog({ isOpen, onOpenChange }: MaintenanceDet
   const { payload } = useDrillDownStore();
   const [maintenanceData, setMaintenanceData] = React.useState<any>(null);
   const [isLoading, setIsLoading] = React.useState(false);
-  
+
   // Fetch real maintenance data from Supabase  
   React.useEffect(() => {
     if (!isOpen || !payload) return;
     if (!("id" in payload)) return;
-    
+
     const fetchMaintenanceData = async () => {
       setIsLoading(true);
       try {
@@ -30,14 +30,14 @@ export function MaintenanceDetailDialog({ isOpen, onOpenChange }: MaintenanceDet
         const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
         const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
         const supabase = createClient(supabaseUrl, supabaseKey);
-        
+
         // Note: Replace 'maintenance_visits' with your actual table name
         const { data, error } = await supabase
           .from('maintenance_visits')
           .select('*')
           .eq('id', (payload as any).id)
           .single();
-        
+
         if (error || !data) {
           console.error('Failed to fetch maintenance data:', error);
           // Fallback data if table doesn't exist yet
@@ -71,7 +71,7 @@ export function MaintenanceDetailDialog({ isOpen, onOpenChange }: MaintenanceDet
         setIsLoading(false);
       }
     };
-    
+
     fetchMaintenanceData();
   }, [isOpen, payload]);
 

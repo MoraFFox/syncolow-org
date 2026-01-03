@@ -54,6 +54,8 @@ export default {
       },
       fontFamily: {
         sans: ['var(--font-sans)', ...fontFamily.sans],
+        mono: ['var(--font-mono)', ...fontFamily.mono],
+        display: ['var(--font-display)', ...fontFamily.sans],
       },
       borderRadius: {
         lg: 'var(--radius)',

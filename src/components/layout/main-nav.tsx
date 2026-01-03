@@ -52,15 +52,15 @@ const mainMenuItems = [
     label: 'Products',
     icon: Package,
     subItems: [
-        { href: '/products/categories', label: 'Categories', icon: Tags },
+      { href: '/products/categories', label: 'Categories', icon: Tags },
     ]
   },
-  { 
-    href: '/orders', 
-    label: 'Orders', 
+  {
+    href: '/orders',
+    label: 'Orders',
     icon: ShoppingCart,
     subItems: [
-        { href: '/orders/areas', label: 'Areas', icon: Map },
+      { href: '/orders/areas', label: 'Areas', icon: Map },
     ]
   },
   { href: '/payments', label: 'Payments', icon: CreditCard },
@@ -69,9 +69,9 @@ const mainMenuItems = [
     label: 'Maintenance',
     icon: Wrench,
     subItems: [
-        { href: '/maintenance/services', label: 'Services Catalog', icon: Tags },
+      { href: '/maintenance/services', label: 'Services Catalog', icon: Tags },
     ]
-   },
+  },
   { href: '/baristas', label: 'Baristas', icon: HardHat },
   { href: '/visits', label: 'Visits & Calls', icon: Phone },
   { href: '/feedback', label: 'Feedback', icon: Star },
@@ -119,18 +119,18 @@ export function MainNav() {
       <div>
         <Separator className="my-2" />
         <SidebarMenu>
-            <SidebarMenuItem>
-                <SidebarMenuButton
-                asChild
-                isActive={pathname.startsWith(settingsMenuItem.href)}
-                className="w-full"
-                >
-                <Link href={settingsMenuItem.href}>
-                    <settingsMenuItem.icon className="h-4 w-4" />
-                    <span>{settingsMenuItem.label}</span>
-                </Link>
-                </SidebarMenuButton>
-            </SidebarMenuItem>
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              asChild
+              isActive={pathname.startsWith(settingsMenuItem.href)}
+              className="w-full"
+            >
+              <Link href={settingsMenuItem.href}>
+                <settingsMenuItem.icon className="h-4 w-4" />
+                <span>{settingsMenuItem.label}</span>
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
         </SidebarMenu>
       </div>
     </div>

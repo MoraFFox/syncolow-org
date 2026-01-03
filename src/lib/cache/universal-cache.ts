@@ -27,42 +27,40 @@ export class UniversalCache implements IUniversalCache {
     fetcher: () => Promise<T>,
     options: CacheOptions = {}
   ): Promise<T> {
-    const { staleTime = 30000, gcTime = 5 * 60 * 1000 } = options;
+    const { staleTime = 5 * 60 * 1000, gcTime = 24 * 60 * 60 * 1000 } = options;
     const queryKey = key as unknown as QueryKey;
 
-    // 1. Check if we have data in memory
+    // 1. Check if we have fresh data in memory
     const state = this.queryClient.getQueryState(queryKey);
-    if (state?.data) {
-      // React Query handles staleness automatically if we use fetchQuery/ensureQueryData
-      return this.queryClient.ensureQueryData({
-        queryKey,
-        queryFn: fetcher,
-        staleTime,
-        gcTime,
-      });
+    const isStale = !state?.dataUpdatedAt || Date.now() - state.dataUpdatedAt > staleTime;
+
+    if (state?.data && !isStale) {
+      // Data exists and is fresh, return it
+      return state.data as T;
     }
 
-    // 2. Check Layer 2 (IndexedDB)
-    // We try to hydrate from IDB before letting React Query fetch
-    try {
-      const cachedEntry = await idbStorage.get(key);
-      if (cachedEntry) {
-        // Hydrate into React Query
-        // We set the data and the updated timestamp so RQ knows how old it is
-        this.queryClient.setQueryData(queryKey, cachedEntry.value, {
-          updatedAt: cachedEntry.metadata.createdAt
-        });
+    // 2. Try to hydrate from Layer 2 (IndexedDB) if no data in memory
+    if (!state?.data) {
+      try {
+        const cachedEntry = await idbStorage.get(key);
+        if (cachedEntry) {
+          // Hydrate into React Query
+          this.queryClient.setQueryData(queryKey, cachedEntry.value, {
+            updatedAt: cachedEntry.metadata.createdAt
+          });
+
+          // Check if hydrated data is still fresh
+          if (Date.now() - cachedEntry.metadata.createdAt < staleTime) {
+            return cachedEntry.value as T;
+          }
+        }
+      } catch (_err) {
+        logger.warn('Failed to hydrate from cache', { component: 'UniversalCache', action: 'hydrateFromIndexedDB' });
       }
-    } catch (err) {
-      logger.warn('Failed to hydrate from cache', { component: 'UniversalCache', action: 'hydrateFromIndexedDB', key: String(key) });
     }
 
-    // 3. Fetch (or return hydrated data if it was set)
-    // ensureQueryData will:
-    // - Return immediately if data exists and is fresh
-    // - Return immediately if data exists and is stale (but trigger background refetch)
-    // - Fetch if no data exists
-    return this.queryClient.ensureQueryData({
+    // 3. Data is stale or missing - fetch fresh data
+    return this.queryClient.fetchQuery({
       queryKey,
       queryFn: fetcher,
       staleTime,
@@ -73,7 +71,7 @@ export class UniversalCache implements IUniversalCache {
   /**
    * Manually set data into the cache.
    */
-  set<T>(key: CacheKey, value: T, options?: CacheOptions): void {
+  set<T>(key: CacheKey, value: T, _options?: CacheOptions): void {
     this.queryClient.setQueryData(key as unknown as QueryKey, value);
     // Persister will automatically pick this up and save to IDB
   }
@@ -109,9 +107,9 @@ export class UniversalCache implements IUniversalCache {
   getMetrics(): CacheMetrics {
     const cache = this.queryClient.getQueryCache();
     const all = cache.getAll();
-    
+
     return {
-      hits: { 
+      hits: {
         memory: all.filter(q => q.state.dataUpdateCount > 0).length, // Proxy metric
         disk: 0 // Hard to track without hooking into IDB get
       },

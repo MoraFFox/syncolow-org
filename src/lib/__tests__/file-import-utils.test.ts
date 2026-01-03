@@ -12,6 +12,79 @@ vi.mock('@/lib/supabase', () => ({
   },
 }));
 
+// Mock Worker for Node environment
+class MockWorker {
+  onmessage: (event: any) => void = () => { };
+  onerror: (err: any) => void = () => { };
+  terminate() { }
+  postMessage(message: any) {
+    // Simulate worker behavior
+    setTimeout(() => {
+      if (message.type === 'PARSE_CSV') {
+        // Return mock CSV data
+        this.onmessage({
+          data: {
+            type: 'SUCCESS',
+            data: [
+              {
+                'Customer Name': 'Test Company A',
+                'Cust Account': '1001',
+                'Item Name': 'Widget A',
+                'Quantity': '10',
+                'Price': '100',
+                'Amount': '1000'
+              },
+              {
+                'Customer Name': 'Test Company B',
+                'Cust Account': '1002',
+                'Item Name': 'Widget B',
+                'Quantity': '5',
+                'Price': '200',
+                'Amount': '1000'
+              },
+              {
+                'Customer Name': 'Test Company C',
+                'Cust Account': '1003',
+                'Item Name': 'Widget C',
+                'Quantity': '2',
+                'Price': '500',
+                'Amount': '1000'
+              }
+            ]
+          }
+        });
+      } else if (message.type === 'PARSE_EXCEL') {
+        // Return mock Excel data
+        this.onmessage({
+          data: {
+            type: 'SUCCESS',
+            data: [
+              {
+                'Customer Name': 'Test Company A',
+                'Cust Account': '1001',
+                'Item Name': 'Widget A',
+                'Inv. Qty': '10',
+                'Price': '100',
+                'Amount': '1000'
+              },
+              {
+                'Customer Name': 'Test Company B',
+                'Cust Account': '1002',
+                'Item Name': 'Widget B',
+                'Inv. Qty': '5',
+                'Price': '200',
+                'Amount': '1000'
+              }
+            ]
+          }
+        });
+      }
+    }, 0);
+  }
+}
+
+global.Worker = MockWorker as any;
+
 describe('File Import Utils Integration', () => {
   const fixturesDir = path.join(__dirname, '../../test/fixtures');
   const csvPath = path.join(fixturesDir, 'products.csv');

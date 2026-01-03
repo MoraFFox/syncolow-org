@@ -2,10 +2,10 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import type { Notification } from '../types';
 
 // Use vi.hoisted() to define mocks before vi.mock hoisting
-const { 
-  mockEq, mockLt, mockOrder, mockLimit, mockSelect, mockInsert, 
-  mockUpdate, mockDelete, mockSingle, mockSubscribe, mockChannel, 
-  mockOn, mockRemoveChannel, mockFrom, buildChain 
+const {
+  mockEq, mockLt, mockOrder, mockLimit, mockSelect, mockInsert,
+  mockUpdate, mockDelete, mockSingle, mockSubscribe, mockChannel,
+  mockOn, mockRemoveChannel, mockFrom, buildChain
 } = vi.hoisted(() => {
   const mockEq = vi.fn();
   const mockLt = vi.fn();
@@ -22,25 +22,39 @@ const {
   const mockRemoveChannel = vi.fn();
 
   // Build chainable mock
-  const buildChain = () => ({
-    select: mockSelect.mockReturnThis(),
-    insert: mockInsert.mockReturnThis(),
-    update: mockUpdate.mockReturnThis(),
-    delete: mockDelete.mockReturnThis(),
-    eq: mockEq.mockReturnThis(),
-    lt: mockLt.mockReturnThis(),
-    order: mockOrder.mockReturnThis(),
-    limit: mockLimit.mockReturnThis(),
-    single: mockSingle,
-    then: vi.fn(),
-  });
+  const buildChain = () => {
+    const chain = {
+      select: mockSelect,
+      insert: mockInsert,
+      update: mockUpdate,
+      delete: mockDelete,
+      eq: mockEq,
+      lt: mockLt,
+      order: mockOrder,
+      limit: mockLimit,
+      single: mockSingle,
+      then: (onSuccess: any) => Promise.resolve({ data: null, error: null }).then(onSuccess),
+    };
+
+    mockSelect.mockReturnValue(chain);
+    mockInsert.mockReturnValue(chain);
+    mockUpdate.mockReturnValue(chain);
+    mockDelete.mockReturnValue(chain);
+    mockEq.mockReturnValue(chain);
+    mockLt.mockReturnValue(chain);
+    mockOrder.mockReturnValue(chain);
+    mockLimit.mockReturnValue(chain);
+    mockSingle.mockReturnValue(chain);
+
+    return chain;
+  };
 
   const mockFrom = vi.fn(() => buildChain());
 
-  return { 
-    mockEq, mockLt, mockOrder, mockLimit, mockSelect, mockInsert, 
-    mockUpdate, mockDelete, mockSingle, mockSubscribe, mockChannel, 
-    mockOn, mockRemoveChannel, mockFrom, buildChain 
+  return {
+    mockEq, mockLt, mockOrder, mockLimit, mockSelect, mockInsert,
+    mockUpdate, mockDelete, mockSingle, mockSubscribe, mockChannel,
+    mockOn, mockRemoveChannel, mockFrom, buildChain
   };
 });
 
@@ -356,14 +370,10 @@ describe('NotificationService', () => {
     it('should update all unread notifications for user', async () => {
       vi.setSystemTime(new Date('2024-01-15T15:00:00.000Z'));
 
-      const mockChain = {
-        update: mockUpdate.mockReturnValue({
-          eq: mockEq.mockReturnValue({
-            eq: mockEq.mockResolvedValue({ error: null }),
-          }),
-        }),
-      };
-      mockFrom.mockReturnValue(mockChain);
+      const chain = buildChain();
+      mockFrom.mockReturnValue(chain);
+
+      // Default then in buildChain returns { data: null, error: null }
 
       await NotificationService.markAllAsRead('user-1');
 
@@ -377,13 +387,11 @@ describe('NotificationService', () => {
     });
 
     it('should throw error when batch update fails', async () => {
-      mockFrom.mockReturnValue({
-        update: mockUpdate.mockReturnValue({
-          eq: mockEq.mockReturnValue({
-            eq: mockEq.mockResolvedValue({ error: new Error('Batch update failed') }),
-          }),
-        }),
-      });
+      const chain = buildChain();
+      mockFrom.mockReturnValue(chain);
+
+      chain.then = (onSuccess: any) =>
+        Promise.resolve({ error: new Error('Batch update failed') }).then(onSuccess);
 
       await expect(
         NotificationService.markAllAsRead('user-1')

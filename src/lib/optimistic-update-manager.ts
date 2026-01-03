@@ -2,7 +2,8 @@
 /** @format */
 
 import { supabase } from './supabase';
-import { addToOfflineQueue } from './indexeddb-storage';
+import { useOfflineQueueStore } from '@/store/use-offline-queue-store';
+import { requestBackgroundSync } from './service-worker-manager';
 
 type Operation = 'create' | 'update' | 'delete';
 type RollbackFn = () => void;
@@ -17,17 +18,40 @@ interface OptimisticUpdate {
 
 const pendingUpdates = new Map<string, OptimisticUpdate>();
 
-export async function optimisticCreate<T extends Record<string, any>>(
+/**
+ * Helper to add operation to offline queue and trigger background sync
+ */
+async function enqueueOfflineOperation(
+  operation: 'create' | 'update' | 'delete',
+  collection: string,
+  data?: Record<string, unknown>,
+  docId?: string
+): Promise<void> {
+  const { addToQueue } = useOfflineQueueStore.getState();
+
+  await addToQueue({
+    operation,
+    collection,
+    data,
+    docId,
+    priority: 1,
+  });
+
+  // Request background sync to process the queue when online
+  await requestBackgroundSync();
+}
+
+export async function optimisticCreate<T extends Record<string, unknown>>(
   collectionName: string,
   data: T,
   onSuccess: (id: string) => void,
   onRollback: () => void
 ): Promise<string> {
   const tempId = `temp_${Date.now()}_${Math.random()}`;
-  
+
   // Apply optimistic update
   onSuccess(tempId);
-  
+
   const updateId = `${collectionName}_${tempId}`;
   pendingUpdates.set(updateId, {
     id: updateId,
@@ -39,10 +63,10 @@ export async function optimisticCreate<T extends Record<string, any>>(
 
   try {
     const { data: insertedData, error } = await supabase
-        .from(collectionName)
-        .insert(data)
-        .select()
-        .single();
+      .from(collectionName)
+      .insert(data)
+      .select()
+      .single();
 
     if (error) throw error;
 
@@ -51,7 +75,7 @@ export async function optimisticCreate<T extends Record<string, any>>(
     return insertedData.id;
   } catch (error) {
     if (!navigator.onLine) {
-      await addToOfflineQueue({ id: tempId, operation: 'create', collection: collectionName, data, timestamp: Date.now(), retries: 0, priority: 1 });
+      await enqueueOfflineOperation('create', collectionName, data);
       return tempId;
     }
     // Rollback on error
@@ -61,7 +85,7 @@ export async function optimisticCreate<T extends Record<string, any>>(
   }
 }
 
-export async function optimisticUpdate<T extends Record<string, any>>(
+export async function optimisticUpdate<T extends Record<string, unknown>>(
   collectionName: string,
   docId: string,
   updates: Partial<T>,
@@ -69,10 +93,10 @@ export async function optimisticUpdate<T extends Record<string, any>>(
   onUpdate: (data: Partial<T>) => void
 ): Promise<void> {
   const previousState = getCurrentState();
-  
+
   // Apply optimistic update
   onUpdate(updates);
-  
+
   const updateId = `${collectionName}_${docId}`;
   pendingUpdates.set(updateId, {
     id: updateId,
@@ -84,15 +108,15 @@ export async function optimisticUpdate<T extends Record<string, any>>(
 
   try {
     const { error } = await supabase
-        .from(collectionName)
-        .update(updates)
-        .eq('id', docId);
+      .from(collectionName)
+      .update(updates)
+      .eq('id', docId);
 
     if (error) throw error;
     pendingUpdates.delete(updateId);
   } catch (error) {
     if (!navigator.onLine) {
-      await addToOfflineQueue({ id: `${collectionName}_${docId}`, operation: 'update', collection: collectionName, docId, data: updates, timestamp: Date.now(), retries: 0, priority: 1 });
+      await enqueueOfflineOperation('update', collectionName, { id: docId, ...updates }, docId);
       return;
     }
     // Rollback on error
@@ -110,7 +134,7 @@ export async function optimisticDelete(
 ): Promise<void> {
   // Apply optimistic delete
   onDelete();
-  
+
   const updateId = `${collectionName}_${docId}`;
   pendingUpdates.set(updateId, {
     id: updateId,
@@ -122,15 +146,15 @@ export async function optimisticDelete(
 
   try {
     const { error } = await supabase
-        .from(collectionName)
-        .delete()
-        .eq('id', docId);
+      .from(collectionName)
+      .delete()
+      .eq('id', docId);
 
     if (error) throw error;
     pendingUpdates.delete(updateId);
   } catch (error) {
     if (!navigator.onLine) {
-      await addToOfflineQueue({ id: `${collectionName}_${docId}`, operation: 'delete', collection: collectionName, docId, timestamp: Date.now(), retries: 0, priority: 1 });
+      await enqueueOfflineOperation('delete', collectionName, undefined, docId);
       return;
     }
     // Rollback on error

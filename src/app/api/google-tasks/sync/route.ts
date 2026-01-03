@@ -1,11 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { withTraceContext } from '@/lib/with-trace-context';
 import { googleTasksService } from '@/services/google-tasks-service';
 import { cookies } from 'next/headers';
 import { logger } from '@/lib/logger';
 
-const LIST_TITLE = 'SynergyFlow Visits';
+interface GoogleTaskList {
+  id: string;
+  title: string;
+}
 
-export async function POST(request: NextRequest) {
+interface GoogleTask {
+  id: string;
+  title: string;
+  status: string;
+  completed?: string;
+}
+
+const LIST_TITLE = 'SynergyFlow Tasks';
+
+export const POST = withTraceContext(async (request: NextRequest) => {
   try {
     const cookieStore = await cookies();
     const tokensCookie = cookieStore.get('google_tasks_tokens');
@@ -16,14 +29,14 @@ export async function POST(request: NextRequest) {
 
     const tokens = JSON.parse(tokensCookie.value);
     const body = await request.json();
-    const { action, visitId, taskData, taskId } = body;
+    const { action, visitId: _visitId, taskData, taskId } = body;
 
     // 1. Ensure Task List Exists
     let taskListId = body.taskListId;
     if (!taskListId) {
       const lists = await googleTasksService.getTaskLists(tokens);
       const existingList = lists.find((l: any) => l.title === LIST_TITLE);
-      
+
       if (existingList) {
         taskListId = existingList.id;
       } else {
@@ -45,27 +58,27 @@ export async function POST(request: NextRequest) {
     }
 
     if (action === 'check_completion') {
-       if (!taskId) return NextResponse.json({ error: 'Missing taskId' }, { status: 400 });
-       const task = await googleTasksService.getTask(tokens, taskListId, taskId);
-       const isCompleted = task.status === 'completed';
-       return NextResponse.json({ success: true, isCompleted, completedDate: task.completed, taskListId });
+      if (!taskId) return NextResponse.json({ error: 'Missing taskId' }, { status: 400 });
+      const task = await googleTasksService.getTask(tokens, taskListId, taskId);
+      const isCompleted = task.status === 'completed';
+      return NextResponse.json({ success: true, isCompleted, completedDate: task.completed, taskListId });
     }
 
     if (action === 'check_batch_completion') {
-        const { taskIds } = body;
-        if (!Array.isArray(taskIds)) return NextResponse.json({ error: 'Invalid taskIds' }, { status: 400 });
-        
-        // Fetch all tasks (pagination is now handled in the service)
-        const allTasks = await googleTasksService.listTasks(tokens, taskListId);
-        const allTaskIds = new Set(allTasks.map((t: any) => t.id));
-        
-        const completedTaskIds = allTasks
-            .filter((t: any) => taskIds.includes(t.id) && t.status === 'completed')
-            .map((t: any) => t.id);
-            
-        const missingTaskIds = taskIds.filter((id: string) => !allTaskIds.has(id));
-            
-        return NextResponse.json({ success: true, completedTaskIds, missingTaskIds, taskListId });
+      const { taskIds } = body;
+      if (!Array.isArray(taskIds)) return NextResponse.json({ error: 'Invalid taskIds' }, { status: 400 });
+
+      // Fetch all tasks (pagination is now handled in the service)
+      const allTasks = await googleTasksService.listTasks(tokens, taskListId);
+      const allTaskIds = new Set(allTasks.map((t: any) => t.id as string));
+
+      const completedTaskIds = allTasks
+        .filter((t: any) => taskIds.includes(t.id) && t.status === 'completed')
+        .map((t: any) => t.id as string);
+
+      const missingTaskIds = taskIds.filter((id: string) => !allTaskIds.has(id));
+
+      return NextResponse.json({ success: true, completedTaskIds, missingTaskIds, taskListId });
     }
 
     return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
@@ -74,4 +87,4 @@ export async function POST(request: NextRequest) {
     logger.error(error, { component: 'GoogleTasksSyncAPI', action: 'POST' });
     return NextResponse.json({ error: 'Failed to sync task' }, { status: 500 });
   }
-}
+});

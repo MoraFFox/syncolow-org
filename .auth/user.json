@@ -2,7 +2,7 @@
   "cookies": [],
   "origins": [
     {
-      "origin": "http://localhost:9002",
+      "origin": "http://localhost:3001",
       "localStorage": [
         {
           "name": "sb-ebbigogxixgbajqijgpp-auth-token",

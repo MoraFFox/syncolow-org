@@ -607,7 +607,7 @@ Implementation Log — Dashboard Enhancement (2025-12-05)
 
 8. Verification
    - Lint clean for `src/app/dashboard`
-   - Dev preview verified via `http://localhost:9002/`
+   - Dev preview verified via `http://localhost:3001/`
 
 Notes
 

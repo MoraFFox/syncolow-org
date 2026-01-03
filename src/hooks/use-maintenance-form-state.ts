@@ -65,9 +65,10 @@ export function useMaintenanceFormState<T extends FieldValues>(
     if (isOpen && visit) {
       const actualArrivalDateValue = parseDateSafely(visit.actualArrivalDate);
       const resolutionDateValue = parseDateSafely(visit.resolutionDate);
-      const scheduledDateValue = visit.scheduledDate
-        ? formatDateForForm(visit.scheduledDate)
-        : formatDateForForm(visit.date);
+      let scheduledDateValue = formatDateForForm(visit.scheduledDate);
+      if (!scheduledDateValue) {
+        scheduledDateValue = formatDateForForm(visit.date);
+      }
 
       reset({
         actualArrivalDate: actualArrivalDateValue,

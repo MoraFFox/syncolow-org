@@ -18,11 +18,13 @@ export type NotificationSettings = {
 interface SettingsState {
   viewMode: ViewMode;
   ordersViewMode: 'list' | 'grid';
+  clientsViewMode: 'list' | 'grid';
   paginationLimit: number;
   notificationSettings: NotificationSettings;
   setPaginationLimit: (limit: number) => void;
   setViewMode: (mode: ViewMode) => void;
   setOrdersViewMode: (mode: 'list' | 'grid') => void;
+  setClientsViewMode: (mode: 'list' | 'grid') => void;
   toggleNotificationType: (type: NotificationType) => void;
 }
 
@@ -51,11 +53,13 @@ export const useSettingsStore = create<SettingsState>()(
     (set) => ({
       viewMode: 'Comfortable',
       ordersViewMode: 'grid',
+      clientsViewMode: 'grid',
       paginationLimit: 20,
       notificationSettings: defaultNotificationSettings,
       setPaginationLimit: (limit) => set({ paginationLimit: limit }),
       setViewMode: (mode) => set({ viewMode: mode }),
       setOrdersViewMode: (mode) => set({ ordersViewMode: mode }),
+      setClientsViewMode: (mode) => set({ clientsViewMode: mode }),
       toggleNotificationType: (type: NotificationType) =>
         set((state) => ({
           notificationSettings: {
@@ -70,13 +74,14 @@ export const useSettingsStore = create<SettingsState>()(
     {
       name: 'synergyflow-settings-storage',
       storage: createJSONStorage(() => localStorage),
-      // Version 2: Changed default ordersViewMode from 'list' to 'grid'
-      version: 2,
+      // Version 3: Added clientsViewMode
+      version: 3,
       migrate: (persistedState: any, version) => {
-        // Migration from version 1 (or no version) to version 2
         if (version < 2) {
-          // Set the new default for existing users
           persistedState.ordersViewMode = 'grid';
+        }
+        if (version < 3) {
+          persistedState.clientsViewMode = 'grid';
         }
         return persistedState;
       },

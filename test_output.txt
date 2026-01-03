@@ -1,24 +1,76 @@
 
-> synergyflow-erp@0.1.0 test
-> vitest run src/components/ui/product-picker.test.tsx
+Running 5 tests using 5 workers
+
+  Γ£ÿ  1 [chromium] ΓÇ║ e2e\analytics.spec.ts:104:5 ΓÇ║ Analytics Dashboard ΓÇ║ should filter by account when selected (9ms)
+  Γ£ÿ  2 [chromium] ΓÇ║ e2e\analytics.spec.ts:121:5 ΓÇ║ Analytics Dashboard ΓÇ║ should revert to global view (10ms)
+  Γ£ÿ  3 [chromium] ΓÇ║ e2e\analytics.spec.ts:98:5 ΓÇ║ Analytics Dashboard ΓÇ║ should display correct KPIs for Global View (9ms)
+  Γ£ÿ  4 [chromium] ΓÇ║ e2e\analytics.spec.ts:90:5 ΓÇ║ Analytics Dashboard ΓÇ║ should display command center header and default global view (9ms)
+  Γ£ÿ  5 [chromium] ΓÇ║ e2e\analytics.spec.ts:134:5 ΓÇ║ Analytics Dashboard ΓÇ║ should display visual reports (9ms)
 
 
-[1m[46m RUN [49m[22m [36mv4.0.15 [39m[90mD:/My projects/firebase-orginal[39m
+  1) [chromium] ΓÇ║ e2e\analytics.spec.ts:90:5 ΓÇ║ Analytics Dashboard ΓÇ║ should display command center header and default global view 
 
+    Error: browserType.launch: Executable doesn't exist at C:\Users\amr\AppData\Local\ms-playwright\chromium_headless_shell-1200\chrome-headless-shell-win64\chrome-headless-shell.exe
+    ΓòöΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòù
+    Γòæ Looks like Playwright Test or Playwright was just installed or updated. Γòæ
+    Γòæ Please run the following command to download new browsers:              Γòæ
+    Γòæ                                                                         Γòæ
+    Γòæ     npx playwright install                                              Γòæ
+    Γòæ                                                                         Γòæ
+    Γòæ <3 Playwright Team                                                      Γòæ
+    ΓòÜΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓò¥
 
-ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ» Failed Suites 1 ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»
+  2) [chromium] ΓÇ║ e2e\analytics.spec.ts:98:5 ΓÇ║ Analytics Dashboard ΓÇ║ should display correct KPIs for Global View 
 
- FAIL  src/components/ui/product-picker.test.tsx [ src/components/ui/product-picker.test.tsx ]
-Error: Cannot find module '@testing-library/dom'
-Require stack:
-- D:\My projects\firebase-orginal\node_modules\@testing-library\react\dist\pure.js
- Γ¥» Object.<anonymous> node_modules/@testing-library/react/dist/pure.js:46:12
+    Error: browserType.launch: Executable doesn't exist at C:\Users\amr\AppData\Local\ms-playwright\chromium_headless_shell-1200\chrome-headless-shell-win64\chrome-headless-shell.exe
+    ΓòöΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòù
+    Γòæ Looks like Playwright Test or Playwright was just installed or updated. Γòæ
+    Γòæ Please run the following command to download new browsers:              Γòæ
+    Γòæ                                                                         Γòæ
+    Γòæ     npx playwright install                                              Γòæ
+    Γòæ                                                                         Γòæ
+    Γòæ <3 Playwright Team                                                      Γòæ
+    ΓòÜΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓò¥
 
-ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»[1/1]ΓÄ»
+  3) [chromium] ΓÇ║ e2e\analytics.spec.ts:104:5 ΓÇ║ Analytics Dashboard ΓÇ║ should filter by account when selected 
 
+    Error: browserType.launch: Executable doesn't exist at C:\Users\amr\AppData\Local\ms-playwright\chromium_headless_shell-1200\chrome-headless-shell-win64\chrome-headless-shell.exe
+    ΓòöΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòù
+    Γòæ Looks like Playwright Test or Playwright was just installed or updated. Γòæ
+    Γòæ Please run the following command to download new browsers:              Γòæ
+    Γòæ                                                                         Γòæ
+    Γòæ     npx playwright install                                              Γòæ
+    Γòæ                                                                         Γòæ
+    Γòæ <3 Playwright Team                                                      Γòæ
+    ΓòÜΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓò¥
 
-[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
-[2m      Tests [22m [2mno tests[22m
-[2m   Start at [22m 22:56:25
-[2m   Duration [22m 3.79s[2m (transform 136ms, setup 388ms, import 0ms, tests 0ms, environment 1.85s)[22m
+  4) [chromium] ΓÇ║ e2e\analytics.spec.ts:121:5 ΓÇ║ Analytics Dashboard ΓÇ║ should revert to global view ΓöÇ
 
+    Error: browserType.launch: Executable doesn't exist at C:\Users\amr\AppData\Local\ms-playwright\chromium_headless_shell-1200\chrome-headless-shell-win64\chrome-headless-shell.exe
+    ΓòöΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòù
+    Γòæ Looks like Playwright Test or Playwright was just installed or updated. Γòæ
+    Γòæ Please run the following command to download new browsers:              Γòæ
+    Γòæ                                                                         Γòæ
+    Γòæ     npx playwright install                                              Γòæ
+    Γòæ                                                                         Γòæ
+    Γòæ <3 Playwright Team                                                      Γòæ
+    ΓòÜΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓò¥
+
+  5) [chromium] ΓÇ║ e2e\analytics.spec.ts:134:5 ΓÇ║ Analytics Dashboard ΓÇ║ should display visual reports 
+
+    Error: browserType.launch: Executable doesn't exist at C:\Users\amr\AppData\Local\ms-playwright\chromium_headless_shell-1200\chrome-headless-shell-win64\chrome-headless-shell.exe
+    ΓòöΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòù
+    Γòæ Looks like Playwright Test or Playwright was just installed or updated. Γòæ
+    Γòæ Please run the following command to download new browsers:              Γòæ
+    Γòæ                                                                         Γòæ
+    Γòæ     npx playwright install                                              Γòæ
+    Γòæ                                                                         Γòæ
+    Γòæ <3 Playwright Team                                                      Γòæ
+    ΓòÜΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓò¥
+
+  5 failed
+    [chromium] ΓÇ║ e2e\analytics.spec.ts:90:5 ΓÇ║ Analytics Dashboard ΓÇ║ should display command center header and default global view 
+    [chromium] ΓÇ║ e2e\analytics.spec.ts:98:5 ΓÇ║ Analytics Dashboard ΓÇ║ should display correct KPIs for Global View 
+    [chromium] ΓÇ║ e2e\analytics.spec.ts:104:5 ΓÇ║ Analytics Dashboard ΓÇ║ should filter by account when selected 
+    [chromium] ΓÇ║ e2e\analytics.spec.ts:121:5 ΓÇ║ Analytics Dashboard ΓÇ║ should revert to global view ΓöÇΓöÇ
+    [chromium] ΓÇ║ e2e\analytics.spec.ts:134:5 ΓÇ║ Analytics Dashboard ΓÇ║ should display visual reports ΓöÇ

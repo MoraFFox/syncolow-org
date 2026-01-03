@@ -3,10 +3,38 @@ import { GlobalDrillListener } from '../global-drill-listener';
 import { useDrillDown } from '@/hooks/use-drilldown';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
-// Mock the useDrillDown hook
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { useDrillSettings } from '@/store/use-drill-settings';
+import { useDrillUserData } from '@/store/use-drill-user-data';
+
+// Mock the hooks
 vi.mock('@/hooks/use-drilldown', () => ({
   useDrillDown: vi.fn()
 }));
+
+vi.mock('@/store/use-drill-settings', () => ({
+  useDrillSettings: vi.fn()
+}));
+
+vi.mock('@/store/use-drill-user-data', () => ({
+  useDrillUserData: vi.fn()
+}));
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: false,
+    },
+  },
+});
+
+const renderWithProviders = (ui: React.ReactElement) => {
+  return render(
+    <QueryClientProvider client={queryClient}>
+      {ui}
+    </QueryClientProvider>
+  );
+};
 
 describe('GlobalDrillListener', () => {
   const mockGoToDetail = vi.fn();
@@ -16,6 +44,18 @@ describe('GlobalDrillListener', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.useFakeTimers();
+    (useDrillSettings as unknown as ReturnType<typeof vi.fn>).mockReturnValue({
+      settings: {
+        previewsEnabled: true,
+        hoverDelay: 300,
+        expandedHitArea: true,
+        hitAreaPadding: 20,
+        proximityThreshold: 100
+      }
+    });
+    (useDrillUserData as unknown as ReturnType<typeof vi.fn>).mockReturnValue({
+      onboarding: { hasSeenFirstInteractionHint: true }
+    });
     (useDrillDown as unknown as ReturnType<typeof vi.fn>).mockReturnValue({
       goToDetail: mockGoToDetail,
       showPreview: mockShowPreview,
@@ -28,11 +68,11 @@ describe('GlobalDrillListener', () => {
   });
 
   it('should trigger goToDetail on click', () => {
-    render(
+    renderWithProviders(
       <>
         <GlobalDrillListener />
-        <div 
-          data-drill-kind="order" 
+        <div
+          data-drill-kind="order"
           data-drill-payload='{"id":"123","total":100}'
         >
           Order #123
@@ -51,11 +91,11 @@ describe('GlobalDrillListener', () => {
   });
 
   it('should trigger showPreview on mouseover', () => {
-    render(
+    renderWithProviders(
       <>
         <GlobalDrillListener />
-        <div 
-          data-drill-kind="product" 
+        <div
+          data-drill-kind="product"
           data-drill-payload='{"id":"456","name":"Widget"}'
         >
           Product Widget
@@ -64,7 +104,8 @@ describe('GlobalDrillListener', () => {
     );
 
     const element = screen.getByText('Product Widget');
-    fireEvent.mouseOver(element, { clientX: 100, clientY: 200 });
+    // Use mouseMove instead of mouseOver because GlobalDrillListener (via useDrillHover) uses mousemove
+    fireEvent.mouseMove(element, { clientX: 100, clientY: 200 });
 
     act(() => {
       vi.advanceTimersByTime(1000);
@@ -78,11 +119,11 @@ describe('GlobalDrillListener', () => {
   });
 
   it('should trigger hidePreview on mouseout', () => {
-    render(
+    renderWithProviders(
       <>
         <GlobalDrillListener />
-        <div 
-          data-drill-kind="company" 
+        <div
+          data-drill-kind="company"
           data-drill-payload='{"id":"789"}'
         >
           Company
@@ -91,18 +132,18 @@ describe('GlobalDrillListener', () => {
     );
 
     const element = screen.getByText('Company');
-    fireEvent.mouseOver(element);
+    fireEvent.mouseMove(element);
     fireEvent.mouseOut(element);
 
     expect(mockHidePreview).toHaveBeenCalled();
   });
 
   it('should handle nested elements correctly', () => {
-    render(
+    renderWithProviders(
       <>
         <GlobalDrillListener />
-        <div 
-          data-drill-kind="order" 
+        <div
+          data-drill-kind="order"
           data-drill-payload='{"id":"999"}'
         >
           <span>Nested Order #999</span>
@@ -121,11 +162,11 @@ describe('GlobalDrillListener', () => {
   });
 
   it('should respect disabled attribute', () => {
-    render(
+    renderWithProviders(
       <>
         <GlobalDrillListener />
-        <div 
-          data-drill-kind="order" 
+        <div
+          data-drill-kind="order"
           data-drill-payload='{"id":"111"}'
           data-drill-disabled
         >
@@ -141,11 +182,11 @@ describe('GlobalDrillListener', () => {
   });
 
   it('should handle dialog mode', () => {
-    render(
+    renderWithProviders(
       <>
         <GlobalDrillListener />
-        <div 
-          data-drill-kind="product" 
+        <div
+          data-drill-kind="product"
           data-drill-payload='{"id":"222"}'
           data-drill-mode="dialog"
         >
@@ -165,13 +206,13 @@ describe('GlobalDrillListener', () => {
   });
 
   it('should handle invalid JSON payload gracefully', () => {
-    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    
-    render(
+    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => { });
+
+    renderWithProviders(
       <>
         <GlobalDrillListener />
-        <div 
-          data-drill-kind="order" 
+        <div
+          data-drill-kind="order"
           data-drill-payload='invalid json'
         >
           Invalid Payload
@@ -184,10 +225,10 @@ describe('GlobalDrillListener', () => {
 
     // Should not call goToDetail if payload is invalid
     expect(mockGoToDetail).not.toHaveBeenCalled();
-    
+
     // Verify error was logged
     expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('Failed to parse drill payload'), expect.any(Error));
-    
+
     consoleSpy.mockRestore();
   });
 });
