@@ -7,50 +7,106 @@ import { ArrowUpRight, ArrowDownRight, TrendingUp, Users, Package, Activity, Ale
 import { ComposedChart, Area, XAxis, Tooltip, ResponsiveContainer, CartesianGrid, YAxis, Brush, Line } from 'recharts';
 import { Button } from '@/components/ui/button';
 import { Tooltip as ShadcnTooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Calendar } from '@/components/ui/calendar';
 import { ProductConsumersList } from './product-consumers-list';
 import { ProductAffinityChart } from './product-affinity-chart';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { endOfDay } from 'date-fns';
+import { endOfDay, format, subMonths } from 'date-fns';
+import { DateRange } from 'react-day-picker';
 
 interface ProductAnalyticsDashboardProps {
     productId: string;
 }
 
 export function ProductAnalyticsDashboard({ productId }: ProductAnalyticsDashboardProps) {
-    // CRITICAL FIX: Query a wider historical range to capture all orders
-    // Orders in DB are from 2023, so we query 2 years back instead of 30 days
-    const analyticsQuery = useMemo(() => ({
+    // State for custom date range selection (affects CHART ONLY, not metrics)
+    const [customDateRange, setCustomDateRange] = useState<DateRange | undefined>(undefined);
+    const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
+
+    // Calculate optimal granularity based on date range span
+    const chartGranularity = useMemo(() => {
+        if (!customDateRange?.from || !customDateRange?.to) return 'month' as const;
+
+        const diffMs = customDateRange.to.getTime() - customDateRange.from.getTime();
+        const diffDays = diffMs / (1000 * 60 * 60 * 24);
+
+        // < 60 days: show daily
+        if (diffDays <= 60) return 'day' as const;
+        // < 180 days (6 months): show weekly
+        if (diffDays <= 180) return 'week' as const;
+        // otherwise: show monthly
+        return 'month' as const;
+    }, [customDateRange]);
+
+    // Primary analytics query for METRICS (always monthly, full range)
+    const metricsQuery = useMemo(() => ({
         entityType: 'product' as const,
         entityId: productId,
-        granularity: 'month' as const, // Use months for longer range
+        granularity: 'month' as const,
         dateRange: {
-            from: new Date('2023-01-01'), // Start of 2023 to capture historical data
-            to: endOfDay(new Date()) // Until today
+            from: new Date('2023-01-01'),
+            to: endOfDay(new Date())
         },
         metrics: ['revenue', 'orders', 'units', 'activeClients', 'returns'] as ('revenue' | 'orders' | 'units' | 'returns' | 'aov' | 'profit' | 'cogs' | 'revenueGrowthRate' | 'activeClients')[]
     }), [productId]);
 
-    const { data, isLoading } = useAnalyticsData(analyticsQuery);
+    // Secondary query for CHART (dynamic granularity based on selected range)
+    const chartQuery = useMemo(() => {
+        if (!customDateRange?.from || !customDateRange?.to) return null;
 
-    const summary = data?.summary;
-    const rawTimeSeries = data?.timeSeries || [];
+        return {
+            entityType: 'product' as const,
+            entityId: productId,
+            granularity: chartGranularity,
+            dateRange: {
+                from: customDateRange.from,
+                to: endOfDay(customDateRange.to)
+            },
+            metrics: ['revenue', 'orders'] as ('revenue' | 'orders')[]
+        };
+    }, [productId, customDateRange, chartGranularity]);
 
-    // SMART TRIM: Filter out the long tail of empty history (leading zeros)
-    // This fixes the issue where the chart looks empty on the left if the product is new
+    const { data: metricsData, isLoading: metricsLoading } = useAnalyticsData(metricsQuery);
+    const { data: chartData, isLoading: chartLoading } = useAnalyticsData(chartQuery || metricsQuery);
+
+    const summary = metricsData?.summary;
+    const rawTimeSeries = metricsData?.timeSeries || [];
+    const chartTimeSeries = chartData?.timeSeries || [];
+
+    // CHART DATA: Use custom range data if available, otherwise use filtered metrics data
     const timeSeries = useMemo(() => {
+        // If a custom range is selected and we have chart-specific data, use it
+        if (customDateRange?.from && customDateRange?.to && chartTimeSeries.length > 0) {
+            return chartTimeSeries;
+        }
+
+        // Otherwise, filter the monthly metrics data (default view)
         if (!rawTimeSeries.length) return [];
 
+        // Default: SMART TRIM - filter out leading zeros
         const firstActiveIndex = rawTimeSeries.findIndex(p => p.revenue > 0 || p.orders > 0);
-
-        // If no data ever, show last 6 months
-        if (firstActiveIndex === -1) return rawTimeSeries.slice(-6);
-
-        // Keep 2 months of "padding" before the first sale for context
+        if (firstActiveIndex === -1) {
+            return rawTimeSeries.slice(-6);
+        }
         const startIndex = Math.max(0, firstActiveIndex - 2);
         return rawTimeSeries.slice(startIndex);
-    }, [rawTimeSeries]);
+    }, [rawTimeSeries, chartTimeSeries, customDateRange]);
+
+    // DEBUG: Log chart query details
+    console.log('[Chart Debug]', {
+        customDateRange,
+        chartGranularity,
+        chartQueryExists: !!chartQuery,
+        chartTimeSeriesLength: chartTimeSeries.length,
+        rawTimeSeriesLength: rawTimeSeries.length,
+        finalTimeSeriesLength: timeSeries.length,
+        firstTimeSeriesLabel: timeSeries[0]?.label,
+    });
+
+    const isLoading = metricsLoading || (chartQuery && chartLoading);
 
     // Derive product specific data from the summary arrays
     const currentProductConsumption = useMemo(() => {
@@ -189,9 +245,94 @@ export function ProductAnalyticsDashboard({ productId }: ProductAnalyticsDashboa
                                 </ShadcnTooltip>
                             </TooltipProvider>
 
-                            <Button variant="ghost" size="icon" className="h-7 w-7 text-zinc-500 hover:text-blue-400 hover:bg-blue-500/10">
-                                <CalendarDays className="w-3.5 h-3.5" />
-                            </Button>
+                            <Popover open={isDatePickerOpen} onOpenChange={setIsDatePickerOpen}>
+                                <PopoverTrigger asChild>
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        className={`h-7 w-7 text-zinc-500 hover:text-blue-400 hover:bg-blue-500/10 ${customDateRange?.from ? 'text-blue-400 bg-blue-500/10' : ''}`}
+                                    >
+                                        <CalendarDays className="w-3.5 h-3.5" />
+                                    </Button>
+                                </PopoverTrigger>
+                                <PopoverContent className="w-auto p-0 bg-zinc-950 border-zinc-800" align="end">
+                                    <div className="p-3 border-b border-zinc-800">
+                                        <div className="flex items-center justify-between">
+                                            <span className="text-xs font-mono text-zinc-400">Select Date Range</span>
+                                            {customDateRange?.from && (
+                                                <Button
+                                                    variant="ghost"
+                                                    size="sm"
+                                                    className="h-6 text-xs text-zinc-500 hover:text-zinc-300"
+                                                    onClick={() => {
+                                                        setCustomDateRange(undefined);
+                                                        setIsDatePickerOpen(false);
+                                                    }}
+                                                >
+                                                    Reset
+                                                </Button>
+                                            )}
+                                        </div>
+                                        {customDateRange?.from && customDateRange?.to && (
+                                            <p className="text-xs text-emerald-400 mt-1">
+                                                {format(customDateRange.from, 'MMM d, yyyy')} — {format(customDateRange.to, 'MMM d, yyyy')}
+                                            </p>
+                                        )}
+                                    </div>
+                                    <Calendar
+                                        mode="range"
+                                        selected={customDateRange}
+                                        onSelect={(range) => {
+                                            console.log('[Calendar onSelect]', range, {
+                                                from: range?.from?.toISOString(),
+                                                to: range?.to?.toISOString(),
+                                            });
+                                            setCustomDateRange(range);
+                                            // Auto-close after selecting full range
+                                            if (range?.from && range?.to) {
+                                                setTimeout(() => setIsDatePickerOpen(false), 300);
+                                            }
+                                        }}
+                                        numberOfMonths={2}
+                                        className="bg-zinc-950"
+                                    />
+                                    <div className="p-2 border-t border-zinc-800 flex gap-2">
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            className="flex-1 text-xs bg-zinc-900 border-zinc-800 hover:bg-zinc-800"
+                                            onClick={() => {
+                                                setCustomDateRange({ from: subMonths(new Date(), 3), to: new Date() });
+                                                setIsDatePickerOpen(false);
+                                            }}
+                                        >
+                                            Last 3 Months
+                                        </Button>
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            className="flex-1 text-xs bg-zinc-900 border-zinc-800 hover:bg-zinc-800"
+                                            onClick={() => {
+                                                setCustomDateRange({ from: subMonths(new Date(), 6), to: new Date() });
+                                                setIsDatePickerOpen(false);
+                                            }}
+                                        >
+                                            Last 6 Months
+                                        </Button>
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            className="flex-1 text-xs bg-zinc-900 border-zinc-800 hover:bg-zinc-800"
+                                            onClick={() => {
+                                                setCustomDateRange({ from: subMonths(new Date(), 12), to: new Date() });
+                                                setIsDatePickerOpen(false);
+                                            }}
+                                        >
+                                            Last Year
+                                        </Button>
+                                    </div>
+                                </PopoverContent>
+                            </Popover>
 
                             <Button
                                 variant="ghost"
